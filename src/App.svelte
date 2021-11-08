@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DeployedList from "./elements/DeployedList/DeployedList.wc.svelte";
+  import C from "./elements/caprover/Caprover.wc.svelte";
 </script>
 
-<DeployedList />
+<C />
