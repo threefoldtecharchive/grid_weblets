@@ -96,9 +96,9 @@
         {/if}
       </div>
     {:else if success}
-      <div class="notification is-success">* Successfully deployed K8S.</div>
+      <div class="notification is-success">* Successfully deployed VM.</div>
     {:else if failed}
-      <div class="notification is-danger">* Failed to deploy K8S.</div>
+      <div class="notification is-danger">* Failed to deploy VM.</div>
     {:else}
       <div class="tabs is-centered">
         <ul>

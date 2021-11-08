@@ -1,35 +1,27 @@
 import type BaseConfig from "./baseConfig";
-const { HTTPMessageBusClient } = window.configs.client;
-const { GridClient } = window.configs.grid3_client;
+const { HTTPMessageBusClient } = window.configs?.client ?? {};
+const { GridClient } = window.configs?.grid3_client ?? {};
 
 interface IData {
   k8s?: any[];
   machines?: any[];
 }
 
+type IKey = "k8s" | "machines";
 export default class DeployedList {
   private data: IData = {};
   constructor(private readonly grid: any) {}
 
-  public get kubernetes(): IData["k8s"] {
-    if (!this.data.k8s) {
-      this._loadData("k8s");
+  public async load(key: IKey) {
+    console.log("loading", key);
+    if (!this.data[key]) {
+      const pointer = this.grid[key];
+      const list = await pointer.list();
+      const items: Promise<any>[] = list.map((n) => pointer.getObj(n));
+      this.data[key] = await Promise.all(items);
     }
-    return this.data.k8s ?? [];
-  }
 
-  public get vms(): IData["machines"] {
-    if (!this.data.machines) {
-      this._loadData("machines");
-    }
-    return this.data.machines ?? [];
-  }
-
-  private async _loadData<T extends keyof IData>(key: T): Promise<void> {
-    const mapper = (name: string) => this.grid[key].getObj(name);
-    const calls = this.grid[key].list().map(mapper);
-    this.data[key] = await Promise.all(calls as any);
-    console.log(key, this.data[key]);
+    return this.data[key];
   }
 
   public static init(configs: BaseConfig): Promise<DeployedList> {

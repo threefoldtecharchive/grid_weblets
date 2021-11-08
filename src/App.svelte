@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Kubernetes from "./elements/kubernetes/Kubernetes.wc.svelte";
+  import DeployedList from "./elements/DeployedList/DeployedList.wc.svelte";
 </script>
 
-<Kubernetes />
+<DeployedList />
