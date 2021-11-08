@@ -43,17 +43,21 @@
   ];
 
   const tabs = [
-    { label: "Base", icon: "far fa-paper-plane" },
-    { label: "Master", icon: "fas fa-shield-alt" },
-    { label: "Workers", icon: "fas fa-sitemap" },
-    { label: "Configs", icon: "fas fa-cogs" },
+    { label: "Base" },
+    { label: "Master" },
+    { label: "Workers" },
+    { label: "Configs" },
   ];
   let active: string = "Base";
   let loading = false;
+  let success = false;
+  let failed = false;
 
   let message: string;
   function onDeployKubernetes() {
     loading = true;
+    success = false;
+    failed = false;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -73,219 +77,233 @@
   }
 </script>
 
-<form on:submit|preventDefault={onDeployKubernetes} class="box">
-  <h4 class="is-size-4">Deploy a Kubernetes</h4>
+<div style="padding: 15px;">
+  <form on:submit|preventDefault={onDeployKubernetes} class="box">
+    <h4 class="is-size-4">Deploy a Kubernetes</h4>
+    <hr />
 
-  <div class="tabs is-centered is-boxed is-medium">
-    <ul>
-      {#each tabs as tab (tab.label)}
-        <li class={active === tab.label ? "is-active" : ""}>
-          <a href="#!" on:click|preventDefault={() => (active = tab.label)}>
-            <span class="icon is-small">
-              <i class={tab.icon} aria-hidden="true" />
-            </span>
-            <span>{tab.label}</span>
-          </a>
-        </li>
-      {/each}
-    </ul>
-  </div>
-
-  {#if active === "Base"}
-    <!-- Show Base Info -->
-    {#each kubernetesFields as field (field.symbol)}
-      <div class="field">
-        <p class="label">{field.label}</p>
-        <div class="control">
-          {#if field.textarea}
-            <textarea
-              class="textarea"
-              placeholder={field.placeholder}
-              bind:value={data[field.symbol]}
-            />
-          {:else}
-            <input
-              class="input"
-              type="text"
-              placeholder={field.placeholder}
-              bind:value={data[field.symbol]}
-            />
-          {/if}
-        </div>
+    {#if loading}
+      <div class="notification is-info">
+        {#if message}
+          * {message}.
+        {:else}
+          * Loading...
+        {/if}
       </div>
-    {/each}
-
-    <!-- Network info -->
-    {#each networkFields as field (field.symbol)}
-      <div class="field">
-        <p class="label">{field.label}</p>
-        <div class="control">
-          <input
-            class="input"
-            type="text"
-            placeholder={field.placeholder}
-            bind:value={data.network[field.symbol]}
-          />
-        </div>
+    {:else if success}
+      <div class="notification is-success">* Successfully deployed K8S.</div>
+    {:else if failed}
+      <div class="notification is-danger">* Failed to deploy K8S.</div>
+    {:else}
+      <div class="tabs is-centered">
+        <ul>
+          {#each tabs as tab (tab.label)}
+            <li class={active === tab.label ? "is-active" : ""}>
+              <a href="#!" on:click|preventDefault={() => (active = tab.label)}>
+                <span>{tab.label}</span>
+              </a>
+            </li>
+          {/each}
+        </ul>
       </div>
-    {/each}
-  {/if}
 
-  {#if active === "Master"}
-    <!-- Show Master Info -->
-    {#each baseFields as field (field.symbol)}
-      <div class="field">
-        <p class="label">{field.label}</p>
-        <div class="control">
-          {#if field.type === "number"}
-            <input
-              class="input"
-              type="number"
-              placeholder={field.placeholder}
-              bind:value={data.master[field.symbol]}
-            />
-          {/if}
-
-          {#if field.type === "checkbox"}
-            <label class="checkbox">
-              <input
-                type="checkbox"
-                checked={data.master[field.symbol]}
-                on:change={() =>
-                  (data.master[field.symbol] = !data.master[field.symbol])}
-              />
-              {field.label}
-            </label>
-          {/if}
-
-          {#if !field.type}
-            <input
-              class="input"
-              type="text"
-              placeholder={field.placeholder}
-              bind:value={data.master[field.symbol]}
-            />
-          {/if}
-        </div>
-      </div>
-    {/each}
-  {/if}
-
-  {#if active === "Workers"}
-    <!-- Show Workers Info -->
-    <div class="actions" style="margin-bottom: 20px;">
-      <button
-        type="button"
-        class="button is-primary is-light"
-        on:click={() => (data.workers = [...data.workers, new Worker()])}
-      >
-        <span class="icon is-medium">
-          <i class="far fa-plus-square" />
-        </span>
-        <span>ADD Worker</span>
-      </button>
-    </div>
-    <div class="worker-container">
-      {#each data.workers as worker, index (worker.id)}
-        <div class="box">
-          <div class="worker-header">
-            <p class="is-size-5 has-text-weight-bold">{worker.name}</p>
-            <button
-              type="button"
-              class="button is-danger is-outlined"
-              on:click={() =>
-                (data.workers = data.workers.filter((_, i) => index !== i))}
-            >
-              <span>Delete</span>
-              <span class="icon is-small">
-                <i class="fas fa-times" />
-              </span>
-            </button>
+      {#if active === "Base"}
+        <!-- Show Base Info -->
+        {#each kubernetesFields as field (field.symbol)}
+          <div class="field">
+            <p class="label">{field.label}</p>
+            <div class="control">
+              {#if field.textarea}
+                <textarea
+                  class="textarea"
+                  placeholder={field.placeholder}
+                  bind:value={data[field.symbol]}
+                />
+              {:else}
+                <input
+                  class="input"
+                  type="text"
+                  placeholder={field.placeholder}
+                  bind:value={data[field.symbol]}
+                />
+              {/if}
+            </div>
           </div>
-          {#each baseFields as field (field.symbol)}
-            <div class="field">
-              <p class="label">{field.label}</p>
-              <div class="control">
-                {#if field.type === "number"}
-                  <input
-                    class="input"
-                    type="number"
-                    placeholder={field.placeholder}
-                    bind:value={worker[field.symbol]}
-                  />
-                {/if}
+        {/each}
 
-                {#if field.type === "checkbox"}
-                  <label class="checkbox">
-                    <input
-                      type="checkbox"
-                      checked={worker[field.symbol]}
-                      on:change={() =>
-                        (worker[field.symbol] = !worker[field.symbol])}
-                    />
-                    {field.label}
-                  </label>
-                {/if}
+        <!-- Network info -->
+        {#each networkFields as field (field.symbol)}
+          <div class="field">
+            <p class="label">{field.label}</p>
+            <div class="control">
+              <input
+                class="input"
+                type="text"
+                placeholder={field.placeholder}
+                bind:value={data.network[field.symbol]}
+              />
+            </div>
+          </div>
+        {/each}
+      {/if}
 
-                {#if !field.type}
+      {#if active === "Master"}
+        <!-- Show Master Info -->
+        {#each baseFields as field (field.symbol)}
+          <div class="field">
+            <p class="label">{field.label}</p>
+            <div class="control">
+              {#if field.type === "number"}
+                <input
+                  class="input"
+                  type="number"
+                  placeholder={field.placeholder}
+                  bind:value={data.master[field.symbol]}
+                />
+              {/if}
+
+              {#if field.type === "checkbox"}
+                <label class="checkbox">
                   <input
-                    class="input"
-                    type="text"
-                    placeholder={field.placeholder}
-                    bind:value={worker[field.symbol]}
+                    type="checkbox"
+                    checked={data.master[field.symbol]}
+                    on:change={() =>
+                      (data.master[field.symbol] = !data.master[field.symbol])}
                   />
-                {/if}
+                  {field.label}
+                </label>
+              {/if}
+
+              {#if !field.type}
+                <input
+                  class="input"
+                  type="text"
+                  placeholder={field.placeholder}
+                  bind:value={data.master[field.symbol]}
+                />
+              {/if}
+            </div>
+          </div>
+        {/each}
+      {/if}
+
+      {#if active === "Workers"}
+        <!-- Show Workers Info -->
+        <div class="actions" style="margin-bottom: 20px;">
+          <button
+            type="button"
+            class="button is-primary is-light"
+            on:click={() => (data.workers = [...data.workers, new Worker()])}
+          >
+            <span>+ ADD Worker</span>
+          </button>
+        </div>
+        <div class="worker-container">
+          {#each data.workers as worker, index (worker.id)}
+            <div class="box">
+              <div class="worker-header">
+                <p class="is-size-5 has-text-weight-bold">{worker.name}</p>
+                <button
+                  type="button"
+                  class="button is-danger is-outlined"
+                  on:click={() =>
+                    (data.workers = data.workers.filter((_, i) => index !== i))}
+                >
+                  <span>Delete</span>
+                </button>
               </div>
+              {#each baseFields as field (field.symbol)}
+                <div class="field">
+                  <p class="label">{field.label}</p>
+                  <div class="control">
+                    {#if field.type === "number"}
+                      <input
+                        class="input"
+                        type="number"
+                        placeholder={field.placeholder}
+                        bind:value={worker[field.symbol]}
+                      />
+                    {/if}
+
+                    {#if field.type === "checkbox"}
+                      <label class="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={worker[field.symbol]}
+                          on:change={() =>
+                            (worker[field.symbol] = !worker[field.symbol])}
+                        />
+                        {field.label}
+                      </label>
+                    {/if}
+
+                    {#if !field.type}
+                      <input
+                        class="input"
+                        type="text"
+                        placeholder={field.placeholder}
+                        bind:value={worker[field.symbol]}
+                      />
+                    {/if}
+                  </div>
+                </div>
+              {/each}
             </div>
           {/each}
         </div>
-      {/each}
-    </div>
-  {/if}
+      {/if}
 
-  {#if active === "Configs"}
-    {#each configFields as field (field.symbol)}
-      <div class="field">
-        <p class="label">{field.label}</p>
-        <div class="control">
-          {#if field.type === "number"}
-            <input
-              class="input"
-              type="number"
-              placeholder={field.placeholder}
-              bind:value={data.configs[field.symbol]}
-            />
-          {:else}
-            <input
-              class="input"
-              type="text"
-              placeholder={field.placeholder}
-              bind:value={data.configs[field.symbol]}
-            />
-          {/if}
-        </div>
-      </div>
-    {/each}
-  {/if}
-
-  <div class="actions">
-    {#if loading}
-      <div class="mr-5">
-        *{message}.
-      </div>
+      {#if active === "Configs"}
+        {#each configFields as field (field.symbol)}
+          <div class="field">
+            <p class="label">{field.label}</p>
+            <div class="control">
+              {#if field.type === "number"}
+                <input
+                  class="input"
+                  type="number"
+                  placeholder={field.placeholder}
+                  bind:value={data.configs[field.symbol]}
+                />
+              {:else}
+                <input
+                  class="input"
+                  type="text"
+                  placeholder={field.placeholder}
+                  bind:value={data.configs[field.symbol]}
+                />
+              {/if}
+            </div>
+          </div>
+        {/each}
+      {/if}
     {/if}
-    <button
-      class={"button is-primary " + (loading ? "is-loading" : "")}
-      type="submit"
-      disabled={loading || !data.valid}
-    >
-      Deploy
-    </button>
-  </div>
-</form>
+
+    <div class="actions">
+      <button
+        class={"button is-primary " + (loading ? "is-loading" : "")}
+        type="submit"
+        disabled={(loading || !data.valid) && !(success || failed)}
+        on:click={(e) => {
+          if (success || failed) {
+            e.preventDefault();
+            success = false;
+            failed = false;
+            loading = false;
+          }
+        }}
+      >
+        {#if success || failed}
+          Back
+        {:else}
+          Deploy
+        {/if}
+      </button>
+    </div>
+  </form>
+</div>
 
 <style lang="scss" scoped>
-  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 
   .worker-container {

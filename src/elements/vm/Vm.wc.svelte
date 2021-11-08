@@ -88,17 +88,17 @@
     <hr />
 
     {#if loading}
-      <div style="text-align: center;">
+      <div class="notification is-info">
         {#if message}
-          *{message}.
+          * {message}.
         {:else}
-          *Loading...
+          * Loading...
         {/if}
       </div>
     {:else if success}
-      <div style="text-align: center;">*Successfully deployed vm.</div>
+      <div class="notification is-success">* Successfully deployed K8S.</div>
     {:else if failed}
-      <div style="text-align: center;">*Failed to deploy vm.</div>
+      <div class="notification is-danger">* Failed to deploy K8S.</div>
     {:else}
       <div class="tabs is-centered">
         <ul>

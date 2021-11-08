@@ -1,5 +1,5 @@
 <script lang="ts">
-  import VM from "./elements/vm/Vm.wc.svelte";
+  import Kubernetes from "./elements/kubernetes/Kubernetes.wc.svelte";
 </script>
 
-<VM />
+<Kubernetes />
