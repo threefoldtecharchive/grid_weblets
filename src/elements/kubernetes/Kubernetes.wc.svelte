@@ -68,8 +68,8 @@
     events.addListener("logs", onLogInfo);
 
     deployKubernetes(data)
-      .then(console.log)
-      .catch(console.log)
+      .then(() => (success = true))
+      .catch(() => (failed = true))
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
