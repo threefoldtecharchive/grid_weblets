@@ -5,7 +5,7 @@
   import BaseConfig from "../../types/baseConfig";
   import DeployedList from "../../types/deployedList";
 
-  export let tab: "k8s" | "vm" | "caprover";
+  export let tab: "k8s" | "vm" | "caprover" = undefined;
 
   // prettier-ignore
   const tabs = [
@@ -52,7 +52,13 @@
 
 <div style="padding: 15px;">
   <section class="box">
-    <h4 class="is-size-4 mb-4">List Deployed Elements</h4>
+    <h4 class="is-size-4 mb-4">
+      List Deployed {#if tab}
+        {tab.toLocaleUpperCase()}
+      {:else}
+        Elements
+      {/if}
+    </h4>
     <hr />
 
     {#if loading}
