@@ -11,7 +11,7 @@ export default function deployVM(data: VM) {
   const { mnemonics, proxyURL, url } = configs;
 
   const http = new HTTPMessageBusClient(0, proxyURL);
-  const grid = new GridClient(url, mnemonics, http, name);
+  const grid = new GridClient(url, mnemonics, http);
 
   const vm = new MachineModel();
   vm.name = name;
