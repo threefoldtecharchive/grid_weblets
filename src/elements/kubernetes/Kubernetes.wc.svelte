@@ -85,15 +85,15 @@
     {#if loading}
       <div class="notification is-info">
         {#if message}
-          * {message}.
+          &gt; {message}.
         {:else}
-          * Loading...
+          &gt; Loading...
         {/if}
       </div>
     {:else if success}
-      <div class="notification is-success">* Successfully deployed K8S.</div>
+      <div class="notification is-success">&gt; Successfully deployed K8S.</div>
     {:else if failed}
-      <div class="notification is-danger">* Failed to deploy K8S.</div>
+      <div class="notification is-danger">&gt; Failed to deploy K8S.</div>
     {:else}
       <div class="tabs is-centered">
         <ul>

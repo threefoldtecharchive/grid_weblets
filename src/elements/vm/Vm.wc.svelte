@@ -90,15 +90,15 @@
     {#if loading}
       <div class="notification is-info">
         {#if message}
-          * {message}.
+          &gt; {message}.
         {:else}
-          * Loading...
+          &gt; Loading...
         {/if}
       </div>
     {:else if success}
-      <div class="notification is-success">* Successfully deployed VM.</div>
+      <div class="notification is-success">&gt; Successfully deployed VM.</div>
     {:else if failed}
-      <div class="notification is-danger">* Failed to deploy VM.</div>
+      <div class="notification is-danger">&gt; Failed to deploy VM.</div>
     {:else}
       <div class="tabs is-centered">
         <ul>

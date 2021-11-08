@@ -102,7 +102,7 @@
 
       {#if active === "Kubernetes"}
         {#await list.load("k8s")}
-          <p class="mt-2">* Loading...</p>
+          <p class="mt-2">&gt; Loading...</p>
         {:then rows}
           <div class="table-container mt-2">
             <table class="table">
@@ -112,7 +112,6 @@
                   <th>Name</th>
                   <th>Public IP</th>
                   <th>Yggdrasil IP</th>
-                  <th>Planetary</th>
                   <th>Workers</th>
                 </tr>
               </thead>
@@ -127,7 +126,6 @@
                       <td>-</td>
                     {/if}
                     <td>{row.masters[0].yggIP}</td>
-                    <td>{row.masters[0].planetary}</td>
                     <td>{row.workers.length}</td>
                   </tr>
                 {/each}
@@ -139,9 +137,36 @@
 
       {#if active === "Virtual Machines"}
         {#await list.load("machines")}
-          * Loading...
-        {:then data}
-          {JSON.stringify(data)}
+          <p class="mt-2">&gt; Loading...</p>
+        {:then rows}
+          <div class="table-container mt-2">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th title="position">#</th>
+                  <th>Name</th>
+                  <th>Public IP</th>
+                  <th>Yggdrasil IP</th>
+                  <th>Flist</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each rows as [row], idx}
+                  <tr>
+                    <th>{idx + 1}</th>
+                    <td>{row.name}</td>
+                    {#if row.publicIP}
+                      <td>{row.publicIP.gateway}</td>
+                    {:else}
+                      <td>-</td>
+                    {/if}
+                    <td>{row.yggIP}</td>
+                    <td>{row.flist}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
         {/await}
       {/if}
     {/if}
@@ -150,4 +175,8 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+
+  .table {
+    width: 100%;
+  }
 </style>
