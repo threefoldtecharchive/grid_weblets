@@ -5,10 +5,13 @@
   import BaseConfig from "../../types/baseConfig";
   import DeployedList from "../../types/deployedList";
 
+  export let tab: "k8s" | "vm" | "caprover";
+
   // prettier-ignore
   const tabs = [
     { label: "Kubernetes" },
     { label: "Virtual Machines" },
+    { label: "Caprover" }
   ];
   let active: string = "Kubernetes";
 
@@ -37,6 +40,13 @@
         console.log(list);
       })
       .finally(() => (loading = false));
+  }
+
+  async function loadCaprover() {
+    const machines = await list.load("machines");
+    return machines.filter(([m]) => {
+      return m.name.startsWith("caprover_leader");
+    });
   }
 </script>
 
@@ -82,25 +92,28 @@
         >
           Back
         </button>
-        <div style="width: 100%;">
-          <div class="tabs is-centered">
-            <ul>
-              {#each tabs as tab (tab.label)}
-                <li class={active === tab.label ? "is-active" : ""}>
-                  <a
-                    href="#!"
-                    on:click|preventDefault={() => (active = tab.label)}
-                  >
-                    <span>{tab.label}</span>
-                  </a>
-                </li>
-              {/each}
-            </ul>
+
+        {#if !tab}
+          <div style="width: 100%;">
+            <div class="tabs is-centered">
+              <ul>
+                {#each tabs as tab (tab.label)}
+                  <li class={active === tab.label ? "is-active" : ""}>
+                    <a
+                      href="#!"
+                      on:click|preventDefault={() => (active = tab.label)}
+                    >
+                      <span>{tab.label}</span>
+                    </a>
+                  </li>
+                {/each}
+              </ul>
+            </div>
           </div>
-        </div>
+        {/if}
       </div>
 
-      {#if active === "Kubernetes"}
+      {#if (!tab && active === "Kubernetes") || tab === "k8s"}
         {#await list.load("k8s")}
           <p class="mt-2">&gt; Loading...</p>
         {:then rows}
@@ -135,8 +148,8 @@
         {/await}
       {/if}
 
-      {#if active === "Virtual Machines"}
-        {#await list.load("machines")}
+      {#if active === "Virtual Machines" || active === "Caprover" || tab === "caprover" || tab === "vm"}
+        {#await active === "Caprover" || tab === "caprover" ? loadCaprover() : list.load("machines")}
           <p class="mt-2">&gt; Loading...</p>
         {:then rows}
           <div class="table-container mt-2">
