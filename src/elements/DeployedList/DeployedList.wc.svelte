@@ -53,7 +53,8 @@
 <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
-      List Deployed {#if tab}
+      List Deployed
+      {#if tab === "k8s" || tab === "vm" || tab === "caprover"}
         {tab.toLocaleUpperCase()}
       {:else}
         Elements
