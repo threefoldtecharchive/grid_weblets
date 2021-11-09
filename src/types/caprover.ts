@@ -19,14 +19,15 @@ export default class Caprover {
   ) {}
 
   public get valid(): boolean {
-    const { name, cpu, memory, nodeId, domain, publicKey } = this;
+    const { name, cpu, memory, nodeId, domain, publicKey, configs } = this;
     return (
       name !== "" &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
       isValidInteger(nodeId) &&
       domain !== "" &&
-      publicKey !== ""
+      publicKey !== "" &&
+      configs.valid
     );
   }
 }
