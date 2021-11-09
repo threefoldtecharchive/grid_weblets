@@ -1,7 +1,7 @@
 export default class BaseConfig {
   public constructor(
-    public url: string = "",
-    public proxyURL: string = "https://rmbproxy1.devnet.grid.tf",
+    public url: string = "wss://tfchain.test.threefold.io/ws",
+    public proxyURL: string = "https://rmbproxy1.testnet.grid.tf",
     public mnemonics: string = ""
   ) {}
 

@@ -15,11 +15,7 @@
   ];
   let active: string = "Kubernetes";
 
-  const data = new BaseConfig(
-    "wss://tfchain.dev.threefold.io/ws",
-    undefined,
-    "fiscal play spin all describe because stem disease coral call bronze please"
-  );
+  const data = new BaseConfig();
   let loading = false;
   let configed = false;
   let list: DeployedList;
