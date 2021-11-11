@@ -1,10 +1,11 @@
 import type { default as VM, Disk, Env } from "../types/vm";
 import createNetwork from "./createNetwork";
+import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { DiskModel, MachineModel, MachinesModel, GridClient } =
   window.configs?.grid3_client ?? {};
 
-export default function deployVM(data: VM) {
+export default async function deployVM(data: VM) {
   const { configs, envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
@@ -14,6 +15,7 @@ export default function deployVM(data: VM) {
   const grid = new GridClient(
     networkEnv,
     mnemonics,
+    await getSignerObj("Deploy VM"),
     storeSecret,
     http,
     undefined,

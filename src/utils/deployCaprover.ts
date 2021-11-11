@@ -1,6 +1,7 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import createNetwork from "./createNetwork";
+import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { MachinesModel, DiskModel, GridClient, MachineModel } =
   window.configs?.grid3_client ?? {};
@@ -8,7 +9,7 @@ const { MachinesModel, DiskModel, GridClient, MachineModel } =
 const CAPROVER_FLIST =
   "https://hub.grid.tf/samehabouelsaad.3bot/tf-caprover-main-a4f186da8d.flist";
 
-export default function deployCaprover(data: Caprover) {
+export default async function deployCaprover(data: Caprover) {
   const { name, memory, nodeId, publicKey, cpu, domain, diskSize } = data;
   const { mnemonics, storeSecret, networkEnv } = data.configs;
 
@@ -48,6 +49,7 @@ export default function deployCaprover(data: Caprover) {
   const grid = new GridClient(
     networkEnv,
     mnemonics,
+    await getSignerObj("Deploy Caprover"),
     storeSecret,
     http,
     undefined,

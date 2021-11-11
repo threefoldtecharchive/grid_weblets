@@ -45,14 +45,19 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
+    "@polkadot/api": "^6.8.1",
+    "@polkadot/extension-dapp": "^0.41.1",
+    "add": "^2.0.6",
     "bulma": "^0.9.3",
     "front-matter": "^4.0.2",
-    "grid3_client": "0.0.14",
+    "grid3_client": "0.0.16",
     "js-yaml": "^4.1.0",
     "marked": "^3.0.8",
     "page": "^1.11.6",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "sirv-cli": "^1.0.0",
     "ts-rmb-http-client": "^0.1.9",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "yarn": "^1.22.17"
   }
 }

@@ -1,10 +1,11 @@
 import type { default as Kubernetes, Base } from "../types/kubernetes";
 import createNetwork from "./createNetwork";
+import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { GridClient, K8SModel, KubernetesNodeModel } =
   window.configs?.grid3_client ?? {};
 
-export default function deployKubernetes(data: Kubernetes) {
+export default async function deployKubernetes(data: Kubernetes) {
   /* Extract Data */
   const { configs, master, workers, network: nw, ...base } = data;
   const { secret, sshKey, description, metadata, name } = base;
@@ -14,6 +15,7 @@ export default function deployKubernetes(data: Kubernetes) {
   const grid = new GridClient(
     networkEnv,
     mnemonics,
+    await getSignerObj("Deploy K8s"),
     storeSecret,
     http,
     undefined,
