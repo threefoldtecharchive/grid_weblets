@@ -25,9 +25,16 @@ export default class DeployedList {
   }
 
   public static init(configs: BaseConfig): Promise<DeployedList> {
-    const { proxyURL, url, mnemonics } = configs;
-    const http = new HTTPMessageBusClient(0, proxyURL);
-    const grid = new GridClient(url, mnemonics, http);
+    const { mnemonics, networkEnv, storeSecret } = configs;
+    const http = new HTTPMessageBusClient(0, "");
+    const grid = new GridClient(
+      networkEnv,
+      mnemonics,
+      storeSecret,
+      http,
+      undefined,
+      "tfkvstore" as any
+    );
     return grid.connect().then(() => new DeployedList(grid));
   }
 }

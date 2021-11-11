@@ -8,10 +8,17 @@ export default function deployVM(data: VM) {
   const { configs, envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
-  const { mnemonics, proxyURL, url } = configs;
+  const { mnemonics, storeSecret, networkEnv } = configs;
 
-  const http = new HTTPMessageBusClient(0, proxyURL);
-  const grid = new GridClient(url, mnemonics, http);
+  const http = new HTTPMessageBusClient(0, "");
+  const grid = new GridClient(
+    networkEnv,
+    mnemonics,
+    storeSecret,
+    http,
+    undefined,
+    "tfkvstore" as any
+  );
 
   const vm = new MachineModel();
   vm.name = name;

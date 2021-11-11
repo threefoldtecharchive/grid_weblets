@@ -53,9 +53,8 @@
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Proxy URL", symbol: "proxyURL", placeholder: "Your Proxy URL." },
-    { label: "URL", symbol: "url", placeholder: "Your substrate URL." },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
   ];
 
   let message: string;
@@ -100,6 +99,15 @@
     {:else if failed}
       <div class="notification is-danger">&gt; Failed to deploy VM.</div>
     {:else}
+      <div
+        class="select mb-4"
+        style="display: flex; justify-content: flex-end;"
+      >
+        <select bind:value={data.configs.networkEnv}>
+          <option value="test">Testnet</option>
+          <option value="dev">Devnet</option>
+        </select>
+      </div>
       <div class="tabs is-centered">
         <ul>
           {#each tabs as tab (tab.label)}

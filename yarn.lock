@@ -2627,10 +2627,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.2.3, graceful-fs@^4.2.4, 
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.10.tgz#742f30985f49eb41ce06f1d522deaa193a45d379"
-  integrity sha512-aKgF2Ph0nO0JI3XIj50Lt34yr5RJj6R0U7WH9r4bCMmxsJ/IDGgYF9AwoH0lm7dIOGjH3233OGlSzDmQk/uz0w==
+grid3_client@0.0.14:
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.14.tgz#506c27195eda6369fc21c22eea30f6778b706244"
+  integrity sha512-Wvu3xGuYIbfFKZsOHUQx/CSsI3GEs/NxDAK6K6ccfnnN2hTNfm+cO7/BJNoEMd9IhciT2I0gXidr8gir20pkKA==
   dependencies:
     appdata-path "^1.0.0"
     axios "^0.22.0"
@@ -2642,11 +2642,12 @@ grid3_client@0.0.10:
     private-ip "^2.3.0"
     reflect-metadata "^0.1.13"
     stellar-sdk "^8.3.0"
-    tfgrid-api-client "^0.1.12"
+    tfgrid-api-client "^1.0.0"
     ts-rmb-client-base "^0.0.1"
     ts-rmb-http-client "^0.1.6"
     ts-rmb-redis-client "^0.0.3"
     tweetnacl "^1.0.3"
+    tweetnacl-util "^0.15.1"
     typescript "^4.3.5"
     url-join "^4.0.1"
     url-parse "^1.5.3"
@@ -5547,10 +5548,10 @@ terser@^5.0.0, terser@^5.7.2:
     source-map "~0.7.2"
     source-map-support "~0.5.20"
 
-tfgrid-api-client@^0.1.12:
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-0.1.12.tgz#cc31d817ad8c3a015a659d3213f91db65de9b34d"
-  integrity sha512-gbif/Mv58B6RRSFWiiPgsYovXyrIZA8KOX0Z2K74OeYnkj30H+zkCRUXKO4tE6W4EYcGFHtHnlfnDyeHdKym3w==
+tfgrid-api-client@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.0.0.tgz#ef7b5f6c12858b934d601b9db0087e0ec0f37b94"
+  integrity sha512-ADHUMAJlMxOoAD32Y8N0yD+FdYIsumXht0J5p/1aFoifgoqD0M8ISh0ms4UtYuizTzdXy5bo6vF2j9fbhOYoew==
   dependencies:
     "@encointer/util" "^0.3.2"
     "@encointer/worker-api" "^0.3.2"
@@ -5703,6 +5704,11 @@ tunnel-agent@^0.6.0:
   integrity sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=
   dependencies:
     safe-buffer "^5.0.1"
+
+tweetnacl-util@^0.15.1:
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/tweetnacl-util/-/tweetnacl-util-0.15.1.tgz#b80fcdb5c97bcc508be18c44a4be50f022eea00b"
+  integrity sha512-RKJBIj8lySrShN4w6i/BonWp2Z/uxwC3h4y7xsRrpP59ZboCd0GpEVsOnMDYLMmKBpYhb5TgHzZXy7wTfYFBRw==
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
