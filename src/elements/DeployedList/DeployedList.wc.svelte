@@ -148,7 +148,7 @@
                     <th>{idx + 1}</th>
                     <td>{row.masters[0].name}</td>
                     {#if row.masters[0].publicIP}
-                      <td>{row.masters[0].publicIP.gateway}</td>
+                      <td>{row.masters[0].publicIP.ip}</td>
                     {:else}
                       <td>-</td>
                     {/if}
@@ -183,7 +183,7 @@
                     <th>{idx + 1}</th>
                     <td>{row.name}</td>
                     {#if row.publicIP}
-                      <td>{row.publicIP.gateway}</td>
+                      <td>{row.publicIP.ip}</td>
                     {:else}
                       <td>-</td>
                     {/if}
