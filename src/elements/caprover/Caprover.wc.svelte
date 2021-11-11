@@ -51,7 +51,10 @@
 
     deployCaprover(data)
       .then(() => (success = true))
-      .catch(() => (failed = true))
+      .catch((err) => {
+        failed = true;
+        console.log("Error", err);
+      })
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);

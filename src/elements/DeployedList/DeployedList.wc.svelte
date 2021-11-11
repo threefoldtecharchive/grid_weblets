@@ -34,6 +34,9 @@
         list = _list;
         console.log(list);
       })
+      .catch((err) => {
+        console.log("Error", err);
+      })
       .finally(() => (loading = false));
   }
 
