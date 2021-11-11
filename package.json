@@ -47,7 +47,7 @@
     "@fortawesome/fontawesome-free": "^5.15.4",
     "bulma": "^0.9.3",
     "front-matter": "^4.0.2",
-    "grid3_client": "0.0.10",
+    "grid3_client": "0.0.14",
     "js-yaml": "^4.1.0",
     "marked": "^3.0.8",
     "page": "^1.11.6",

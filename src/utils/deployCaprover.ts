@@ -10,9 +10,9 @@ const CAPROVER_FLIST =
 
 export default function deployCaprover(data: Caprover) {
   const { name, memory, nodeId, publicKey, cpu, domain, diskSize } = data;
-  const { url, proxyURL, mnemonics } = data.configs;
+  const { mnemonics, storeSecret, networkEnv } = data.configs;
 
-  const http = new HTTPMessageBusClient(0, proxyURL);
+  const http = new HTTPMessageBusClient(0, "");
   const network = createNetwork(new Network(`caprover_network_${name}`, "10.200.0.0/16")); // prettier-ignore
 
   /* Docker disk */
@@ -45,6 +45,13 @@ export default function deployCaprover(data: Caprover) {
   machines.network = network;
   machines.description = "caprover leader machine/node";
 
-  const grid = new GridClient(url, mnemonics, http);
+  const grid = new GridClient(
+    networkEnv,
+    mnemonics,
+    storeSecret,
+    http,
+    undefined,
+    "tfkvstore" as any
+  );
   return grid.connect().then(() => grid.machines.deploy(machines));
 }

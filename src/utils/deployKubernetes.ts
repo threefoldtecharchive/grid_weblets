@@ -8,10 +8,17 @@ export default function deployKubernetes(data: Kubernetes) {
   /* Extract Data */
   const { configs, master, workers, network: nw, ...base } = data;
   const { secret, sshKey, description, metadata, name } = base;
-  const { proxyURL, mnemonics, url } = configs;
+  const { mnemonics, storeSecret, networkEnv } = configs;
 
-  const http = new HTTPMessageBusClient(0, proxyURL);
-  const grid = new GridClient(url, mnemonics, http);
+  const http = new HTTPMessageBusClient(0, "");
+  const grid = new GridClient(
+    networkEnv,
+    mnemonics,
+    storeSecret,
+    http,
+    undefined,
+    "tfkvstore" as any
+  );
   const masterNodes = [createNode(master)];
   const workerNodes = workers.map(createNode);
 

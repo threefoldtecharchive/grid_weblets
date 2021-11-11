@@ -22,9 +22,8 @@
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Proxy URL", symbol: "proxyURL", placeholder: "Your Proxy URL." },
-    { label: "URL", symbol: "url", placeholder: "Your substrate URL." },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
   ];
 
   function onConfigHandler() {
@@ -62,6 +61,15 @@
       <p style="text-align: center; mt-2 mb-2">Loading...</p>
     {:else if !configed}
       <form on:submit|preventDefault={onConfigHandler}>
+        <div
+          class="select mb-4"
+          style="display: flex; justify-content: flex-end;"
+        >
+          <select bind:value={data.networkEnv}>
+            <option value="test">Testnet</option>
+            <option value="dev">Devnet</option>
+          </select>
+        </div>
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
