@@ -1,6 +1,9 @@
 import type BaseConfig from "./baseConfig";
+import getSignerObj from "../utils/getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { GridClient } = window.configs?.grid3_client ?? {};
+const { web3Accounts, web3Enable, web3FromSource } =
+  window.configs?.polkadot ?? {};
 
 interface IData {
   k8s?: any[];
@@ -24,17 +27,19 @@ export default class DeployedList {
     return this.data[key];
   }
 
-  public static init(configs: BaseConfig): Promise<DeployedList> {
+  public static async init(configs: BaseConfig): Promise<DeployedList> {
     const { mnemonics, networkEnv, storeSecret } = configs;
     const http = new HTTPMessageBusClient(0, "");
     const grid = new GridClient(
       networkEnv,
       mnemonics,
+      await getSignerObj("Deploy List"),
       storeSecret,
       http,
-      undefined,
+      "",
       "tfkvstore" as any
     );
-    return grid.connect().then(() => new DeployedList(grid));
+    await grid.connect();
+    return new DeployedList(grid);
   }
 }
