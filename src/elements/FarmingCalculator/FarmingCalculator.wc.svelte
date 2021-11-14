@@ -206,7 +206,7 @@
   }
 
   .farming-content {
-    --w: 65%;
+    --w: 50%;
     display: flex;
 
     &--left {
