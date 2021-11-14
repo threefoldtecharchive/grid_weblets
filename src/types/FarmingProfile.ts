@@ -1,14 +1,17 @@
+const REWARD_RATIO = 0.15;
+
 export default class FarmingProfile {
   public constructor(
-    public memory: number /* GB */,
-    public cpu: number /* Cores */,
-    public hdd: number /* GB */,
-    public ssd: number /* GB */,
-    public price: number /* USD */,
-    public priceAfter5Years: number /* USD */,
-    public rewardPerCu: number /* USD */,
-    public rewardPerSu: number /* USD */,
-    public rewardPerNu: number /* USD */
+    public name: string = "Empty Profile",
+    public memory: number = 0 /* GB */,
+    public cpu: number = 0 /* Cores */,
+    public hdd: number = 0 /* GB */,
+    public ssd: number = 0 /* GB */,
+    public price: number = 0 /* USD */,
+    public priceAfter5Years: number = 0 /* USD */,
+    public rewardPerCu: number = 0 /* USD */,
+    public rewardPerSu: number = 0 /* USD */,
+    public rewardPerNu: number = 0 /* USD */
   ) {}
 
   public get cu(): number {
@@ -36,18 +39,30 @@ export default class FarmingProfile {
     return (price + priceAfter5Years) / 2;
   }
 
+  public get rewardPerCuValue(): number {
+    return this.rewardPerCu * REWARD_RATIO;
+  }
+
+  public get rewardPerSuValue(): number {
+    return this.rewardPerSu * REWARD_RATIO;
+  }
+
+  public get rewardPerNuValue(): number {
+    return this.rewardPerNu * REWARD_RATIO;
+  }
+
   public get tftRewardPerCu(): number {
-    const { rewardPerCu, price } = this;
-    return (rewardPerCu / price) * 1.25;
+    const { rewardPerCuValue, price } = this;
+    return (rewardPerCuValue / price) * 1.25;
   }
 
   public get tftRewardPerSu(): number {
-    const { rewardPerSu, price } = this;
-    return (rewardPerSu / price) * 1.25;
+    const { rewardPerSuValue, price } = this;
+    return (rewardPerSuValue / price) * 1.25;
   }
 
   public get tftRewardPerNu(): number {
-    const { rewardPerNu, price } = this;
-    return rewardPerNu / price;
+    const { rewardPerNuValue, price } = this;
+    return rewardPerNuValue / price;
   }
 }
