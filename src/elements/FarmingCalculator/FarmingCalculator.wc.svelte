@@ -2,6 +2,9 @@
 
 <script lang="ts">
   import FarmingProfile from "../../types/FarmingProfile";
+  import { onMount } from "svelte";
+  import { buildPieChart } from "../../utils/FarmingCalculatorCharts";
+  import { Chart, registerables } from "chart.js";
 
   const profiles = [
     new FarmingProfile(),
@@ -45,6 +48,22 @@
     { label: "NU Farming Reward In TFT", symbol: "nuFarmingRewardInTft" },
     { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft" },
   ];
+
+  let pieCanvas: HTMLCanvasElement;
+  let _pieChart: Chart<"doughnut", number[], string>;
+
+  onMount(() => {
+    Chart.register(...registerables);
+    _pieChart = buildPieChart(pieCanvas);
+  });
+
+  $: {
+    if (_pieChart && activeProfile) {
+      const { cu, su, nu } = activeProfile;
+      _pieChart.data.datasets[0].data = [cu, su, nu];
+      _pieChart.update();
+    }
+  }
 </script>
 
 <section class="farming-container">
@@ -126,20 +145,7 @@
           {/each}
         </div>
         <div class="farming-content--right" style="white-space: pre;">
-          <div>
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-
-            test
-
-            <br />
-            <br />
-            <br />
-            <br />
-          </div>
+          <canvas bind:this={pieCanvas} />
           {#each outputFields as field (field.symbol)}
             <div class="field">
               <div class="control">

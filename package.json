@@ -49,6 +49,7 @@
     "@polkadot/extension-dapp": "^0.41.1",
     "add": "^2.0.6",
     "bulma": "^0.9.3",
+    "chart.js": "^3.6.0",
     "front-matter": "^4.0.2",
     "grid3_client": "0.0.16",
     "js-yaml": "^4.1.0",
