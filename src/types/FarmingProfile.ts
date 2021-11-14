@@ -2,7 +2,7 @@ const REWARD_RATIO = 0.15;
 
 export default class FarmingProfile {
   public constructor(
-    public name: string = "Empty Profile",
+    public name: string = "Empty",
     public memory: number = 0 /* GB */,
     public cpu: number = 0 /* Cores */,
     public hdd: number = 0 /* GB */,
