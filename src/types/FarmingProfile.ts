@@ -8,7 +8,7 @@ export default class FarmingProfile {
     public price: number = 0,
     public priceAfter5Years: number = 0,
     public certified: boolean = true,
-    public publicIp: boolean = false
+    public publicIp: boolean = true
   ) {}
 
   public get cu(): number {
@@ -86,5 +86,28 @@ export default class FarmingProfile {
     const { cuFarmingRewardInTft, suFarmingRewardInTft, nuFarmingRewardInTft } =
       this;
     return cuFarmingRewardInTft + suFarmingRewardInTft + nuFarmingRewardInTft;
+  }
+
+  /* help functions for charts */
+  public getCuFarmingRewardInTft(additionMemory: number = 0): number {
+    const { memory, cpu, tftRewardPerCu } = this;
+    const x = (memory + additionMemory - 1) / 4;
+    const y = (cpu * 4) / 2;
+    const cu = Math.min(x, y);
+    return tftRewardPerCu * cu;
+  }
+
+  public getSuFarmingRewardInTft(additionHdd: number = 0): number {
+    const { hdd, ssd, tftRewardPerSu } = this;
+    const x = (hdd + additionHdd) / 1200;
+    const y = (ssd / 300) * 0.8;
+    const su = x + y;
+    return tftRewardPerSu * su;
+  }
+
+  public getNuFarmingRewardInTft(additionMemory: number = 0): number {
+    const { tftRewardPerNu, publicIp } = this;
+    const nu = this.getCuFarmingRewardInTft(additionMemory) * 30;
+    return publicIp ? tftRewardPerNu * nu : 0;
   }
 }

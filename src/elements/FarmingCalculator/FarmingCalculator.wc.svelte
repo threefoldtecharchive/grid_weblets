@@ -3,8 +3,11 @@
 <script lang="ts">
   import FarmingProfile from "../../types/FarmingProfile";
   import { onMount } from "svelte";
-  import { buildPieChart } from "../../utils/FarmingCalculatorCharts";
   import { Chart, registerables } from "chart.js";
+  import {
+    buildPieChart,
+    buildStackedBarChart,
+  } from "../../utils/FarmingCalculatorCharts";
 
   const profiles = [
     new FarmingProfile(),
@@ -52,9 +55,14 @@
   let pieCanvas: HTMLCanvasElement;
   let _pieChart: Chart<"doughnut", number[], string>;
 
+  let stackedBarChart: HTMLCanvasElement;
+  let _stackedBarChart: Chart<"bar", number[], string>;
+
   onMount(() => {
     Chart.register(...registerables);
+
     _pieChart = buildPieChart(pieCanvas);
+    _stackedBarChart = buildStackedBarChart(stackedBarChart);
   });
 
   $: {
@@ -62,6 +70,22 @@
       const { cu, su, nu } = activeProfile;
       _pieChart.data.datasets[0].data = [cu, su, nu];
       _pieChart.update();
+    }
+
+    if (_stackedBarChart && activeProfile) {
+      const cu = activeProfile.getCuFarmingRewardInTft();
+      const su = activeProfile.getSuFarmingRewardInTft();
+      const nu = activeProfile.getNuFarmingRewardInTft();
+      const total = cu + su + nu;
+
+      const stackedCu = activeProfile.getCuFarmingRewardInTft(1000);
+      const stackedSu = activeProfile.getSuFarmingRewardInTft(1000);
+      const stackedNu = activeProfile.getNuFarmingRewardInTft(1000);
+      const stackedTotal = stackedCu + stackedSu + stackedNu;
+
+      _stackedBarChart.data.datasets[0].data = [cu, su, nu, total];
+      _stackedBarChart.data.datasets[1].data = [stackedCu, stackedSu, stackedNu, stackedTotal]; // prettier-ignore
+      _stackedBarChart.update();
     }
   }
 </script>
@@ -146,6 +170,7 @@
         </div>
         <div class="farming-content--right" style="white-space: pre;">
           <canvas bind:this={pieCanvas} />
+          <canvas bind:this={stackedBarChart} />
           {#each outputFields as field (field.symbol)}
             <div class="field">
               <div class="control">
