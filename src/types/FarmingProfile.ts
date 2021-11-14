@@ -1,17 +1,14 @@
-const REWARD_RATIO = 0.15;
-
 export default class FarmingProfile {
   public constructor(
     public name: string = "Empty",
-    public memory: number = 0 /* GB */,
-    public cpu: number = 0 /* Cores */,
-    public hdd: number = 0 /* GB */,
-    public ssd: number = 0 /* GB */,
-    public price: number = 0 /* USD */,
-    public priceAfter5Years: number = 0 /* USD */,
-    public rewardPerCu: number = 0 /* USD */,
-    public rewardPerSu: number = 0 /* USD */,
-    public rewardPerNu: number = 0 /* USD */
+    public memory: number = 0,
+    public cpu: number = 0,
+    public hdd: number = 0,
+    public ssd: number = 0,
+    public price: number = 0,
+    public priceAfter5Years: number = 0,
+    public certified: boolean = true,
+    public publicIp: boolean = false
   ) {}
 
   public get cu(): number {
@@ -39,30 +36,55 @@ export default class FarmingProfile {
     return (price + priceAfter5Years) / 2;
   }
 
-  public get rewardPerCuValue(): number {
-    return this.rewardPerCu * REWARD_RATIO;
+  public get rewardPerCu(): number {
+    return 2.4;
   }
 
-  public get rewardPerSuValue(): number {
-    return this.rewardPerSu * REWARD_RATIO;
+  public get rewardPerSu(): number {
+    return 1.5;
   }
 
-  public get rewardPerNuValue(): number {
-    return this.rewardPerNu * REWARD_RATIO;
+  public get rewardPerNu(): number {
+    return 0.03;
+  }
+
+  private get tftRewardPer(): number {
+    return (this.certified ? 1 : 0) * 0.25 + 1;
   }
 
   public get tftRewardPerCu(): number {
-    const { rewardPerCuValue, price } = this;
-    return (rewardPerCuValue / price) * 1.25;
+    const { rewardPerCu, price, tftRewardPer } = this;
+    return (rewardPerCu / price) * tftRewardPer;
   }
 
   public get tftRewardPerSu(): number {
-    const { rewardPerSuValue, price } = this;
-    return (rewardPerSuValue / price) * 1.25;
+    const { rewardPerSu, price, tftRewardPer } = this;
+    return (rewardPerSu / price) * tftRewardPer;
   }
 
   public get tftRewardPerNu(): number {
-    const { rewardPerNuValue, price } = this;
-    return rewardPerNuValue / price;
+    const { rewardPerNu, price } = this;
+    return rewardPerNu / price;
+  }
+
+  public get cuFarmingRewardInTft(): number {
+    const { cu, tftRewardPerCu } = this;
+    return tftRewardPerCu * cu;
+  }
+
+  public get suFarmingRewardInTft(): number {
+    const { su, tftRewardPerSu } = this;
+    return tftRewardPerSu * su;
+  }
+
+  public get nuFarmingRewardInTft(): number {
+    const { nu, tftRewardPerNu, publicIp } = this;
+    return publicIp ? tftRewardPerNu * nu : 0;
+  }
+
+  public get totalFarmingRewardInTft(): number {
+    const { cuFarmingRewardInTft, suFarmingRewardInTft, nuFarmingRewardInTft } =
+      this;
+    return cuFarmingRewardInTft + suFarmingRewardInTft + nuFarmingRewardInTft;
   }
 }
