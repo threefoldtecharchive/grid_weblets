@@ -14,8 +14,8 @@
     new FarmingProfile("Custom", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
     new FarmingProfile("Standard", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
-  let profileChoosing: boolean = false;
-  let activeProfile: FarmingProfile = profiles[2];
+  let profileChoosing: boolean = true;
+  let activeProfile: FarmingProfile = null;
 
   function onSelectProfile(e: Event) {
     const idx = e.target["selectedIndex"] - 1;
@@ -60,10 +60,21 @@
 
   onMount(() => {
     Chart.register(...registerables);
-
-    _pieChart = buildPieChart(pieCanvas);
-    _stackedBarChart = buildStackedBarChart(stackedBarChart);
   });
+
+  function onProfileChoosing() {
+    profileChoosing = false;
+    requestAnimationFrame(() => {
+      _pieChart = buildPieChart(pieCanvas);
+      _stackedBarChart = buildStackedBarChart(stackedBarChart);
+    });
+  }
+
+  function onBackProfileChoosing() {
+    profileChoosing = true;
+    _pieChart = null;
+    _stackedBarChart = null;
+  }
 
   $: {
     if (_pieChart && activeProfile) {
@@ -104,7 +115,7 @@
       {#if !profileChoosing}
         <button
           class="button is-primary is-outlined"
-          on:click={() => (profileChoosing = true)}
+          on:click={onBackProfileChoosing}
         >
           Back
         </button>
@@ -132,7 +143,7 @@
             <button
               disabled={activeProfile === null}
               class="button is-primary"
-              on:click={() => (profileChoosing = false)}
+              on:click={onProfileChoosing}
             >
               Choose
             </button>
@@ -168,7 +179,7 @@
             </div>
           {/each}
         </div>
-        <div class="farming-content--right" style="white-space: pre;">
+        <div class="farming-content--right">
           <canvas bind:this={pieCanvas} />
           <canvas bind:this={stackedBarChart} />
           {#each outputFields as field (field.symbol)}
