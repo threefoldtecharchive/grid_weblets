@@ -11,7 +11,6 @@
 
   const profiles = [
     new FarmingProfile(),
-    new FarmingProfile("Custom", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
     new FarmingProfile("Standard", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
   let profileChoosing: boolean = true;
@@ -84,18 +83,10 @@
     }
 
     if (_stackedBarChart && activeProfile) {
-      const cu = activeProfile.getCuFarmingRewardInTft();
-      const su = activeProfile.getSuFarmingRewardInTft();
-      const nu = activeProfile.getNuFarmingRewardInTft();
-      const total = cu + su + nu;
-
-      const stackedCu = activeProfile.getCuFarmingRewardInTft(1000);
-      const stackedSu = activeProfile.getSuFarmingRewardInTft(1000);
-      const stackedNu = activeProfile.getNuFarmingRewardInTft(1000);
-      const stackedTotal = stackedCu + stackedSu + stackedNu;
-
-      _stackedBarChart.data.datasets[0].data = [cu, su, nu, total];
-      _stackedBarChart.data.datasets[1].data = [stackedCu, stackedSu, stackedNu, stackedTotal]; // prettier-ignore
+      _stackedBarChart.data.datasets[0].data = activeProfile.farmingReward;
+      _stackedBarChart.data.datasets[1].data = activeProfile.farmingReward1000;
+      _stackedBarChart.data.datasets[2].data = activeProfile.farmingRewardIn5Years; // prettier-ignore
+      _stackedBarChart.data.datasets[3].data = activeProfile.farmingReward1000In5Years; // prettier-ignore
       _stackedBarChart.update();
     }
   }
@@ -126,11 +117,11 @@
     {#if profileChoosing}
       <div class="profile-container">
         <div>
-          <p class="mb-2">Choose a profile</p>
+          <p class="mb-2">Choose A Configuration</p>
 
           <div class="select">
             <select on:change={onSelectProfile}>
-              <option disabled selected>Please Select A Profile</option>
+              <option disabled selected>Please Select A Configuration</option>
               {#each profiles as profile (profile.name)}
                 <option>
                   {profile.name}
@@ -145,7 +136,7 @@
               class="button is-primary"
               on:click={onProfileChoosing}
             >
-              Choose
+              Select Configuration
             </button>
           </div>
         </div>
@@ -180,8 +171,14 @@
           {/each}
         </div>
         <div class="farming-content--right">
-          <canvas bind:this={pieCanvas} />
-          <canvas bind:this={stackedBarChart} />
+          <div class="charts-container">
+            <div class="chart chart-1">
+              <canvas bind:this={pieCanvas} />
+            </div>
+            <div class="chart">
+              <canvas bind:this={stackedBarChart} />
+            </div>
+          </div>
           {#each outputFields as field (field.symbol)}
             <div class="field">
               <div class="control">
@@ -217,7 +214,7 @@
   }
 
   .farming-content {
-    --w: 50%;
+    --w: 35%;
     display: flex;
 
     &--left {
@@ -245,6 +242,21 @@
       &::-webkit-scrollbar-thumb {
         background-color: #d3d3d3;
       }
+    }
+  }
+
+  .charts-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .chart {
+    width: 60%;
+
+    &-1 {
+      width: 40%;
+      border-right: 2px solid #f5f5f5;
+      margin-right: 1.5rem;
     }
   }
 </style>
