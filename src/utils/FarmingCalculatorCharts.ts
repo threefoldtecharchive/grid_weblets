@@ -73,3 +73,43 @@ export function buildStackedBarChart(canvas: HTMLCanvasElement) {
     },
   });
 }
+
+export function buildLineChart(canvas: HTMLCanvasElement) {
+  const ctx = canvas.getContext("2d");
+
+  return new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: // prettier-ignore
+      [0, 0.06,
+        ...Array
+        .from({ length: 21 })
+        .map((_, i) => (0.06 + 0.047 * i))
+        .map(i => i.toFixed(3))],
+      datasets: [
+        {
+          label: "TFT Price",
+          data: [
+            0,
+            ...Array.from({ length: 20 }).map((_, i) => 0.06 + 0.047 * i),
+          ],
+          backgroundColor: "rgb(255, 99, 132)",
+          borderColor: "rgba(255, 99, 132, 0.5)",
+          pointRadius: 5,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: "TFS / INCA",
+        },
+      },
+    },
+  });
+}
