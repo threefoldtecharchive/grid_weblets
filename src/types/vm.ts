@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
-import BaseConfig from "./baseConfig";
 import { Network } from "./kubernetes";
 
 export class Env {
@@ -51,7 +50,7 @@ export default class VM {
     public publicIp = false,
 
     /* Configs */
-    public configs = new BaseConfig()
+    public configs = window.configs.baseConfig
   ) {}
 
   public get valid(): boolean {

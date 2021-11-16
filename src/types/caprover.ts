@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
-import BaseConfig from "./baseConfig";
 
 export default class Caprover {
   constructor(
@@ -15,7 +14,7 @@ export default class Caprover {
     public publicKey = "",
     public diskSize = 1,
 
-    public configs = new BaseConfig()
+    public configs = window.configs.baseConfig
   ) {}
 
   public get valid(): boolean {
