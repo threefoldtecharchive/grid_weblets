@@ -57,6 +57,7 @@
     loading = true;
     success = false;
     failed = false;
+    message = undefined;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -68,9 +69,9 @@
 
     deployKubernetes(data)
       .then(() => (success = true))
-      .catch((err) => {
+      .catch((err: Error) => {
         failed = true;
-        console.log("Error", err);
+        message = err.message;
       })
       .finally(() => {
         loading = false;
@@ -95,7 +96,14 @@
     {:else if success}
       <div class="notification is-success">&gt; Successfully deployed K8S.</div>
     {:else if failed}
-      <div class="notification is-danger">&gt; Failed to deploy K8S.</div>
+      <div class="notification is-danger">
+        &gt;
+        {#if message}
+          {message}
+        {:else}
+          Failed to deploy K8S.
+        {/if}
+      </div>
     {:else}
       <div
         class="select mb-4"
