@@ -6,13 +6,12 @@
   import { Chart, registerables } from "chart.js";
   import {
     buildPieChart,
-    buildStackedBarChart,
     buildLineChart,
   } from "../../utils/FarmingCalculatorCharts";
 
   const profiles = [
     new FarmingProfile(),
-    new FarmingProfile("Tital v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
+    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
   let profileChoosing: boolean = false;
   let activeProfile: FarmingProfile = profiles[1];
@@ -67,7 +66,7 @@
     profileChoosing = false;
     requestAnimationFrame(() => {
       _pieChart = buildPieChart(pieCanvas);
-      _lineCanvas = buildLineChart(lineCanvas);
+      _lineCanvas = buildLineChart(lineCanvas, activeProfile);
       // _stackedBarChart = buildStackedBarChart(stackedBarChart);
     });
   }
@@ -80,8 +79,8 @@
 
   $: {
     if (_pieChart && activeProfile) {
-      const { cu, su, nu } = activeProfile;
-      _pieChart.data.datasets[0].data = [cu, su, nu];
+      const { cu, su, nu, rewardPerCu, rewardPerNu, rewardPerSu } = activeProfile; // prettier-ignore
+      _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nu * rewardPerNu]; // prettier-ignore
       _pieChart.update();
     }
 
