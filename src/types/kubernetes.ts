@@ -57,11 +57,10 @@ export default class Kubernetes {
   ) {}
 
   public get valid(): boolean {
-    const { secret, sshKey, master, workers, configs, network } = this;
+    const { secret, sshKey, master, workers, network } = this;
     return (
       secret !== "" &&
       sshKey !== "" &&
-      configs.valid &&
       master.valid &&
       network.valid &&
       workers.reduce((res, w) => res && w.valid, true)

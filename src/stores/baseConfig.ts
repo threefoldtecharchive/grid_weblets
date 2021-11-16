@@ -1,4 +1,4 @@
-import { get, writable } from "svelte/store";
+import { /*  get, */ writable } from "svelte/store";
 
 function createBaseConfig() {
   const store = writable({ mnemonics: "", storeSecret: "", networkEnv: "dev" });
@@ -7,10 +7,10 @@ function createBaseConfig() {
     subscribe,
     set,
     update,
-    get valid(): boolean {
-      const { mnemonics, storeSecret } = get(store);
-      return mnemonics !== "" && storeSecret !== "";
-    },
+    // get valid(): boolean {
+    //   const { mnemonics, storeSecret } = get(store);
+    //   return mnemonics !== "" && storeSecret !== "";
+    // },
   };
 }
 
