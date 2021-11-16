@@ -7,6 +7,7 @@
   const { events } = window.configs?.grid3_client ?? {};
 
   const data = new Caprover();
+  const configs = data.configs;
   let loading = false;
   let success = false;
   let failed = false;
@@ -94,7 +95,7 @@
         class="select mb-4"
         style="display: flex; justify-content: flex-end;"
       >
-        <select bind:value={data.configs.networkEnv}>
+        <select bind:value={$configs.networkEnv}>
           <option value="test">Testnet</option>
           <option value="dev">Devnet</option>
         </select>
@@ -146,14 +147,14 @@
                   class="input"
                   type="number"
                   placeholder={field.placeholder}
-                  bind:value={data.configs[field.symbol]}
+                  bind:value={$configs[field.symbol]}
                 />
               {:else}
                 <input
                   class="input"
                   type="text"
                   placeholder={field.placeholder}
-                  bind:value={data.configs[field.symbol]}
+                  bind:value={$configs[field.symbol]}
                 />
               {/if}
             </div>

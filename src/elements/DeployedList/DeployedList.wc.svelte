@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import type { IFormField } from "../../types";
-  import BaseConfig from "../../types/baseConfig";
   import DeployedList from "../../types/deployedList";
 
   export let tab: "k8s" | "vm" | "caprover" = undefined;
@@ -15,7 +14,7 @@
   ];
   let active: string = "Kubernetes";
 
-  const data = new BaseConfig();
+  const data = window.configs.baseConfig;
   let loading = false;
   let configed = false;
   let list: DeployedList;
@@ -29,7 +28,7 @@
   function onConfigHandler() {
     configed = true;
     loading = true;
-    DeployedList.init(data)
+    DeployedList.init($data)
       .then((_list) => {
         list = _list;
         // console.log(list);
@@ -68,7 +67,7 @@
           class="select mb-4"
           style="display: flex; justify-content: flex-end;"
         >
-          <select bind:value={data.networkEnv}>
+          <select bind:value={$data.networkEnv}>
             <option value="test">Testnet</option>
             <option value="dev">Devnet</option>
           </select>
