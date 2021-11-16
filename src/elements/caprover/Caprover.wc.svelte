@@ -53,9 +53,9 @@
 
     deployCaprover(data)
       .then(() => (success = true))
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = err.message;
+        message = err;
       })
       .finally(() => {
         loading = false;
