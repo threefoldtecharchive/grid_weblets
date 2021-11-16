@@ -40,6 +40,7 @@
     loading = true;
     success = false;
     failed = false;
+    message = undefined;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -51,9 +52,9 @@
 
     deployCaprover(data)
       .then(() => (success = true))
-      .catch((err) => {
+      .catch((err: Error) => {
         failed = true;
-        console.log("Error", err);
+        message = err.message;
       })
       .finally(() => {
         loading = false;
@@ -80,7 +81,14 @@
         &gt; Successfully deployed Caprover.
       </div>
     {:else if failed}
-      <div class="notification is-danger">&gt; Failed to deploy Caprover.</div>
+      <div class="notification is-danger">
+        &gt;
+        {#if message}
+          {message}
+        {:else}
+          Failed to deploy Caprover.
+        {/if}
+      </div>
     {:else}
       <div
         class="select mb-4"

@@ -32,11 +32,11 @@
     DeployedList.init(data)
       .then((_list) => {
         list = _list;
-        console.log(list);
+        // console.log(list);
       })
-      .catch((err) => {
-        console.log("Error", err);
-      })
+      // .catch((err) => {
+      //   console.log("Error", err);
+      // })
       .finally(() => (loading = false));
   }
 
@@ -159,6 +159,8 @@
               </tbody>
             </table>
           </div>
+        {:catch}
+          <p class="mt-2">&gt; Failed to list {active}.</p>
         {/await}
       {/if}
 
@@ -194,6 +196,8 @@
               </tbody>
             </table>
           </div>
+        {:catch}
+          <p class="mt-2">&gt; Failed to list {active}.</p>
         {/await}
       {/if}
     {/if}
