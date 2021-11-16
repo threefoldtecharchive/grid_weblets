@@ -62,6 +62,7 @@
     loading = true;
     success = false;
     failed = false;
+    message = undefined;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -73,9 +74,9 @@
 
     deployVM(data)
       .then(() => (success = true))
-      .catch((err) => {
+      .catch((err: Error) => {
         failed = true;
-        console.log("Error", err);
+        message = err.message;
       })
       .finally(() => {
         loading = false;
@@ -100,7 +101,14 @@
     {:else if success}
       <div class="notification is-success">&gt; Successfully deployed VM.</div>
     {:else if failed}
-      <div class="notification is-danger">&gt; Failed to deploy VM.</div>
+      <div class="notification is-danger">
+        &gt;
+        {#if message}
+          {message}
+        {:else}
+          Failed to deploy VM.
+        {/if}
+      </div>
     {:else}
       <div
         class="select mb-4"
