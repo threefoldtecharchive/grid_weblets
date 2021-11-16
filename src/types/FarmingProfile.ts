@@ -7,8 +7,10 @@ export default class FarmingProfile {
     public ssd: number = 0,
     public price: number = 0,
     public priceAfter5Years: number = 0,
+    public powerUtilization: number = 40,
+    public powerCost: number = 0.15,
     public certified: boolean = true,
-    public publicIp: boolean = true
+    public publicIp: boolean = false
   ) {}
 
   public get cu(): number {
@@ -90,21 +92,33 @@ export default class FarmingProfile {
 
   /* help functions for charts */
   public getTotalReward(price: number): number {
-    const { memory, cpu, tftRewardPer, rewardPerCu } = this;
-    const tftRewardPerCu = (rewardPerCu / price) * tftRewardPer;
-    const x1 = (memory - 1) / 4;
-    const y1 = (cpu * 4) / 2;
-    const cu = tftRewardPerCu * Math.min(x1, y1);
+    /* rewards = rewards SU + rewards CU + rewards NU
+rewards NU = (0.03/price of token)
+*/
+    const { certified, powerUtilization, powerCost, publicIp } = this;
+    const certifiedValue = 1 + (certified ? 1 : 0) * 0.25;
 
-    const { hdd, ssd, rewardPerSu } = this;
-    const tftRewardPerSu = (rewardPerSu / price) * tftRewardPer;
-    const x2 = hdd / 1200;
-    const y2 = (ssd / 300) * 0.8;
-    const su = tftRewardPerSu * (x2 + y2);
+    const cu = (2.4 / price) * certifiedValue;
+    const su = (1.5 / price) * certifiedValue;
+    const nu = publicIp ? 0.03 / price : 0;
 
-    const { rewardPerNu, publicIp } = this;
-    const tftRewardPerNu = rewardPerNu / price;
-    const nu = publicIp ? tftRewardPerNu * (cu * 30) : 0;
-    return cu + su + nu;
+    return cu + su + nu - powerUtilization * powerCost;
+
+    // const { memory, cpu, tftRewardPer, rewardPerCu } = this;
+    // const tftRewardPerCu = (rewardPerCu / price) * tftRewardPer;
+    // const x1 = (memory - 1) / 4;
+    // const y1 = (cpu * 4) / 2;
+    // const cu = tftRewardPerCu * Math.min(x1, y1);
+    // const { hdd, ssd, rewardPerSu } = this;
+    // const tftRewardPerSu = (rewardPerSu / price) * tftRewardPer;
+    // const x2 = hdd / 1200;
+    // const y2 = (ssd / 300) * 0.8;
+    // const su = tftRewardPerSu * (x2 + y2);
+    // const { rewardPerNu, publicIp } = this;
+    // const tftRewardPerNu = rewardPerNu / price;
+    // const nu = publicIp ? tftRewardPerNu * (cu * 30) : 0;
+    // const total = cu + su + nu;
+    // const { powerUtilization, powerCost } = this;
+    // return total - powerUtilization * powerCost;
   }
 }

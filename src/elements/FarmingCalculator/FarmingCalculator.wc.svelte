@@ -29,6 +29,8 @@
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
+    { label: "Power Utilization", symbol: "powerUtilization" },
+    { label: "Power Cost", symbol: "powerCost" },
     { label: "Public IP", symbol: "publicIp", type: "checkbox" },
     { label: "Certified", symbol: "certified", type: "checkbox" },
   ];
@@ -55,7 +57,7 @@
   let _pieChart: Chart<"doughnut", number[], string>;
 
   let lineCanvas: HTMLCanvasElement;
-  let _lineCanvas: any; //Chart<"bar", number[], string>;
+  let _lineCanvas: Chart<"line", number[], string>;
 
   onMount(() => {
     Chart.register(...registerables);
@@ -67,14 +69,13 @@
     requestAnimationFrame(() => {
       _pieChart = buildPieChart(pieCanvas);
       _lineCanvas = buildLineChart(lineCanvas, activeProfile);
-      // _stackedBarChart = buildStackedBarChart(stackedBarChart);
     });
   }
 
   function onBackProfileChoosing() {
     profileChoosing = true;
     _pieChart = null;
-    // _stackedBarChart = null;
+    _lineCanvas = null;
   }
 
   $: {
@@ -84,13 +85,11 @@
       _pieChart.update();
     }
 
-    // if (_stackedBarChart && activeProfile) {
-    //   _stackedBarChart.data.datasets[0].data = activeProfile.farmingReward;
-    //   _stackedBarChart.data.datasets[1].data = activeProfile.farmingReward1000;
-    //   _stackedBarChart.data.datasets[2].data = activeProfile.farmingRewardIn5Years; // prettier-ignore
-    //   _stackedBarChart.data.datasets[3].data = activeProfile.farmingReward1000In5Years; // prettier-ignore
-    //   _stackedBarChart.update();
-    // }
+    if (_lineCanvas && activeProfile) {
+      const xs = [...Array.from({ length: 51 }).map((_, i) => 0.15 + 0.397 * i)]; // prettier-ignore
+      _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getTotalReward(x)); // prettier-ignore
+      _lineCanvas.update();
+    }
   }
 </script>
 
