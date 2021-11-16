@@ -1,6 +1,6 @@
 export default class FarmingProfile {
   public constructor(
-    public name: string = "Empty",
+    public name: string = "DIY",
     public memory: number = 0,
     public cpu: number = 0,
     public hdd: number = 0,

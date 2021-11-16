@@ -129,7 +129,7 @@
 
       {#if (!tab && active === "Kubernetes") || tab === "k8s"}
         {#await list.load("k8s")}
-          <p class="mt-2">&gt; Loading...</p>
+          <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           <div class="table-container mt-2">
             <table class="table">
@@ -159,14 +159,21 @@
               </tbody>
             </table>
           </div>
-        {:catch}
-          <p class="mt-2">&gt; Failed to list {active}.</p>
+        {:catch err}
+          <div class="notification is-danger mt-2">
+            &gt;
+            {#if err && err.message}
+              {err.message}
+            {:else}
+              Failed to list {active}.
+            {/if}
+          </div>
         {/await}
       {/if}
 
       {#if active === "Virtual Machines" || active === "Caprover" || tab === "caprover" || tab === "vm"}
         {#await active === "Caprover" || tab === "caprover" ? loadCaprover() : list.load("machines")}
-          <p class="mt-2">&gt; Loading...</p>
+          <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           <div class="table-container mt-2">
             <table class="table">
@@ -196,8 +203,15 @@
               </tbody>
             </table>
           </div>
-        {:catch}
-          <p class="mt-2">&gt; Failed to list {active}.</p>
+        {:catch err}
+          <div class="notification is-danger mt-2">
+            &gt;
+            {#if err && err.message}
+              {err.message}
+            {:else}
+              Failed to list {active}.
+            {/if}
+          </div>
         {/await}
       {/if}
     {/if}
