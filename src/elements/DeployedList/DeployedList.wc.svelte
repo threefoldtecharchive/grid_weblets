@@ -18,6 +18,7 @@
   let loading = false;
   let configed = false;
   let list: DeployedList;
+  let password: string = "";
 
   // prettier-ignore
   const configFields: IFormField[] = [
@@ -72,6 +73,43 @@
             <option value="dev">Devnet</option>
           </select>
         </div>
+        {#if $data.loaded === false}
+          <div style="display: flex; align-items: center;">
+            <div class="field mr-2" style="width: 100%">
+              <p class="label">Configs Password</p>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="Your Configs Password"
+                  bind:value={password}
+                />
+              </div>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="button is-primary is-outlined mb-2"
+                disabled={password === ""}
+                on:click={() => {
+                  data.load(password);
+                }}
+              >
+                Load
+              </button>
+              <button
+                type="button"
+                class="button is-success"
+                disabled={password === ""}
+                on:click={() => {
+                  data.save(password);
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        {/if}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
@@ -87,7 +125,7 @@
         {/each}
         <div style="display: flex; justify-content: center;">
           <button
-            disabled={!data.valid}
+            disabled={$data.mnemonics === "" || $data.storeSecret === ""}
             type="submit"
             class="button is-primary"
           >
