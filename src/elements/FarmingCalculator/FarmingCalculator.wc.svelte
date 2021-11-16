@@ -7,14 +7,15 @@
   import {
     buildPieChart,
     buildStackedBarChart,
+    buildLineChart,
   } from "../../utils/FarmingCalculatorCharts";
 
   const profiles = [
     new FarmingProfile(),
     new FarmingProfile("Tital v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
-  let profileChoosing: boolean = true;
-  let activeProfile: FarmingProfile = null;
+  let profileChoosing: boolean = false;
+  let activeProfile: FarmingProfile = profiles[1];
 
   function onSelectProfile(e: Event) {
     const idx = e.target["selectedIndex"] - 1;
@@ -54,25 +55,27 @@
   let pieCanvas: HTMLCanvasElement;
   let _pieChart: Chart<"doughnut", number[], string>;
 
-  let stackedBarChart: HTMLCanvasElement;
-  let _stackedBarChart: Chart<"bar", number[], string>;
+  let lineCanvas: HTMLCanvasElement;
+  let _lineCanvas: any; //Chart<"bar", number[], string>;
 
   onMount(() => {
     Chart.register(...registerables);
+    onProfileChoosing(); /* Debug */
   });
 
   function onProfileChoosing() {
     profileChoosing = false;
     requestAnimationFrame(() => {
       _pieChart = buildPieChart(pieCanvas);
-      _stackedBarChart = buildStackedBarChart(stackedBarChart);
+      _lineCanvas = buildLineChart(lineCanvas);
+      // _stackedBarChart = buildStackedBarChart(stackedBarChart);
     });
   }
 
   function onBackProfileChoosing() {
     profileChoosing = true;
     _pieChart = null;
-    _stackedBarChart = null;
+    // _stackedBarChart = null;
   }
 
   $: {
@@ -82,13 +85,13 @@
       _pieChart.update();
     }
 
-    if (_stackedBarChart && activeProfile) {
-      _stackedBarChart.data.datasets[0].data = activeProfile.farmingReward;
-      _stackedBarChart.data.datasets[1].data = activeProfile.farmingReward1000;
-      _stackedBarChart.data.datasets[2].data = activeProfile.farmingRewardIn5Years; // prettier-ignore
-      _stackedBarChart.data.datasets[3].data = activeProfile.farmingReward1000In5Years; // prettier-ignore
-      _stackedBarChart.update();
-    }
+    // if (_stackedBarChart && activeProfile) {
+    //   _stackedBarChart.data.datasets[0].data = activeProfile.farmingReward;
+    //   _stackedBarChart.data.datasets[1].data = activeProfile.farmingReward1000;
+    //   _stackedBarChart.data.datasets[2].data = activeProfile.farmingRewardIn5Years; // prettier-ignore
+    //   _stackedBarChart.data.datasets[3].data = activeProfile.farmingReward1000In5Years; // prettier-ignore
+    //   _stackedBarChart.update();
+    // }
   }
 </script>
 
@@ -176,7 +179,7 @@
               <canvas bind:this={pieCanvas} />
             </div>
             <div class="chart">
-              <canvas bind:this={stackedBarChart} />
+              <canvas bind:this={lineCanvas} />
             </div>
           </div>
           {#each outputFields as field (field.symbol)}
