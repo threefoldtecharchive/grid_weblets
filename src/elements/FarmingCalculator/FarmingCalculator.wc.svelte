@@ -11,7 +11,7 @@
 
   const profiles = [
     new FarmingProfile(),
-    new FarmingProfile("Standard", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
+    new FarmingProfile("Tital v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
   let profileChoosing: boolean = true;
   let activeProfile: FarmingProfile = null;
@@ -100,7 +100,7 @@
       <h4 class="is-size-4 mb-4">
         Farming Calculator
         {#if activeProfile && !profileChoosing}
-          ({activeProfile.name} Configuration)
+          ({activeProfile.name})
         {/if}
       </h4>
       {#if !profileChoosing}
@@ -117,11 +117,11 @@
     {#if profileChoosing}
       <div class="profile-container">
         <div>
-          <p class="mb-2">Choose A Configuration</p>
+          <p class="mb-2">Choose configuration</p>
 
           <div class="select">
             <select on:change={onSelectProfile}>
-              <option disabled selected>Please Select A Configuration</option>
+              <option disabled selected>Please select configuration</option>
               {#each profiles as profile (profile.name)}
                 <option>
                   {profile.name}
