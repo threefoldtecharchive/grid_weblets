@@ -89,73 +89,22 @@ export default class FarmingProfile {
   }
 
   /* help functions for charts */
-  private getCuFarmingRewardInTft(
-    additionMemory: number = 0,
-    in5Years: boolean = false
-  ): number {
-    const { memory, cpu, tftRewardPer, rewardPerCu, price, priceAfter5Years } =
-      this;
-    const tftRewardPerCu =
-      (rewardPerCu / (in5Years ? priceAfter5Years : price)) * tftRewardPer;
-    const x = (memory + additionMemory - 1) / 4;
-    const y = (cpu * 4) / 2;
-    const cu = Math.min(x, y);
-    return tftRewardPerCu * cu;
-  }
+  public getTotalReward(price: number): number {
+    const { memory, cpu, tftRewardPer, rewardPerCu } = this;
+    const tftRewardPerCu = (rewardPerCu / price) * tftRewardPer;
+    const x1 = (memory - 1) / 4;
+    const y1 = (cpu * 4) / 2;
+    const cu = tftRewardPerCu * Math.min(x1, y1);
 
-  private getSuFarmingRewardInTft(
-    additionHdd: number = 0,
-    in5Years: boolean = false
-  ): number {
-    const { hdd, ssd, tftRewardPer, rewardPerSu, price, priceAfter5Years } =
-      this;
-    const tftRewardPerSu =
-      (rewardPerSu / (in5Years ? priceAfter5Years : price)) * tftRewardPer;
-    const x = (hdd + additionHdd) / 1200;
-    const y = (ssd / 300) * 0.8;
-    const su = x + y;
-    return tftRewardPerSu * su;
-  }
+    const { hdd, ssd, rewardPerSu } = this;
+    const tftRewardPerSu = (rewardPerSu / price) * tftRewardPer;
+    const x2 = hdd / 1200;
+    const y2 = (ssd / 300) * 0.8;
+    const su = tftRewardPerSu * (x2 + y2);
 
-  private getNuFarmingRewardInTft(
-    additionMemory: number = 0,
-    in5Years: boolean = false
-  ): number {
-    const { rewardPerNu, publicIp, price, priceAfter5Years } = this;
-    const tftRewardPerNu = rewardPerNu / (in5Years ? priceAfter5Years : price);
-    const nu = this.getCuFarmingRewardInTft(additionMemory) * 30;
-    return publicIp ? tftRewardPerNu * nu : 0;
-  }
-
-  public get farmingReward() {
-    const cu = this.getCuFarmingRewardInTft();
-    const su = this.getSuFarmingRewardInTft();
-    const nu = this.getNuFarmingRewardInTft();
-    const total = cu + su + nu;
-    return [cu, su, nu, total];
-  }
-
-  public get farmingReward1000() {
-    const cu = this.getCuFarmingRewardInTft(1000);
-    const su = this.getSuFarmingRewardInTft(1000);
-    const nu = this.getNuFarmingRewardInTft(1000);
-    const total = cu + su + nu;
-    return [cu, su, nu, total];
-  }
-
-  public get farmingRewardIn5Years() {
-    const cu = this.getCuFarmingRewardInTft(0, true);
-    const su = this.getSuFarmingRewardInTft(0, true);
-    const nu = this.getNuFarmingRewardInTft(0, true);
-    const total = cu + su + nu;
-    return [cu, su, nu, total];
-  }
-
-  public get farmingReward1000In5Years() {
-    const cu = this.getCuFarmingRewardInTft(1000, true);
-    const su = this.getSuFarmingRewardInTft(1000, true);
-    const nu = this.getNuFarmingRewardInTft(1000, true);
-    const total = cu + su + nu;
-    return [cu, su, nu, total];
+    const { rewardPerNu, publicIp } = this;
+    const tftRewardPerNu = rewardPerNu / price;
+    const nu = publicIp ? tftRewardPerNu * (cu * 30) : 0;
+    return cu + su + nu;
   }
 }
