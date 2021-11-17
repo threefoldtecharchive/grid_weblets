@@ -1,0 +1,98 @@
+- label: GENERAL
+  children:
+    - label: Dashboard
+      path: /Dashboard
+      to: /#Dashboard
+    - label: Customers
+      path: /Customers
+      to: /#Customers
+- label: ADMINISTRATION
+  children:
+    - label: Team Settings
+      path: /Team
+      to: /#Team
+    - label: Manage Your Team
+      path: /Manage
+      to: /#Manage
+      children:
+        - label: Members
+          path: /Members
+          to: /#Members
+        - label: Plugins
+          path: /Plugins
+          to: /#Plugins
+        - label: Add a member
+          path: /Add
+          to: /#Add
+    - label: Invitations
+      path: /Invitations
+      to: /#Invitations
+    - label: Cloud Storage Environment Settings
+      path: /Cloud
+      to: /#Cloud
+    - label: Authentication
+      path: /Authentication
+      to: /#Authentication
+      children:
+        - label: Team Settings
+          path: /Team
+          to: /#Team
+        - label: Manage Your Team
+          path: /Manage
+          to: /#Manage
+          children:
+            - label: Members
+              path: /Members
+              to: /#Members
+            - label: Plugins
+              path: /Plugins
+              to: /#Plugins
+            - label: Add a member
+              path: /Add
+              to: /#Add
+        - label: Invitations
+          path: /Invitations
+          to: /#Invitations
+        - label: Cloud Storage Environment Settings
+          path: /Cloud
+          to: /#Cloud
+        - label: Authentication
+          path: /Authentication
+          to: /#Authentication
+          children:
+            - label: Team Settings
+              path: /Team
+              to: /#Team
+            - label: Manage Your Team
+              path: /Manage
+              to: /#Manage
+              children:
+                - label: Members
+                  path: /Members
+                  to: /#Members
+                - label: Plugins
+                  path: /Plugins
+                  to: /#Plugins
+                - label: Add a member
+                  path: /Add
+                  to: /#Add
+            - label: Invitations
+              path: /Invitations
+              to: /#Invitations
+            - label: Cloud Storage Environment Settings
+              path: /Cloud
+              to: /#Cloud
+            - label: Authentication
+              path: /Authentication
+              to: /#Authentication
+- label: TRANSACTIONS
+  children:
+    - label: Payments
+      path: /Payments
+      to: /#Payments
+    - label: Transfers
+      path: /Transfers
+      to: /#Transfers
+    - label: Balance
+      path: /Balance
+      to: /#Balance

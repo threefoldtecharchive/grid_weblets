@@ -1,16 +1,16 @@
 <svelte:options tag={null} />
 
 <script lang="ts">
-  import { Chart, registerables } from "chart.js";
   import { onMount } from "svelte";
+  import { build3DChart } from "../../utils/incaCharts";
 
-  let canvas3D: HTMLCanvasElement;
+  let canvas3D: HTMLDivElement;
 
   onMount(() => {
-    Chart.register(...registerables);
+    build3DChart(canvas3D);
   });
 </script>
 
-<div>
-  <canvas bind:this={canvas3D} />
+<div style="width: 500px;">
+  <div bind:this={canvas3D} />
 </div>
