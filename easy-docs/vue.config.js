@@ -4,6 +4,6 @@ module.exports = {
     transpileDependencies: [
       'vuetify'
     ],
-    outputDir: join(__dirname, 'docs'),
-    publicPath: '/easy-docs/'
+    outputDir: join(__dirname, '..', 'docs'),
+    publicPath: '/grid_weblets/'
 }

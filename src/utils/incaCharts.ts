@@ -1,5 +1,3 @@
-import { newPlot } from "plotly.js";
-
 export function build3DChart(canvas: HTMLDivElement) {
   // const ctx = canvas.getContext("2d");
 
@@ -29,28 +27,6 @@ export function build3DChart(canvas: HTMLDivElement) {
   const z = multiple.map((a) => +a.toFixed(3));
 
   console.log({ x, y, z });
-
-  newPlot(
-    canvas,
-    [
-      {
-        type: "scatter3d",
-        mode: "lines",
-        x: x,
-        y: y,
-        z: z,
-        opacity: 1,
-        line: {
-          width: 6,
-          // color: c,
-          // reversescale: false
-        },
-      },
-    ],
-    {
-      height: 640,
-    }
-  );
 
   // return new Chart(ctx, {
   //   type: "line",
