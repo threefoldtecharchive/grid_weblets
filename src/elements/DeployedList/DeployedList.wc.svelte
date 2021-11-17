@@ -18,7 +18,6 @@
   let loading = false;
   let configed = false;
   let list: DeployedList;
-  let password: string = "";
 
   // prettier-ignore
   const configFields: IFormField[] = [
@@ -51,11 +50,9 @@
 <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
-      List Deployed
+      Deployment List
       {#if tab === "k8s" || tab === "vm" || tab === "caprover"}
-        {tab.toLocaleUpperCase()}
-      {:else}
-        Elements
+        ({tab.toLocaleUpperCase()})
       {/if}
     </h4>
     <hr />
@@ -73,43 +70,6 @@
             <option value="dev">Devnet</option>
           </select>
         </div>
-        {#if $data.loaded === false}
-          <div style="display: flex; align-items: center;">
-            <div class="field mr-2" style="width: 100%">
-              <p class="label">Configs Password</p>
-              <div class="control">
-                <input
-                  class="input"
-                  type="text"
-                  placeholder="Your Configs Password"
-                  bind:value={password}
-                />
-              </div>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="button is-primary is-outlined mb-2"
-                disabled={password === ""}
-                on:click={() => {
-                  data.load(password);
-                }}
-              >
-                Load
-              </button>
-              <button
-                type="button"
-                class="button is-success"
-                disabled={password === ""}
-                on:click={() => {
-                  data.save(password);
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        {/if}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
@@ -118,18 +78,40 @@
                 class="input"
                 type="text"
                 placeholder={field.placeholder}
-                bind:value={data[field.symbol]}
+                bind:value={$data[field.symbol]}
               />
             </div>
           </div>
         {/each}
-        <div style="display: flex; justify-content: center;">
+        <div style="display: flex; justify-content: flex-end;">
+          {#if $data.loaded === false}
+            <button
+              type="button"
+              class="button is-primary is-outlined mr-2"
+              disabled={$data.storeSecret === ""}
+              on:click={() => {
+                data.load();
+              }}
+            >
+              Load
+            </button>
+            <button
+              type="button"
+              class="button is-success mr-2"
+              disabled={$data.storeSecret === "" || $data.mnemonics === ""}
+              on:click={() => {
+                data.save();
+              }}
+            >
+              Save
+            </button>
+          {/if}
           <button
             disabled={$data.mnemonics === "" || $data.storeSecret === ""}
             type="submit"
             class="button is-primary"
           >
-            List Elements
+            List
           </button>
         </div>
       </form>
