@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "rollup -c",
+    "build:app": "yarn build && sh build.sh && cd easy-docs && yarn build",
     "dev": "rollup -c rollup.config.dev.js -w",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json"
@@ -14,9 +15,9 @@
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
+    "@types/crypto-js": "^4.0.2",
     "@types/js-yaml": "^4.0.4",
     "@types/marked": "^3.0.2",
-    "@types/page": "^1.11.5",
     "@types/uuid": "^8.3.1",
     "autoprefixer": "^10.3.7",
     "clean-webpack-plugin": "^4.0.0",
@@ -49,6 +50,8 @@
     "@polkadot/extension-dapp": "^0.41.1",
     "add": "^2.0.6",
     "bulma": "^0.9.3",
+    "chart.js": "^3.6.0",
+    "crypto-js": "^4.1.1",
     "front-matter": "^4.0.2",
     "grid3_client": "0.0.16",
     "js-yaml": "^4.1.0",

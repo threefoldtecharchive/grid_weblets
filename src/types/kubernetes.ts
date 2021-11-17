@@ -1,5 +1,4 @@
 import { v4 } from "uuid";
-import BaseConfig from "./baseConfig";
 import isValidInteger from "../utils/isValidInteger";
 
 export abstract class Base {
@@ -54,15 +53,14 @@ export default class Kubernetes {
     public sshKey: string = "",
     public metadata: string = "",
     public description: string = "",
-    public configs = new BaseConfig()
+    public configs = window.configs.baseConfig
   ) {}
 
   public get valid(): boolean {
-    const { secret, sshKey, master, workers, configs, network } = this;
+    const { secret, sshKey, master, workers, network } = this;
     return (
       secret !== "" &&
       sshKey !== "" &&
-      configs.valid &&
       master.valid &&
       network.valid &&
       workers.reduce((res, w) => res && w.valid, true)

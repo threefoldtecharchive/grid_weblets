@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import type { IFormField } from "../../types";
-  import BaseConfig from "../../types/baseConfig";
   import DeployedList from "../../types/deployedList";
 
   export let tab: "k8s" | "vm" | "caprover" = undefined;
@@ -15,10 +14,11 @@
   ];
   let active: string = "Kubernetes";
 
-  const data = new BaseConfig();
+  const data = window.configs.baseConfig;
   let loading = false;
   let configed = false;
   let list: DeployedList;
+  let password: string = "";
 
   // prettier-ignore
   const configFields: IFormField[] = [
@@ -29,14 +29,14 @@
   function onConfigHandler() {
     configed = true;
     loading = true;
-    DeployedList.init(data)
+    DeployedList.init($data)
       .then((_list) => {
         list = _list;
-        console.log(list);
+        // console.log(list);
       })
-      .catch((err) => {
-        console.log("Error", err);
-      })
+      // .catch((err) => {
+      //   console.log("Error", err);
+      // })
       .finally(() => (loading = false));
   }
 
@@ -68,11 +68,48 @@
           class="select mb-4"
           style="display: flex; justify-content: flex-end;"
         >
-          <select bind:value={data.networkEnv}>
+          <select bind:value={$data.networkEnv}>
             <option value="test">Testnet</option>
             <option value="dev">Devnet</option>
           </select>
         </div>
+        {#if $data.loaded === false}
+          <div style="display: flex; align-items: center;">
+            <div class="field mr-2" style="width: 100%">
+              <p class="label">Configs Password</p>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="Your Configs Password"
+                  bind:value={password}
+                />
+              </div>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="button is-primary is-outlined mb-2"
+                disabled={password === ""}
+                on:click={() => {
+                  data.load(password);
+                }}
+              >
+                Load
+              </button>
+              <button
+                type="button"
+                class="button is-success"
+                disabled={password === ""}
+                on:click={() => {
+                  data.save(password);
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        {/if}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
@@ -88,7 +125,7 @@
         {/each}
         <div style="display: flex; justify-content: center;">
           <button
-            disabled={!data.valid}
+            disabled={$data.mnemonics === "" || $data.storeSecret === ""}
             type="submit"
             class="button is-primary"
           >
@@ -129,7 +166,7 @@
 
       {#if (!tab && active === "Kubernetes") || tab === "k8s"}
         {#await list.load("k8s")}
-          <p class="mt-2">&gt; Loading...</p>
+          <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           <div class="table-container mt-2">
             <table class="table">
@@ -159,12 +196,21 @@
               </tbody>
             </table>
           </div>
+        {:catch err}
+          <div class="notification is-danger mt-2">
+            &gt;
+            {#if err && err.message}
+              {err.message}
+            {:else}
+              Failed to list {active}.
+            {/if}
+          </div>
         {/await}
       {/if}
 
       {#if active === "Virtual Machines" || active === "Caprover" || tab === "caprover" || tab === "vm"}
         {#await active === "Caprover" || tab === "caprover" ? loadCaprover() : list.load("machines")}
-          <p class="mt-2">&gt; Loading...</p>
+          <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           <div class="table-container mt-2">
             <table class="table">
@@ -193,6 +239,15 @@
                 {/each}
               </tbody>
             </table>
+          </div>
+        {:catch err}
+          <div class="notification is-danger mt-2">
+            &gt;
+            {#if err && err.message}
+              {err.message}
+            {:else}
+              Failed to list {active}.
+            {/if}
           </div>
         {/await}
       {/if}
