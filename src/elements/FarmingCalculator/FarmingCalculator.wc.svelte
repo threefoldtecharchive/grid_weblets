@@ -10,12 +10,12 @@
   } from "../../utils/FarmingCalculatorCharts";
 
   const basicProfiles = [
-    new FarmingProfile(),
+    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
     new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
 
   const advancedProfiles = [
-    new FarmingProfile(),
+    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
     new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
   let profileChoosing: boolean = true;
