@@ -62,7 +62,7 @@ export function buildLineChart(canvas: HTMLCanvasElement, fp: FarmingProfile) {
         },
         title: {
           display: true,
-          text: "TFT Price (USD) / TFT Reward",
+          text: "TFT Price (USD) / USD Return",
         },
       },
     },
