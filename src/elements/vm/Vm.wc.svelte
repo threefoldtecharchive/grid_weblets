@@ -271,43 +271,6 @@
       {/if}
 
       {#if active === "Configs"}
-        {#if $configs.loaded === false}
-          <div style="display: flex; align-items: center;">
-            <div class="field mr-2" style="width: 100%">
-              <p class="label">Configs Password</p>
-              <div class="control">
-                <input
-                  class="input"
-                  type="text"
-                  placeholder="Your Configs Password"
-                  bind:value={password}
-                />
-              </div>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="button is-primary is-outlined mb-2"
-                disabled={password === ""}
-                on:click={() => {
-                  configs.load(password);
-                }}
-              >
-                Load
-              </button>
-              <button
-                type="button"
-                class="button is-success"
-                disabled={password === ""}
-                on:click={() => {
-                  configs.save(password);
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        {/if}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
@@ -334,6 +297,28 @@
     {/if}
 
     <div class="actions">
+      {#if $configs.loaded === false}
+        <button
+          type="button"
+          class="button is-primary is-outlined mr-2"
+          disabled={$configs.storeSecret === ""}
+          on:click={() => {
+            configs.load();
+          }}
+        >
+          Load
+        </button>
+        <button
+          type="button"
+          class="button is-success mr-2"
+          disabled={$configs.storeSecret === "" || $configs.mnemonics === ""}
+          on:click={() => {
+            configs.save();
+          }}
+        >
+          Save
+        </button>
+      {/if}
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
