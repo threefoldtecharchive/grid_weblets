@@ -96,6 +96,6 @@ yarn build
 
 - `cd easy-docs`
 - `yarn build`  will output in the docs directory
-- serve content in public dir for `/grid_weblets`
+- serve content in docs dir for path `/grid_weblets` so `play.grid.tf/grid_weblets`
 
 
