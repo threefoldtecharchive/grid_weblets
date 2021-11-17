@@ -1,6 +1,6 @@
 #!/bin/bash
 
-$WORKING_DIR = easy-docs/public/build/
+WORKING_DIR=easy-docs/public/build/
 
 if [ -d "$WORKING_DIR" ]; 
 then 
