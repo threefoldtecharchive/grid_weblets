@@ -12,45 +12,44 @@
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your K8S Name." },
-    { label: "Secret", symbol: "secret", placeholder: "Your Secret." },
-    { label: "SSH Key", symbol: "sshKey", placeholder: "Your SSH Key." },
-    { label: "Metadata", symbol: "metadata", placeholder: "Your Metadata." },
-    { label: "Description", symbol: "description", placeholder: "Your Description.", textarea: true },
+    { label: "Name", symbol: "name", placeholder: "Your K8S Name" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Your Cluster Token" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your Public SSH Key" },
+    // { label: "Metadata", symbol: "metadata", placeholder: "Your Metadata" },
+    // { label: "Description", symbol: "description", placeholder: "Your Description", textarea: true },
   ];
 
   // prettier-ignore
   const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Your Network Name." },
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range." },
+    { label: "Network Name", symbol: "name", placeholder: "Your Network Name" },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range" },
   ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Solution name" },
-    { label: "Node", symbol: "node", placeholder: "Node ID", type: 'number' },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU count", type: 'number' },
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size in Gigabyte", type: 'number' },
+    { label: "Name", symbol: "name", placeholder: "Enter name" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU Size", type: 'number' },
+    { label: "Memory", symbol: "memory", placeholder: "Memory Size", type: 'number' },
+    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size", type: 'number' },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
-    { label: "Memory", symbol: "memory", placeholder: "Memory Size in Megabyte", type: 'number' },
-    { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
-    { label: "Plantery", symbol: "plantery", placeholder: "", type: 'checkbox' },
+    { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
+    { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
+    // { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
+    { label: "Secret", symbol: "storeSecret", placeholder: "Your Secret.", type: "password" },
   ];
-
 
   const tabs = [
-    { label: "Base" },
+    { label: "Config" },
     { label: "Master" },
     { label: "Workers" },
-    { label: "Configs" },
+    { label: "Credentials" },
   ];
-  let active: string = "Base";
+  let active: string = "Config";
   let loading = false;
   let success = false;
   let failed = false;
@@ -129,7 +128,7 @@
         </ul>
       </div>
 
-      {#if active === "Base"}
+      {#if active === "Config"}
         <!-- Show Base Info -->
         {#each kubernetesFields as field (field.symbol)}
           <div class="field">
@@ -173,7 +172,11 @@
         <!-- Show Master Info -->
         {#each baseFields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}</p>
+            <p class="label">{field.label}
+              {#if field.link}
+                (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+              {/if}
+            </p>
             <div class="control">
               {#if field.type === "number"}
                 <input
@@ -214,10 +217,10 @@
         <div class="actions" style="margin-bottom: 20px;">
           <button
             type="button"
-            class="button is-primary is-light"
+            class="button is-primary"
             on:click={() => (data.workers = [...data.workers, new Worker()])}
           >
-            <span>+ ADD Worker</span>
+            <span>+</span>
           </button>
         </div>
         <div class="worker-container">
@@ -227,16 +230,20 @@
                 <p class="is-size-5 has-text-weight-bold">{worker.name}</p>
                 <button
                   type="button"
-                  class="button is-danger is-outlined"
+                  class="button is-danger"
                   on:click={() =>
                     (data.workers = data.workers.filter((_, i) => index !== i))}
                 >
-                  <span>Delete</span>
+                  <span>-</span>
                 </button>
               </div>
               {#each baseFields as field (field.symbol)}
                 <div class="field">
-                  <p class="label">{field.label}</p>
+                    <p class="label">{field.label}
+                      {#if field.link}
+                    (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+                  {/if}
+                  </p>
                   <div class="control">
                     {#if field.type === "number"}
                       <input
@@ -275,52 +282,16 @@
         </div>
       {/if}
 
-      {#if active === "Configs"}
-        {#if $configs.loaded === false}
-          <div style="display: flex; align-items: center;">
-            <div class="field mr-2" style="width: 100%">
-              <p class="label">Configs Password</p>
-              <div class="control">
-                <input
-                  class="input"
-                  type="text"
-                  placeholder="Your Configs Password"
-                  bind:value={password}
-                />
-              </div>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="button is-primary is-outlined mb-2"
-                disabled={password === ""}
-                on:click={() => {
-                  configs.load(password);
-                }}
-              >
-                Load
-              </button>
-              <button
-                type="button"
-                class="button is-success"
-                disabled={password === ""}
-                on:click={() => {
-                  configs.save(password);
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        {/if}
+      {#if active === "Credentials"}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
             <div class="control">
-              {#if field.type === "number"}
+              {#if field.type === "password"}
                 <input
                   class="input"
-                  type="number"
+                  type="password"
+                  autocomplete="off"
                   placeholder={field.placeholder}
                   bind:value={$configs[field.symbol]}
                 />
@@ -339,6 +310,28 @@
     {/if}
 
     <div class="actions">
+      {#if $configs.loaded === false}
+        <button
+          type="button"
+          class="button is-primary is-outlined mr-2"
+          disabled={$configs.storeSecret === ""}
+          on:click={() => {
+            configs.load();
+          }}
+        >
+          Load
+        </button>
+        <button
+          type="button"
+          class="button is-success mr-2"
+          disabled={$configs.storeSecret === "" || $configs.mnemonics === ""}
+          on:click={() => {
+            configs.save();
+          }}
+        >
+          Save
+        </button>
+      {/if}
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
