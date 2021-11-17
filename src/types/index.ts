@@ -24,5 +24,9 @@ export interface IFormField {
   placeholder?: string;
   symbol: string;
   textarea?: boolean;
-  type?: "text" | "number" | "checkbox";
+  type?: "text" | "number" | "checkbox" | "password";
+  link?: {
+    url: string,
+    label: string,
+  };
 }

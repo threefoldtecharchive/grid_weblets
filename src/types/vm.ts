@@ -18,9 +18,9 @@ export class Env {
 export class Disk {
   constructor(
     public id = v4(),
-    public name = id.split("-")[0],
-    public size = 2,
-    public mountpoint = "/"
+    public name = "disk_" + id.split("-")[0],
+    public size = 50,
+    public mountpoint = "/opt/"
   ) {}
 
   public get valid(): boolean {
@@ -33,20 +33,20 @@ export default class VM {
   constructor(
     /* Base */
     public id = v4(),
-    public name = id.split("-")[0],
+    public name = "vm_" + id.split("-")[0],
     public flist = "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-    public cpu = 1,
-    public memory = 1024,
+    public cpu = 4,
+    public memory = 1024 * 8,
     public entrypoint = "/sbin/zinit init",
     public planetary = true,
     public nodeId = 1,
-    public rootFsSize = 1,
+    public rootFsSize = 25,
 
     /* Network */
     public network = new Network(),
 
-    public envs: Env[] = [new Env()],
-    public disks: Disk[] = [new Disk()],
+    public envs: Env[] = [],
+    public disks: Disk[] = [],
     public publicIp = false,
 
     /* Configs */

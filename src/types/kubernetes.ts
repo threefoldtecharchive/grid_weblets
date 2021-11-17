@@ -32,7 +32,7 @@ export class Worker extends Base {}
 
 export class Network {
   constructor(
-    public name: string = "",
+    public name: string = "nw_" + v4().split("-")[0],
     public ipRange: string = "10.20.0.0/16"
   ) {}
 
