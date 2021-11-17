@@ -51,11 +51,11 @@ class Weblet {
 })
 export default class Editor extends Vue {
   public weblets: Weblet[] = [
-    new Weblet("Kubernetes", `kubernetes`),
-    new Weblet("Virtual Machine", "vm"),
-    new Weblet("Deployed List", "deployedlist"),
-    new Weblet("CapRover", "caprover"),
     new Weblet("Farming Calculator", "farming-calculator"),
+    new Weblet("CapRover", "caprover"),
+    new Weblet("Virtual Machine", "vm"),
+    new Weblet("Kubernetes", `kubernetes`),
+    new Weblet("Deployed List", "deployedlist"),
   ];
   public active = -1;
 }
