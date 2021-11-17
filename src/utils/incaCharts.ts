@@ -1,6 +1,4 @@
 export function build3DChart(canvas: HTMLDivElement) {
-  // const ctx = canvas.getContext("2d");
-
   // constants
   const MAX_NO_OF_TFS = 50; // D42
   const TFS_PRICE = 10; // C3
@@ -26,7 +24,7 @@ export function build3DChart(canvas: HTMLDivElement) {
   const y = tftPrice.map((a) => +a.toFixed(3));
   const z = multiple.map((a) => +a.toFixed(3));
 
-  console.log({ x, y, z });
+  return { x, y, z };
 
   // return new Chart(ctx, {
   //   type: "line",

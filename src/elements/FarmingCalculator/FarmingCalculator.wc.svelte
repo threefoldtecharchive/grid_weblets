@@ -9,17 +9,32 @@
     buildLineChart,
   } from "../../utils/FarmingCalculatorCharts";
 
-  const profiles = [
+  const basicProfiles = [
+    new FarmingProfile(),
+    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
+  ];
+
+  const advancedProfiles = [
     new FarmingProfile(),
     new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
   let profileChoosing: boolean = true;
+  let activeProfileIdx: number = 0;
   let activeProfile: FarmingProfile = null;
 
   function onSelectProfile(e: Event) {
-    const idx = e.target["selectedIndex"] - 1;
-    activeProfile = profiles[idx];
+    activeProfileIdx = e.target["selectedIndex"] - 1;
+    activeProfile = getProfile();
   }
+
+  function getProfile(): FarmingProfile {
+    return active === "Basic"
+      ? basicProfiles[activeProfileIdx]
+      : advancedProfiles[activeProfileIdx];
+  }
+
+  const tabFields = ["Basic", "Advanced"];
+  let active: string = tabFields[0];
 
   // prettier-ignore
   const inputFields = [
@@ -67,7 +82,7 @@
     profileChoosing = false;
     requestAnimationFrame(() => {
       _pieChart = buildPieChart(pieCanvas);
-      _lineCanvas = buildLineChart(lineCanvas, activeProfile);
+      _lineCanvas = buildLineChart(lineCanvas, getProfile());
     });
   }
 
@@ -77,16 +92,28 @@
     _lineCanvas = null;
   }
 
+  function onSelectTab(tab: string) {
+    _pieChart = null;
+    _lineCanvas = null;
+    active = tab;
+    activeProfile = getProfile();
+
+    requestAnimationFrame(() => {
+      _pieChart = buildPieChart(pieCanvas);
+      _lineCanvas = buildLineChart(lineCanvas, getProfile());
+    });
+  }
+
   $: {
     if (_pieChart && activeProfile) {
-      const { cu, su, nu, rewardPerCu, rewardPerNu, rewardPerSu } = activeProfile; // prettier-ignore
+      const { cu, su, nu, rewardPerCu, rewardPerNu, rewardPerSu } = getProfile(); // prettier-ignore
       _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nu * rewardPerNu]; // prettier-ignore
       _pieChart.update();
     }
 
     if (_lineCanvas && activeProfile) {
-      const xs = [...Array.from({ length: 51 }).map((_, i) => 0.15 + 0.397 * i)]; // prettier-ignore
-      _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getTotalReward(x)); // prettier-ignore
+      const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + 0.397 * i)]; // prettier-ignore
+      _lineCanvas.data.datasets[0].data = xs.map((x) => getProfile().getTotalReward(x)); // prettier-ignore
       _lineCanvas.update();
     }
   }
@@ -122,7 +149,7 @@
           <div class="select">
             <select on:change={onSelectProfile}>
               <option disabled selected>Please select configuration</option>
-              {#each profiles as profile (profile.name)}
+              {#each basicProfiles as profile (profile.name)}
                 <option>
                   {profile.name}
                 </option>
@@ -141,61 +168,137 @@
           </div>
         </div>
       </div>
-    {:else}
-      <div class="farming-content">
-        <div class="farming-content--left">
-          {#each inputFields as field (field.symbol)}
-            <div class="field">
-              <div class="control">
-                {#if field.type === "checkbox"}
-                  <label class="checkbox">
-                    <p class="label">{field.label}</p>
-                    <input
-                      type="checkbox"
-                      bind:checked={activeProfile[field.symbol]}
-                    />
-                    {field.label}
-                  </label>
-                {:else}
+    {/if}
+
+    {#if !profileChoosing}
+      <div class="tabs is-centered">
+        <ul>
+          {#each tabFields as tab (tab)}
+            <li class={tab === active ? "is-active" : ""}>
+              <a
+                on:click|preventDefault={onSelectTab.bind(undefined, tab)}
+                href="#!"
+                >{tab}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </div>
+
+      {#if active === "Basic"}
+        <div class="farming-content">
+          <div class="farming-content--left">
+            {#each inputFields as field (field.symbol)}
+              <div class="field">
+                <div class="control">
+                  {#if field.type === "checkbox"}
+                    <label class="checkbox">
+                      <p class="label">{field.label}</p>
+                      <input
+                        type="checkbox"
+                        bind:checked={activeProfile[field.symbol]}
+                      />
+                      {field.label}
+                    </label>
+                  {:else}
+                    <label class="label">
+                      <p>{field.label}</p>
+                      <input
+                        disabled={field.symbol === "priceAfter5Years"}
+                        class="input"
+                        type="number"
+                        bind:value={activeProfile[field.symbol]}
+                      />
+                    </label>
+                  {/if}
+                </div>
+              </div>
+            {/each}
+          </div>
+          <div class="farming-content--right">
+            <div class="charts-container">
+              <div class="chart chart-1" style="display: none;">
+                <canvas bind:this={pieCanvas} />
+              </div>
+              <div class="chart chart-2">
+                <canvas bind:this={lineCanvas} />
+              </div>
+            </div>
+            {#each outputFields as field (field.symbol)}
+              <div class="field">
+                <div class="control">
                   <label class="label">
                     <p>{field.label}</p>
                     <input
+                      disabled
                       class="input"
                       type="number"
-                      bind:value={activeProfile[field.symbol]}
+                      value={activeProfile[field.symbol].toFixed(2)}
                     />
                   </label>
-                {/if}
+                </div>
               </div>
-            </div>
-          {/each}
-        </div>
-        <div class="farming-content--right">
-          <div class="charts-container">
-            <div class="chart chart-1">
-              <canvas bind:this={pieCanvas} />
-            </div>
-            <div class="chart">
-              <canvas bind:this={lineCanvas} />
-            </div>
+            {/each}
           </div>
-          {#each outputFields as field (field.symbol)}
-            <div class="field">
-              <div class="control">
-                <label class="label">
-                  <p>{field.label}</p>
-                  <input
-                    disabled
-                    class="input"
-                    type="number"
-                    value={activeProfile[field.symbol].toFixed(2)}
-                  />
-                </label>
+        </div>
+      {/if}
+
+      {#if active === "Advanced"}
+        <div class="farming-content">
+          <div class="farming-content--left">
+            {#each inputFields as field (field.symbol)}
+              <div class="field">
+                <div class="control">
+                  {#if field.type === "checkbox"}
+                    <label class="checkbox">
+                      <p class="label">{field.label}</p>
+                      <input
+                        type="checkbox"
+                        bind:checked={activeProfile[field.symbol]}
+                      />
+                      {field.label}
+                    </label>
+                  {:else}
+                    <label class="label">
+                      <p>{field.label}</p>
+                      <input
+                        class="input"
+                        type="number"
+                        bind:value={activeProfile[field.symbol]}
+                      />
+                    </label>
+                  {/if}
+                </div>
+              </div>
+            {/each}
+          </div>
+          <div class="farming-content--right">
+            <div class="charts-container">
+              <div class="chart chart-1">
+                <canvas bind:this={pieCanvas} />
+              </div>
+              <div class="chart">
+                <canvas bind:this={lineCanvas} />
               </div>
             </div>
-          {/each}
+            {#each outputFields as field (field.symbol)}
+              <div class="field">
+                <div class="control">
+                  <label class="label">
+                    <p>{field.label}</p>
+                    <input
+                      disabled
+                      class="input"
+                      type="number"
+                      value={activeProfile[field.symbol].toFixed(2)}
+                    />
+                  </label>
+                </div>
+              </div>
+            {/each}
+          </div>
         </div>
-      </div>
+      {/if}
     {/if}
   </div>
 </section>
@@ -257,6 +360,10 @@
       width: 40%;
       border-right: 2px solid #f5f5f5;
       margin-right: 1.5rem;
+    }
+
+    &-2 {
+      width: 100%;
     }
   }
 </style>
