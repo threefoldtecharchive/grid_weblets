@@ -26,8 +26,8 @@
     { label: "Name", symbol: 'name', placeholder: 'Your VM name.'},
     { label: "FList", symbol: 'flist', placeholder: 'Your flist.'},
     { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint.'},    
-    { label: "CPU", symbol: 'cpu', placeholder: 'Your Cpu size.', type: 'number'},
-    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory size.', type: 'number'},
+    { label: "CPU", symbol: 'cpu', placeholder: 'Your CPU.', type: 'number'},
+    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB.', type: 'number'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
     { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID.', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
@@ -36,21 +36,21 @@
 
   // prettier-ignore
   const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Your Env Key."},
-    { label: 'Value', symbol: 'value', placeholder: "Your Env Value."},
+    { label: 'Key', symbol: 'key', placeholder: "Your Env Key"},
+    { label: 'Value', symbol: 'value', placeholder: "Your Env Value"},
   ];
 
   // prettier-ignore
   const diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your Disk Name." },
-    { label: "Size", symbol: "size", placeholder: "Your Disk Size.", type: "number" },
-    { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point." },
+    { label: "Name", symbol: "name", placeholder: "Your Disk Name" },
+    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
+    { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point" },
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Secret", symbol: "storeSecret", placeholder: "Your Secret.", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
   let message: string;

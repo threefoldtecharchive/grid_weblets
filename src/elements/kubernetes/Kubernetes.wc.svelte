@@ -28,8 +28,8 @@
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Enter name" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Size", type: 'number' },
-    { label: "Memory", symbol: "memory", placeholder: "Memory Size", type: 'number' },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: 'number' },
+    { label: "Memory", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size", type: 'number' },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
@@ -39,8 +39,8 @@
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Secret", symbol: "storeSecret", placeholder: "Your Secret.", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
   const tabs = [

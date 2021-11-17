@@ -22,18 +22,18 @@
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your caprover name" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Size", type: "number" },
-    { label: "Memory", symbol: 'memory', placeholder: "Memory Size", type: "number" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
+    { label: "Memory", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
     { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number", link:{ label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Your Disk Size.", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "Your domain." },
+    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
+    { label: "Domain", symbol: "domain", placeholder: "domain configured on your name provider" },
     { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key" }
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret.", type:"password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
   let message: string;
