@@ -38,7 +38,8 @@ export function buildPieChart(canvas: HTMLCanvasElement) {
 export function buildLineChart(canvas: HTMLCanvasElement, fp: FarmingProfile) {
   const ctx = canvas.getContext("2d");
 
-  const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + 0.397 * i)];
+  const X = (20 - 0.15) / 19;
+  const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
 
   return new Chart(ctx, {
     type: "line",

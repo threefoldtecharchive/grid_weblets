@@ -10,13 +10,13 @@
   } from "../../utils/FarmingCalculatorCharts";
 
   const basicProfiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
+    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
+    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
   ];
 
   const advancedProfiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
+    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
+    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
   ];
   let profileChoosing: boolean = true;
   let activeProfileIdx: number = 0;
@@ -112,7 +112,9 @@
     }
 
     if (_lineCanvas && activeProfile) {
-      const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + 0.397 * i)]; // prettier-ignore
+      const X = (activeProfile.priceAfter5Years - 0.15) / 19;
+      const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
+      _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
       _lineCanvas.data.datasets[0].data = xs.map((x) => getProfile().getTotalReward(x)); // prettier-ignore
       _lineCanvas.update();
     }
