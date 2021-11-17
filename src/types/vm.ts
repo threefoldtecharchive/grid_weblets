@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
-import BaseConfig from "./baseConfig";
 import { Network } from "./kubernetes";
 
 export class Env {
@@ -51,12 +50,12 @@ export default class VM {
     public publicIp = false,
 
     /* Configs */
-    public configs = new BaseConfig()
+    public configs = window.configs.baseConfig
   ) {}
 
   public get valid(): boolean {
     const { name, flist, cpu, memory, entrypoint, nodeId } = this;
-    const { rootFsSize, network, envs, disks, configs } = this;
+    const { rootFsSize, network, envs, disks } = this;
     return (
       name !== "" &&
       flist !== "" &&
@@ -66,7 +65,6 @@ export default class VM {
       isValidInteger(nodeId) &&
       isValidInteger(rootFsSize) &&
       network.valid &&
-      configs.valid &&
       envs.reduce((res, env) => res && env.valid, true) &&
       disks.reduce((res, disk) => res && disk.valid, true)
     );

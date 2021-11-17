@@ -7,6 +7,8 @@
   import type { IFormField } from "../../types";
 
   const data = new Kubernetes();
+  const configs = data.configs;
+  let password: string = "";
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
@@ -57,6 +59,7 @@
     loading = true;
     success = false;
     failed = false;
+    message = undefined;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -68,9 +71,9 @@
 
     deployKubernetes(data)
       .then(() => (success = true))
-      .catch((err) => {
+      .catch((err: Error) => {
         failed = true;
-        console.log("Error", err);
+        message = err.message;
       })
       .finally(() => {
         loading = false;
@@ -95,13 +98,20 @@
     {:else if success}
       <div class="notification is-success">&gt; Successfully deployed K8S.</div>
     {:else if failed}
-      <div class="notification is-danger">&gt; Failed to deploy K8S.</div>
+      <div class="notification is-danger">
+        &gt;
+        {#if message}
+          {message}
+        {:else}
+          Failed to deploy K8S.
+        {/if}
+      </div>
     {:else}
       <div
         class="select mb-4"
         style="display: flex; justify-content: flex-end;"
       >
-        <select bind:value={data.configs.networkEnv}>
+        <select bind:value={$configs.networkEnv}>
           <option value="test">Testnet</option>
           <option value="dev">Devnet</option>
         </select>
@@ -265,6 +275,43 @@
       {/if}
 
       {#if active === "Configs"}
+        {#if $configs.loaded === false}
+          <div style="display: flex; align-items: center;">
+            <div class="field mr-2" style="width: 100%">
+              <p class="label">Configs Password</p>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="Your Configs Password"
+                  bind:value={password}
+                />
+              </div>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="button is-primary is-outlined mb-2"
+                disabled={password === ""}
+                on:click={() => {
+                  configs.load(password);
+                }}
+              >
+                Load
+              </button>
+              <button
+                type="button"
+                class="button is-success"
+                disabled={password === ""}
+                on:click={() => {
+                  configs.save(password);
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        {/if}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
@@ -274,14 +321,14 @@
                   class="input"
                   type="number"
                   placeholder={field.placeholder}
-                  bind:value={data.configs[field.symbol]}
+                  bind:value={$configs[field.symbol]}
                 />
               {:else}
                 <input
                   class="input"
                   type="text"
                   placeholder={field.placeholder}
-                  bind:value={data.configs[field.symbol]}
+                  bind:value={$configs[field.symbol]}
                 />
               {/if}
             </div>

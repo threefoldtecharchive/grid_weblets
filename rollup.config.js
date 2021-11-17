@@ -62,7 +62,7 @@ function build(options) {
 
 function buildElements() {
 	const dir = path.join(__dirname, 'src', 'elements');
-	const outDir = `../public/build/elements/`;
+	const outDir = `.build/build/elements/`;
 	return fs
 		.readdirSync(dir)
 		.map(f => {

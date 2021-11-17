@@ -1,3 +1,4 @@
+import { get } from "svelte/store";
 import type { default as VM, Disk, Env } from "../types/vm";
 import createNetwork from "./createNetwork";
 import getSignerObj from "./getSignerObj";
@@ -9,11 +10,11 @@ export default async function deployVM(data: VM) {
   const { configs, envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
-  const { mnemonics, storeSecret, networkEnv } = configs;
+  const { mnemonics, storeSecret, networkEnv } = get(configs);
 
   const http = new HTTPMessageBusClient(0, "");
   const grid = new GridClient(
-    networkEnv,
+    networkEnv as any,
     mnemonics,
     await getSignerObj("Deploy VM"),
     storeSecret,
