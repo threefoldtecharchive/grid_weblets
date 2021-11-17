@@ -3,11 +3,33 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { build3DChart } from "../../utils/incaCharts";
+  import Plotly from "plotly.js-dist";
 
-  let canvas3D: HTMLDivElement;
+  let canvas3D;
 
   onMount(() => {
-    build3DChart(canvas3D);
+    const { x, y, z } = build3DChart(canvas3D);
+
+    Plotly.newPlot(
+      canvas3D,
+      [
+        {
+          type: "scatter3d",
+          mode: "lines",
+          x: x,
+          y: y,
+          z: z,
+          opacity: 1,
+          line: {
+            width: 6,
+            reversescale: false,
+          },
+        },
+      ],
+      {
+        height: 500,
+      }
+    );
   });
 </script>
 

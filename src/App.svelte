@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Inca from "./elements/inca/Inca.wc.svelte";
+  import F from "./elements/FarmingCalculator/FarmingCalculator.wc.svelte";
 </script>
 
-<Inca />
+<F />

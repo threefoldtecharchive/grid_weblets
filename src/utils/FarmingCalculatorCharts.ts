@@ -38,19 +38,19 @@ export function buildPieChart(canvas: HTMLCanvasElement) {
 export function buildLineChart(canvas: HTMLCanvasElement, fp: FarmingProfile) {
   const ctx = canvas.getContext("2d");
 
-  const xs = [...Array.from({ length: 51 }).map((_, i) => 0.15 + 0.397 * i)];
+  const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + 0.397 * i)];
 
   return new Chart(ctx, {
     type: "line",
     data: {
-      labels: xs.map((i) => i.toFixed(3)),
+      labels: xs.map((i) => i.toFixed(2)),
       datasets: [
         {
           label: "TFT Price",
           data: xs.map((x) => fp.getTotalReward(x)),
           backgroundColor: "rgb(255, 99, 132)",
           borderColor: "rgba(255, 99, 132, 0.5)",
-          pointRadius: 1,
+          pointRadius: 3,
         },
       ],
     },
@@ -62,7 +62,7 @@ export function buildLineChart(canvas: HTMLCanvasElement, fp: FarmingProfile) {
         },
         title: {
           display: true,
-          text: "TFT Price (USD) / USD Return",
+          text: "Return (USD) / TFT price (USD)",
         },
       },
     },
