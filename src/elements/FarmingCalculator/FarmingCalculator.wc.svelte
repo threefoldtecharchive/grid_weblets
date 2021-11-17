@@ -13,8 +13,8 @@
     new FarmingProfile(),
     new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 1), // prettier-ignore
   ];
-  let profileChoosing: boolean = false;
-  let activeProfile: FarmingProfile = profiles[1];
+  let profileChoosing: boolean = true;
+  let activeProfile: FarmingProfile = null;
 
   function onSelectProfile(e: Event) {
     const idx = e.target["selectedIndex"] - 1;
@@ -61,7 +61,6 @@
 
   onMount(() => {
     Chart.register(...registerables);
-    onProfileChoosing(); /* Debug */
   });
 
   function onProfileChoosing() {
