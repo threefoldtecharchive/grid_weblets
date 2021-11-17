@@ -14,26 +14,26 @@
 
   // prettier-ignore
   const tabs = [
-    { label: "Base" },
-    { label: "Configs" },
+    { label: "Config" },
+    { label: "Credentials" },
   ];
-  let active = "Base";
+  let active = "Config";
 
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your caprover name" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU Size", type: "number" },
     { label: "Memory", symbol: 'memory', placeholder: "Memory Size", type: "number" },
-    { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
+    { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number", link:{ label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
     { label: "Disk Size", symbol: "diskSize", placeholder: "Your Disk Size.", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "Your domain." },
-    { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key." }
+    { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key" }
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret.", type:"password" },
   ];
 
   let message: string;
@@ -112,10 +112,14 @@
         </ul>
       </div>
 
-      {#if active === "Base"}
+      {#if active === "Config"}
         {#each fields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}</p>
+            <p class="label">{field.label}
+              {#if field.link}
+                (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+              {/if}
+            </p>
             <div class="control">
               {#if field.type === "number"}
                 <input
@@ -137,15 +141,16 @@
         {/each}
       {/if}
 
-      {#if active === "Configs"}
+      {#if active === "Credentials"}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
             <div class="control">
-              {#if field.type === "number"}
+              {#if field.type === "password"}
                 <input
                   class="input"
-                  type="number"
+                  type="password"
+                  autocomplete="off"
                   placeholder={field.placeholder}
                   bind:value={$configs[field.symbol]}
                 />
