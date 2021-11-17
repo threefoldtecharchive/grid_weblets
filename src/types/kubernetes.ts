@@ -4,13 +4,13 @@ import isValidInteger from "../utils/isValidInteger";
 export abstract class Base {
   public constructor(
     public id = v4(),
-    public name: string = id.split("-")[0],
+    public name: string = "vm_" + id.split("-")[0],
     public node: number = 0,
     public cpu: number = 0,
-    public diskSize: number = 0,
+    public diskSize: number = 100,
     public publicIp: boolean = false,
     public memory: number = 0,
-    public rootFsSize: number = 0,
+    public rootFsSize: number = 25,
     public plantery: boolean = true
   ) {}
 
@@ -32,7 +32,7 @@ export class Worker extends Base {}
 
 export class Network {
   constructor(
-    public name: string = "",
+    public name: string = "nw_" + v4().split("-")[0],
     public ipRange: string = "10.20.0.0/16"
   ) {}
 

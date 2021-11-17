@@ -15,27 +15,33 @@ function createBaseConfig() {
     subscribe,
     set,
     update,
-    load(password: string) {
+    load() {
+      const password = get(store).storeSecret;
       let data = localStorage.getItem("BASE_CONFIGS");
 
-      update((v) => {
-        try {
-          if (data) {
-            v = {
-              ...v,
-              ...JSON.parse(decrypt(data, password).toString(enc.Utf8)),
-            };
-          }
-          v.loaded = true;
-        } catch {}
-        return v;
-      });
+      if (data) {
+        update((v) => {
+          try {
+            if (data) {
+              v = {
+                ...v,
+                ...JSON.parse(decrypt(data, password).toString(enc.Utf8)),
+              };
+            }
+            v.loaded = true;
+          } catch {}
+          return v;
+        });
+      }
     },
-    save(password: string) {
-      localStorage.setItem(
-        "BASE_CONFIGS",
-        encrypt(JSON.stringify(get(store)), password).toString()
-      );
+    save() {
+      const { storeSecret: password, mnemonics } = get(store);
+      if (password && mnemonics) {
+        localStorage.setItem(
+          "BASE_CONFIGS",
+          encrypt(JSON.stringify(get(store)), password).toString()
+        );
+      }
     },
   };
 }

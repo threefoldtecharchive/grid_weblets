@@ -11,32 +11,30 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let password: string = "";
 
   // prettier-ignore
   const tabs = [
-    { label: "Base" },
-    { label: "Configs" },
+    { label: "Config" },
+    { label: "Credentials" },
   ];
-  let active = "Base";
+  let active = "Config";
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your Caprover instance name" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU count", type: "number" },
-    { label: "Memory", symbol: 'memory', placeholder: "Memory Size in Megabyte", type: "number" },
-    { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size in Gigabyte", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "whildcard domain on your name provider e.g *.mycaprover.example.com" },
-    { label: "SSH Public Key", symbol: "publicKey", placeholder: "Your SSH Public Key" }
+    { label: "Name", symbol: "name", placeholder: "Your caprover name" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU Size", type: "number" },
+    { label: "Memory", symbol: 'memory', placeholder: "Memory Size", type: "number" },
+    { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number", link:{ label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
+    { label: "Disk Size", symbol: "diskSize", placeholder: "Your Disk Size.", type: "number" },
+    { label: "Domain", symbol: "domain", placeholder: "Your domain." },
+    { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key" }
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret.", type:"password" },
   ];
-
 
   let message: string;
   function deployCaproverHandler() {
@@ -114,47 +112,14 @@
         </ul>
       </div>
 
-      {#if active === "Base"}
-        {#if $configs.loaded === false}
-          <div style="display: flex; align-items: center;">
-            <div class="field mr-2" style="width: 100%">
-              <p class="label">Configs Password</p>
-              <div class="control">
-                <input
-                  class="input"
-                  type="text"
-                  placeholder="Your Configs Password"
-                  bind:value={password}
-                />
-              </div>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="button is-primary is-outlined mb-2"
-                disabled={password === ""}
-                on:click={() => {
-                  configs.load(password);
-                }}
-              >
-                Load
-              </button>
-              <button
-                type="button"
-                class="button is-success"
-                disabled={password === ""}
-                on:click={() => {
-                  configs.save(password);
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        {/if}
+      {#if active === "Config"}
         {#each fields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}</p>
+            <p class="label">{field.label}
+              {#if field.link}
+                (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+              {/if}
+            </p>
             <div class="control">
               {#if field.type === "number"}
                 <input
@@ -176,15 +141,16 @@
         {/each}
       {/if}
 
-      {#if active === "Configs"}
+      {#if active === "Credentials"}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
             <div class="control">
-              {#if field.type === "number"}
+              {#if field.type === "password"}
                 <input
                   class="input"
-                  type="number"
+                  type="password"
+                  autocomplete="off"
                   placeholder={field.placeholder}
                   bind:value={$configs[field.symbol]}
                 />
@@ -202,6 +168,28 @@
       {/if}
     {/if}
     <div class="actions">
+      {#if $configs.loaded === false}
+        <button
+          type="button"
+          class="button is-primary is-outlined mr-2"
+          disabled={$configs.storeSecret === ""}
+          on:click={() => {
+            configs.load();
+          }}
+        >
+          Load
+        </button>
+        <button
+          type="button"
+          class="button is-success mr-2"
+          disabled={$configs.storeSecret === "" || $configs.mnemonics === ""}
+          on:click={() => {
+            configs.save();
+          }}
+        >
+          Save
+        </button>
+      {/if}
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
