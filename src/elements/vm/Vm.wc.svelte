@@ -23,40 +23,40 @@
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: 'name', placeholder: 'Your VM name.'},
-    { label: "FList", symbol: 'flist', placeholder: 'Your flist.'},
-    { label: "CPU", symbol: 'cpu', placeholder: 'Your Cpu size.', type: 'number'},
-    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory size.', type: 'number'},
-    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint.'},
+    { label: "Name", symbol: 'name', placeholder: 'Your VM name'},
+    { label: "FList", symbol: 'flist', placeholder: 'flist url'},
+    { label: "CPU", symbol: 'cpu', placeholder: 'CPU count', type: 'number'},
+    { label: "Memory", symbol: 'memory', placeholder: 'Memory size in Megabyte', type: 'number'},
+    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID.', type: 'number'},
+    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number'},
     { label: "Root FS Size", symbol: 'rootFsSize', placeholder: 'Your Root File System Size.', type: 'number'},
     { label: "Planetary", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
 
   // prettier-ignore
   const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Your Network Name." },
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range." },
+    { label: "Network Name", symbol: "name", placeholder: "Your Network Name" },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range" },
   ];
 
   // prettier-ignore
   const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Your Env Key."},
-    { label: 'Value', symbol: 'value', placeholder: "Your Env Value."},
+    { label: 'Key', symbol: 'key', placeholder: "Environment variable key"},
+    { label: 'Value', symbol: 'value', placeholder: "Environment variable value"},
   ];
 
   // prettier-ignore
   const diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your Disk Name." },
-    { label: "Size", symbol: "size", placeholder: "Your Disk Size.", type: "number" },
-    { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point." },
+    { label: "Name", symbol: "name", placeholder: "Disk Name." },
+    { label: "Size", symbol: "size", placeholder: "Disk Size in Gigabyte", type: "number" },
+    { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point" },
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
   let message: string;
