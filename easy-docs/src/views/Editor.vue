@@ -55,9 +55,9 @@ export default class Editor extends Vue {
     new Weblet("CapRover", "caprover"),
     new Weblet("Virtual Machine", "vm"),
     new Weblet("Kubernetes", `kubernetes`),
-    new Weblet("Deployed List", "deployedlist"),
+    new Weblet("Deployments", "deployedlist"),
   ];
-  public active = -1;
+  public active = 0;
 }
 </script>
 
