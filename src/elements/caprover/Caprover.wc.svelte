@@ -22,20 +22,21 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your caprover name" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Size", type: "number" },
-    { label: "Memory", symbol: 'memory', placeholder: "Memory Size", type: "number" },
+    { label: "Name", symbol: "name", placeholder: "Your Caprover instance name" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU count", type: "number" },
+    { label: "Memory", symbol: 'memory', placeholder: "Memory Size in Megabyte", type: "number" },
     { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Your Disk Size.", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "Your domain." },
-    { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key." }
+    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size in Gigabyte", type: "number" },
+    { label: "Domain", symbol: "domain", placeholder: "whildcard domain on your name provider e.g *.mycaprover.example.com" },
+    { label: "SSH Public Key", symbol: "publicKey", placeholder: "Your SSH Public Key." }
   ];
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
+
 
   let message: string;
   function deployCaproverHandler() {
