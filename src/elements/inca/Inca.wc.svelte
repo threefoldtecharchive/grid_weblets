@@ -2,12 +2,12 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import { build3DChart } from "../../utils/incaCharts";
-  import Plotly from "plotly.js-dist";
+  // import { build3DChart } from "../../utils/incaCharts";
+  // import Plotly from "plotly.js-dist";
 
   let canvas3D;
 
-  onMount(() => {
+  /*onMount(() => {
     const { x, y, z } = build3DChart(canvas3D);
 
     Plotly.newPlot(
@@ -30,7 +30,7 @@
         height: 500,
       }
     );
-  });
+  });*/
 </script>
 
 <div style="width: 500px;">
