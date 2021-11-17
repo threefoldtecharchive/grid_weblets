@@ -30,7 +30,7 @@
     { label: "Name", symbol: "name", placeholder: "Enter name" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: 'number' },
     { label: "Memory", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size", type: 'number' },
+    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
     { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
