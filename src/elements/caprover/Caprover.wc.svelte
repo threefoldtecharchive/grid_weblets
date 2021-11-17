@@ -28,7 +28,7 @@
     { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk Size in Gigabyte", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "whildcard domain on your name provider e.g *.mycaprover.example.com" },
-    { label: "SSH Public Key", symbol: "publicKey", placeholder: "Your SSH Public Key." }
+    { label: "SSH Public Key", symbol: "publicKey", placeholder: "Your SSH Public Key" }
   ];
 
   // prettier-ignore
