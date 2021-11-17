@@ -22,9 +22,10 @@
 
   // prettier-ignore
   const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
+    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
+
 
   function onConfigHandler() {
     configed = true;
