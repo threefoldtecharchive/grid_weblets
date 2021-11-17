@@ -15,7 +15,8 @@ function createBaseConfig() {
     subscribe,
     set,
     update,
-    load(password: string) {
+    load() {
+      const password = get(store).storeSecret;
       let data = localStorage.getItem("BASE_CONFIGS");
 
       update((v) => {
@@ -31,7 +32,8 @@ function createBaseConfig() {
         return v;
       });
     },
-    save(password: string) {
+    save() {
+      const password = get(store).storeSecret;
       localStorage.setItem(
         "BASE_CONFIGS",
         encrypt(JSON.stringify(get(store)), password).toString()
