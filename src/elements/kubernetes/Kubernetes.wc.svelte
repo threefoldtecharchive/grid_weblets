@@ -239,7 +239,11 @@
               </div>
               {#each baseFields as field (field.symbol)}
                 <div class="field">
-                  <p class="label">{field.label}</p>
+                    <p class="label">{field.label}
+                      {#if field.link}
+                    (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+                  {/if}
+                  </p>
                   <div class="control">
                     {#if field.type === "number"}
                       <input
