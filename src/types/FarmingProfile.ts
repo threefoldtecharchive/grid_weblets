@@ -98,11 +98,16 @@ rewards NU = (0.03/price of token)
     const { certified, powerUtilization, powerCost, publicIp } = this;
     const certifiedValue = 1 + (certified ? 1 : 0) * 0.25;
 
-    const cu = (2.4 / price) * certifiedValue;
-    const su = (1.5 / price) * certifiedValue;
-    const nu = publicIp ? 0.03 / price : 0;
+    // const cu = (2.4 / price) * certifiedValue;
+    // const su = (1.5 / price) * certifiedValue;
+    // const nu = publicIp ? 0.03 / price : 0;
 
-    return cu + su + nu - powerUtilization * powerCost;
+    const cu = 2.4 * certifiedValue;
+    const su = 1.5 * certifiedValue;
+    const nu = publicIp ? 0.03 : 0;
+
+    const total = (cu + su + nu) * price;
+    return total - powerUtilization * powerCost;
 
     // const { memory, cpu, tftRewardPer, rewardPerCu } = this;
     // const tftRewardPerCu = (rewardPerCu / price) * tftRewardPer;
