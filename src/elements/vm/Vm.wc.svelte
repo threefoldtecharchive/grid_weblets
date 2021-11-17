@@ -10,12 +10,12 @@
   const configs = data.configs;
 
   const tabs = [
-    { label: "Base" },
-    { label: "Envs" },
+    { label: "Config" },
+    { label: "Environment Variables" },
     { label: "Disks" },
-    { label: "Configs" },
+    { label: "Credentials" },
   ];
-  let active: string = "Base";
+  let active: string = "Config";
   let loading = false;
   let success = false;
   let failed = false;
@@ -25,20 +25,14 @@
   const baseFields: IFormField[] = [
     { label: "Name", symbol: 'name', placeholder: 'Your VM name.'},
     { label: "FList", symbol: 'flist', placeholder: 'Your flist.'},
+    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint.'},    
     { label: "CPU", symbol: 'cpu', placeholder: 'Your Cpu size.', type: 'number'},
     { label: "Memory", symbol: 'memory', placeholder: 'Your Memory size.', type: 'number'},
-    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint.'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID.', type: 'number'},
-    { label: "Root FS Size", symbol: 'rootFsSize', placeholder: 'Your Root File System Size.', type: 'number'},
-    { label: "Planetary", symbol: "planetary", placeholder: "", type: 'checkbox' },
+    { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
+    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID.', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
   ];
 
-  // prettier-ignore
-  const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Your Network Name." },
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range." },
-  ];
 
   // prettier-ignore
   const envFields: IFormField[] = [
@@ -56,7 +50,7 @@
   // prettier-ignore
   const configFields: IFormField[] = [
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Your Mnemonics." },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Your Store Secret." },
+    { label: "Secret", symbol: "storeSecret", placeholder: "Your Secret.", type: "password" },
   ];
 
   let message: string;
@@ -133,11 +127,15 @@
         </ul>
       </div>
 
-      {#if active === "Base"}
+      {#if active === "Config"}
         <!-- Show Base Info -->
         {#each baseFields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}</p>
+            <p class="label">{field.label}
+            {#if field.link}
+              (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+            {/if}
+            </p>
             <div class="control">
               {#if field.type === "number"}
                 <input
@@ -167,30 +165,16 @@
           </div>
         {/each}
 
-        <!-- Network info -->
-        {#each networkFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              <input
-                class="input"
-                type="text"
-                placeholder={field.placeholder}
-                bind:value={data.network[field.symbol]}
-              />
-            </div>
-          </div>
-        {/each}
       {/if}
 
-      {#if active === "Envs"}
+      {#if active === "Environment Variables"}
         <div class="actions" style="margin-bottom: 20px;">
           <button
             type="button"
-            class="button is-primary is-light"
+            class="button is-primary"
             on:click={() => (data.envs = [...data.envs, new Env()])}
           >
-            <span>+ ADD Env</span>
+            <span>+</span>
           </button>
         </div>
         <div class="vm-container">
@@ -200,11 +184,11 @@
                 <p class="is-size-5 has-text-weight-bold">{env.key}</p>
                 <button
                   type="button"
-                  class="button is-danger is-outlined"
+                  class="button is-danger"
                   on:click={() =>
                     (data.envs = data.envs.filter((_, i) => index !== i))}
                 >
-                  <span>Delete</span>
+                  <span>-</span>
                 </button>
               </div>
               {#each envFields as field (field.symbol)}
@@ -229,13 +213,10 @@
         <div class="actions" style="margin-bottom: 20px;">
           <button
             type="button"
-            class="button is-primary is-light"
+            class="button is-primary"
             on:click={() => (data.disks = [...data.disks, new Disk()])}
           >
-            <span class="icon is-medium">
-              <i class="far fa-plus-square" />
-            </span>
-            <span>+ ADD Disk</span>
+            <span>+</span>
           </button>
         </div>
         <div class="vm-container">
@@ -245,11 +226,11 @@
                 <p class="is-size-5 has-text-weight-bold">{disk.name}</p>
                 <button
                   type="button"
-                  class="button is-danger is-outlined"
+                  class="button is-danger"
                   on:click={() =>
                     (data.disks = data.disks.filter((_, i) => index !== i))}
                 >
-                  <span>Delete</span>
+                  <span>-</span>
                 </button>
               </div>
               {#each diskFields as field (field.symbol)}
@@ -270,15 +251,16 @@
         </div>
       {/if}
 
-      {#if active === "Configs"}
+      {#if active === "Credentials"}
         {#each configFields as field (field.symbol)}
           <div class="field">
             <p class="label">{field.label}</p>
             <div class="control">
-              {#if field.type === "number"}
+              {#if field.type === "password"}
                 <input
                   class="input"
-                  type="number"
+                  type="password"
+                  autocomplete="off"
                   placeholder={field.placeholder}
                   bind:value={$configs[field.symbol]}
                 />
