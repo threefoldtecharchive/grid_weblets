@@ -9,6 +9,7 @@ A svelte project for creating web components that should be used every where els
     - [VM](#virtual-machine)
     - [Caprover](#caprover)
     - [Deployed List](#deployed-list)
+- [Add New Weblet](#add-new-weblet)
 
 
 ### Kubernetes
@@ -39,3 +40,52 @@ A svelte project for creating web components that should be used every where els
 ```
 ![image](https://user-images.githubusercontent.com/31689104/140760029-634e5e14-ac83-4caf-ad3e-75c66edbdf18.png)
 ![image](https://user-images.githubusercontent.com/31689104/140760540-a0475e07-14d7-4daa-a728-5babf32bc8d4.png)
+
+
+### Add New Weblet
+We are going to add new weblet called `demo` .
+
+1. Add new folder called **demo** at `src/elements/demo` .
+2. Add **Demo.wc.svelte** at `src/elements/demo/Demo.wc.svelte` .
+3. Add **index.ts** at `src/elements/demo/index.ts` .
+
+```ts
+// index.ts
+
+// import *demo* component
+import Demo from './Demo.wc.svelte';
+
+// import *defineElement* library
+import defineElement from '../../utils/defineElement';
+
+
+// Register new wc
+defineElement('demo', Demo); // tf-demo
+```
+
+```ts
+// Demo.wc.svelte
+
+/* Write whatever svelte code u need here */
+```
+> Find More About svelte [here](https://svelte.dev/docs) .
+
+
+4. Developing weblet by importing `Demo.wc.svelte` into `App.svelte`.
+
+```html
+<!-- App.svelte -->
+<script lang="ts">
+    import Demo from './elements/demo/Demo.wc.svelte';
+</script>
+
+<Demo />
+```
+```sh
+yarn dev
+```
+
+5. Build `Demo.wc.svelte`.
+```sh
+yarn build
+```
