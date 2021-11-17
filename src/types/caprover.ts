@@ -6,13 +6,13 @@ export default class Caprover {
     public id = v4(),
 
     /* Base info */
-    public name = id.split("-")[0],
-    public cpu = 1,
-    public memory = 1024,
+    public name = "cr_" + id.split("-")[0],
+    public cpu = 4,
+    public memory = 1024 * 8,
     public nodeId = 3,
     public domain = "",
     public publicKey = "",
-    public diskSize = 1,
+    public diskSize = 100,
 
     public configs = window.configs.baseConfig
   ) {}
