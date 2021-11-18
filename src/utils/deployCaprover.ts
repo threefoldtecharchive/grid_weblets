@@ -2,7 +2,6 @@ import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
-import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { MachinesModel, DiskModel, GridClient, MachineModel } =
   window.configs?.grid3_client ?? {};
@@ -53,7 +52,6 @@ export default async function deployCaprover(
   const grid = new GridClient(
     networkEnv as any,
     mnemonics,
-    await getSignerObj("Deploy Caprover"),
     storeSecret,
     http,
     undefined,

@@ -128,7 +128,7 @@
                   <th title="position">#</th>
                   <th>Name</th>
                   <th>Public IP</th>
-                  <th>Yggdrasil IP</th>
+                  <th>Planetary Network IP</th>
                   <th>Workers</th>
                 </tr>
               </thead>
@@ -172,7 +172,7 @@
                   <th title="position">#</th>
                   <th>Name</th>
                   <th>Public IP</th>
-                  <th>Yggdrasil IP</th>
+                  <th>Planetary Network IP</th>
                   <th>Flist</th>
                 </tr>
               </thead>

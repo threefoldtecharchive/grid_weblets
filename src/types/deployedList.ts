@@ -1,4 +1,3 @@
-import getSignerObj from "../utils/getSignerObj";
 import type { IProfile } from "./Profile";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { GridClient } = window.configs?.grid3_client ?? {};
@@ -18,8 +17,18 @@ export default class DeployedList {
     if (!this.data[key]) {
       const pointer = this.grid[key];
       const list = await pointer.list();
-      const items: Promise<any>[] = list.map((n) => pointer.getObj(n));
-      this.data[key] = await Promise.all(items);
+      const items: Promise<any>[] = list.map(
+        (n) =>
+          new Promise((res) => {
+            pointer
+              .getObj(n)
+              .then(res)
+              .catch(() => res(null));
+          })
+      );
+      this.data[key] = (await Promise.all(items)).filter((x) =>
+        x instanceof Array ? !!x[0] : !!x
+      );
     }
 
     return this.data[key];
@@ -31,7 +40,6 @@ export default class DeployedList {
     const grid = new GridClient(
       networkEnv as any,
       mnemonics,
-      await getSignerObj("Deploy List"),
       storeSecret,
       http,
       "",
