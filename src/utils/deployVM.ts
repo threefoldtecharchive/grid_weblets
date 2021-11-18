@@ -7,7 +7,7 @@ const { DiskModel, MachineModel, MachinesModel, GridClient } =
 import type { IProfile } from "../types/Profile";
 
 export default async function deployVM(data: VM, profile: IProfile) {
-  const { configs, envs, disks, ...base } = data;
+  const { envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;

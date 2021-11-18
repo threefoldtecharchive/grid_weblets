@@ -11,7 +11,7 @@ export default async function deployKubernetes(
   profile: IProfile
 ) {
   /* Extract Data */
-  const { configs, master, workers, network: nw, ...base } = data;
+  const { master, workers, network: nw, ...base } = data;
   const { secret, sshKey, description, metadata, name } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 

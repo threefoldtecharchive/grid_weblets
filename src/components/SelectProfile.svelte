@@ -21,8 +21,14 @@
 
 <div class="select mb-4" style="display: flex; justify-content: flex-end;">
   <select on:change={onSelectProfile}>
-    {#each profiles as _, idx (idx)}
-      <option value={idx}>Profile {idx + 1}</option>
+    {#each profiles as profile, idx (idx)}
+      <option value={idx}
+        >{#if profile.name}
+          {profile.name}
+        {:else}
+          Profile {idx + 1}
+        {/if}</option
+      >
     {/each}
   </select>
 </div>
