@@ -3,23 +3,20 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { createEventDispatcher } from "svelte";
-  import type { IProfile } from "../types/Profile";
 
-  const dispatch = createEventDispatcher<{ profile: IProfile }>();
-  const EVENT = "profile";
+  const dispatch = createEventDispatcher<{ profileIdx: number }>();
+  const EVENT = "profileIdx";
 
   const configs = window.configs?.baseConfig;
-  $: profiles = $configs.profiles;
+  $: profiles = $configs;
 
   onMount(() => {
-    dispatch(EVENT, profiles[0]);
+    dispatch(EVENT, 0);
   });
 
   function onSelectProfile(e: Event) {
-    dispatch(EVENT, profiles[(e.target as any).selectedIndex]);
+    dispatch(EVENT, (e.target as any).selectedIndex);
   }
-
-  let profile: IProfile;
 </script>
 
 <div class="select mb-4" style="display: flex; justify-content: flex-end;">

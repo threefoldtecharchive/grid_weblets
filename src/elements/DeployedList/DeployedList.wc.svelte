@@ -1,7 +1,7 @@
 <svelte:options tag={null} />
 
 <script lang="ts">
-  import type { IFormField } from "../../types";
+  import SelectProfile from "../../components/SelectProfile.svelte";
   import DeployedList from "../../types/deployedList";
 
   export let tab: "k8s" | "vm" | "caprover" = undefined;
@@ -14,29 +14,20 @@
   ];
   let active: string = "Kubernetes";
 
-  const data = window.configs.baseConfig;
   let loading = false;
   let configed = false;
   let list: DeployedList;
-
-  // prettier-ignore
-  const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
-  ];
-
+  const configs = window.configs?.baseConfig;
+  let profileIdx: number;
+  $: profile = $configs[profileIdx];
 
   function onConfigHandler() {
     configed = true;
     loading = true;
-    DeployedList.init($data)
+    DeployedList.init(profile)
       .then((_list) => {
         list = _list;
-        // console.log(list);
       })
-      // .catch((err) => {
-      //   console.log("Error", err);
-      // })
       .finally(() => (loading = false));
   }
 
@@ -62,53 +53,14 @@
       <p style="text-align: center; mt-2 mb-2">Loading...</p>
     {:else if !configed}
       <form on:submit|preventDefault={onConfigHandler}>
-        <div
-          class="select mb-4"
-          style="display: flex; justify-content: flex-end;"
-        >
-          <select bind:value={$data.networkEnv}>
-            <option value="test">Testnet</option>
-            <option value="dev">Devnet</option>
-          </select>
+        <div style="display: flex; justify-content: center;">
+          <SelectProfile on:profileIdx={(p) => (profileIdx = p.detail)} />
         </div>
-        {#each configFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              <input
-                class="input"
-                type="text"
-                placeholder={field.placeholder}
-                bind:value={$data[field.symbol]}
-              />
-            </div>
-          </div>
-        {/each}
-        <div style="display: flex; justify-content: flex-end;">
-          {#if $data.loaded === false}
-            <button
-              type="button"
-              class="button is-primary is-outlined mr-2"
-              disabled={$data.storeSecret === ""}
-              on:click={() => {
-                data.load();
-              }}
-            >
-              Load
-            </button>
-            <button
-              type="button"
-              class="button is-success mr-2"
-              disabled={$data.storeSecret === "" || $data.mnemonics === ""}
-              on:click={() => {
-                data.save();
-              }}
-            >
-              Save
-            </button>
-          {/if}
+        <div style="display: flex; justify-content: center;">
           <button
-            disabled={$data.mnemonics === "" || $data.storeSecret === ""}
+            disabled={!profile ||
+              profile.mnemonics === "" ||
+              profile.storeSecret === ""}
             type="submit"
             class="button is-primary"
           >

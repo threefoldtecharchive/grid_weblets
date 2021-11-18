@@ -6,7 +6,6 @@
   const { events } = window.configs?.grid3_client ?? {};
   import deployVM from "../../utils/deployVM";
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import type { IProfile } from "../../types/Profile";
 
   const data = new VM();
 
@@ -19,7 +18,9 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
+  const configs = window.configs?.baseConfig;
+  let profileIdx: number;
+  $: profile = $configs[profileIdx];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
@@ -76,7 +77,9 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+    <h4 class="is-size-4">
+      Deploy a Virtual Machine - {JSON.stringify(profile)}
+    </h4>
     <hr />
 
     {#if loading}
@@ -99,7 +102,7 @@
         {/if}
       </div>
     {:else}
-      <SelectProfile on:profile={(p) => (profile = p.detail)} />
+      <SelectProfile on:profileIdx={(p) => (profileIdx = p.detail)} />
       <div class="tabs is-centered">
         <ul>
           {#each tabs as tab (tab.label)}
@@ -243,6 +246,7 @@
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
         disabled={((loading || !data.valid) && !(success || failed)) ||
+          !profile ||
           profile.mnemonics === "" ||
           profile.storeSecret === ""}
         on:click={(e) => {

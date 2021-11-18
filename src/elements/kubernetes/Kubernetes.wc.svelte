@@ -7,6 +7,7 @@
   import type { IFormField } from "../../types";
   import SelectProfile from "../../components/SelectProfile.svelte";
   import type { IProfile } from "../../types/Profile";
+  import { onMount } from "svelte";
 
   const data = new Kubernetes();
 
@@ -42,7 +43,9 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
+  const configs = window.configs?.baseConfig;
+  let profileIdx: number;
+  $: profile = $configs[profileIdx];
 
   let message: string;
   function onDeployKubernetes() {
@@ -97,7 +100,7 @@
         {/if}
       </div>
     {:else}
-      <SelectProfile on:profile={(p) => (profile = p.detail)} />
+      <SelectProfile on:profileIdx={(p) => (profileIdx = p.detail)} />
       <div class="tabs is-centered">
         <ul>
           {#each tabs as tab (tab.label)}
@@ -275,6 +278,7 @@
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
         disabled={((loading || !data.valid) && !(success || failed)) ||
+          !profile ||
           profile.mnemonics === "" ||
           profile.storeSecret === ""}
         on:click={(e) => {
