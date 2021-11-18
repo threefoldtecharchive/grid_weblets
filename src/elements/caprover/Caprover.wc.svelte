@@ -7,15 +7,18 @@
   const { events } = window.configs?.grid3_client ?? {};
 
   const data = new Caprover();
-  const configs = data.configs;
   let loading = false;
   let success = false;
   let failed = false;
+  const configs = window.configs?.baseConfig;
+  let profileIdx: number = 0;
+
+  $: profiles = $configs;
+  $: profile = $configs[profileIdx];
 
   // prettier-ignore
   const tabs = [
     { label: "Config" },
-    { label: "Credentials" },
   ];
   let active = "Config";
 
@@ -28,12 +31,6 @@
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "domain configured on your name provider" },
     { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key" }
-  ];
-
-  // prettier-ignore
-  const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
   let message: string;
@@ -51,7 +48,7 @@
 
     events.addListener("logs", onLogInfo);
 
-    deployCaprover(data)
+    deployCaprover(data, profile)
       .then(() => (success = true))
       .catch((err: string) => {
         failed = true;
@@ -62,6 +59,8 @@
         events.removeListener("logs", onLogInfo);
       });
   }
+
+  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
 </script>
 
 <div style="padding: 15px;">
@@ -95,9 +94,16 @@
         class="select mb-4"
         style="display: flex; justify-content: flex-end;"
       >
-        <select bind:value={$configs.networkEnv}>
-          <option value="test">Testnet</option>
-          <option value="dev">Devnet</option>
+        <select on:change={onSelectProfile}>
+          {#each profiles as profile, idx (idx)}
+            <option value={idx}
+              >{#if profile.name}
+                {profile.name}
+              {:else}
+                Profile {idx + 1}
+              {/if}</option
+            >
+          {/each}
         </select>
       </div>
       <div class="tabs is-centered">
@@ -115,9 +121,11 @@
       {#if active === "Config"}
         {#each fields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}
+            <p class="label">
+              {field.label}
               {#if field.link}
-                (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+                (<a href={field.link.url} target="_blank">{field.link.label}</a
+                >)
               {/if}
             </p>
             <div class="control">
@@ -140,60 +148,15 @@
           </div>
         {/each}
       {/if}
-
-      {#if active === "Credentials"}
-        {#each configFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              {#if field.type === "password"}
-                <input
-                  class="input"
-                  type="password"
-                  autocomplete="off"
-                  placeholder={field.placeholder}
-                  bind:value={$configs[field.symbol]}
-                />
-              {:else}
-                <input
-                  class="input"
-                  type="text"
-                  placeholder={field.placeholder}
-                  bind:value={$configs[field.symbol]}
-                />
-              {/if}
-            </div>
-          </div>
-        {/each}
-      {/if}
     {/if}
     <div class="actions">
-      {#if $configs.loaded === false}
-        <button
-          type="button"
-          class="button is-primary is-outlined mr-2"
-          disabled={$configs.storeSecret === ""}
-          on:click={() => {
-            configs.load();
-          }}
-        >
-          Load
-        </button>
-        <button
-          type="button"
-          class="button is-success mr-2"
-          disabled={$configs.storeSecret === "" || $configs.mnemonics === ""}
-          on:click={() => {
-            configs.save();
-          }}
-        >
-          Save
-        </button>
-      {/if}
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
-        disabled={(loading || !data.valid) && !(success || failed)}
+        disabled={((loading || !data.valid) && !(success || failed)) ||
+          !profile ||
+          profile.mnemonics === "" ||
+          profile.storeSecret === ""}
         on:click={(e) => {
           if (success || failed) {
             e.preventDefault();

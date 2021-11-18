@@ -47,10 +47,7 @@ export default class VM {
 
     public envs: Env[] = [],
     public disks: Disk[] = [],
-    public publicIp = false,
-
-    /* Configs */
-    public configs = window.configs.baseConfig
+    public publicIp = false
   ) {}
 
   public get valid(): boolean {

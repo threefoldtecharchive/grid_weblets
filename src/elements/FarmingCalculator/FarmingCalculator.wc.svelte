@@ -68,6 +68,14 @@
     { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft" },
   ];
 
+  // prettier-ignore
+  const advancedFields = [
+    { label: "Return On Investment", symbol: "ROI", skip: true },
+    { label: "Gross Profit", symbol: "grossProfit" },
+    { label: "Total Costs", symbol: "totalCosts" },
+    { label: "Net Profit", symbol: "netProfit" },
+  ];
+
   let pieCanvas: HTMLCanvasElement;
   let _pieChart: Chart<"doughnut", number[], string>;
 
@@ -78,12 +86,16 @@
     Chart.register(...registerables);
   });
 
+  function _initCharts() {
+    requestAnimationFrame(() => {
+      if (pieCanvas) _pieChart = buildPieChart(pieCanvas); // prettier-ignore
+      if (lineCanvas) _lineCanvas = buildLineChart(lineCanvas, getProfile()); // prettier-ignore
+    });
+  }
+
   function onProfileChoosing() {
     profileChoosing = false;
-    requestAnimationFrame(() => {
-      _pieChart = buildPieChart(pieCanvas);
-      _lineCanvas = buildLineChart(lineCanvas, getProfile());
-    });
+    _initCharts();
   }
 
   function onBackProfileChoosing() {
@@ -98,16 +110,13 @@
     active = tab;
     activeProfile = getProfile();
 
-    requestAnimationFrame(() => {
-      _pieChart = buildPieChart(pieCanvas);
-      _lineCanvas = buildLineChart(lineCanvas, getProfile());
-    });
+    _initCharts();
   }
 
   $: {
     if (_pieChart && activeProfile) {
-      const { cu, su, nu, rewardPerCu, rewardPerNu, rewardPerSu } = getProfile(); // prettier-ignore
-      _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nu * rewardPerNu]; // prettier-ignore
+      const { cu, su, rewardPerCu, rewardPerSu, nuFarmingRewardInTft } = getProfile(); // prettier-ignore
+      _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nuFarmingRewardInTft]; // prettier-ignore
       _pieChart.update();
     }
 
@@ -226,21 +235,23 @@
                 <canvas bind:this={lineCanvas} />
               </div>
             </div>
-            {#each outputFields as field (field.symbol)}
-              <div class="field">
-                <div class="control">
-                  <label class="label">
-                    <p>{field.label}</p>
-                    <input
-                      disabled
-                      class="input"
-                      type="number"
-                      value={activeProfile[field.symbol].toFixed(2)}
-                    />
-                  </label>
+            <div class="calculations mt-4">
+              {#each outputFields as field (field.symbol)}
+                <div class="field">
+                  <div class="control">
+                    <label class="label">
+                      <p>{field.label}</p>
+                      <input
+                        disabled
+                        class="input"
+                        type="text"
+                        value={activeProfile[field.symbol].toFixed(2)}
+                      />
+                    </label>
+                  </div>
                 </div>
-              </div>
-            {/each}
+              {/each}
+            </div>
           </div>
         </div>
       {/if}
@@ -280,24 +291,42 @@
                 <canvas bind:this={pieCanvas} />
               </div>
               <div class="chart">
-                <canvas bind:this={lineCanvas} />
+                {#each advancedFields as field (field.symbol)}
+                  <div class="field">
+                    <div class="control">
+                      <label class="label">
+                        <p>{field.label}</p>
+                        <input
+                          disabled
+                          class="input"
+                          type="text"
+                          value={field.skip
+                            ? activeProfile[field.symbol]
+                            : activeProfile[field.symbol].toFixed(2)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                {/each}
               </div>
             </div>
-            {#each outputFields as field (field.symbol)}
-              <div class="field">
-                <div class="control">
-                  <label class="label">
-                    <p>{field.label}</p>
-                    <input
-                      disabled
-                      class="input"
-                      type="number"
-                      value={activeProfile[field.symbol].toFixed(2)}
-                    />
-                  </label>
+            <div class="calculations mt-4">
+              {#each outputFields as field (field.symbol)}
+                <div class="field">
+                  <div class="control">
+                    <label class="label">
+                      <p>{field.label}</p>
+                      <input
+                        disabled
+                        class="input"
+                        type="text"
+                        value={activeProfile[field.symbol].toFixed(2)}
+                      />
+                    </label>
+                  </div>
                 </div>
-              </div>
-            {/each}
+              {/each}
+            </div>
           </div>
         </div>
       {/if}
@@ -310,7 +339,21 @@
 
   .farming-container {
     padding: 15px;
-    max-height: 100vh;
+
+    > .box {
+      min-height: 100px;
+      max-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: #d3d3d3;
+      }
+    }
   }
 
   .profile-container {
@@ -332,22 +375,6 @@
       width: calc(100% - var(--w));
       padding: 0 1.5rem;
     }
-
-    &--left,
-    &--right {
-      max-height: calc(100vh - 175px);
-      min-height: 100px;
-      overflow-x: hidden;
-      overflow-y: auto;
-
-      &::-webkit-scrollbar {
-        width: 10px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background-color: #d3d3d3;
-      }
-    }
   }
 
   .charts-container {
@@ -366,6 +393,16 @@
 
     &-2 {
       width: 100%;
+    }
+  }
+
+  .calculations {
+    display: flex;
+    flex-wrap: wrap;
+
+    > div {
+      width: calc(100% / 4);
+      padding: 0 10px;
     }
   }
 </style>

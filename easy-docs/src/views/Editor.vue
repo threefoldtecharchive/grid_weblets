@@ -51,13 +51,14 @@ class Weblet {
 })
 export default class Editor extends Vue {
   public weblets: Weblet[] = [
+    new Weblet("Profile Manager", "profiles"),
     new Weblet("Farming Calculator", "farming-calculator"),
     new Weblet("CapRover", "caprover"),
     new Weblet("Virtual Machine", "vm"),
     new Weblet("Kubernetes", `kubernetes`),
     new Weblet("Deployments", "deployedlist"),
   ];
-  public active = 0;
+  public active = -1;
 }
 </script>
 
@@ -103,7 +104,7 @@ export default class Editor extends Vue {
     bottom: 0;
     right: 0;
     width: calc(100% - 260px);
-    height: 200px;
+    height: 50px;
 
     textarea {
       height: 100%;

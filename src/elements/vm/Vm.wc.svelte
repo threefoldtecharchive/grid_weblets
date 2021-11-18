@@ -2,37 +2,46 @@
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
-  import type { IFormField } from "../../types";
+  import type { IFlist, IFormField } from "../../types";
   const { events } = window.configs?.grid3_client ?? {};
   import deployVM from "../../utils/deployVM";
 
   const data = new VM();
-  const configs = data.configs;
+  data.envs = [new Env()];
 
   const tabs = [
     { label: "Config" },
     { label: "Environment Variables" },
     { label: "Disks" },
-    { label: "Credentials" },
   ];
   let active: string = "Config";
   let loading = false;
   let success = false;
   let failed = false;
-  let password: string = "";
+  const configs = window.configs?.baseConfig;
+  let profileIdx: number = 0;
+
+  $: profiles = $configs;
+  $: profile = $configs[profileIdx];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: 'name', placeholder: 'Your VM name.'},
-    { label: "FList", symbol: 'flist', placeholder: 'Your flist.'},
-    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint.'},    
-    { label: "CPU", symbol: 'cpu', placeholder: 'Your CPU.', type: 'number'},
-    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB.', type: 'number'},
+    { label: "CPU", symbol: 'cpu', placeholder: 'Your CPU', type: 'number'},
+    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID.', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
+    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.dev.grid.tf/nodes"}},
   ];
 
+  $: {
+    baseFields[baseFields.length - 1].link.url = `https://explorer.${profile.networkEnv}.grid.tf/nodes`; // prettier-ignore
+  }
+
+  // prettier-ignore
+  const flistFields: IFormField[] = [
+    { label: "FList", symbol: 'flist', placeholder: 'Your flist' },
+    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint'},
+  ]
 
   // prettier-ignore
   const envFields: IFormField[] = [
@@ -45,12 +54,6 @@
     { label: "Name", symbol: "name", placeholder: "Your Disk Name" },
     { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point" },
-  ];
-
-  // prettier-ignore
-  const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
   let message: string;
@@ -68,17 +71,34 @@
 
     events.addListener("logs", onLogInfo);
 
-    deployVM(data)
+    deployVM(data, profile)
       .then(() => (success = true))
       .catch((err: Error) => {
         failed = true;
-        message = err.message;
+
+        message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
       });
   }
+
+  // prettier-ignore
+  const flists: IFlist[] = [
+    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/base:latest.flist", entryPoint: "/sbin/zinit init" },
+    { name: "Ubuntu", url: "https://hub.grid.tf/omar0.3bot/omarelawady-ubuntu-20.04.flist", entryPoint: "/init.sh" },
+  ];
+  let flistIdx: number | string;
+
+  function onSelectFlist() {
+    if (flistIdx && +flistIdx <= flists.length) {
+      data.flist = flists[flistIdx].url;
+      data.entrypoint = flists[flistIdx].entryPoint;
+    }
+  }
+
+  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
 </script>
 
 <div style="padding: 15px;">
@@ -110,9 +130,16 @@
         class="select mb-4"
         style="display: flex; justify-content: flex-end;"
       >
-        <select bind:value={$configs.networkEnv}>
-          <option value="test">Testnet</option>
-          <option value="dev">Devnet</option>
+        <select on:change={onSelectProfile}>
+          {#each profiles as profile, idx (idx)}
+            <option value={idx}
+              >{#if profile.name}
+                {profile.name}
+              {:else}
+                Profile {idx + 1}
+              {/if}</option
+            >
+          {/each}
         </select>
       </div>
       <div class="tabs is-centered">
@@ -128,13 +155,57 @@
       </div>
 
       {#if active === "Config"}
-        <!-- Show Base Info -->
+        <div class="field">
+          <p class="label">Name</p>
+          <div class="control">
+            <input
+              class="input"
+              type="text"
+              placeholder="Virtual Machine Name"
+              bind:value={data.name}
+            />
+          </div>
+        </div>
+
+        <p class="label">Flists</p>
+        <div class="select mb-2" style="width: 100%;">
+          <select
+            style="width: 100%;"
+            bind:value={flistIdx}
+            on:change={onSelectFlist}
+          >
+            <option selected disabled>Please select a flist</option>
+            {#each flists as f, idx (f.url)}
+              <option value={idx}>{f.name}</option>
+            {/each}
+            <option value="other">Other</option>
+          </select>
+        </div>
+        {#if flistIdx === "other"}
+          {#each flistFields as field (field.symbol)}
+            <div class="field">
+              <p class="label">
+                {field.label}
+              </p>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder={field.placeholder}
+                  bind:value={data[field.symbol]}
+                />
+              </div>
+            </div>
+          {/each}
+        {/if}
         {#each baseFields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}
-            {#if field.link}
-              (<a href={field.link.url} target="_blank">{field.link.label}</a>)
-            {/if}
+            <p class="label">
+              {field.label}
+              {#if field.link}
+                (<a href={field.link.url} target="_blank">{field.link.label}</a
+                >)
+              {/if}
             </p>
             <div class="control">
               {#if field.type === "number"}
@@ -164,7 +235,6 @@
             </div>
           </div>
         {/each}
-
       {/if}
 
       {#if active === "Environment Variables"}
@@ -250,61 +320,16 @@
           {/each}
         </div>
       {/if}
-
-      {#if active === "Credentials"}
-        {#each configFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              {#if field.type === "password"}
-                <input
-                  class="input"
-                  type="password"
-                  autocomplete="off"
-                  placeholder={field.placeholder}
-                  bind:value={$configs[field.symbol]}
-                />
-              {:else}
-                <input
-                  class="input"
-                  type="text"
-                  placeholder={field.placeholder}
-                  bind:value={$configs[field.symbol]}
-                />
-              {/if}
-            </div>
-          </div>
-        {/each}
-      {/if}
     {/if}
 
     <div class="actions">
-      {#if $configs.loaded === false}
-        <button
-          type="button"
-          class="button is-primary is-outlined mr-2"
-          disabled={$configs.storeSecret === ""}
-          on:click={() => {
-            configs.load();
-          }}
-        >
-          Load
-        </button>
-        <button
-          type="button"
-          class="button is-success mr-2"
-          disabled={$configs.storeSecret === "" || $configs.mnemonics === ""}
-          on:click={() => {
-            configs.save();
-          }}
-        >
-          Save
-        </button>
-      {/if}
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
-        disabled={(loading || !data.valid) && !(success || failed)}
+        disabled={((loading || !data.valid) && !(success || failed)) ||
+          !profile ||
+          profile.mnemonics === "" ||
+          profile.storeSecret === ""}
         on:click={(e) => {
           if (success || failed) {
             e.preventDefault();
