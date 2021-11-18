@@ -38,12 +38,6 @@
     // { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
   ];
 
-  // prettier-ignore
-  const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
-  ];
-
   const tabs = [{ label: "Config" }, { label: "Master" }, { label: "Workers" }];
   let active: string = "Config";
   let loading = false;
@@ -274,32 +268,6 @@
             </div>
           {/each}
         </div>
-      {/if}
-
-      {#if active === "Credentials"}
-        {#each configFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              {#if field.type === "password"}
-                <input
-                  class="input"
-                  type="password"
-                  autocomplete="off"
-                  placeholder={field.placeholder}
-                  bind:value={$configs[field.symbol]}
-                />
-              {:else}
-                <input
-                  class="input"
-                  type="text"
-                  placeholder={field.placeholder}
-                  bind:value={$configs[field.symbol]}
-                />
-              {/if}
-            </div>
-          </div>
-        {/each}
       {/if}
     {/if}
 

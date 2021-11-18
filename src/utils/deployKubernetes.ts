@@ -1,4 +1,3 @@
-import { get } from "svelte/store";
 import type { default as Kubernetes, Base } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
