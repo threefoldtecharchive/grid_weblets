@@ -9,7 +9,6 @@
   import type { IProfile } from "../../types/Profile";
 
   const data = new VM();
-  const configs = data.configs;
 
   const tabs = [
     { label: "Config" },
@@ -243,7 +242,9 @@
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
-        disabled={(loading || !data.valid) && !(success || failed)}
+        disabled={((loading || !data.valid) && !(success || failed)) ||
+          profile.mnemonics === "" ||
+          profile.storeSecret === ""}
         on:click={(e) => {
           if (success || failed) {
             e.preventDefault();

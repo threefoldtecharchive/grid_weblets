@@ -9,7 +9,6 @@
   import type { IProfile } from "../../types/Profile";
 
   const data = new Kubernetes();
-  const configs = data.configs;
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
@@ -275,7 +274,9 @@
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
-        disabled={(loading || !data.valid) && !(success || failed)}
+        disabled={((loading || !data.valid) && !(success || failed)) ||
+          profile.mnemonics === "" ||
+          profile.storeSecret === ""}
         on:click={(e) => {
           if (success || failed) {
             e.preventDefault();
