@@ -1,7 +1,6 @@
 import type { default as Kubernetes, Base } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
-import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { GridClient, K8SModel, KubernetesNodeModel } =
   window.configs?.grid3_client ?? {};
@@ -19,7 +18,6 @@ export default async function deployKubernetes(
   const grid = new GridClient(
     networkEnv as any,
     mnemonics,
-    await getSignerObj("Deploy K8s"),
     storeSecret,
     http,
     undefined,

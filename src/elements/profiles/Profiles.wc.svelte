@@ -27,9 +27,17 @@
         + Add Profile
       </button>
     </div>
-    <hr />
 
-    <!--  -->
+    <p class="mt-4">
+      Please visit <a
+        href="https://library.threefold.me/info/threefold"
+        target="_blank"
+      >
+        the manual
+      </a>
+      to <strong>get started.</strong>
+    </p>
+    <hr />
 
     <div class="tabs">
       <ul>

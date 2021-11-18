@@ -5,5 +5,5 @@ module.exports = {
       'vuetify'
     ],
     outputDir: join(__dirname, '..', 'docs'),
-    publicPath: '/grid_weblets/'
+    publicPath: '/'
 }

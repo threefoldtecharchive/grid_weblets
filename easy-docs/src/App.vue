@@ -4,7 +4,7 @@
       v-for="el in elements"
       :key="el"
       type="application/javascript"
-      :src="`/grid_weblets/build/elements/${el}.wc.js`"
+      :src="`/build/elements/${el}.wc.js`"
       defer
     ></script>
 

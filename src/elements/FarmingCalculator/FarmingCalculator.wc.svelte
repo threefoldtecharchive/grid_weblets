@@ -115,8 +115,8 @@
 
   $: {
     if (_pieChart && activeProfile) {
-      const { cu, su, nu, rewardPerCu, rewardPerNu, rewardPerSu } = getProfile(); // prettier-ignore
-      _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nu * rewardPerNu]; // prettier-ignore
+      const { cu, su, rewardPerCu, rewardPerSu, nuFarmingRewardInTft } = getProfile(); // prettier-ignore
+      _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nuFarmingRewardInTft]; // prettier-ignore
       _pieChart.update();
     }
 

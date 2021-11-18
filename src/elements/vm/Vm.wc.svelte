@@ -2,11 +2,12 @@
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
-  import type { IFormField } from "../../types";
+  import type { IFlist, IFormField } from "../../types";
   const { events } = window.configs?.grid3_client ?? {};
   import deployVM from "../../utils/deployVM";
 
   const data = new VM();
+  data.envs = [new Env()];
 
   const tabs = [
     { label: "Config" },
@@ -25,15 +26,22 @@
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: 'name', placeholder: 'Your VM name.'},
-    { label: "FList", symbol: 'flist', placeholder: 'Your flist.'},
-    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint.'},    
-    { label: "CPU", symbol: 'cpu', placeholder: 'Your CPU.', type: 'number'},
-    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB.', type: 'number'},
+    { label: "CPU", symbol: 'cpu', placeholder: 'Your CPU', type: 'number'},
+    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID.', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
+    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.dev.grid.tf/nodes"}},
   ];
+
+  $: {
+    baseFields[baseFields.length - 1].link.url = `https://explorer.${profile.networkEnv}.grid.tf/nodes`; // prettier-ignore
+  }
+
+  // prettier-ignore
+  const flistFields: IFormField[] = [
+    { label: "FList", symbol: 'flist', placeholder: 'Your flist' },
+    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint'},
+  ]
 
   // prettier-ignore
   const envFields: IFormField[] = [
@@ -67,12 +75,27 @@
       .then(() => (success = true))
       .catch((err: Error) => {
         failed = true;
-        message = err.message;
+
+        message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
       });
+  }
+
+  // prettier-ignore
+  const flists: IFlist[] = [
+    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/base:latest.flist", entryPoint: "/sbin/zinit init" },
+    { name: "Ubuntu", url: "https://hub.grid.tf/omar0.3bot/omarelawady-ubuntu-20.04.flist", entryPoint: "/init.sh" },
+  ];
+  let flistIdx: number | string;
+
+  function onSelectFlist() {
+    if (flistIdx && +flistIdx <= flists.length) {
+      data.flist = flists[flistIdx].url;
+      data.entrypoint = flists[flistIdx].entryPoint;
+    }
   }
 
   const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
@@ -132,7 +155,49 @@
       </div>
 
       {#if active === "Config"}
-        <!-- Show Base Info -->
+        <div class="field">
+          <p class="label">Name</p>
+          <div class="control">
+            <input
+              class="input"
+              type="text"
+              placeholder="Virtual Machine Name"
+              bind:value={data.name}
+            />
+          </div>
+        </div>
+
+        <p class="label">Flists</p>
+        <div class="select mb-2" style="width: 100%;">
+          <select
+            style="width: 100%;"
+            bind:value={flistIdx}
+            on:change={onSelectFlist}
+          >
+            <option selected disabled>Please select a flist</option>
+            {#each flists as f, idx (f.url)}
+              <option value={idx}>{f.name}</option>
+            {/each}
+            <option value="other">Other</option>
+          </select>
+        </div>
+        {#if flistIdx === "other"}
+          {#each flistFields as field (field.symbol)}
+            <div class="field">
+              <p class="label">
+                {field.label}
+              </p>
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder={field.placeholder}
+                  bind:value={data[field.symbol]}
+                />
+              </div>
+            </div>
+          {/each}
+        {/if}
         {#each baseFields as field (field.symbol)}
           <div class="field">
             <p class="label">
