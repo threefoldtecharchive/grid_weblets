@@ -12,9 +12,7 @@ export default class Caprover {
     public nodeId = 3,
     public domain = "",
     public publicKey = "",
-    public diskSize = 100,
-
-    public configs = window.configs.baseConfig
+    public diskSize = 100
   ) {}
 
   public get valid(): boolean {
