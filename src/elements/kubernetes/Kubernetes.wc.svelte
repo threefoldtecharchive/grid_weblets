@@ -5,9 +5,6 @@
   import deployKubernetes from "../../utils/deployKubernetes";
   const { events } = window.configs?.grid3_client ?? {};
   import type { IFormField } from "../../types";
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import type { IProfile } from "../../types/Profile";
-  import { onMount } from "svelte";
 
   const data = new Kubernetes();
 
@@ -44,7 +41,9 @@
   let success = false;
   let failed = false;
   const configs = window.configs?.baseConfig;
-  let profileIdx: number;
+  let profileIdx: number = 0;
+
+  $: profiles = $configs;
   $: profile = $configs[profileIdx];
 
   let message: string;
@@ -73,6 +72,8 @@
         events.removeListener("logs", onLogInfo);
       });
   }
+
+  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
 </script>
 
 <div style="padding: 15px;">
@@ -100,7 +101,22 @@
         {/if}
       </div>
     {:else}
-      <SelectProfile on:profileIdx={(p) => (profileIdx = p.detail)} />
+      <div
+        class="select mb-4"
+        style="display: flex; justify-content: flex-end;"
+      >
+        <select on:change={onSelectProfile}>
+          {#each profiles as profile, idx (idx)}
+            <option value={idx}
+              >{#if profile.name}
+                {profile.name}
+              {:else}
+                Profile {idx + 1}
+              {/if}</option
+            >
+          {/each}
+        </select>
+      </div>
       <div class="tabs is-centered">
         <ul>
           {#each tabs as tab (tab.label)}
