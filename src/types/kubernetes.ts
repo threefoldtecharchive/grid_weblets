@@ -52,8 +52,7 @@ export default class Kubernetes {
     public secret: string = "",
     public sshKey: string = "",
     public metadata: string = "",
-    public description: string = "",
-    public configs = window.configs.baseConfig
+    public description: string = ""
   ) {}
 
   public get valid(): boolean {
