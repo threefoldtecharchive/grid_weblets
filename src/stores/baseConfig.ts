@@ -7,7 +7,6 @@ const createProfile = (m = "", s = "", n = "dev") => ({ mnemonics: m, storeSecre
 
 function createBaseConfig() {
   const store = writable({
-    loaded: false,
     profiles: [createProfile()],
   });
 
@@ -39,7 +38,6 @@ function createBaseConfig() {
         const profiles = JSON.parse(decrypt(data, password).toString(enc.Utf8));
         if (profiles instanceof Array) {
           update((value) => {
-            value.loaded = true;
             value.profiles = profiles;
             return value;
           });
