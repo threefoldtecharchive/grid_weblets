@@ -1,7 +1,6 @@
 <svelte:options tag={null} />
 
 <script lang="ts">
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import DeployedList from "../../types/deployedList";
 
   export let tab: "k8s" | "vm" | "caprover" = undefined;
@@ -18,7 +17,9 @@
   let configed = false;
   let list: DeployedList;
   const configs = window.configs?.baseConfig;
-  let profileIdx: number;
+  let profileIdx: number = 0;
+
+  $: profiles = $configs;
   $: profile = $configs[profileIdx];
 
   function onConfigHandler() {
@@ -37,6 +38,8 @@
       return m.name.startsWith("caprover_leader");
     });
   }
+
+  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
 </script>
 
 <div style="padding: 15px;">
@@ -54,7 +57,22 @@
     {:else if !configed}
       <form on:submit|preventDefault={onConfigHandler}>
         <div style="display: flex; justify-content: center;">
-          <SelectProfile on:profileIdx={(p) => (profileIdx = p.detail)} />
+          <div
+            class="select mb-4"
+            style="display: flex; justify-content: flex-end;"
+          >
+            <select on:change={onSelectProfile}>
+              {#each profiles as profile, idx (idx)}
+                <option value={idx}
+                  >{#if profile.name}
+                    {profile.name}
+                  {:else}
+                    Profile {idx + 1}
+                  {/if}</option
+                >
+              {/each}
+            </select>
+          </div>
         </div>
         <div style="display: flex; justify-content: center;">
           <button
