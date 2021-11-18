@@ -26,7 +26,13 @@ export interface IFormField {
   textarea?: boolean;
   type?: "text" | "number" | "checkbox" | "password";
   link?: {
-    url: string,
-    label: string,
+    url: string;
+    label: string;
   };
+}
+
+export interface IFlist {
+  name: string;
+  url: string;
+  entryPoint: string;
 }

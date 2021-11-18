@@ -1,18 +1,20 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
+import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
-import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { MachinesModel, DiskModel, GridClient, MachineModel } =
   window.configs?.grid3_client ?? {};
-import { get } from "svelte/store";
 
 const CAPROVER_FLIST =
   "https://hub.grid.tf/samehabouelsaad.3bot/tf-caprover-main-a4f186da8d.flist";
 
-export default async function deployCaprover(data: Caprover) {
+export default async function deployCaprover(
+  data: Caprover,
+  profile: IProfile
+) {
   const { name, memory, nodeId, publicKey, cpu, domain, diskSize } = data;
-  const { mnemonics, storeSecret, networkEnv } = get(data.configs);
+  const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
   const network = createNetwork(new Network(`caprover_network_${name}`, "10.200.0.0/16")); // prettier-ignore
@@ -50,7 +52,6 @@ export default async function deployCaprover(data: Caprover) {
   const grid = new GridClient(
     networkEnv as any,
     mnemonics,
-    await getSignerObj("Deploy Caprover"),
     storeSecret,
     http,
     undefined,

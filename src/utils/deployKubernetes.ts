@@ -1,22 +1,23 @@
-import { get } from "svelte/store";
 import type { default as Kubernetes, Base } from "../types/kubernetes";
+import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
-import getSignerObj from "./getSignerObj";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { GridClient, K8SModel, KubernetesNodeModel } =
   window.configs?.grid3_client ?? {};
 
-export default async function deployKubernetes(data: Kubernetes) {
+export default async function deployKubernetes(
+  data: Kubernetes,
+  profile: IProfile
+) {
   /* Extract Data */
-  const { configs, master, workers, network: nw, ...base } = data;
+  const { master, workers, network: nw, ...base } = data;
   const { secret, sshKey, description, metadata, name } = base;
-  const { mnemonics, storeSecret, networkEnv } = get(configs);
+  const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
   const grid = new GridClient(
     networkEnv as any,
     mnemonics,
-    await getSignerObj("Deploy K8s"),
     storeSecret,
     http,
     undefined,
