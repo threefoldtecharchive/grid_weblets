@@ -33,13 +33,19 @@
 
     <div class="tabs">
       <ul>
-        {#each profiles as _, idx}
+        {#each profiles as profile, idx}
           <li class={activeConfig === idx ? "is-active" : ""}>
             <a
               href="#!"
               on:click|preventDefault={onSelectProfile.bind(undefined, idx)}
             >
-              <span>Profile {idx + 1}</span>
+              <span>
+                {#if profile.name}
+                  {profile.name}
+                {:else}
+                  Profile {idx + 1}
+                {/if}
+              </span>
               {#if idx !== 0}
                 <button
                   class="ml-2 is-small delete"
@@ -56,6 +62,19 @@
     </div>
 
     <div class="mt-2">
+      <div class="field">
+        <p class="label">Name</p>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            value={activeProfile.name}
+            on:input={configs.updateName.bind(undefined, activeConfig)}
+            placeholder="Enter Your Mnemonics"
+          />
+        </div>
+      </div>
+
       <p class="label">Network Environment</p>
       <div
         class="select mb-2"
@@ -70,6 +89,7 @@
           <option value="dev">Devnet</option>
         </select>
       </div>
+
       <div class="field">
         <p class="label">Mnemonics</p>
         <div class="control">

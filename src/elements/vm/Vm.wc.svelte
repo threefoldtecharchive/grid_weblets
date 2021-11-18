@@ -77,9 +77,7 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">
-      Deploy a Virtual Machine - {JSON.stringify(profile)}
-    </h4>
+    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <hr />
 
     {#if loading}

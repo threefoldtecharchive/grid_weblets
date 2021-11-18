@@ -3,10 +3,10 @@ import { enc } from "crypto-js";
 import { encrypt, decrypt } from "crypto-js/aes";
 
 const KEY = "BASE_CONFIGS";
-const createProfile = (m = "", s = "", n = "dev") => ({ mnemonics: m, storeSecret: s, networkEnv: n }); // prettier-ignore
+const createProfile = (name = "", m = "", s = "", n = "dev") => ({ name, mnemonics: m, storeSecret: s, networkEnv: n }); // prettier-ignore
 
 function createBaseConfig() {
-  const store = writable([createProfile()]);
+  const store = writable([createProfile("Profile 1")]);
 
   const { subscribe, set, update } = store;
   return {
@@ -28,6 +28,12 @@ function createBaseConfig() {
     updateNetworkEnv(idx: number, e: Event) {
       return update((value) => {
         value[idx].networkEnv = (e.target as any).selectedIndex === 0 ? "test" : "dev"; // prettier-ignore
+        return value;
+      });
+    },
+    updateName(idx: number, e: InputEvent) {
+      return update((value) => {
+        value[idx].name = (e.target as any).value;
         return value;
       });
     },
