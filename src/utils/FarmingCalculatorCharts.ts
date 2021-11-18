@@ -47,7 +47,7 @@ export function buildLineChart(canvas: HTMLCanvasElement, fp: FarmingProfile) {
       labels: xs.map((i) => i.toFixed(2)),
       datasets: [
         {
-          label: "TFT Price",
+          label: "Margin",
           data: xs.map((x) => fp.getTotalReward(x)),
           backgroundColor: "rgb(255, 99, 132)",
           borderColor: "rgba(255, 99, 132, 0.5)",
