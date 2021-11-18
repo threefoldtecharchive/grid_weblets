@@ -5,10 +5,11 @@
   import deployKubernetes from "../../utils/deployKubernetes";
   const { events } = window.configs?.grid3_client ?? {};
   import type { IFormField } from "../../types";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import type { IProfile } from "../../types/Profile";
 
   const data = new Kubernetes();
   const configs = data.configs;
-  let password: string = "";
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
@@ -43,16 +44,12 @@
     { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used for data encryption" },
   ];
 
-  const tabs = [
-    { label: "Config" },
-    { label: "Master" },
-    { label: "Workers" },
-    { label: "Credentials" },
-  ];
+  const tabs = [{ label: "Config" }, { label: "Master" }, { label: "Workers" }];
   let active: string = "Config";
   let loading = false;
   let success = false;
   let failed = false;
+  let profile: IProfile;
 
   let message: string;
   function onDeployKubernetes() {
@@ -69,7 +66,7 @@
 
     events.addListener("logs", onLogInfo);
 
-    deployKubernetes(data)
+    deployKubernetes(data, profile)
       .then(() => (success = true))
       .catch((err: Error) => {
         failed = true;
@@ -107,15 +104,7 @@
         {/if}
       </div>
     {:else}
-      <div
-        class="select mb-4"
-        style="display: flex; justify-content: flex-end;"
-      >
-        <select bind:value={$configs.networkEnv}>
-          <option value="test">Testnet</option>
-          <option value="dev">Devnet</option>
-        </select>
-      </div>
+      <SelectProfile on:profile={(p) => (profile = p.detail)} />
       <div class="tabs is-centered">
         <ul>
           {#each tabs as tab (tab.label)}
@@ -172,9 +161,11 @@
         <!-- Show Master Info -->
         {#each baseFields as field (field.symbol)}
           <div class="field">
-            <p class="label">{field.label}
+            <p class="label">
+              {field.label}
               {#if field.link}
-                (<a href={field.link.url} target="_blank">{field.link.label}</a>)
+                (<a href={field.link.url} target="_blank">{field.link.label}</a
+                >)
               {/if}
             </p>
             <div class="control">
@@ -239,10 +230,13 @@
               </div>
               {#each baseFields as field (field.symbol)}
                 <div class="field">
-                    <p class="label">{field.label}
-                      {#if field.link}
-                    (<a href={field.link.url} target="_blank">{field.link.label}</a>)
-                  {/if}
+                  <p class="label">
+                    {field.label}
+                    {#if field.link}
+                      (<a href={field.link.url} target="_blank"
+                        >{field.link.label}</a
+                      >)
+                    {/if}
                   </p>
                   <div class="control">
                     {#if field.type === "number"}
@@ -310,28 +304,6 @@
     {/if}
 
     <div class="actions">
-      {#if $configs.loaded === false}
-        <button
-          type="button"
-          class="button is-primary is-outlined mr-2"
-          disabled={$configs.storeSecret === ""}
-          on:click={() => {
-            configs.load();
-          }}
-        >
-          Load
-        </button>
-        <button
-          type="button"
-          class="button is-success mr-2"
-          disabled={$configs.storeSecret === "" || $configs.mnemonics === ""}
-          on:click={() => {
-            configs.save();
-          }}
-        >
-          Save
-        </button>
-      {/if}
       <button
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
