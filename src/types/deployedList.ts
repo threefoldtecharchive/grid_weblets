@@ -1,4 +1,5 @@
 import getSignerObj from "../utils/getSignerObj";
+import type { IProfile } from "./Profile";
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { GridClient } = window.configs?.grid3_client ?? {};
 
@@ -24,11 +25,11 @@ export default class DeployedList {
     return this.data[key];
   }
 
-  public static async init(configs: any): Promise<DeployedList> {
+  public static async init(configs: IProfile): Promise<DeployedList> {
     const { mnemonics, networkEnv, storeSecret } = configs;
     const http = new HTTPMessageBusClient(0, "");
     const grid = new GridClient(
-      networkEnv,
+      networkEnv as any,
       mnemonics,
       await getSignerObj("Deploy List"),
       storeSecret,

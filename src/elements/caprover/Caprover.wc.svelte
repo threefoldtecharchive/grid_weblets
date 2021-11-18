@@ -4,7 +4,6 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import type { IFormField } from "../../types";
   import { default as Caprover } from "../../types/caprover";
-  import type { IProfile } from "../../types/Profile";
   import deployCaprover from "../../utils/deployCaprover";
   const { events } = window.configs?.grid3_client ?? {};
 
@@ -12,7 +11,9 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
+  const configs = window.configs?.baseConfig;
+  let profileIdx: number;
+  $: profile = $configs[profileIdx];
 
   // prettier-ignore
   const tabs = [
@@ -86,7 +87,7 @@
         {/if}
       </div>
     {:else}
-      <SelectProfile on:profile={(p) => (profile = p.detail)} />
+      <SelectProfile on:profileIdx={(p) => (profileIdx = p.detail)} />
       <div class="tabs is-centered">
         <ul>
           {#each tabs as tab (tab.label)}
@@ -135,6 +136,7 @@
         class={"button is-primary " + (loading ? "is-loading" : "")}
         type="submit"
         disabled={((loading || !data.valid) && !(success || failed)) ||
+          !profile ||
           profile.mnemonics === "" ||
           profile.storeSecret === ""}
         on:click={(e) => {

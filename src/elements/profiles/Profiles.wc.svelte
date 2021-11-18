@@ -1,24 +1,16 @@
 <svelte:options tag={null} />
 
 <script lang="ts">
-  import type { IFormField } from "../../types";
-
   const configs = window.configs?.baseConfig;
   let activeConfig: number = 0;
   let password: string = "";
-
-  // prettier-ignore
-  const configFields: IFormField[] = [
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Mnemonics of your tfchain account" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "Secret key used as profile secret" },
-  ];
 
   function onSelectProfile(idx: number) {
     activeConfig = idx;
   }
 
-  $: profiles = $configs.profiles;
-  $: activeProfile = $configs.profiles[activeConfig];
+  $: profiles = $configs;
+  $: activeProfile = $configs[activeConfig];
 </script>
 
 <section style="padding: 15px;">
@@ -69,34 +61,40 @@
         class="select mb-2"
         style="display: flex; justify-content: flex-end;"
       >
-        <select style="width: 100%;" bind:value={activeProfile.networkEnv}>
+        <select
+          style="width: 100%;"
+          value={activeProfile.networkEnv}
+          on:change={configs.updateNetworkEnv.bind(undefined, activeConfig)}
+        >
           <option value="test">Testnet</option>
           <option value="dev">Devnet</option>
         </select>
       </div>
-      {#each configFields as field (field.symbol)}
-        <div class="field">
-          <p class="label">{field.label}</p>
-          <div class="control">
-            {#if field.type === "password"}
-              <input
-                class="input"
-                type="password"
-                autocomplete="off"
-                placeholder={field.placeholder}
-                bind:value={activeProfile[field.symbol]}
-              />
-            {:else}
-              <input
-                class="input"
-                type="text"
-                placeholder={field.placeholder}
-                bind:value={activeProfile[field.symbol]}
-              />
-            {/if}
-          </div>
+      <div class="field">
+        <p class="label">Mnemonics</p>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            value={activeProfile.mnemonics}
+            on:input={configs.updateMnemonics.bind(undefined, activeConfig)}
+            placeholder="Enter Your Mnemonics"
+          />
         </div>
-      {/each}
+      </div>
+      <div class="field">
+        <p class="label">Store Secret</p>
+        <div class="control">
+          <input
+            class="input"
+            type="password"
+            autocomplete="off"
+            value={activeProfile.storeSecret}
+            on:input={configs.updateStoreSecret.bind(undefined, activeConfig)}
+            placeholder="Secret key used as profile secret"
+          />
+        </div>
+      </div>
     </div>
 
     <hr />
