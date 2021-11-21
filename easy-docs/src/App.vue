@@ -40,6 +40,7 @@ export default class App extends Vue {
     "deployedlist",
     "caprover",
     "farmingcalculator",
+    "peertube",
   ];
   sidenav: ISidenav | null = null;
 
