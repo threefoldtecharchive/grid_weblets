@@ -8,11 +8,11 @@
   import DL from "./elements/DeployedList/DeployedList.wc.svelte";
 </script>
 
-<C />
+<!-- <C /> -->
 
-<!-- <Base />
-<Profiles /> -->
-<!-- <DL /> -->
+<Base />
+<Profiles />
+<DL />
 
 <!-- <C /> -->
 <!-- <Base />
