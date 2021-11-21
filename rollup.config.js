@@ -63,9 +63,9 @@ function build(options) {
 function buildElements() {
 	const dir = path.join(__dirname, 'src', 'elements');
 	const outDir = `.build/build/elements/`;
-	// return fs
-	// 	.readdirSync(dir)
-	return ['peertube']
+	return fs
+		.readdirSync(dir)
+	// return ['peertube']
 		.map(f => {
 			const name = f.replace(".wc.svelte", "").toLocaleLowerCase();
 			return build({

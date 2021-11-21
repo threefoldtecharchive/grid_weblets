@@ -10,8 +10,8 @@
   } from "../../utils/FarmingCalculatorCharts";
 
   const profiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
+    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
+    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
   ];
 
   let profileChoosing: boolean = true;
@@ -30,6 +30,8 @@
     { label: "CPU (Cores)", symbol: "cpu" },
     { label: "HDD (GB)", symbol: "hdd" },
     { label: "SSD (GB)", symbol: "ssd" },
+    { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
+    { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     // { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
     { label: "Power Utilization", symbol: "powerUtilization" },
@@ -44,6 +46,8 @@
     { label: "CPU (Cores)", symbol: "cpu" },
     { label: "HDD (GB)", symbol: "hdd" },
     { label: "SSD (GB)", symbol: "ssd" },
+    { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
+    { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     { label: "Maximum Token Price", symbol: "maximumTokenPrice" },
     { label: "Power Utilization", symbol: "powerUtilization" },
@@ -54,20 +58,20 @@
 
   // prettier-ignore
   const outputFields = [
+    { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft", fullWidth: true },
     { label: "CU", symbol: "cu" },
-    { label: "NU", symbol: "nu" },
     { label: "SU", symbol: "su" },
-    { label: "Average Token Price", symbol: "averageTokenPrice" },
-    { label: "Reward Per CU", symbol: "rewardPerCu" },
-    { label: "Reward Per SU", symbol: "rewardPerSu" },
-    { label: "Reward Per NU", symbol: "rewardPerNu" },
+    { label: "NU", symbol: "nu" },
+    // { label: "Average Token Price", symbol: "averageTokenPrice" },
+    { label: "USD reward per CU", symbol: "rewardPerCu" },
+    { label: "USD reward per SU", symbol: "rewardPerSu" },
+    { label: "USD reward per NU", symbol: "rewardPerNu" },
     { label: "TFT Reward Per CU", symbol: "tftRewardPerCu" },
     { label: "TFT Reward Per SU", symbol: "tftRewardPerSu" },
     { label: "TFT Reward Per NU", symbol: "tftRewardPerNu" },
     { label: "CU Farming Reward In TFT", symbol: "cuFarmingRewardInTft" },
     { label: "SU Farming Reward In TFT", symbol: "suFarmingRewardInTft" },
     { label: "NU Farming Reward In TFT", symbol: "nuFarmingRewardInTft" },
-    { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft" },
   ];
 
   // prettier-ignore
@@ -75,9 +79,9 @@
     { label: "CU", symbol: "cu" },
     { label: "SU", symbol: "su" },
     { label: "NU", symbol: "nu" },
-    { label: "Reward Per CU", symbol: "rewardPerCu" },
-    { label: "Reward Per SU", symbol: "rewardPerSu" },
-    { label: "Reward Per NU", symbol: "rewardPerNu" },
+    { label: "USD reward per CU", symbol: "rewardPerCu" },
+    { label: "USD reward per SU", symbol: "rewardPerSu" },
+    { label: "USD reward per NU", symbol: "rewardPerNu" },
   ];
 
   // prettier-ignore
@@ -124,23 +128,37 @@
     _initCharts();
   }
 
-  function _updateLineCanvas(price: number) {
-    const X = (price - 0.15) / 19;
-    const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
-    _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
-    _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getTotalReward(x)); // prettier-ignore
-    _lineCanvas.update();
+  let showChartRoi: boolean = false;
+  function _updateLineCanvas() {
+    const price = active === "Basic" ? activeProfile.maximumTokenPrice : activeProfile.priceAfter5Years; // prettier-ignore
+    if (_lineCanvas && activeProfile) {
+      const X = (price - 0.15) / 19;
+      const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
+      _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
+
+      if (showChartRoi) {
+        _lineCanvas.data.datasets[0].label = "Margin";
+        _lineCanvas.options.plugins.title.text = "Return On Investment / TFT Price(USD)"; // prettier-ignore
+        _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getRoi(x) / 100); // prettier-ignore
+      } else {
+        _lineCanvas.data.datasets[0].label = "Margin";
+        _lineCanvas.options.plugins.title.text = "Return (USD) / TFT price (USD)"; // prettier-ignore
+        _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getTotalReward(x)); // prettier-ignore
+      }
+      _lineCanvas.update();
+    }
   }
 
   $: {
     if (_pieChart && activeProfile) {
-      const { cu, su, rewardPerCu, rewardPerSu, nuFarmingRewardInTft } = activeProfile; // prettier-ignore
-      _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nuFarmingRewardInTft]; // prettier-ignore
+      const { /* cu, su, rewardPerCu, rewardPerSu, */ nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft } = activeProfile; // prettier-ignore
+      // _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nuFarmingRewardInTft]; // prettier-ignore
+      _pieChart.data.datasets[0].data = [cuFarmingRewardInTft, suFarmingRewardInTft, nuFarmingRewardInTft]; // prettier-ignore
       _pieChart.update();
     }
 
     if (_lineCanvas && activeProfile) {
-      _updateLineCanvas(active === "Basic" ? activeProfile.maximumTokenPrice : activeProfile.priceAfter5Years); // prettier-ignore
+      _updateLineCanvas(); // prettier-ignore
     }
   }
 </script>
@@ -246,6 +264,18 @@
                 <canvas bind:this={pieCanvas} />
               </div>
               <div class="chart chart-2">
+                <label style="display: flex; align-items: center;">
+                  <input
+                    class="mr-2 ml-2"
+                    type="checkbox"
+                    checked={showChartRoi}
+                    on:change={() => {
+                      showChartRoi = !showChartRoi;
+                      _updateLineCanvas();
+                    }}
+                  />
+                  <p class="label">Return On Investment</p>
+                </label>
                 <canvas bind:this={lineCanvas} />
               </div>
             </div>
@@ -346,9 +376,9 @@
                 {/each}
               </div>
             </div>
-            <div class="calculations mt-4">
+            <div class="calculations calculations-3 mt-4">
               {#each outputFields as field (field.symbol)}
-                <div class="field">
+                <div class="field" style={field.fullWidth ? "width: 100%" : ""}>
                   <div class="control">
                     <label class="label">
                       <p>{field.label}</p>
