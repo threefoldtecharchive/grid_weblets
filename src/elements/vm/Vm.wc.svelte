@@ -6,8 +6,7 @@
   const { events } = window.configs?.grid3_client ?? {};
   import deployVM from "../../utils/deployVM";
 
-  const data = new VM();
-  data.envs = [new Env()];
+  const configs = window.configs?.baseConfig;
 
   const tabs = [
     { label: "Config" },
@@ -18,11 +17,15 @@
   let loading = false;
   let success = false;
   let failed = false;
-  const configs = window.configs?.baseConfig;
   let profileIdx: number = 0;
 
   $: profiles = $configs;
   $: profile = $configs[profileIdx];
+
+  const data = new VM();
+  requestAnimationFrame(() => {
+    data.envs = [new Env(undefined, "SSH_KEY", profile?.sshKey)];
+  });
 
   // prettier-ignore
   const baseFields: IFormField[] = [
@@ -32,8 +35,6 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
     { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://library.threefold.me/info/threefold#/manual_tfgrid3/threefold__grid3_explorer"}},
   ];
-
-
 
   // prettier-ignore
   const flistFields: IFormField[] = [

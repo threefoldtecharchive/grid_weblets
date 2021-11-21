@@ -153,7 +153,7 @@
           </div>
         </div>
         <div class="field">
-          <p class="label">Public ssh key</p>
+          <p class="label">Public SSH Key</p>
           <div class="control">
             <input
               class="input"
