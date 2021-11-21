@@ -31,7 +31,7 @@
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number', link: { label: "Grid Explorer", url: "https://explorer.tfchain.dev.threefold.io/nodes"}},
+    { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number', link: { label: "Grid Explorer", url: "https://library.threefold.me/info/threefold#/manual_tfgrid3/threefold__grid3_explorer"}},
     // { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
   ];
 

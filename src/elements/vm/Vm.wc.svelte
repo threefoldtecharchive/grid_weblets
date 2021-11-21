@@ -30,12 +30,10 @@
     { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://explorer.dev.grid.tf/nodes"}},
+    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://library.threefold.me/info/threefold#/manual_tfgrid3/threefold__grid3_explorer"}},
   ];
 
-  $: {
-    baseFields[baseFields.length - 1].link.url = `https://explorer.${profile.networkEnv}.grid.tf/nodes`; // prettier-ignore
-  }
+
 
   // prettier-ignore
   const flistFields: IFormField[] = [
