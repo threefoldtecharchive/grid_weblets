@@ -6,13 +6,14 @@ export default class FarmingProfile {
     public hdd: number = 0,
     public ssd: number = 0,
     public price: number = 0,
-    public priceAfter5Years: number = 20,
-    public maximumTokenPrice: number = 20,
+    public priceAfter5Years: number = 2,
+    public maximumTokenPrice: number = 2,
     public powerUtilization: number = 40,
     public powerCost: number = 0.15,
     public certified: boolean = true,
     public publicIp: boolean = false,
-    public investmentCostHW: number = 1040
+    public investmentCostHW: number = 1040,
+    public nuRequiredPerCu: number = 30
   ) {}
 
   public get cu(): number {
@@ -24,7 +25,7 @@ export default class FarmingProfile {
   }
 
   public get nu(): number {
-    return this.cu * 30;
+    return this.cu * this.nuRequiredPerCu;
   }
 
   public get su(): number {
@@ -112,15 +113,19 @@ export default class FarmingProfile {
     return grossProfit - this.totalCosts;
   }
 
-  public get ROI(): string {
+  public getRoi(price: number = this.priceAfter5Years): number {
     const { totalFarmingRewardInTft, investmentCostHW /* D32 */, powerUtilization, powerCost } = this; // prettier-ignore
     const tft = totalFarmingRewardInTft * 60;
-    const usd /* D31 */ = tft * this.priceAfter5Years;
+    const usd /* D31 */ = tft * price;
     const powerCostOver5Years /* D33 */ = powerUtilization * 24 * .365 * 5 * powerCost; // prettier-ignore
     const roiX = usd - (investmentCostHW + powerCostOver5Years);
     const roiY = investmentCostHW + powerCostOver5Years;
     const roi = roiX / roiY;
-    return (roi * 100).toFixed(0) + "%";
+    return roi * 100;
+  }
+
+  public get ROI(): string {
+    return this.getRoi().toFixed(0) + "%";
   }
 
   public get grossProfit(): number {
