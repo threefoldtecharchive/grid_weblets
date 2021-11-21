@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import DeployedList from "../../types/deployedList";
+  import deleteContracts from "../../utils/deleteContracts";
 
   export let tab: "k8s" | "vm" | "caprover" = undefined;
 
@@ -130,6 +131,7 @@
                   <th>Public IP</th>
                   <th>Planetary Network IP</th>
                   <th>Workers</th>
+                  <th>Delete</th>
                 </tr>
               </thead>
               <tbody>
@@ -144,6 +146,12 @@
                     {/if}
                     <td>{row.masters[0].yggIP}</td>
                     <td>{row.workers.length}</td>
+                    <td>
+                      <button class="button is-outlined is-danger">
+                        <!-- on:click={onDeleteContract.bind(undefined, )} -->
+                        Remove
+                      </button>
+                    </td>
                   </tr>
                 {/each}
               </tbody>

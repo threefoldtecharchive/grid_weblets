@@ -31,7 +31,7 @@
     { label: "HDD (GB)", symbol: "hdd" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
-    { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
+    // { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
     { label: "Power Utilization", symbol: "powerUtilization" },
     { label: "Power Cost", symbol: "powerCost" },
     { label: "Public IP", symbol: "publicIp", type: "checkbox" },
@@ -82,10 +82,10 @@
 
   // prettier-ignore
   const advancedFields = [
-    { label: "Return On Investment", symbol: "ROI", skip: true },
+    { label: "Return On Investment", symbol: "ROI", skip: true, big: true },
+    { label: "Net Profit", symbol: "netProfit", big: true },
     { label: "Gross Profit", symbol: "grossProfit" },
     { label: "Total Costs", symbol: "totalCosts" },
-    { label: "Net Profit", symbol: "netProfit" },
   ];
 
   let pieCanvas: HTMLCanvasElement;
@@ -305,12 +305,34 @@
                 <canvas bind:this={pieCanvas} />
               </div>
               <div class="chart">
+                <div class="field">
+                  <div class="control">
+                    <label class="label">
+                      <p>Token price after 5 years (USD)</p>
+                      <input
+                        class="input"
+                        type="number"
+                        bind:value={activeProfile.priceAfter5Years}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <hr />
                 {#each advancedFields as field (field.symbol)}
                   <div class="field">
                     <div class="control">
                       <label class="label">
-                        <p>{field.label}</p>
+                        <p
+                          style={field.big
+                            ? "font-size: 20px; font-weight: bold;"
+                            : ""}
+                        >
+                          {field.label}
+                        </p>
                         <input
+                          style={field.big
+                            ? "font-size: 20px; font-weight: bold;"
+                            : ""}
                           disabled
                           class="input"
                           type="text"
