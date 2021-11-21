@@ -3,7 +3,7 @@ import { enc } from "crypto-js";
 import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
 
-const createProfile = (name = "", m = "", s = "", n = "dev") => ({ name, mnemonics: m, storeSecret: s, networkEnv: n }); // prettier-ignore
+const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
 
 function createBaseConfig() {
   const store = writable([createProfile("Profile 1")]);
@@ -43,6 +43,12 @@ function createBaseConfig() {
     updateName(idx: number, e: InputEvent) {
       return update((value) => {
         value[idx].name = (e.target as any).value;
+        return value;
+      });
+    },
+    updateSshKey(idx: number, e: InputEvent) {
+      return update((value) => {
+        value[idx].sshKey = (e.target as any).value;
         return value;
       });
     },
