@@ -152,6 +152,19 @@
             />
           </div>
         </div>
+        <div class="field">
+          <p class="label">Public ssh key</p>
+          <div class="control">
+            <input
+              class="input"
+              type="text"
+              autocomplete="off"
+              value={activeProfile.sshKey}
+              on:input={configs.updateSshKey.bind(undefined, activeConfig)}
+              placeholder="Your public ssh key"
+            />
+          </div>
+        </div>
       </div>
     {:else}
       <div class="field">
