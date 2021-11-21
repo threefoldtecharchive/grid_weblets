@@ -51,6 +51,20 @@
   ];
 
   // prettier-ignore
+  const basicInputFields = [
+    { label: "Memory (GB)", symbol: "memory" },
+    { label: "CPU (Cores)", symbol: "cpu" },
+    { label: "HDD (GB)", symbol: "hdd" },
+    { label: "SSD (GB)", symbol: "ssd" },
+    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
+    { label: "Maximum Token Price", symbol: "maximumTokenPrice" },
+    { label: "Power Utilization", symbol: "powerUtilization" },
+    { label: "Power Cost", symbol: "powerCost" },
+    { label: "Public IP", symbol: "publicIp", type: "checkbox" },
+    { label: "Certified", symbol: "certified", type: "checkbox" },
+  ];
+
+  // prettier-ignore
   const outputFields = [
     { label: "CU", symbol: "cu" },
     { label: "NU", symbol: "nu" },
@@ -66,6 +80,16 @@
     { label: "SU Farming Reward In TFT", symbol: "suFarmingRewardInTft" },
     { label: "NU Farming Reward In TFT", symbol: "nuFarmingRewardInTft" },
     { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft" },
+  ];
+
+  // prettier-ignore
+  const basicOutputFields = [
+    { label: "CU", symbol: "cu" },
+    { label: "SU", symbol: "su" },
+    { label: "NU", symbol: "nu" },
+    { label: "Reward Per CU", symbol: "rewardPerCu" },
+    { label: "Reward Per SU", symbol: "rewardPerSu" },
+    { label: "Reward Per NU", symbol: "rewardPerNu" },
   ];
 
   // prettier-ignore
@@ -113,6 +137,14 @@
     _initCharts();
   }
 
+  function _updateLineCanvas(price: number) {
+    const X = (price - 0.15) / 19;
+    const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
+    _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
+    _lineCanvas.data.datasets[0].data = xs.map((x) => getProfile().getTotalReward(x)); // prettier-ignore
+    _lineCanvas.update();
+  }
+
   $: {
     if (_pieChart && activeProfile) {
       const { cu, su, rewardPerCu, rewardPerSu, nuFarmingRewardInTft } = getProfile(); // prettier-ignore
@@ -121,11 +153,7 @@
     }
 
     if (_lineCanvas && activeProfile) {
-      const X = (activeProfile.priceAfter5Years - 0.15) / 19;
-      const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
-      _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
-      _lineCanvas.data.datasets[0].data = xs.map((x) => getProfile().getTotalReward(x)); // prettier-ignore
-      _lineCanvas.update();
+      _updateLineCanvas(active === "Basic" ? activeProfile.maximumTokenPrice : activeProfile.priceAfter5Years); // prettier-ignore
     }
   }
 </script>
@@ -199,7 +227,7 @@
       {#if active === "Basic"}
         <div class="farming-content">
           <div class="farming-content--left">
-            {#each inputFields as field (field.symbol)}
+            {#each basicInputFields as field (field.symbol)}
               <div class="field">
                 <div class="control">
                   {#if field.type === "checkbox"}
@@ -215,7 +243,6 @@
                     <label class="label">
                       <p>{field.label}</p>
                       <input
-                        disabled={field.symbol === "priceAfter5Years"}
                         class="input"
                         type="number"
                         bind:value={activeProfile[field.symbol]}
@@ -235,8 +262,8 @@
                 <canvas bind:this={lineCanvas} />
               </div>
             </div>
-            <div class="calculations mt-4">
-              {#each outputFields as field (field.symbol)}
+            <div class="calculations calculations-3 mt-4">
+              {#each basicOutputFields as field (field.symbol)}
                 <div class="field">
                   <div class="control">
                     <label class="label">
@@ -403,6 +430,10 @@
     > div {
       width: calc(100% / 4);
       padding: 0 10px;
+    }
+
+    &-3 > div {
+      width: calc(100% / 3);
     }
   }
 </style>
