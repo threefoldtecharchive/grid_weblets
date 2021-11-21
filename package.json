@@ -5,6 +5,7 @@
   "scripts": {
     "build": "rollup -c",
     "build:app": "yarn build && sh build.sh && cd easy-docs && yarn build",
+    "build:dev": "yarn build && sh build.sh",
     "dev": "rollup -c rollup.config.dev.js -w",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json"
