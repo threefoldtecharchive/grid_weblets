@@ -42,7 +42,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   vm.flist =
     "https://hub.grid.tf/omar0.3bot/omarelawady-peertube-grid3-tfconnect.flist";
   vm.entrypoint = "/start.sh";
-  vm.env = createEnvs({
+  vm.env = {
     PEERTUBE_BIND_ADDRESS: "::",
     PEERTUBE_WEBSERVER_HOSTNAME: "peertube4.gent01.dev.grid.tf",
     PEERTUBE_DB_HOSTNAME: "10.1.4.3", // how should i know these? maybe guessing on each new network ip starts from 2: redis, 3: postgres, 4: peertube.
@@ -50,7 +50,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     PEERTUBE_DB_PASSWORD: "omar123456",
     PEERTUBE_REDIS_HOSTNAME: "10.1.4.2",
     PEERTUBE_REDIS_AUTH: "omar123456",
-  });
+  };
 
   const vms = new MachinesModel();
   vms.name = name;
@@ -60,13 +60,6 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   deployReqVMs(data, net, profile);
 
   return grid.connect().then(() => grid.machines.deploy(vms));
-}
-
-function createEnvs(envs): { [key: string]: string } {
-  return envs.reduce((res, env) => {
-    res[env.key] = env.value;
-    return res;
-  }, {});
 }
 
 export async function deployReqVMs(data: VM, n: any, profile: IProfile) {
@@ -101,9 +94,9 @@ export async function deployReqVMs(data: VM, n: any, profile: IProfile) {
   vm1.rootfs_size = 1;
   vm1.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-redis-grid3.flist";
   vm1.entrypoint = "/start.sh";
-  vm1.env = createEnvs({
+  vm1.env = {
     PASSWORD: "omar123456",
-  });
+  };
 
   const disk2 = new DiskModel();
   disk2.name = "postgres_data";
@@ -121,11 +114,11 @@ export async function deployReqVMs(data: VM, n: any, profile: IProfile) {
   vm2.rootfs_size = 1;
   vm2.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-postgres-grid3.flist";
   vm2.entrypoint = "/start.sh";
-  vm2.env = createEnvs({
+  vm2.env = {
     POSTGRES_PASSWORD: "omar123456",
     POSTGRES_DB: "peertube_prod",
     PGDATA: "/var/lib/postgresql/data",
-  });
+  };
 
   const vms = new MachinesModel();
   vms.name = name;
