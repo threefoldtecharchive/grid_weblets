@@ -9,28 +9,16 @@
     buildLineChart,
   } from "../../utils/FarmingCalculatorCharts";
 
-  const basicProfiles = [
+  const profiles = [
     new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
     new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
   ];
 
-  const advancedProfiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 20), // prettier-ignore
-  ];
   let profileChoosing: boolean = true;
-  let activeProfileIdx: number = 0;
   let activeProfile: FarmingProfile = null;
 
   function onSelectProfile(e: Event) {
-    activeProfileIdx = e.target["selectedIndex"] - 1;
-    activeProfile = getProfile();
-  }
-
-  function getProfile(): FarmingProfile {
-    return active === "Basic"
-      ? basicProfiles[activeProfileIdx]
-      : advancedProfiles[activeProfileIdx];
+    activeProfile = profiles[e.target["selectedIndex"] - 1];
   }
 
   const tabFields = ["Basic", "Advanced"];
@@ -113,7 +101,7 @@
   function _initCharts() {
     requestAnimationFrame(() => {
       if (pieCanvas) _pieChart = buildPieChart(pieCanvas); // prettier-ignore
-      if (lineCanvas) _lineCanvas = buildLineChart(lineCanvas, getProfile()); // prettier-ignore
+      if (lineCanvas) _lineCanvas = buildLineChart(lineCanvas, activeProfile); // prettier-ignore
     });
   }
 
@@ -132,7 +120,6 @@
     _pieChart = null;
     _lineCanvas = null;
     active = tab;
-    activeProfile = getProfile();
 
     _initCharts();
   }
@@ -141,13 +128,13 @@
     const X = (price - 0.15) / 19;
     const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
     _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
-    _lineCanvas.data.datasets[0].data = xs.map((x) => getProfile().getTotalReward(x)); // prettier-ignore
+    _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getTotalReward(x)); // prettier-ignore
     _lineCanvas.update();
   }
 
   $: {
     if (_pieChart && activeProfile) {
-      const { cu, su, rewardPerCu, rewardPerSu, nuFarmingRewardInTft } = getProfile(); // prettier-ignore
+      const { cu, su, rewardPerCu, rewardPerSu, nuFarmingRewardInTft } = activeProfile; // prettier-ignore
       _pieChart.data.datasets[0].data = [cu * rewardPerCu, su * rewardPerSu, nuFarmingRewardInTft]; // prettier-ignore
       _pieChart.update();
     }
@@ -188,7 +175,7 @@
           <div class="select">
             <select on:change={onSelectProfile}>
               <option disabled selected>Please select configuration</option>
-              {#each basicProfiles as profile (profile.name)}
+              {#each profiles as profile (profile.name)}
                 <option>
                   {profile.name}
                 </option>
