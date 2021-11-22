@@ -1,6 +1,8 @@
 <svelte:options tag={null} />
 
 <script lang="ts">
+  import { onMount, onDestroy } from "svelte";
+
   import DeployedList from "../../types/deployedList";
   import deleteContracts from "../../utils/deleteContracts";
 
@@ -18,6 +20,7 @@
   let configed = false;
   let list: DeployedList;
   const configs = window.configs?.baseConfig;
+  const deployedStore = window.configs?.deploymentStore;
   let profileIdx: number = 0;
 
   $: profiles = $configs;
@@ -62,6 +65,17 @@
   }
 
   let infoToShow: string = "";
+
+  let _sub: any;
+  onMount(() => {
+    _sub = deployedStore.subscribe(() => {
+      _reloadTab();
+    });
+  });
+
+  onDestroy(() => {
+    _sub();
+  });
 </script>
 
 <div style="padding: 15px;">
