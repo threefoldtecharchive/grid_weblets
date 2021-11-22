@@ -33,14 +33,35 @@
       .finally(() => (loading = false));
   }
 
-  async function loadCaprover() {
-    const machines = await list.load("machines");
-    return machines.filter(([m]) => {
-      return m.name.startsWith("caprover_leader");
+  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
+
+  function _reloadTab() {
+    const x = active;
+    active = "";
+    requestAnimationFrame(() => {
+      active = x;
     });
   }
 
-  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
+  let removed: string[] = [];
+  function onRemoveHandler(key: "k8s" | "machines", name: string) {
+    removed = [...removed, name];
+    const idx = removed.length - 1;
+    deleteContracts(profile, key, name)
+      .then((data) => {
+        console.log("Removed", data);
+        if (data.deleted.length === 0) {
+          removed.splice(idx, 1);
+          removed = removed;
+        }
+        _reloadTab();
+      })
+      .catch((err) => {
+        console.log("Error while removing", err);
+      });
+  }
+
+  let infoToShow: string = "";
 </script>
 
 <div style="padding: 15px;">
@@ -119,7 +140,7 @@
       </div>
 
       {#if (!tab && active === "Kubernetes") || tab === "k8s"}
-        {#await list.load("k8s")}
+        {#await list.loadK8s()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           <div class="table-container mt-2">
@@ -131,6 +152,7 @@
                   <th>Public IP</th>
                   <th>Planetary Network IP</th>
                   <th>Workers</th>
+                  <th>Details</th>
                   <th>Delete</th>
                 </tr>
               </thead>
@@ -138,17 +160,36 @@
                 {#each rows as row, idx}
                   <tr>
                     <th>{idx + 1}</th>
-                    <td>{row.masters[0].name}</td>
-                    {#if row.masters[0].publicIP}
-                      <td>{row.masters[0].publicIP.ip}</td>
+                    <td>{row.name}</td>
+                    {#if row.master.publicIP}
+                      <td>{row.master.publicIP.ip}</td>
                     {:else}
                       <td>-</td>
                     {/if}
-                    <td>{row.masters[0].yggIP}</td>
-                    <td>{row.workers.length}</td>
+                    <td>{row.master.yggIP}</td>
+                    <td>{row.workers}</td>
                     <td>
-                      <button class="button is-outlined is-danger">
-                        <!-- on:click={onDeleteContract.bind(undefined, )} -->
+                      <button
+                        class="button is-outlined is-primary"
+                        on:click={() => {
+                          infoToShow = JSON.stringify(
+                            row.details,
+                            undefined,
+                            4
+                          );
+                        }}
+                        disabled={removed.includes(row.name)}
+                      >
+                        Show Details
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        class={"button is-danger " +
+                          (removed.includes(row.name) ? "is-loading" : "")}
+                        on:click={() => onRemoveHandler("k8s", row.name)}
+                        disabled={removed.includes(row.name)}
+                      >
                         Remove
                       </button>
                     </td>
@@ -162,6 +203,8 @@
             &gt;
             {#if err && err.message}
               {err.message}
+            {:else if typeof err === "string"}
+              {err}
             {:else}
               Failed to list {active}.
             {/if}
@@ -170,7 +213,7 @@
       {/if}
 
       {#if active === "Virtual Machines" || active === "Caprover" || tab === "caprover" || tab === "vm"}
-        {#await active === "Caprover" || tab === "caprover" ? loadCaprover() : list.load("machines")}
+        {#await active === "Caprover" || tab === "caprover" ? list.loadCaprover() : list.loadVm()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           <div class="table-container mt-2">
@@ -182,10 +225,12 @@
                   <th>Public IP</th>
                   <th>Planetary Network IP</th>
                   <th>Flist</th>
+                  <th>Details</th>
+                  <th>Delete</th>
                 </tr>
               </thead>
               <tbody>
-                {#each rows as [row], idx}
+                {#each rows as row, idx}
                   <tr>
                     <th>{idx + 1}</th>
                     <td>{row.name}</td>
@@ -196,6 +241,27 @@
                     {/if}
                     <td>{row.yggIP}</td>
                     <td>{row.flist}</td>
+                    <td>
+                      <button
+                        class="button is-outlined is-primary"
+                        on:click={() => {
+                          infoToShow = JSON.stringify(row, undefined, 4);
+                        }}
+                        disabled={removed.includes(row.name)}
+                      >
+                        Show Details
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        class={"button is-danger " +
+                          (removed.includes(row.name) ? "is-loading" : "")}
+                        on:click={() => onRemoveHandler("machines", row.name)}
+                        disabled={removed.includes(row.name)}
+                      >
+                        Remove
+                      </button>
+                    </td>
                   </tr>
                 {/each}
               </tbody>
@@ -206,6 +272,8 @@
             &gt;
             {#if err && err.message}
               {err.message}
+            {:else if typeof err === "string"}
+              {err}
             {:else}
               Failed to list {active}.
             {/if}
@@ -215,6 +283,22 @@
     {/if}
   </section>
 </div>
+
+{#if infoToShow}
+  <div class="modal is-active">
+    <div class="modal-background" />
+    <div class="modal-content">
+      <div class="box" style="white-space: pre;">
+        {infoToShow}
+      </div>
+    </div>
+    <button
+      class="modal-close is-large"
+      aria-label="close"
+      on:click={() => (infoToShow = "")}
+    />
+  </div>
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
