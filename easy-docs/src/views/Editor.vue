@@ -27,8 +27,11 @@ import { parse } from "marked";
 class Weblet {
   private _md: string;
   public html: string;
-  public constructor(public name: string, symbol: string) {
+  public constructor(public name: string, symbol: string, deployment?: string) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
+    if (deployment) {
+      this._md += `<tf-deployedlist tab="${deployment}"></tf-deployedlist>`;
+    }
     this.html = parse(this._md, {
       sanitize: false,
     });
@@ -53,9 +56,9 @@ export default class Editor extends Vue {
   public weblets: Weblet[] = [
     new Weblet("Profile Manager", "profiles"),
     new Weblet("Farming Calculator", "farming-calculator"),
-    new Weblet("CapRover", "caprover"),
-    new Weblet("Virtual Machine", "vm"),
-    new Weblet("Kubernetes", `kubernetes`),
+    new Weblet("CapRover", "caprover", "caprover"), // "k8s" | "vm" | "caprover"
+    new Weblet("Virtual Machine", "vm", "vm"),
+    new Weblet("Kubernetes", `kubernetes`, "k8s"),
     new Weblet("Deployments", "deployedlist"),
     // new Weblet("Peertube", "peertube"),
   ];

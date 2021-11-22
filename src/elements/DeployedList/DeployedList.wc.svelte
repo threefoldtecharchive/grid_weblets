@@ -41,8 +41,12 @@
   function _reloadTab() {
     const x = active;
     active = "";
+
+    const y = tab;
+    tab = undefined;
     requestAnimationFrame(() => {
       active = x;
+      tab = y;
     });
   }
 
@@ -68,7 +72,7 @@
 
   let _sub: any;
   onMount(() => {
-    _sub = deployedStore.subscribe(() => {
+    _sub = deployedStore.subscribe((data) => {
       _reloadTab();
     });
   });
