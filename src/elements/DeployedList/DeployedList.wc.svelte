@@ -143,61 +143,64 @@
         {#await list.loadK8s()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
-          <div class="table-container mt-2">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th title="position">#</th>
-                  <th>Name</th>
-                  <th>Public IP</th>
-                  <th>Planetary Network IP</th>
-                  <th>Workers</th>
-                  <th>Details</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#each rows as row, idx}
+          {#if rows.length}
+            <div class="table-container mt-2">
+              <table class="table">
+                <thead>
                   <tr>
-                    <th>{idx + 1}</th>
-                    <td>{row.name}</td>
-                    {#if row.master.publicIP}
-                      <td>{row.master.publicIP.ip}</td>
-                    {:else}
-                      <td>-</td>
-                    {/if}
-                    <td>{row.master.yggIP}</td>
-                    <td>{row.workers}</td>
-                    <td>
-                      <button
-                        class="button is-outlined is-primary"
-                        on:click={() => {
-                          infoToShow = JSON.stringify(
-                            row.details,
-                            undefined,
-                            4
-                          );
-                        }}
-                        disabled={removed.includes(row.name)}
-                      >
-                        Show Details
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        class={"button is-danger " +
-                          (removed.includes(row.name) ? "is-loading" : "")}
-                        on:click={() => onRemoveHandler("k8s", row.name)}
-                        disabled={removed.includes(row.name)}
-                      >
-                        Remove
-                      </button>
-                    </td>
+                    <th title="position">#</th>
+                    <th>Name</th>
+                    <th>Public IP</th>
+                    <th>Planetary Network IP</th>
+                    <th>Workers</th>
+                    <th>Actions</th>
                   </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {#each rows as row, idx}
+                    <tr>
+                      <th>{idx + 1}</th>
+                      <td>{row.name}</td>
+                      {#if row.master.publicIP}
+                        <td>{row.master.publicIP.ip}</td>
+                      {:else}
+                        <td>-</td>
+                      {/if}
+                      <td>{row.master.yggIP}</td>
+                      <td>{row.workers}</td>
+                      <td>
+                        <button
+                          class="button is-outlined is-primary ml-2"
+                          on:click={() => {
+                            infoToShow = JSON.stringify(
+                              row.details,
+                              undefined,
+                              4
+                            );
+                          }}
+                          disabled={removed.includes(row.name)}
+                        >
+                          Show Details
+                        </button>
+                        <button
+                          class={"button is-danger " +
+                            (removed.includes(row.name) ? "is-loading" : "")}
+                          on:click={() => onRemoveHandler("k8s", row.name)}
+                          disabled={removed.includes(row.name)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          {:else}
+            <p style="text-align: center;" class="mt-2">
+              No Deployments was found on this profile.
+            </p>
+          {/if}
         {:catch err}
           <div class="notification is-danger mt-2">
             &gt;
@@ -216,57 +219,60 @@
         {#await active === "Caprover" || tab === "caprover" ? list.loadCaprover() : list.loadVm()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
-          <div class="table-container mt-2">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th title="position">#</th>
-                  <th>Name</th>
-                  <th>Public IP</th>
-                  <th>Planetary Network IP</th>
-                  <th>Flist</th>
-                  <th>Details</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#each rows as row, idx}
+          {#if rows.length}
+            <div class="table-container mt-2">
+              <table class="table">
+                <thead>
                   <tr>
-                    <th>{idx + 1}</th>
-                    <td>{row.name}</td>
-                    {#if row.publicIP}
-                      <td>{row.publicIP.ip}</td>
-                    {:else}
-                      <td>-</td>
-                    {/if}
-                    <td>{row.yggIP}</td>
-                    <td>{row.flist}</td>
-                    <td>
-                      <button
-                        class="button is-outlined is-primary"
-                        on:click={() => {
-                          infoToShow = JSON.stringify(row, undefined, 4);
-                        }}
-                        disabled={removed.includes(row.name)}
-                      >
-                        Show Details
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        class={"button is-danger " +
-                          (removed.includes(row.name) ? "is-loading" : "")}
-                        on:click={() => onRemoveHandler("machines", row.name)}
-                        disabled={removed.includes(row.name)}
-                      >
-                        Remove
-                      </button>
-                    </td>
+                    <th title="position">#</th>
+                    <th>Name</th>
+                    <th>Public IP</th>
+                    <th>Planetary Network IP</th>
+                    <th>Flist</th>
+                    <th>Actions</th>
                   </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {#each rows as row, idx}
+                    <tr>
+                      <th>{idx + 1}</th>
+                      <td>{row.name}</td>
+                      {#if row.publicIP}
+                        <td>{row.publicIP.ip}</td>
+                      {:else}
+                        <td>-</td>
+                      {/if}
+                      <td>{row.yggIP}</td>
+                      <td>{row.flist}</td>
+                      <td>
+                        <button
+                          class="button is-outlined is-primary  ml-2"
+                          on:click={() => {
+                            infoToShow = JSON.stringify(row, undefined, 4);
+                          }}
+                          disabled={removed.includes(row.name)}
+                        >
+                          Show Details
+                        </button>
+                        <button
+                          class={"button is-danger " +
+                            (removed.includes(row.name) ? "is-loading" : "")}
+                          on:click={() => onRemoveHandler("machines", row.name)}
+                          disabled={removed.includes(row.name)}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          {:else}
+            <p style="text-align: center;" class="mt-2">
+              No Deployments was found on this profile.
+            </p>
+          {/if}
         {:catch err}
           <div class="notification is-danger mt-2">
             &gt;
