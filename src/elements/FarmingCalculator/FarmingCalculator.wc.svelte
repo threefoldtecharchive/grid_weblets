@@ -137,7 +137,7 @@
       _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
 
       if (showChartRoi) {
-        _lineCanvas.data.datasets[0].label = "Margin";
+        _lineCanvas.data.datasets[0].label = "ROI";
         _lineCanvas.options.plugins.title.text = "Return On Investment / TFT Price(USD)"; // prettier-ignore
         _lineCanvas.data.datasets[0].data = xs.map((x) => activeProfile.getRoi(x) / 100); // prettier-ignore
       } else {
