@@ -265,6 +265,13 @@
               </div>
               <div class="chart chart-2">
                 <div style="display: flex; align-items: center;">
+                  <label
+                    for="roi-checkbox"
+                    class="label mr-2 mb-0"
+                    style="cursor: pointer;"
+                  >
+                    Net Profit
+                  </label>
                   <label class="switch">
                     <input
                       type="checkbox"
