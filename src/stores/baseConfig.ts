@@ -1,12 +1,21 @@
 import { get, writable } from "svelte/store";
 import { enc } from "crypto-js";
+import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
 
-const KEY = "BASE_CONFIGS";
-const createProfile = (name = "", m = "", s = "", n = "dev") => ({ name, mnemonics: m, storeSecret: s, networkEnv: n }); // prettier-ignore
+const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
 
 function createBaseConfig() {
   const store = writable([createProfile("Profile 1")]);
+
+  function hashPassword(password: string) {
+    return md5(password).toString();
+  }
+
+  function getEncryptedStore(password: string) {
+    const data = JSON.stringify(get(store));
+    return encrypt(data, password).toString();
+  }
 
   const { subscribe, set, update } = store;
   return {
@@ -37,6 +46,12 @@ function createBaseConfig() {
         return value;
       });
     },
+    updateSshKey(idx: number, e: InputEvent) {
+      return update((value) => {
+        value[idx].sshKey = (e.target as any).value;
+        return value;
+      });
+    },
     addProfile() {
       update((value) => {
         value.push(createProfile());
@@ -50,27 +65,39 @@ function createBaseConfig() {
       });
     },
 
+    create(password: string) {
+      const hash = hashPassword(password);
+
+      if (localStorage.getItem(hash) !== null) {
+        return "Password already exists.";
+      }
+
+      localStorage.setItem(hash, getEncryptedStore(password));
+    },
+
     load(password: string) {
-      const data = localStorage.getItem(KEY);
+      const hash = hashPassword(password);
+      const data = localStorage.getItem(hash);
+
       if (data === null) {
-        return;
+        return "Password is not correct.";
       }
 
       try {
-        const profiles = JSON.parse(decrypt(data, password).toString(enc.Utf8));
-        if (profiles instanceof Array) {
-          update((value) => {
-            value = profiles;
-            return value;
-          });
-        }
-      } catch {}
+        set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
+      } catch {
+        return "Incorrect data.";
+      }
     },
 
     save(password: string) {
-      const profiles = get(store);
-      const data = JSON.stringify(profiles);
-      localStorage.setItem(KEY, encrypt(data, password).toString()); // prettier-ignore
+      const hash = hashPassword(password);
+
+      if (localStorage.getItem(hash) === null) {
+        return "Password wasn't found.";
+      }
+
+      localStorage.setItem(hash, getEncryptedStore(password));
     },
   };
 }
