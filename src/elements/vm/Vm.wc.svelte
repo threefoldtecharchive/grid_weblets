@@ -7,6 +7,7 @@
   import deployVM from "../../utils/deployVM";
 
   const configs = window.configs?.baseConfig;
+  const deploymentStore = window.configs?.deploymentStore;
 
   const tabs = [
     { label: "Config" },
@@ -71,7 +72,10 @@
     events.addListener("logs", onLogInfo);
 
     deployVM(data, profile)
-      .then(() => (success = true))
+      .then(() => {
+        deploymentStore.set(0);
+        success = true;
+      })
       .catch((err: Error) => {
         failed = true;
 

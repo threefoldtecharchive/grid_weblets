@@ -41,6 +41,7 @@
   let success = false;
   let failed = false;
   const configs = window.configs?.baseConfig;
+  const deploymentStore = window.configs?.deploymentStore;
   let profileIdx: number = 0;
 
   $: profiles = $configs;
@@ -62,8 +63,8 @@
     events.addListener("logs", onLogInfo);
 
     deployKubernetes(data, profile)
-      .then((data) => {
-        console.log(JSON.stringify(data, undefined, 4));
+      .then(() => {
+        deploymentStore.set(0);
         success = true;
       })
       .catch((err: Error) => {

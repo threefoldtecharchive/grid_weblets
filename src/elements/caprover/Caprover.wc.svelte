@@ -11,6 +11,7 @@
   let success = false;
   let failed = false;
   const configs = window.configs?.baseConfig;
+  const deploymentStore = window.configs?.deploymentStore;
   let profileIdx: number = 0;
 
   $: profiles = $configs;
@@ -50,7 +51,10 @@
     events.addListener("logs", onLogInfo);
 
     deployCaprover(data, profile)
-      .then(() => (success = true))
+      .then(() => {
+        deploymentStore.set(0);
+        success = true;
+      })
       .catch((err: string) => {
         failed = true;
         message = err;
