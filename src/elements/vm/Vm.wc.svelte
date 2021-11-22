@@ -5,6 +5,7 @@
   import type { IFlist, IFormField } from "../../types";
   const { events } = window.configs?.grid3_client ?? {};
   import deployVM from "../../utils/deployVM";
+  import findNodes from "../../utils/findNodes";
 
   const configs = window.configs?.baseConfig;
   const deploymentStore = window.configs?.deploymentStore;
@@ -102,6 +103,33 @@
   }
 
   const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
+
+  const nodeFilters = {
+    accessNodeV4: false,
+    accessNodeV6: true,
+    gateway: false,
+    city: "",
+    country: "",
+    farmId: null,
+    cru: null,
+    hru: null,
+    mru: null,
+    sru: null,
+  };
+
+  // prettier-ignore
+  const filtersFields = [
+    { label: "Access Node V4 Filter", symbol: "accessNodeV4", type: "checkbox" },
+    { label: "Access Node V6 Filter", symbol: "accessNodeV6", type: "checkbox" },
+    { label: "Gateway Filter", symbol: "gateway", type: "checkbox" },
+    { label: "City Filter", symbol: "city", type: "text" },
+    { label: "Country Filter", symbol: "country", type: "text" },
+    { label: "Farm ID Filter", symbol: "farmId", type: "number" },
+    { label: "CRU Filter", symbol: "cru", type: "number" },
+    { label: "HRU Filter", symbol: "hru", type: "number" },
+    { label: "MRU Filter", symbol: "mru", type: "number" },
+    { label: "SRU Filter", symbol: "sru", type: "number" },
+  ];
 </script>
 
 <div style="padding: 15px;">
@@ -238,6 +266,70 @@
             </div>
           </div>
         {/each}
+
+        <section style="width: 50%;">
+          {#each filtersFields as field (field.symbol)}
+            {#if field.type === "checkbox"}
+              <div style="display: flex; align-items: center;" class="mb-2">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    bind:checked={nodeFilters[field.symbol]}
+                    id={field.symbol}
+                  />
+                  <span class="slider" />
+                </label>
+                <label
+                  for={field.symbol}
+                  class="label ml-2"
+                  style="cursor: pointer;"
+                >
+                  {field.label}
+                </label>
+              </div>
+            {/if}
+
+            {#if field.type === "text"}
+              <div class="field">
+                <p class="label">{field.label}</p>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    placeholder={field.label}
+                    bind:value={nodeFilters[field.symbol]}
+                  />
+                </div>
+              </div>
+            {/if}
+
+            {#if field.type === "number"}
+              <div class="field">
+                <p class="label">{field.label}</p>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="number"
+                    placeholder={field.label}
+                    bind:value={nodeFilters[field.symbol]}
+                  />
+                </div>
+              </div>
+            {/if}
+          {/each}
+        </section>
+
+        <button
+          class="button is-primary mt-4"
+          type="button"
+          on:click={() => {
+            findNodes(nodeFilters).then((res) => {
+              console.log(res);
+            });
+          }}
+        >
+          Apply Filters
+        </button>
       {/if}
 
       {#if active === "Environment Variables"}
@@ -374,5 +466,59 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  /* Switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #2196f3;
+    }
+
+    input:checked + .slider {
+      box-shadow: 0 0 1px #2196f3;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
   }
 </style>

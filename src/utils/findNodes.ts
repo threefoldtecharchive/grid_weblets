@@ -1,21 +1,10 @@
 const { GridClient, Nodes } = window.configs?.grid3_client ?? {};
 
-export default function findNodes() {
+export default function findNodes(filters: any) {
   const nodes = new Nodes(
-    GridClient.config.graphqlURL,
-    GridClient.config.rmbClient["proxyURL"]
+    "https://graphql.dev.grid.tf/graphql",
+    "https://gridproxy.dev.grid.tf"
   );
 
-  return nodes.filterNodes({
-    accessNodeV4: false,
-    accessNodeV6: false,
-    city: "",
-    country: "",
-    cru: 0,
-    farmId: 0,
-    gateway: false,
-    hru: 0,
-    mru: 0,
-    sru: 0,
-  });
+  return nodes.filterNodes(filters);
 }
