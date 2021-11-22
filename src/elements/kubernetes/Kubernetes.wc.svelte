@@ -62,7 +62,10 @@
     events.addListener("logs", onLogInfo);
 
     deployKubernetes(data, profile)
-      .then(() => (success = true))
+      .then((data) => {
+        console.log(JSON.stringify(data, undefined, 4));
+        success = true;
+      })
       .catch((err: Error) => {
         failed = true;
         message = err.message;
