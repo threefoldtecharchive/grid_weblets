@@ -34,6 +34,8 @@
 </div>
 
 <style lang="scss">
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+
   .select-profile {
     display: flex;
     justify-content: flex-end;

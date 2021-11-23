@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-profiles" />
 
 <script lang="ts">
   const configs = window.configs?.baseConfig;

@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-base" />
 
 <script lang="ts">
   import baseConfigStore from "../../stores/baseConfig";

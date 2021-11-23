@@ -1,24 +1,18 @@
 <svelte:options tag="tf-kubernetes" />
 
 <script lang="ts">
-  // const { events } = window.configs?.grid3_client ?? {};
-  import Kubernetes from "../../types/kubernetes";
+  import Inputs from "../../components/Inputs.svelte";
+  import Kubernetes, { Worker } from "../../types/kubernetes";
+  import deployKubernetes from "../../utils/deployKubernetes";
+  const { events } = window.configs?.grid3_client ?? {};
   import type { IFormField, ITab } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-  import type { Network } from "../../types/kubernetes";
-
-  // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
+  import type { IProfile } from "../../types/Profile";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
-  import Inputs from "../../components/Inputs.svelte";
+  import NodesContainer from "../../components/NodesContainer.svelte";
 
-  // prettier-ignore
-  const tabs: ITab[] = [
-    { label: "Config", value: "config" },
-    { label: "Master", value: "master" },
-    { label: "Workers", value: "workers" },
-  ];
+  let data = new Kubernetes();
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
@@ -47,22 +41,61 @@
     { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
   ];
 
-  let data = new Kubernetes();
-  let profile: IProfile;
+  // prettier-ignore
+  const tabs: ITab[] = [
+    { label: "Config", value: "config" },
+    { label: "Master", value: "master" },
+    { label: "Workers", value: "workers" },
+  ];
   let active: string = "config";
-  let loading: boolean = false;
-  let success: boolean = false;
-  let failed: boolean = false;
+
+  let loading = false;
+  let success = false;
+  let failed = false;
+  const deploymentStore = window.configs?.deploymentStore;
+
+  let profile: IProfile;
+  requestAnimationFrame(() => {
+    data.sshKey = profile?.sshKey;
+  });
+
   let message: string;
+  function onDeployKubernetes() {
+    loading = true;
+    success = false;
+    failed = false;
+    message = undefined;
+
+    function onLogInfo(msg: string) {
+      if (typeof msg === "string") {
+        message = msg;
+      }
+    }
+
+    events.addListener("logs", onLogInfo);
+
+    deployKubernetes(data, profile)
+      .then(() => {
+        deploymentStore.set(0);
+        success = true;
+      })
+      .catch((err: Error) => {
+        failed = true;
+        message = err.message;
+      })
+      .finally(() => {
+        loading = false;
+        events.removeListener("logs", onLogInfo);
+      });
+  }
 </script>
 
 <div style="padding: 15px;">
-  <form class="box" on:submit|preventDefault>
+  <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
     <hr />
 
     {JSON.stringify(data)}
-    <Inputs bind:data={data.network} fields={networkFields} />
 
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
@@ -79,14 +112,48 @@
         <Inputs bind:data fields={kubernetesFields} />
 
         <!-- Network info -->
-        <!-- <Inputs bind:data={data.network} fields={networkFields} /> -->
+        <Inputs bind:data={data.network} fields={networkFields} />
       {/if}
 
-      <!-- Show Master Info -->
-      <!-- {#if active === "master"}
+      {#if active === "master"}
+        <!-- Show Master Info -->
         <Inputs bind:data={data.master} fields={baseFields} />
-      {/if} -->
+      {/if}
+
+      {#if active === "workers"}
+        <!-- Show Workers Info -->
+        <NodesContainer
+          bind:nodes={data.workers}
+          fields={baseFields}
+          on:click={() => (data.workers = [...data.workers, new Worker()])}
+        />
+      {/if}
     {/if}
+
+    <div class="actions">
+      <button
+        class={"button is-primary " + (loading ? "is-loading" : "")}
+        type="submit"
+        disabled={((loading || !data.valid) && !(success || failed)) ||
+          !profile ||
+          profile.mnemonics === "" ||
+          profile.storeSecret === ""}
+        on:click={(e) => {
+          if (success || failed) {
+            e.preventDefault();
+            success = false;
+            failed = false;
+            loading = false;
+          }
+        }}
+      >
+        {#if success || failed}
+          Back
+        {:else}
+          Deploy
+        {/if}
+      </button>
+    </div>
   </form>
 </div>
 

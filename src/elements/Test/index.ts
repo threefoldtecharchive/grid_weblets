@@ -1,0 +1,1 @@
+import "./Test.wc.svelte";

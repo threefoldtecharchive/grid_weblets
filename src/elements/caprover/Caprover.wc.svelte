@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-caprover" />
 
 <script lang="ts">
   import type { IFormField } from "../../types";

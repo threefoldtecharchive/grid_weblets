@@ -8,9 +8,9 @@
   export let field: IFormField;
   export let data: any;
 
+  const id = v4();
   let _input: HTMLInputElement;
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
-  const id = v4();
 
   onMount(() => {
     if (_input) {
@@ -37,7 +37,7 @@
             class="input"
             placeholder={field.placeholder}
             bind:value={data[field.symbol]}
-            on:change
+            on:input
           />
         {/if}
       </div>
