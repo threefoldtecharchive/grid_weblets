@@ -35,7 +35,7 @@
     { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number'},
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://library.threefold.me/info/threefold#/manual_tfgrid3/threefold__grid3_explorer"}},
+    // { label: "Node ID", symbol: 'nodeId', placeholder: 'Your Node ID', type: 'number', link: { label: "Grid Explorer", url: "https://library.threefold.me/info/threefold#/manual_tfgrid3/threefold__grid3_explorer"}},
   ];
 
   // prettier-ignore
@@ -130,6 +130,18 @@
     { label: "MRU Filter", symbol: "mru", type: "number" },
     { label: "SRU Filter", symbol: "sru", type: "number" },
   ];
+
+  let nodeSelection: string;
+  let nodes: number[] = [];
+  let loadingNodes: boolean = false;
+  function onLoadNodesHandler() {
+    loadingNodes = true;
+    findNodes(nodeFilters, profile)
+      .then((_nodes) => {
+        nodes = _nodes;
+      })
+      .finally(() => (loadingNodes = false));
+  }
 </script>
 
 <div style="padding: 15px;">
@@ -267,69 +279,109 @@
           </div>
         {/each}
 
-        <section style="width: 50%;">
-          {#each filtersFields as field (field.symbol)}
-            {#if field.type === "checkbox"}
-              <div style="display: flex; align-items: center;" class="mb-2">
-                <label class="switch">
-                  <input
-                    type="checkbox"
-                    bind:checked={nodeFilters[field.symbol]}
-                    id={field.symbol}
-                  />
-                  <span class="slider" />
-                </label>
-                <label
-                  for={field.symbol}
-                  class="label ml-2"
-                  style="cursor: pointer;"
-                >
-                  {field.label}
-                </label>
-              </div>
-            {/if}
+        <p class="label">Node Selection</p>
+        <div class="select mb-2">
+          <select bind:value={nodeSelection}>
+            <option selected disabled>Choose a way to select node</option>
+            <option value="automatic">Automatic</option>
+            <option value="manual">Manual</option>
+          </select>
+        </div>
 
-            {#if field.type === "text"}
-              <div class="field">
-                <p class="label">{field.label}</p>
-                <div class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    placeholder={field.label}
-                    bind:value={nodeFilters[field.symbol]}
-                  />
+        {#if nodeSelection === "automatic"}
+          <section style="width: 50%;">
+            <h5 class="is-size-3 has-text-weight-bold">Nodes Filter</h5>
+            {#each filtersFields as field (field.symbol)}
+              {#if field.type === "checkbox"}
+                <div style="display: flex; align-items: center;" class="mb-2">
+                  <label class="switch">
+                    <input
+                      type="checkbox"
+                      bind:checked={nodeFilters[field.symbol]}
+                      id={field.symbol}
+                    />
+                    <span class="slider" />
+                  </label>
+                  <label
+                    for={field.symbol}
+                    class="label ml-2"
+                    style="cursor: pointer;"
+                  >
+                    {field.label}
+                  </label>
                 </div>
-              </div>
-            {/if}
+              {/if}
 
-            {#if field.type === "number"}
-              <div class="field">
-                <p class="label">{field.label}</p>
-                <div class="control">
-                  <input
-                    class="input"
-                    type="number"
-                    placeholder={field.label}
-                    bind:value={nodeFilters[field.symbol]}
-                  />
+              {#if field.type === "text"}
+                <div class="field">
+                  <p class="label">{field.label}</p>
+                  <div class="control">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder={field.label}
+                      bind:value={nodeFilters[field.symbol]}
+                    />
+                  </div>
                 </div>
-              </div>
-            {/if}
-          {/each}
-        </section>
+              {/if}
 
-        <button
-          class="button is-primary mt-4"
-          type="button"
-          on:click={() => {
-            findNodes(nodeFilters).then((res) => {
-              console.log(res);
-            });
-          }}
-        >
-          Apply Filters
-        </button>
+              {#if field.type === "number"}
+                <div class="field">
+                  <p class="label">{field.label}</p>
+                  <div class="control">
+                    <input
+                      class="input"
+                      type="number"
+                      placeholder={field.label}
+                      bind:value={nodeFilters[field.symbol]}
+                    />
+                  </div>
+                </div>
+              {/if}
+            {/each}
+
+            <button
+              class={"button is-primary mt-2 " +
+                (loadingNodes ? "is-loading" : "")}
+              disabled={loadingNodes}
+              type="button"
+              on:click={onLoadNodesHandler}
+            >
+              Apply Filters
+            </button>
+
+            <div class="select mt-4">
+              <p class="label">Node ID</p>
+              <select bind:value={data.nodeId}>
+                <option selected disabled>
+                  {#if loadingNodes}
+                    Loading...
+                  {:else}
+                    Please select a node ID
+                  {/if}
+                </option>
+                {#each nodes as node (node)}
+                  <option value={node}>
+                    {node}
+                  </option>
+                {/each}
+              </select>
+            </div>
+          </section>
+        {:else if nodeSelection === "manual"}
+          <div class="field">
+            <p class="label">Node ID</p>
+            <div class="control">
+              <input
+                class="input"
+                type="number"
+                placeholder="Your Node ID"
+                bind:value={data.nodeId}
+              />
+            </div>
+          </div>
+        {/if}
       {/if}
 
       {#if active === "Environment Variables"}
@@ -520,5 +572,10 @@
       -ms-transform: translateX(26px);
       transform: translateX(26px);
     }
+  }
+
+  .select,
+  .select > select {
+    width: 100%;
   }
 </style>
