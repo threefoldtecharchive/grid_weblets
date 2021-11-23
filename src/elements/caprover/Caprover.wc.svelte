@@ -16,6 +16,9 @@
 
   $: profiles = $configs;
   $: profile = $configs[profileIdx];
+  requestAnimationFrame(() => {
+    data.publicKey = profile?.sshKey;
+  });
 
   // prettier-ignore
   const tabs = [

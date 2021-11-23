@@ -6,5 +6,5 @@
 
 <!-- <C /> -->
 <Base />
-<VM />
 <Profiles />
+<VM />
