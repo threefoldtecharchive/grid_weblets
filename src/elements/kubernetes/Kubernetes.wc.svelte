@@ -46,6 +46,9 @@
 
   $: profiles = $configs;
   $: profile = $configs[profileIdx];
+  requestAnimationFrame(() => {
+    data.sshKey = profile?.sshKey;
+  });
 
   let message: string;
   function onDeployKubernetes() {
