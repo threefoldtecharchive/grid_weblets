@@ -63,9 +63,10 @@ function build(options) {
 function buildElements() {
 	const dir = path.join(__dirname, 'src', 'elements');
 	const outDir = `.build/build/elements/`;
-	return fs
-		.readdirSync(dir)
-		.map(f => {
+	// return fs
+	// 	.readdirSync(dir)
+	return ["kubernetes"]
+	.map(f => {
 			const name = f.replace(".wc.svelte", "").toLocaleLowerCase();
 			return build({
 				src: `src/elements/${f}/index.ts`,
