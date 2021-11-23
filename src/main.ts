@@ -1,3 +1,5 @@
-import App from "./App.svelte";
+import "./App.svelte";
 
-export default new App({ target: document.body });
+// import App from "./App.svelte";
+
+// export default new App({ target: document.body });
