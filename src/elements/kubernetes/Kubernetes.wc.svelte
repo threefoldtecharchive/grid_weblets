@@ -1,21 +1,24 @@
 <svelte:options tag="tf-kubernetes" />
 
 <script lang="ts">
-  // const { events } = window.configs?.grid3_client ?? {};
-  import Kubernetes from "../../types/kubernetes";
+  const { events } = window.configs?.grid3_client ?? {};
+  const deploymentStore = window.configs?.deploymentStore;
+  import Kubernetes, { Worker } from "../../types/kubernetes";
+  import deployKubernetes from "../../utils/deployKubernetes";
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
-  import type { Network } from "../../types/kubernetes";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import Alert from "../../components/Alert.svelte";
   import Inputs from "../../components/Inputs.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import NodesContainer from "../../components/NodesContainer.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
+    { label: "Network", value: "network" },
     { label: "Master", value: "master" },
     { label: "Workers", value: "workers" },
   ];
@@ -48,21 +51,56 @@
   ];
 
   let data = new Kubernetes();
-  let profile: IProfile;
+
   let active: string = "config";
-  let loading: boolean = false;
-  let success: boolean = false;
-  let failed: boolean = false;
+  let loading = false;
+  let success = false;
+  let failed = false;
+  let profile: IProfile;
   let message: string;
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+
+  function onDeployKubernetes() {
+    loading = true;
+    success = false;
+    failed = false;
+    message = undefined;
+
+    const onLogInfo = (msg: string) => typeof msg === "string" ? (message = msg) : null; // prettier-ignore
+    events.addListener("logs", onLogInfo);
+
+    console.log(data);
+    deployKubernetes(data, profile)
+      .then(() => {
+        deploymentStore.set(0);
+        success = true;
+      })
+      .catch((err: Error) => {
+        failed = true;
+        message = err.message;
+      })
+      .finally(() => {
+        loading = false;
+        events.removeListener("logs", onLogInfo);
+      });
+  }
+
+  function onResetHandler(e: Event) {
+    if (success || failed) {
+      e.preventDefault();
+      success = false;
+      failed = false;
+      loading = false;
+    }
+  }
+
+  requestAnimationFrame(() => (data.sshKey = profile?.sshKey));
 </script>
 
 <div style="padding: 15px;">
-  <form class="box" on:submit|preventDefault>
+  <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
     <hr />
-
-    {JSON.stringify(data)}
-    <Inputs bind:data={data.network} fields={networkFields} />
 
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
@@ -71,25 +109,42 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile bind:profile />
+      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
-        <!-- Show Base Info -->
         <Inputs bind:data fields={kubernetesFields} />
-
-        <!-- Network info -->
-        <!-- <Inputs bind:data={data.network} fields={networkFields} /> -->
-      {/if}
-
-      <!-- Show Master Info -->
-      <!-- {#if active === "master"}
+      {:else if active === "network"}
+        <Inputs bind:data={data.network} fields={networkFields} />
+      {:else if active === "master"}
         <Inputs bind:data={data.master} fields={baseFields} />
-      {/if} -->
+      {:else if active === "workers"}
+        <NodesContainer
+          bind:nodes={data.workers}
+          fields={baseFields}
+          on:click={() => (data.workers = [...data.workers, new Worker()])}
+        />
+      {/if}
     {/if}
+
+    <div class="is-flex is-justify-content-flex-end is-align-items-center">
+      <button
+        class={"button is-primary " + (loading ? "is-loading" : "")}
+        type="submit"
+        {disabled}
+        on:click={onResetHandler}
+      >
+        {#if success || failed}
+          Back
+        {:else}
+          Deploy
+        {/if}
+      </button>
+    </div>
   </form>
 </div>
 
+<!-- </Layout> -->
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

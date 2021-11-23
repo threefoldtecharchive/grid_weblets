@@ -9,14 +9,7 @@
   export let data: any;
 
   const id = v4();
-  let _input: HTMLInputElement;
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
-
-  onMount(() => {
-    if (_input) {
-      _input.type = field.type;
-    }
-  });
 </script>
 
 {#if field}
@@ -31,9 +24,25 @@
             bind:value={data[field.symbol]}
             on:change
           />
-        {:else}
+        {:else if field.type === "text"}
           <input
-            bind:this={_input}
+            type="text"
+            class="input"
+            placeholder={field.placeholder}
+            bind:value={data[field.symbol]}
+            on:input
+          />
+        {:else if field.type === "number"}
+          <input
+            type="number"
+            class="input"
+            placeholder={field.placeholder}
+            bind:value={data[field.symbol]}
+            on:input
+          />
+        {:else if field.type === "password"}
+          <input
+            type="password"
             class="input"
             placeholder={field.placeholder}
             bind:value={data[field.symbol]}

@@ -8,7 +8,7 @@
   export let fields: IFormField[];
 </script>
 
-<div class="actions">
+<div class="is-flex is-justify-content-flex-end is-align-items-center">
   <button type="button" class="button is-primary" on:click>
     <span>+</span>
   </button>
@@ -17,7 +17,9 @@
   {#if nodes}
     {#each nodes as node, index (node.id)}
       <div class="box">
-        <div class="worker-header">
+        <div
+          class="is-flex is-justify-content-space-between is-align-items-center"
+        >
           <p class="is-size-5 has-text-weight-bold">{node.name}</p>
           <button
             type="button"
@@ -28,13 +30,15 @@
           </button>
         </div>
 
-        <Inputs bind:data={nodes} {fields} />
+        <Inputs bind:data={node} {fields} />
       </div>
     {/each}
   {/if}
 </div>
 
-<style lang="scss" scopred>
+<style lang="scss" scoped>
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+
   .worker-container {
     overflow-x: hidden;
     overflow-y: auto;
@@ -42,18 +46,5 @@
     will-change: transform;
     padding-bottom: 5rem;
     margin-bottom: 20px;
-  }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .worker-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 </style>
