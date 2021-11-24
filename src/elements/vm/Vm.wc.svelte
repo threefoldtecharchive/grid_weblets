@@ -83,7 +83,6 @@
   ];
 
   const { events } = window.configs?.grid3_client ?? {};
-  const configs = window.configs?.baseConfig;
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";
   let loading = false;

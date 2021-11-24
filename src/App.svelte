@@ -1,7 +1,7 @@
 <script lang="ts">
   import Base from "./elements/base/Base.wc.svelte";
-  import VM from "./elements/vm/Vm.wc.svelte";
+  import CapRover from "./elements/caprover/Caprover.wc.svelte";
 </script>
 
 <Base />
-<VM />
+<CapRover />
