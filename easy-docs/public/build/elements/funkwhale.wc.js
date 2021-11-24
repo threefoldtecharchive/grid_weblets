@@ -1,0 +1,1 @@
+!function(){"use strict";var i,n,o;Promise.resolve(),null===(i=window.configs)||void 0===i||i.grid3_client,null===(n=window.configs)||void 0===n||n.client,null===(o=window.configs)||void 0===o||o.grid3_client}();
