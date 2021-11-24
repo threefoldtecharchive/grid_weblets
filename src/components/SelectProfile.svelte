@@ -1,23 +1,24 @@
 <svelte:options tag="tf-select-profile" />
 
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, createEventDispatcher } from "svelte";
   import Input from "./Input.svelte";
   import type { IProfile } from "../types/Profile";
   import type { ISelectOption } from "../types";
+
+  const dispatch = createEventDispatcher<{ profile: IProfile }>();
 
   let selected = "0";
   const configs = window.configs?.baseConfig;
   let profiles: IProfile[];
   let options: ISelectOption[] = [];
-  export let profile: IProfile;
 
   function onUpdateProfile() {
     profiles = $configs;
     options = profiles.map((p, i) => {
       return { label: p.name || `Profile ${i + 1}`, value: i.toString() };
     });
-    profile = profiles[selected];
+    dispatch("profile", profiles[selected]);
   }
 
   let _sub = configs.subscribe(() => {
