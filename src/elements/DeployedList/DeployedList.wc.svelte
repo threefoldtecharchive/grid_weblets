@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-deployedlist" />
 
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";

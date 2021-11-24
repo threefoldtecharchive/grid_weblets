@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-peertube" />
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";

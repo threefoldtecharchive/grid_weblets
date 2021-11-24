@@ -4,7 +4,7 @@ import isValidInteger from "../utils/isValidInteger";
 export abstract class Base {
   public constructor(
     public id = v4(),
-    public name: string = "vm_" + id.split("-")[0],
+    public name: string = "worker_" + id.split("-")[0],
     public node: number = 0,
     public cpu: number = 0,
     public diskSize: number = 100,
@@ -48,7 +48,7 @@ export default class Kubernetes {
     public master = new Master(),
     public workers = [new Worker()],
     public network = new Network(),
-    public name: string = "",
+    public name: string = "k8s_" + id.split("-")[0],
     public secret: string = "",
     public sshKey: string = "",
     public metadata: string = "",

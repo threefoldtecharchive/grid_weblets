@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-farming-calculator" />
 
 <script lang="ts">
   import FarmingProfile from "../../types/FarmingProfile";
