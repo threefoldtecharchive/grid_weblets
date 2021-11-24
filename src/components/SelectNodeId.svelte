@@ -134,7 +134,7 @@
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
 {#if nodeSelection === "automatic"}
-  <h5 class="is-size-1 has-text-weight-bold">Nodes Filter</h5>
+  <h5 class="is-size-7 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     <Input bind:data={nodeFilters[field.symbol]} {field} />
   {/each}
