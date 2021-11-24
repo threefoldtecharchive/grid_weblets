@@ -9,16 +9,17 @@
   import type { IProfile } from "../../types/Profile";
 
   // Components
-  import Inputs from "../../components/Inputs.svelte";
+  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
-  import NodesContainer from "../../components/NodesContainer.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import AddBtn from "../../components/AddBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
-    { label: "Network", value: "network" },
     { label: "Master", value: "master" },
     { label: "Workers", value: "workers" },
   ];
@@ -109,42 +110,53 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
+      <SelectProfile bind:profile />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
-        <Inputs bind:data fields={kubernetesFields} />
-      {:else if active === "network"}
-        <Inputs bind:data={data.network} fields={networkFields} />
+        {#each kubernetesFields as field (field.symbol)}
+          <Input bind:data={data[field.symbol]} {field} />
+        {/each}
+        {#each networkFields as field (field.symbol)}
+          <Input bind:data={data.network[field.symbol]} {field} />
+        {/each}
       {:else if active === "master"}
-        <Inputs bind:data={data.master} fields={baseFields} />
+        {#each baseFields as field (field.symbol)}
+          <Input bind:data={data.master[field.symbol]} {field} />
+        {/each}
       {:else if active === "workers"}
-        <NodesContainer
-          bind:nodes={data.workers}
-          fields={baseFields}
+        <AddBtn
           on:click={() => (data.workers = [...data.workers, new Worker()])}
         />
+        <div class="nodes-container">
+          {#each data.workers as worker, index (worker.id)}
+            <div class="box">
+              <DeleteBtn
+                name={worker.name}
+                on:click={() =>
+                  (data.workers = data.workers.filter((_, i) => index !== i))}
+              />
+              {#each baseFields as field (field.symbol)}
+                <Input bind:data={worker[field.symbol]} {field} />
+              {/each}
+            </div>
+          {/each}
+        </div>
       {/if}
     {/if}
 
-    <div class="is-flex is-justify-content-flex-end is-align-items-center">
-      <button
-        class={"button is-primary " + (loading ? "is-loading" : "")}
-        type="submit"
-        {disabled}
-        on:click={onResetHandler}
-      >
-        {#if success || failed}
-          Back
-        {:else}
-          Deploy
-        {/if}
-      </button>
-    </div>
+    <DeployBtn
+      {disabled}
+      {loading}
+      {failed}
+      {success}
+      on:click={onResetHandler}
+    />
   </form>
 </div>
 
 <!-- </Layout> -->
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import "../../assets/global.scss";
 </style>
