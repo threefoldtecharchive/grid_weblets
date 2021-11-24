@@ -121,13 +121,11 @@
         events.removeListener("logs", onLogInfo);
       });
   }
-
-  requestAnimationFrame(() => data.envs = [new Env(undefined, "SSH_KEY", profile?.sshKey)]); // prettier-ignore
 </script>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine - {active}</h4>
+    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <hr />
 
     {#if loading}
@@ -137,7 +135,12 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
-      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
+      <SelectProfile
+        on:profile={({ detail }) => {
+          profile = detail;
+          data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+        }}
+      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -159,7 +162,16 @@
           <Input bind:data={data[field.symbol]} {field} />
         {/each}
 
-        <SelectNodeId bind:data={data.nodeId} {profile} />
+        <SelectNodeId
+          cpu={data.cpu}
+          memory={data.memory}
+          ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            data.rootFsSize
+          )}
+          bind:data={data.nodeId}
+          {profile}
+        />
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">

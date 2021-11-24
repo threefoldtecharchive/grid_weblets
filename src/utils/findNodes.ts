@@ -14,10 +14,14 @@ export default function findNodes(
     const nodes = new Nodes(graphql, rmbProxy);
 
     try {
+      console.log(nodes);
+
       const items = await nodes.filterNodes(filters);
+      console.log({ items });
+
       const resNodes = items.map((node) => {
         return {
-          label: `NodeID(${node.nodeId}) - FarmID(${node.farm})`,
+          label: `NodeID(${node.nodeId})`,
           value: node.nodeId,
         } as ISelectOption;
       });

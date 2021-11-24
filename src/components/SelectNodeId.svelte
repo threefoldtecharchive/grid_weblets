@@ -1,23 +1,27 @@
 <svelte:options tag="tf-select-node-id" />
 
 <script lang="ts">
-  import type { IFormField } from "../types";
+  import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
+  import gqlApi from "../utils/gqlApi";
+
+  // components
   import Input from "./Input.svelte";
+
+  export let cpu: number;
+  export let memory: number;
+  export let ssd: number;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
-    { label: "Access Node V4 Filter", symbol: "accessNodeV4", type: "checkbox" },
-    { label: "Access Node V6 Filter", symbol: "accessNodeV6", type: "checkbox" },
-    { label: "Gateway Filter", symbol: "gateway", type: "checkbox" },
-    { label: "City Filter", symbol: "city", type: "text" },
-    { label: "Country Filter", symbol: "country", type: "text" },
-    { label: "Farm ID Filter", symbol: "farmId", type: "number" },
-    { label: "CRU Filter", symbol: "cru", type: "number" },
-    { label: "HRU Filter", symbol: "hru", type: "number" },
-    { label: "MRU Filter", symbol: "mru", type: "number" },
-    { label: "SRU Filter", symbol: "sru", type: "number" },
+    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
+      { label: "Please select a farm", value: null, selected: true, disabled: true }
+    ] },
+    { label: "Country", symbol: "country", type: "text", placeholder: "Enter a country name" },
+    { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
+    { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
+    { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
   ];
 
   // prettier-ignore
@@ -45,17 +49,24 @@
   const nodeIdField: IFormField = { label: "Node ID", symbol: "nodeId", type: "number", placeholder: "Your Node ID" }; // prettier-ignore
 
   const nodeFilters = {
-    accessNodeV4: false,
-    accessNodeV6: true,
-    gateway: false,
-    city: "",
-    country: "",
-    farmId: null,
-    cru: null,
-    hru: null,
-    mru: null,
-    sru: null,
+    // boolean
+    publicIPs: null, // -
+
+    // string
+    country: null,
+    farmName: null, // *
+
+    // number
+    cru: null, // *
+    mru: null, // *
+    sru: null, // *
   };
+  $: {
+    if (cpu) nodeFilters.cru = cpu;
+    if (memory) nodeFilters.mru = memory;
+    if (ssd) nodeFilters.sru = ssd;
+  }
+
   export let profile: IProfile;
   let loadingNodes: boolean = false;
 
@@ -71,6 +82,54 @@
   }
 
   export let data: number;
+
+  const farmsConnection = `
+    {
+      farmsConnection {
+        limit: totalCount
+      }
+    }
+`;
+  const getFarmsName = `
+    query getFarmsName($limit: Int!) {
+      farms(limit: $limit) {
+        name
+      }
+    }
+`;
+
+  let _network: string;
+  $: {
+    if (
+      nodeSelection === "automatic" &&
+      profile &&
+      profile.networkEnv !== _network
+    ) {
+      const label = filtersFields[0].options[0].label;
+      filtersFields[0].options[0].label = "Loading...";
+      _network = profile.networkEnv;
+      gqlApi(profile, "farmsConnection", farmsConnection)
+        .then<{ name: string }[]>((vars) => {
+          console.log({ vars });
+
+          return gqlApi(profile, "farms", getFarmsName, vars);
+        })
+        .then((farms) => {
+          console.log({ farms });
+
+          const [option] = filtersFields[0].options;
+          const res = farms.map(({ name }) => {
+            return { label: name, value: name } as ISelectOption;
+          });
+          res.unshift(option);
+          option.label = label;
+          filtersFields[0].options = res;
+        })
+        .catch((err) => {
+          console.log("Error", err);
+        });
+    }
+  }
 </script>
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
