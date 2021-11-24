@@ -127,7 +127,7 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+    <h4 class="is-size-4">Deploy a Virtual Machine - {active}</h4>
     <hr />
 
     {#if loading}
@@ -137,8 +137,8 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
-      <SelectProfile bind:profile />
-      <Tabs {tabs} bind:active />
+      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
+      <Tabs bind:active {tabs} />
 
       {#if active === "config"}
         <Input bind:data={data.name} field={nameField} />
@@ -160,9 +160,7 @@
         {/each}
 
         <SelectNodeId bind:data={data.nodeId} {profile} />
-      {/if}
-
-      {#if active === "env"}
+      {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
@@ -178,9 +176,7 @@
             </div>
           {/each}
         </div>
-      {/if}
-
-      {#if active === "disks"}
+      {:else if active === "disks"}
         <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}

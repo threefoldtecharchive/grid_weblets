@@ -87,7 +87,7 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy Caprover."} />
     {:else}
-      <SelectProfile bind:profile />
+      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}

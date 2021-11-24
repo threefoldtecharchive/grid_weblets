@@ -110,7 +110,7 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile bind:profile />
+      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
