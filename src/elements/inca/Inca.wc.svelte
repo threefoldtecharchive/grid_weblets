@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-inca" />
 
 <script lang="ts">
   import { onMount } from "svelte";

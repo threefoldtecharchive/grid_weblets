@@ -1,70 +1,77 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-kubernetes" />
 
 <script lang="ts">
+  const { events } = window.configs?.grid3_client ?? {};
+  const deploymentStore = window.configs?.deploymentStore;
   import Kubernetes, { Worker } from "../../types/kubernetes";
   import deployKubernetes from "../../utils/deployKubernetes";
-  const { events } = window.configs?.grid3_client ?? {};
-  import type { IFormField } from "../../types";
+  import type { IFormField, ITab } from "../../types";
+  import type { IProfile } from "../../types/Profile";
 
-  const data = new Kubernetes();
+  // Components
+  import Input from "../../components/Input.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import AddBtn from "../../components/AddBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+
+  // prettier-ignore
+  const tabs: ITab[] = [
+    { label: "Config", value: "config" },
+    { label: "Master", value: "master" },
+    { label: "Workers", value: "workers" },
+  ];
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your K8S Name" },
-    { label: "Cluster Token", symbol: "secret", placeholder: "Your Cluster Token" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your Public SSH Key" },
-    // { label: "Metadata", symbol: "metadata", placeholder: "Your Metadata" },
-    // { label: "Description", symbol: "description", placeholder: "Your Description", textarea: true },
+    { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Your Cluster Token", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your Public SSH Key", type: "text" },
+    { label: "Metadata", symbol: "metadata", placeholder: "Your Metadata", type: "text" },
+    { label: "Description", symbol: "description", placeholder: "Your Description", type: "textarea" },
   ];
 
   // prettier-ignore
   const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Your Network Name" },
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range" },
+    { label: "Network Name", symbol: "name", placeholder: "Your Network Name", type: "text" },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range", type: "text" },
   ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Enter name" },
+    { label: "Name", symbol: "name", placeholder: "Enter name", type: "text" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: 'number' },
     { label: "Memory", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
-    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
+    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number', link: { label: "Grid Explorer", url: "https://library.threefold.me/info/threefold#/manual_tfgrid3/threefold__grid3_explorer"}},
-    // { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
+    // { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number' },
+    { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
   ];
 
-  const tabs = [{ label: "Config" }, { label: "Master" }, { label: "Workers" }];
-  let active: string = "Config";
+  let data = new Kubernetes();
+
+  let active: string = "config";
   let loading = false;
   let success = false;
   let failed = false;
-  const configs = window.configs?.baseConfig;
-  const deploymentStore = window.configs?.deploymentStore;
-  let profileIdx: number = 0;
-
-  $: profiles = $configs;
-  $: profile = $configs[profileIdx];
-  requestAnimationFrame(() => {
-    data.sshKey = profile?.sshKey;
-  });
-
+  let profile: IProfile;
   let message: string;
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+
   function onDeployKubernetes() {
     loading = true;
     success = false;
     failed = false;
     message = undefined;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
+    const onLogInfo = (msg: string) => typeof msg === "string" ? (message = msg) : null; // prettier-ignore
     events.addListener("logs", onLogInfo);
 
+    console.log(data);
     deployKubernetes(data, profile)
       .then(() => {
         deploymentStore.set(0);
@@ -80,7 +87,14 @@
       });
   }
 
-  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
+  function onResetHandler(e: Event) {
+    if (success || failed) {
+      e.preventDefault();
+      success = false;
+      failed = false;
+      loading = false;
+    }
+  }
 </script>
 
 <div style="padding: 15px;">
@@ -89,260 +103,66 @@
     <hr />
 
     {#if loading}
-      <div class="notification is-info">
-        {#if message}
-          &gt; {message}.
-        {:else}
-          &gt; Loading...
-        {/if}
-      </div>
+      <Alert type="info" message={message || "Loading..."} />
     {:else if success}
-      <div class="notification is-success">&gt; Successfully deployed K8S.</div>
+      <Alert type="success" message="Successfully deployed K8S." />
     {:else if failed}
-      <div class="notification is-danger">
-        &gt;
-        {#if message}
-          {message}
-        {:else}
-          Failed to deploy K8S.
-        {/if}
-      </div>
+      <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <div
-        class="select mb-4"
-        style="display: flex; justify-content: flex-end;"
-      >
-        <select on:change={onSelectProfile}>
-          {#each profiles as profile, idx (idx)}
-            <option value={idx}
-              >{#if profile.name}
-                {profile.name}
-              {:else}
-                Profile {idx + 1}
-              {/if}</option
-            >
-          {/each}
-        </select>
-      </div>
-      <div class="tabs is-centered">
-        <ul>
-          {#each tabs as tab (tab.label)}
-            <li class={active === tab.label ? "is-active" : ""}>
-              <a href="#!" on:click|preventDefault={() => (active = tab.label)}>
-                <span>{tab.label}</span>
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </div>
+      <SelectProfile
+        on:profile={({ detail }) => {
+          profile = detail;
+          data.sshKey = detail.sshKey;
+        }}
+      />
+      <Tabs bind:active {tabs} />
 
-      {#if active === "Config"}
-        <!-- Show Base Info -->
+      {#if active === "config"}
         {#each kubernetesFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              {#if field.textarea}
-                <textarea
-                  class="textarea"
-                  placeholder={field.placeholder}
-                  bind:value={data[field.symbol]}
-                />
-              {:else}
-                <input
-                  class="input"
-                  type="text"
-                  placeholder={field.placeholder}
-                  bind:value={data[field.symbol]}
-                />
-              {/if}
-            </div>
-          </div>
+          <Input bind:data={data[field.symbol]} {field} />
         {/each}
-
-        <!-- Network info -->
         {#each networkFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">{field.label}</p>
-            <div class="control">
-              <input
-                class="input"
-                type="text"
-                placeholder={field.placeholder}
-                bind:value={data.network[field.symbol]}
-              />
-            </div>
-          </div>
+          <Input bind:data={data.network[field.symbol]} {field} />
         {/each}
-      {/if}
-
-      {#if active === "Master"}
-        <!-- Show Master Info -->
+      {:else if active === "master"}
         {#each baseFields as field (field.symbol)}
-          <div class="field">
-            <p class="label">
-              {field.label}
-              {#if field.link}
-                (<a href={field.link.url} target="_blank">{field.link.label}</a
-                >)
-              {/if}
-            </p>
-            <div class="control">
-              {#if field.type === "number"}
-                <input
-                  class="input"
-                  type="number"
-                  placeholder={field.placeholder}
-                  bind:value={data.master[field.symbol]}
-                />
-              {/if}
-
-              {#if field.type === "checkbox"}
-                <label class="checkbox">
-                  <input
-                    type="checkbox"
-                    checked={data.master[field.symbol]}
-                    on:change={() =>
-                      (data.master[field.symbol] = !data.master[field.symbol])}
-                  />
-                  {field.label}
-                </label>
-              {/if}
-
-              {#if !field.type}
-                <input
-                  class="input"
-                  type="text"
-                  placeholder={field.placeholder}
-                  bind:value={data.master[field.symbol]}
-                />
-              {/if}
-            </div>
-          </div>
+          <Input bind:data={data.master[field.symbol]} {field} />
         {/each}
-      {/if}
-
-      {#if active === "Workers"}
-        <!-- Show Workers Info -->
-        <div class="actions" style="margin-bottom: 20px;">
-          <button
-            type="button"
-            class="button is-primary"
-            on:click={() => (data.workers = [...data.workers, new Worker()])}
-          >
-            <span>+</span>
-          </button>
-        </div>
-        <div class="worker-container">
+        <SelectNodeId bind:data={data.master.node} {profile} />
+      {:else if active === "workers"}
+        <AddBtn
+          on:click={() => (data.workers = [...data.workers, new Worker()])}
+        />
+        <div class="nodes-container">
           {#each data.workers as worker, index (worker.id)}
             <div class="box">
-              <div class="worker-header">
-                <p class="is-size-5 has-text-weight-bold">{worker.name}</p>
-                <button
-                  type="button"
-                  class="button is-danger"
-                  on:click={() =>
-                    (data.workers = data.workers.filter((_, i) => index !== i))}
-                >
-                  <span>-</span>
-                </button>
-              </div>
+              <DeleteBtn
+                name={worker.name}
+                on:click={() =>
+                  (data.workers = data.workers.filter((_, i) => index !== i))}
+              />
               {#each baseFields as field (field.symbol)}
-                <div class="field">
-                  <p class="label">
-                    {field.label}
-                    {#if field.link}
-                      (<a href={field.link.url} target="_blank"
-                        >{field.link.label}</a
-                      >)
-                    {/if}
-                  </p>
-                  <div class="control">
-                    {#if field.type === "number"}
-                      <input
-                        class="input"
-                        type="number"
-                        placeholder={field.placeholder}
-                        bind:value={worker[field.symbol]}
-                      />
-                    {/if}
-
-                    {#if field.type === "checkbox"}
-                      <label class="checkbox">
-                        <input
-                          type="checkbox"
-                          checked={worker[field.symbol]}
-                          on:change={() =>
-                            (worker[field.symbol] = !worker[field.symbol])}
-                        />
-                        {field.label}
-                      </label>
-                    {/if}
-
-                    {#if !field.type}
-                      <input
-                        class="input"
-                        type="text"
-                        placeholder={field.placeholder}
-                        bind:value={worker[field.symbol]}
-                      />
-                    {/if}
-                  </div>
-                </div>
+                <Input bind:data={worker[field.symbol]} {field} />
               {/each}
+              <SelectNodeId bind:data={worker.node} {profile} />
             </div>
           {/each}
         </div>
       {/if}
     {/if}
 
-    <div class="actions">
-      <button
-        class={"button is-primary " + (loading ? "is-loading" : "")}
-        type="submit"
-        disabled={((loading || !data.valid) && !(success || failed)) ||
-          !profile ||
-          profile.mnemonics === "" ||
-          profile.storeSecret === ""}
-        on:click={(e) => {
-          if (success || failed) {
-            e.preventDefault();
-            success = false;
-            failed = false;
-            loading = false;
-          }
-        }}
-      >
-        {#if success || failed}
-          Back
-        {:else}
-          Deploy
-        {/if}
-      </button>
-    </div>
+    <DeployBtn
+      {disabled}
+      {loading}
+      {failed}
+      {success}
+      on:click={onResetHandler}
+    />
   </form>
 </div>
 
+<!-- </Layout> -->
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-
-  .worker-container {
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-height: 70vh;
-    will-change: transform;
-    padding-bottom: 5rem;
-    margin-bottom: 20px;
-  }
-
-  .actions,
-  .worker-header {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  .worker-header {
-    justify-content: space-between;
-  }
+  @import "../../assets/global.scss";
 </style>

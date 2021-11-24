@@ -2932,10 +2932,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.2.3, graceful-fs@^4.2.4, 
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@0.0.23:
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.23.tgz#02d5ecac744091c5ec0c85585b3f3c12236cb516"
-  integrity sha512-6rFjVSKXrJgTgpenn6TinpKzDd3/N7I6iEIFxgouJWRnheCBQ6nd7H+wUvDm0F2k0HrsACTISRy+Gqh0Leu7mg==
+grid3_client@0.0.25:
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.25.tgz#09d952676cac455bd2d092c4df75149010517489"
+  integrity sha512-8h+KTM0vWrHlQGzmv6PjypuK/9M/68Rkod7CTXNJZKgui6Hs4A9f3BfX76pi6n/CRDXqHopUgPjVWoWQgS215Q==
   dependencies:
     appdata-path "^1.0.0"
     axios "^0.22.0"

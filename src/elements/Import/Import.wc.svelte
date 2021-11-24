@@ -1,4 +1,4 @@
-<svelte:options tag={null} />
+<svelte:options tag="tf-import" />
 
 <script lang="ts">
   import { parse } from "marked";
