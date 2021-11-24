@@ -55,4 +55,5 @@ export interface IFlist {
 export interface ITab {
   label: string;
   value: string;
+  removable?: boolean;
 }

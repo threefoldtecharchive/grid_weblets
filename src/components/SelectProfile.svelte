@@ -1,7 +1,7 @@
 <svelte:options tag="tf-select-profile" />
 
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import Input from "./Input.svelte";
   import type { IProfile } from "../types/Profile";
   import type { ISelectOption } from "../types";
@@ -20,7 +20,11 @@
     profile = profiles[selected];
   }
 
-  onMount(onUpdateProfile);
+  let _sub = configs.subscribe(() => {
+    onUpdateProfile();
+  });
+
+  onDestroy(_sub);
 </script>
 
 <div class="is-flex is-justify-content-flex-end is-align-items-center">
