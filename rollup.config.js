@@ -65,7 +65,7 @@ function buildElements() {
 	const outDir = `.build/build/elements/`;
 	// return fs
 	// 	.readdirSync(dir)
-	return ["kubernetes"]
+	return ["vm"]
 	.map(f => {
 			const name = f.replace(".wc.svelte", "").toLocaleLowerCase();
 			return build({

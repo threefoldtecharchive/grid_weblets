@@ -5,11 +5,11 @@
   import Input from "./Input.svelte";
 
   export let fields: IFormField[];
-  export let data: any;
+  // export let data: any;
 </script>
 
-{#if fields && data}
+{#if fields}
   {#each fields as field (field.symbol)}
-    <Input bind:data {field} />
+    <Input bind:field />
   {/each}
 {/if}
