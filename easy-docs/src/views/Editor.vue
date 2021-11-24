@@ -62,7 +62,7 @@ export default class Editor extends Vue {
     new Weblet("Deployments", "deployedlist"),
     // new Weblet("Peertube", "peertube"),
   ];
-  public active = -1;
+  public active = 0;
 }
 </script>
 

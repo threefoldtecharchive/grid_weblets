@@ -252,6 +252,7 @@
                 </thead>
                 <tbody>
                   {#each rows as row, idx}
+                  {#if row.name }
                     <tr>
                       <th>{idx + 1}</th>
                       <td>{row.name}</td>
@@ -278,10 +279,12 @@
                           on:click={() => onRemoveHandler("machines", row.name)}
                           disabled={removed.includes(row.name)}
                         >
-                          Remove
+                          Delete
                         </button>
                       </td>
                     </tr>
+                  {/if}
+
                   {/each}
                 </tbody>
               </table>

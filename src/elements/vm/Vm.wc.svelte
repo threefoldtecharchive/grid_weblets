@@ -26,8 +26,8 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU", symbol: 'cpu', placeholder: 'Your CPU', type: 'number' },
-    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number' },
+    { label: "CPU", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number' },
+    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number' },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
@@ -42,11 +42,11 @@
 
   // prettier-ignore
   const flistField: IFormField = {
-    label: "Flists",
+    label: "VM Image",
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Please select a flist", value: null, selected: true, disabled: true },
+      { label: "Please select an image", value: null, selected: true, disabled: true },
       { label: "Alpine", value: "0" },
       { label: "Ubuntu", value: "1" },
       { label: "Other", value: "other" }
@@ -65,21 +65,21 @@
 
   // prettier-ignore
   const flistFields: IFormField[] = [
-    { label: "FList", symbol: 'flist', placeholder: 'Your flist', type: "text" },
-    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Your Entrypoint', type: "text"},
+    { label: "FList", symbol: 'flist', placeholder: 'VM Image', type: "text" },
+    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Entrypoint', type: "text"},
   ]
 
   // prettier-ignore
   const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Your Env Key", type: "text"},
-    { label: 'Value', symbol: 'value', placeholder: "Your Env Value", type: "text" },
+    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text"},
+    { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
   ];
 
   // prettier-ignore
   const diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your Disk Name", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
     { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
-    { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point", type: "text" },
+    { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text" },
   ];
 
   const { events } = window.configs?.grid3_client ?? {};
