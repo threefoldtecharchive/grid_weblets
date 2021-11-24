@@ -11,6 +11,10 @@
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import AddBtn from "../../components/AddBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -66,17 +70,17 @@
   ]
 
   // prettier-ignore
-  // const envFields: IFormField[] = [
-  //   { label: 'Key', symbol: 'key', placeholder: "Your Env Key", type: "text"},
-  //   { label: 'Value', symbol: 'value', placeholder: "Your Env Value", type: "text" },
-  // ];
+  const envFields: IFormField[] = [
+    { label: 'Key', symbol: 'key', placeholder: "Your Env Key", type: "text"},
+    { label: 'Value', symbol: 'value', placeholder: "Your Env Value", type: "text" },
+  ];
 
   // prettier-ignore
-  // const diskFields: IFormField[] = [
-  //   { label: "Name", symbol: "name", placeholder: "Your Disk Name", type: "text" },
-  //   { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
-  //   { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point", type: "text" },
-  // ];
+  const diskFields: IFormField[] = [
+    { label: "Name", symbol: "name", placeholder: "Your Disk Name", type: "text" },
+    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
+    { label: "Mount Point", symbol: "mountpoint", placeholder: "Your Disk Mount Point", type: "text" },
+  ];
 
   const { events } = window.configs?.grid3_client ?? {};
   const configs = window.configs?.baseConfig;
@@ -86,6 +90,7 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
 
   let message: string;
   function onDeployVM() {
@@ -127,24 +132,11 @@
     <hr />
 
     {#if loading}
-      <div class="notification is-info">
-        {#if message}
-          &gt; {message}.
-        {:else}
-          &gt; Loading...
-        {/if}
-      </div>
+      <Alert type="info" message={message || "Loading..."} />
     {:else if success}
-      <div class="notification is-success">&gt; Successfully deployed VM.</div>
+      <Alert type="success" message="Successfully deployed VM." />
     {:else if failed}
-      <div class="notification is-danger">
-        &gt;
-        {#if message}
-          {message}
-        {:else}
-          Failed to deploy VM.
-        {/if}
-      </div>
+      <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
       <SelectProfile bind:profile />
       <Tabs {tabs} bind:active />
@@ -171,139 +163,61 @@
         <SelectNodeId bind:data={data.nodeId} {profile} />
       {/if}
 
-      {#if active === "Environment Variables"}
-        <div class="actions" style="margin-bottom: 20px;">
-          <button
-            type="button"
-            class="button is-primary"
-            on:click={() => (data.envs = [...data.envs, new Env()])}
-          >
-            <span>+</span>
-          </button>
-        </div>
-        <div class="vm-container">
+      {#if active === "env"}
+        <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
+        <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
             <div class="box">
-              <div class="vm-header">
-                <p class="is-size-5 has-text-weight-bold">{env.key}</p>
-                <button
-                  type="button"
-                  class="button is-danger"
-                  on:click={() =>
-                    (data.envs = data.envs.filter((_, i) => index !== i))}
-                >
-                  <span>-</span>
-                </button>
-              </div>
-              <!-- {#each envFields as field (field.symbol)}
-                <div class="field">
-                  <p class="label">{field.label}</p>
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder={field.placeholder}
-                      bind:value={env[field.symbol]}
-                    />
-                  </div>
-                </div>
-              {/each} -->
+              <DeleteBtn
+                name={env.key}
+                on:click={() =>
+                  (data.envs = data.envs.filter((_, i) => index !== i))}
+              />
+              {#each envFields as field (field.symbol)}
+                <Input bind:data={env[field.symbol]} {field} />
+              {/each}
             </div>
           {/each}
         </div>
       {/if}
 
-      {#if active === "Disks"}
-        <div class="actions" style="margin-bottom: 20px;">
-          <button
-            type="button"
-            class="button is-primary"
-            on:click={() => (data.disks = [...data.disks, new Disk()])}
-          >
-            <span>+</span>
-          </button>
-        </div>
-        <div class="vm-container">
+      {#if active === "disks"}
+        <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
+        <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
             <div class="box">
-              <div class="vm-header">
-                <p class="is-size-5 has-text-weight-bold">{disk.name}</p>
-                <button
-                  type="button"
-                  class="button is-danger"
-                  on:click={() =>
-                    (data.disks = data.disks.filter((_, i) => index !== i))}
-                >
-                  <span>-</span>
-                </button>
-              </div>
-              <!-- {#each diskFields as field (field.symbol)}
-                <div class="field">
-                  <p class="label">{field.label}</p>
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder={field.placeholder}
-                      bind:value={disk[field.symbol]}
-                    />
-                  </div>
-                </div>
-              {/each} -->
+              <DeleteBtn
+                name={disk.name}
+                on:click={() =>
+                  (data.disks = data.disks.filter((_, i) => index !== i))}
+              />
+              {#each diskFields as field (field.symbol)}
+                <Input bind:data={disk[field.symbol]} {field} />
+              {/each}
             </div>
           {/each}
         </div>
       {/if}
     {/if}
 
-    <div class="actions">
-      <button
-        class={"button is-primary " + (loading ? "is-loading" : "")}
-        type="submit"
-        disabled={((loading || !data.valid) && !(success || failed)) ||
-          !profile ||
-          profile.mnemonics === "" ||
-          profile.storeSecret === ""}
-        on:click={(e) => {
-          if (success || failed) {
-            e.preventDefault();
-            success = false;
-            failed = false;
-            loading = false;
-          }
-        }}
-      >
-        {#if success || failed}
-          Back
-        {:else}
-          Deploy
-        {/if}
-      </button>
-    </div>
+    <DeployBtn
+      {disabled}
+      {loading}
+      {failed}
+      {success}
+      on:click={(e) => {
+        if (success || failed) {
+          e.preventDefault();
+          success = false;
+          failed = false;
+          loading = false;
+        }
+      }}
+    />
   </form>
 </div>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  .vm-container {
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-height: 70vh;
-    will-change: transform;
-    padding-bottom: 5rem;
-    margin-bottom: 20px;
-  }
-
-  .vm-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  @import "../../assets/global.scss";
 </style>
