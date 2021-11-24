@@ -16,6 +16,7 @@
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -47,7 +48,7 @@
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
-    { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number' },
+    // { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number' },
     { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
   ];
 
@@ -94,8 +95,6 @@
       loading = false;
     }
   }
-
-  requestAnimationFrame(() => (data.sshKey = profile?.sshKey));
 </script>
 
 <div style="padding: 15px;">
@@ -110,7 +109,12 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
+      <SelectProfile
+        on:profile={({ detail }) => {
+          profile = detail;
+          data.sshKey = detail.sshKey;
+        }}
+      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -124,6 +128,7 @@
         {#each baseFields as field (field.symbol)}
           <Input bind:data={data.master[field.symbol]} {field} />
         {/each}
+        <SelectNodeId bind:data={data.master.node} {profile} />
       {:else if active === "workers"}
         <AddBtn
           on:click={() => (data.workers = [...data.workers, new Worker()])}
@@ -139,6 +144,7 @@
               {#each baseFields as field (field.symbol)}
                 <Input bind:data={worker[field.symbol]} {field} />
               {/each}
+              <SelectNodeId bind:data={worker.node} {profile} />
             </div>
           {/each}
         </div>

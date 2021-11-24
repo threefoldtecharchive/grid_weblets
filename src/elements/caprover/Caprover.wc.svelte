@@ -5,6 +5,7 @@
   import { default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
   const { events } = window.configs?.grid3_client ?? {};
+  import type { IProfile } from "../../types/Profile";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -12,7 +13,7 @@
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  import type { IProfile } from "../../types/Profile";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
 
   const data = new Caprover();
   let loading = false;
@@ -36,7 +37,7 @@
     { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "domain configured on your name provider", type: "text" },
     { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key", type: "text" },
-    { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
+    // { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
 
   ];
 
@@ -69,8 +70,6 @@
         events.removeListener("logs", onLogInfo);
       });
   }
-
-  requestAnimationFrame(() => (data.publicKey = profile?.sshKey));
 </script>
 
 <div style="padding: 15px;">
@@ -87,13 +86,19 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy Caprover."} />
     {:else}
-      <SelectProfile on:profile={({ detail }) => (profile = detail)} />
+      <SelectProfile
+        on:profile={({ detail }) => {
+          profile = detail;
+          data.publicKey = detail.sshKey;
+        }}
+      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
         {#each fields as field (field.symbol)}
           <Input bind:data={data[field.symbol]} {field} />
         {/each}
+        <SelectNodeId bind:data={data.nodeId} {profile} />
       {/if}
     {/if}
 

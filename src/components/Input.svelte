@@ -1,9 +1,11 @@
 <svelte:options tag="tf-input" />
 
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import type { IFormField } from "../types";
   import { v4 } from "uuid";
 
+  const dispatch = createEventDispatcher<{ input: void }>();
   export let field: IFormField;
   export let data: any;
   export let selected: number = 0;
@@ -11,6 +13,7 @@
   const id = v4();
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
   function _onSelectChange(e: Event) {
+    dispatch("input");
     const select = e.target as HTMLSelectElement;
     selected = select.selectedIndex;
   }
@@ -87,7 +90,7 @@
             class="textarea"
             placeholder={field.placeholder}
             bind:value={data}
-            on:change
+            on:input
           />
         {:else if field.type === "text"}
           <input
@@ -124,7 +127,7 @@
           type="checkbox"
           bind:checked={data}
           {id}
-          on:change
+          on:input
         />
         <span class="slider" />
       </label>

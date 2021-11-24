@@ -2,13 +2,8 @@
 
 <script lang="ts">
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
