@@ -20,7 +20,7 @@
     ] },
     { label: "Country", symbol: "country", type: "text", placeholder: "Enter a country name" },
     { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
-    { label: "Memory (MB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
+    { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
     { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
   ];
 
