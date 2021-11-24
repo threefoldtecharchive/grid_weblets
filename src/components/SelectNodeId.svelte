@@ -20,7 +20,7 @@
     ] },
     { label: "Country", symbol: "country", type: "text", placeholder: "Enter a country name" },
     { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
-    { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
+    { label: "Memory (MB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
     { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
   ];
 
@@ -63,7 +63,7 @@
   };
   $: {
     if (cpu) nodeFilters.cru = cpu;
-    if (memory) nodeFilters.mru = memory;
+    if (memory) nodeFilters.mru = Math.floor(memory/1000);
     if (ssd) nodeFilters.sru = ssd;
   }
 
@@ -134,7 +134,7 @@
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
 {#if nodeSelection === "automatic"}
-  <h5 class="is-size-3 has-text-weight-bold">Nodes Filter</h5>
+  <h5 class="is-size-1 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     <Input bind:data={nodeFilters[field.symbol]} {field} />
   {/each}
