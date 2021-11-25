@@ -24,7 +24,7 @@
   ];
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  let active: string = "Config";
+  let active: string = "config";
   let loading = false;
   let success = false;
   let failed = false;
