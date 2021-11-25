@@ -48,7 +48,7 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Please select an image", value: null, selected: true, disabled: true },
+      // { label: "Please select an image", value: null, selected: true, disabled: true },
       { label: "Alpine", value: "0" },
       { label: "Ubuntu", value: "1" },
       { label: "Other", value: "other" }
