@@ -281,6 +281,18 @@
                           >
                             Delete
                           </button>
+                          {#if row.details.env && row.details.env.CAPROVER_ROOT_DOMAIN}
+                            <a
+                              target="_blank"
+                              href={"http://captain." +
+                                row.details.env.CAPROVER_ROOT_DOMAIN}
+                              disabled={removed.includes(row.details.name)}
+                            >
+                              <button class="button is-link">
+                                Admin Panel
+                              </button>
+                            </a>
+                          {/if}
                         </td>
                       </tr>
                     {/if}

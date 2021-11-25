@@ -7,13 +7,14 @@
 
   // components
   import Tabs from "./Tabs.svelte";
+  import FormatData from "./FormatData.svelte";
 
   const dispatch = createEventDispatcher<{ closed: void }>();
   const tabs: ITab[] = [
-    { label: "Formatted", value: "formatted" },
+    { label: "Details", value: "details" },
     { label: "JSON", value: "json" },
   ];
-  let active: string = "formatted";
+  let active: string = "details";
   export let data: Object;
   $: json = data ? JSON.stringify(data, undefined, 4) : "";
 
@@ -57,14 +58,17 @@
 </div>
 
 <div class="modal is-active">
-  <div class="modal-background" />
-  <div class="modal-content">
+  <div
+    class="modal-background"
+    on:click|preventDefault={() => dispatch("closed")}
+  />
+  <div class="modal-content" on:click|stopPropagation>
     <div class="box">
       <Tabs bind:active {tabs} />
 
       <section class="content">
-        {#if active === "formatted"}
-          formatted
+        {#if active === "details"}
+          <FormatData {data} />
         {:else if active === "json"}
           <div class="json">
             {json}

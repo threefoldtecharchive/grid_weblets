@@ -15,6 +15,7 @@
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -92,6 +93,8 @@
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
 
   let message: string;
+  let modalData: Object;
+
   function onDeployVM() {
     loading = true;
     success = false;
@@ -107,9 +110,10 @@
     events.addListener("logs", onLogInfo);
 
     deployVM(data, profile)
-      .then(() => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
+        modalData = data;
       })
       .catch((err: Error) => {
         failed = true;
@@ -224,6 +228,9 @@
     />
   </form>
 </div>
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
