@@ -2,17 +2,24 @@ import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const { DiskModel, MachineModel, MachinesModel, GridClient, NetworkModel } =
-  window.configs?.grid3_client ?? {};
+const {
+  GridClient,
+  NetworkModel,
+  DiskModel,
+  MachineModel,
+  MachinesModel,
+  GatewayNameModel,
+} = window.configs?.grid3_client ?? {};
 
 export default async function deployPeertube(data: VM, profile: IProfile) {
+  // connect
   const { envs, disks, ...base } = data;
-  const { name } = base;
-  const { publicIp, planetary } = base;
+  const { name, flist, cpu, memory, entrypoint, network: nw } = base;
+  const { publicIp, planetary, nodeId, rootFsSize } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
-  const grid = new GridClient(
+  const client = new GridClient(
     networkEnv as any,
     mnemonics,
     storeSecret,
@@ -21,84 +28,55 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     "tfkvstore" as any
   );
 
-  // let netObj: Network;
-  // netObj.name = "peertube_net";
-  // netObj.ipRange = "10.1.0.0/16";
+  await client.connect();
 
-  // const net = createNetwork(netObj);
+  // define a network
+  const network = new NetworkModel();
+  network.name = name + "_network";
+  network.ip_range = "10.1.0.0/16";
 
-  const net = new NetworkModel();
-  net.name = "peertube_net";
-  net.ip_range = "10.1.0.0/16";
+  // deploy redis
+  await deployRedis(client, network, nodeId, name);
 
-  const disk = new DiskModel();
-  disk.name = "peertube_data";
-  disk.size = 10;
-  disk.mountpoint = "/data";
+  // get the info
+  const redisInfo = await getRedisInfo(client, name + "_redis_vms");
+  const redisIP = redisInfo[0]["interfaces"][0]["ip"];
 
-  const vm = new MachineModel();
-  vm.name = name;
-  vm.node_id = 7;
-  vm.disks = [disk];
-  vm.public_ip = publicIp;
-  vm.planetary = planetary;
-  vm.cpu = 3;
-  vm.memory = 1024 * 2;
-  vm.rootfs_size = 1;
-  vm.flist =
-    "https://hub.grid.tf/omar0.3bot/omarelawady-peertube-grid3-tfconnect.flist";
-  vm.entrypoint = "/start.sh";
-  vm.env = createEnvs({
-    PEERTUBE_BIND_ADDRESS: "::",
-    PEERTUBE_WEBSERVER_HOSTNAME: "peertube4.gent01.dev.grid.tf",
-    PEERTUBE_DB_HOSTNAME: "10.1.4.3", // how should i know these? maybe guessing on each new network ip starts from 2: redis, 3: postgres, 4: peertube.
-    PEERTUBE_DB_USERNAME: "postgres",
-    PEERTUBE_DB_PASSWORD: "omar123456",
-    PEERTUBE_REDIS_HOSTNAME: "10.1.4.2",
-    PEERTUBE_REDIS_AUTH: "omar123456",
-  });
+  // deploy postgres
+  await deployPostgres(client, network, nodeId, name);
 
-  const vms = new MachinesModel();
-  vms.name = name;
-  vms.network = net;
-  vms.machines = [vm];
+  // get the info
+  const postgresInfo = await getPostgresInfo(client, name + "_postgres_vms");
+  const postgresIP = postgresInfo[0]["interfaces"][0]["ip"];
 
-  deployReqVMs(data, net, profile);
+  // deploy the peertube
+  await deployPeertubeVM(client, network, redisIP, postgresIP, nodeId, name);
 
-  return grid.connect().then(() => grid.machines.deploy(vms));
+  // get the info
+  const peertubeInfo = await getPeertubeInfo(client, name + "_peertube_vms");
+  const peertubeYggIp = peertubeInfo[0]["yggIP"];
+
+  // deploy the gateway
+  await deployPrefixGateway(client, name, peertubeYggIp);
+
+  // return the info
+  const gatewayInfo = await getGatewayInfo(client, name);
+  const gatewayDomain = gatewayInfo[0]["domain"];
+
+  console.log(gatewayDomain);
 }
 
-function createEnvs(envs): { [key: string]: string } {
-  return envs.reduce((res, env) => {
-    res[env.key] = env.value;
-    return res;
-  }, {});
-}
-
-export async function deployReqVMs(data: VM, n: any, profile: IProfile) {
-  const { envs, disks, ...base } = data;
-  const { name } = base;
-  // const { publicIp, planetary, nodeId, rootFsSize } = base;
-  const { mnemonics, storeSecret, networkEnv } = profile;
-
-  const http = new HTTPMessageBusClient(0, "");
-  const grid = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
-  );
-
+async function deployRedis(client: any, net: any, nodeId: any, name: string) {
+  // disk
   const disk1 = new DiskModel();
-  disk1.name = "redis_data";
+  disk1.name = name + "_redis_data";
   disk1.size = 10;
   disk1.mountpoint = "/data";
 
+  // vm specs
   const vm1 = new MachineModel();
-  vm1.name = "redis";
-  vm1.node_id = 7;
+  vm1.name = name + "_redis_vm";
+  vm1.node_id = nodeId;
   vm1.disks = [disk1];
   vm1.public_ip = false;
   vm1.planetary = true;
@@ -107,18 +85,36 @@ export async function deployReqVMs(data: VM, n: any, profile: IProfile) {
   vm1.rootfs_size = 1;
   vm1.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-redis-grid3.flist";
   vm1.entrypoint = "/start.sh";
-  vm1.env = createEnvs({
+  vm1.env = {
     PASSWORD: "omar123456",
-  });
+  };
 
+  // vms specs
+  const vms = new MachinesModel();
+  vms.name = name + "_redis_vms";
+  vms.network = net;
+  vms.machines = [vm1];
+
+  // deploy
+  return client.machines.deploy(vms);
+}
+
+async function deployPostgres(
+  client: any,
+  net: any,
+  nodeId: any,
+  name: string
+) {
+  // disk
   const disk2 = new DiskModel();
-  disk2.name = "postgres_data";
+  disk2.name = name + "_postgres_data";
   disk2.size = 10;
   disk2.mountpoint = "/var/lib/postgresql/data";
 
+  // vm specs
   const vm2 = new MachineModel();
-  vm2.name = "postgres";
-  vm2.node_id = 7;
+  vm2.name = name + "_postgres_vm";
+  vm2.node_id = nodeId;
   vm2.disks = [disk2];
   vm2.public_ip = false;
   vm2.planetary = true;
@@ -127,16 +123,97 @@ export async function deployReqVMs(data: VM, n: any, profile: IProfile) {
   vm2.rootfs_size = 1;
   vm2.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-postgres-grid3.flist";
   vm2.entrypoint = "/start.sh";
-  vm2.env = createEnvs({
+  vm2.env = {
     POSTGRES_PASSWORD: "omar123456",
     POSTGRES_DB: "peertube_prod",
     PGDATA: "/var/lib/postgresql/data",
-  });
+  };
 
+  // vms specs
   const vms = new MachinesModel();
-  vms.name = name;
-  vms.network = n;
-  vms.machines = [vm1, vm2];
+  vms.name = name + "_postgres_vms";
+  vms.network = net;
+  vms.machines = [vm2];
 
-  return grid.connect().then(() => grid.machines.deploy(vms));
+  // deploy
+  return client.machines.deploy(vms);
+}
+
+async function deployPeertubeVM(
+  client: any,
+  net: any,
+  redisIp: string,
+  postgresIp: string,
+  nodeId: any,
+  name: string
+) {
+  // disk
+  const disk3 = new DiskModel();
+  disk3.name = name + "_peertube_data";
+  disk3.size = 10;
+  disk3.mountpoint = "/data";
+
+  // vm specs
+  const vm = new MachineModel();
+  vm.name = name + "_peertube_vm";
+  vm.node_id = nodeId;
+  vm.disks = [disk3];
+  vm.public_ip = false;
+  vm.planetary = true;
+  vm.cpu = 3;
+  vm.memory = 1024 * 2;
+  vm.rootfs_size = 1;
+  vm.flist =
+    "https://hub.grid.tf/omar0.3bot/omarelawady-peertube-grid3-tfconnect.flist";
+  vm.entrypoint = "/start.sh";
+  vm.env = {
+    PEERTUBE_BIND_ADDRESS: "::",
+    PEERTUBE_WEBSERVER_HOSTNAME: name + ".gent01.dev.grid.tf",
+    PEERTUBE_DB_HOSTNAME: postgresIp,
+    PEERTUBE_DB_USERNAME: "postgres",
+    PEERTUBE_DB_PASSWORD: "omar123456",
+    PEERTUBE_REDIS_HOSTNAME: redisIp,
+    PEERTUBE_REDIS_AUTH: "omar123456",
+  };
+
+  // vms specs
+  const vms = new MachinesModel();
+  vms.name = name + "_peertube_vms";
+  vms.network = net;
+  vms.machines = [vm];
+
+  // deploy
+  return client.machines.deploy(vms);
+}
+
+async function deployPrefixGateway(client: any, name: string, backend: string) {
+  // define specs
+  const gw = new GatewayNameModel();
+  gw.name = name;
+  gw.node_id = 8;
+  gw.tls_passthrough = false;
+  gw.backends = [`http://[${backend}]:3000/`];
+
+  // deploy
+  return client.gateway.deploy_name(gw);
+}
+
+async function getRedisInfo(client: any, name: string) {
+  const info = await client.machines.getObj(name);
+  return info;
+}
+
+async function getPostgresInfo(client: any, name: string) {
+  const info = await client.machines.getObj(name);
+  return info;
+}
+
+async function getPeertubeInfo(client: any, name: string) {
+  const info = await client.machines.getObj(name);
+  return info;
+}
+
+async function getGatewayInfo(client: any, name: string) {
+  const info = await client.gateway.getObj(name);
+  return info;
 }

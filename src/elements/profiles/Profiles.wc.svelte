@@ -27,16 +27,16 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Profile name", type: "text" },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile name", type: "text" },
     { label: "Network Environment", symbol: "networkEnv", type: "select", options: [
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "text" },
-    { label: "Store Secret", symbol: "storeSecret", placeholder: "secret key used as profile secret", type: "text" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public ssh key", type: "text" },
+    { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
   ]
-  const secretField: IFormField = { label: "Secret", type: "password", placeholder: "Secret key used for data encryption.", symbol: "secret" }; // prettier-ignore
+  const secretField: IFormField = { label: "Browser Session Secret", type: "password", placeholder: "Browser Session Secret", symbol: "secret" }; // prettier-ignore
 
   let message: string;
   function onEventHandler(event: "create" | "load" | "save") {
@@ -117,7 +117,7 @@
           disabled={password === ""}
           on:click={onEventHandler.bind(undefined, "load")}
         >
-          Load
+          Unlock Store
         </button>
 
         <button
@@ -126,7 +126,7 @@
           disabled={password === ""}
           on:click={onEventHandler.bind(undefined, "create")}
         >
-          Create
+          Create a New Store
         </button>
       </div>
     {/if}

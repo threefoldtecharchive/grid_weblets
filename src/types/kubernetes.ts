@@ -10,8 +10,8 @@ export abstract class Base {
     public diskSize: number = 100,
     public publicIp: boolean = false,
     public memory: number = 0,
-    public rootFsSize: number = 25,
-    public plantery: boolean = true
+    public rootFsSize: number = 50,
+    public planetary: boolean = true
   ) {}
 
   public get valid(): boolean {
@@ -49,7 +49,7 @@ export default class Kubernetes {
     public workers = [new Worker()],
     public network = new Network(),
     public name: string = "k8s_" + id.split("-")[0],
-    public secret: string = "",
+    public secret: string = v4().split("-")[0],
     public sshKey: string = "",
     public metadata: string = "",
     public description: string = ""
