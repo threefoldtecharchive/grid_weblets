@@ -74,7 +74,7 @@ export default class DeployedList {
 
   public loadCaprover(): Promise<any[]> {
     return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.name.startsWith("caprover_leader"));
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("caprover"));
     });
   }
 
