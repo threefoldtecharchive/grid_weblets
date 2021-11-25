@@ -16,13 +16,13 @@ interface IQueryCount {
 const queryData = `
 query GetData($farms_limit: Int!, $countries_limit: Int!) {
     farms(limit: $farms_limit) { name }
-    countries(limit: $countries_limit) { name }
+    countries(limit: $countries_limit) { name code }
 }
 `;
 
 interface IQueryData {
   farms: Array<{ name: string }>;
-  countries: Array<{ name: string }>;
+  countries: Array<{ name: string; code: string }>;
 }
 
 export default function fetchFarmAndCountries(profile: IProfile) {
