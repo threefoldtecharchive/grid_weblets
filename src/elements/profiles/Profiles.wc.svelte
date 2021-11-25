@@ -1,12 +1,14 @@
 <svelte:options tag="tf-profiles" />
 
 <script lang="ts">
+  import type { IFormField, ITab } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import validateMnemonics from "../../utils/validateMnemonics";
+
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
-  import type { IFormField, ITab } from "../../types";
-  import type { IProfile } from "../../types/Profile";
 
   const configs = window.configs?.baseConfig;
   let active = "0";
@@ -45,6 +47,19 @@
       configured = true;
     }
   }
+
+  let saving: boolean = false;
+  async function onSave() {
+    saving = true;
+    const valids = await Promise.all(profiles.map((p) => validateMnemonics(p)));
+    if (valids.reduce((res, v) => res && v, true)) {
+      fields[2].error = null;
+      onEventHandler("save");
+    } else {
+      fields[2].error = "Invalid Mnemonics";
+    }
+    saving = false;
+  }
 </script>
 
 <section style="padding: 15px;">
@@ -64,9 +79,9 @@
             + Add Profile
           </button>
           <button
-            class="button is-primary mr-2"
+            class={"button is-primary mr-2" + (saving ? " is-loading" : "")}
             type="button"
-            on:click={onEventHandler.bind(undefined, "save")}
+            on:click={onSave}
           >
             Save
           </button>

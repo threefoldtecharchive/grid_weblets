@@ -45,6 +45,7 @@ export interface IFormField {
   placeholder?: string;
   options?: ISelectOption[];
   disabled?: boolean;
+  error?: string;
 }
 
 export interface IFlist {

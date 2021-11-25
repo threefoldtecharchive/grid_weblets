@@ -120,7 +120,7 @@
         <div class="control">
           {#if field.type === "textarea"}
             <textarea
-              class="textarea"
+              class={"textarea" + (field.error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input
@@ -129,7 +129,7 @@
           {:else if field.type === "text"}
             <input
               type="text"
-              class="input"
+              class={"input" + (field.error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input
@@ -138,7 +138,7 @@
           {:else if field.type === "number"}
             <input
               type="number"
-              class="input"
+              class={"input" + (field.error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input
@@ -147,7 +147,7 @@
           {:else if field.type === "password"}
             <input
               type="password"
-              class="input"
+              class={"input" + (field.error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input
@@ -155,6 +155,11 @@
             />
           {/if}
         </div>
+        {#if field.error}
+          <p class="help is-danger">
+            {field.error}
+          </p>
+        {/if}
       </div>
     {:else if field.type === "checkbox"}
       <div style="display: flex; align-items: center;" class="mb-2">
@@ -177,7 +182,11 @@
       {#if field.label}
         <p class="label">{field.label}</p>
       {/if}
-      <div class="select mb-2" style="width: 100%;" {id}>
+      <div
+        class={"select mb-2" + (field.error ? " is-danger" : "")}
+        style="width: 100%;"
+        {id}
+      >
         <select
           disabled={field.disabled}
           style="width: 100%;"
@@ -194,6 +203,11 @@
             </option>
           {/each}
         </select>
+        {#if field.error}
+          <p class="help is-danger">
+            {field.error}
+          </p>
+        {/if}
       </div>
     {/if}
 
