@@ -97,9 +97,9 @@
   let modalData: Object;
 
   let nodeIdError: string;
-  function onDeployVM() {
-    // const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
-    // const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
+  async function onDeployVM() {
+    const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
+    const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -107,13 +107,14 @@
       }
     }
 
-    loading = true;
-    // const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
-    // if (error) {
-    //   nodeIdError = error;
-    //   return;
-    // }
+    const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
+    console.log({ error });
+    if (error) {
+      nodeIdError = error;
+      return;
+    }
 
+    loading = true;
     nodeIdError = null;
     success = false;
     failed = false;
