@@ -39,7 +39,11 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vms.network = createNetwork(nw);
   vms.machines = [vm];
 
-  return grid.connect().then(() => grid.machines.deploy(vms));
+  return grid
+    .connect()
+    .then(() => grid.machines.deploy(vms))
+    .then(() => grid.machines.getObj(name))
+    .then(([vm]) => vm);
 }
 
 function createDisk({ name, size, mountpoint }: Disk) {

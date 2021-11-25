@@ -75,6 +75,7 @@
   let loadingNodes: boolean = false;
 
   function onLoadNodesHandler() {
+    loadingNodes = true;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
 
@@ -89,7 +90,7 @@
         console.log("Error", err);
       })
       .finally(() => {
-        loadingNodes = true;
+        loadingNodes = false;
         nodeIdSelectField.options[0].label = label;
       });
   }
