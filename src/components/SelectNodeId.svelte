@@ -4,7 +4,7 @@
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
-  import gqlApi from "../utils/gqlApi";
+  import fetchFarmAndCountries from "../utils/fetchFarmAndCountries";
 
   // components
   import Input from "./Input.svelte";
@@ -18,7 +18,9 @@
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
       { label: "Please select a farm", value: null, selected: true, disabled: true }
     ] },
-    { label: "Country", symbol: "country", type: "text", placeholder: "Enter a country name" },
+    { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
+      { label: "Please select a country", value: null, selected: true, disabled: true }
+    ] },
     { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
     { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
     { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
@@ -63,7 +65,7 @@
   };
   $: {
     if (cpu) nodeFilters.cru = cpu;
-    if (memory) nodeFilters.mru = Math.floor(memory/1000);
+    if (memory) nodeFilters.mru = Math.floor(memory / 1000);
     if (ssd) nodeFilters.sru = ssd;
   }
 
@@ -83,20 +85,23 @@
 
   export let data: number;
 
-  const farmsConnection = `
-    {
-      farmsConnection {
-        limit: totalCount
-      }
-    }
-`;
-  const getFarmsName = `
-    query getFarmsName($limit: Int!) {
-      farms(limit: $limit) {
-        name
-      }
-    }
-`;
+  function _setLabel(index: number, label: string = "Loading...") {
+    const oldLabel = filtersFields[index].options[0].label;
+    filtersFields[index].options[0].label = label;
+    return oldLabel;
+  }
+
+  function _setOptions(index: number, items: Array<{ name: string }>) {
+    const [option] = filtersFields[index].options;
+    filtersFields[index].options = items.reduce(
+      (res, { name }) => {
+        const op = { label: name, value: name } as ISelectOption;
+        res.push(op);
+        return res;
+      },
+      [option]
+    );
+  }
 
   let _network: string;
   $: {
@@ -105,25 +110,22 @@
       profile &&
       profile.networkEnv !== _network
     ) {
-      const label = filtersFields[0].options[0].label;
-      filtersFields[0].options[0].label = "Loading...";
+      /* Cache last used network */
       _network = profile.networkEnv;
-      gqlApi(profile, "farmsConnection", farmsConnection)
-        .then<{ name: string }[]>((vars) => {
-          console.log({ vars });
 
-          return gqlApi(profile, "farms", getFarmsName, vars);
-        })
-        .then((farms) => {
-          console.log({ farms });
+      /* Loading farms & countries */
+      const farmsLabel = _setLabel(0);
+      const countriesLabel = _setLabel(1);
 
-          const [option] = filtersFields[0].options;
-          const res = farms.map(({ name }) => {
-            return { label: name, value: name } as ISelectOption;
-          });
-          res.unshift(option);
-          option.label = label;
-          filtersFields[0].options = res;
+      fetchFarmAndCountries(profile)
+        .then(({ farms, countries }) => {
+          /* Handle farms */
+          _setOptions(0, farms);
+          _setLabel(0, farmsLabel);
+
+          /* Handle countries */
+          _setOptions(1, countries);
+          _setLabel(1, countriesLabel);
         })
         .catch((err) => {
           console.log("Error", err);
