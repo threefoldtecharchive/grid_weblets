@@ -162,7 +162,7 @@
 
       {#if (!tab && active === "Kubernetes") || tab === "k8s"}
         {#await list.loadK8s()}
-          <div class="notification is-info mt-2">&gt; Loading...</div>
+          <div class="notification is-info mt-2">Loading...</div>
         {:then rows}
           {#if rows.length}
             <div class="table-container mt-2">
