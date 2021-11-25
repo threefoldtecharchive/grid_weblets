@@ -12,14 +12,15 @@
   export let cpu: number;
   export let memory: number;
   export let ssd: number;
+  export let publicIp: boolean;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
-      { label: "Please select a farm", value: null, selected: true, disabled: true }
+      { label: "Please select a farm", value: null, selected: true }
     ] },
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
-      { label: "Please select a country", value: null, selected: true, disabled: true }
+      { label: "Please select a country", value: null, selected: true }
     ] },
     { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
     { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
@@ -67,20 +68,30 @@
     if (cpu) nodeFilters.cru = cpu;
     if (memory) nodeFilters.mru = Math.round(memory / 1024);
     if (ssd) nodeFilters.sru = ssd;
+    nodeFilters.publicIPs = publicIp;
   }
 
   export let profile: IProfile;
   let loadingNodes: boolean = false;
 
   function onLoadNodesHandler() {
-    loadingNodes = true;
+    const label = nodeIdSelectField.options[0].label;
+    nodeIdSelectField.options[0].label = "Loading...";
+
     findNodes(nodeFilters, profile)
       .then((_nodes) => {
+        nodeIdSelectField.options[0].label = label;
         const [option] = nodeIdSelectField.options;
         _nodes.unshift(option);
         nodeIdSelectField.options = _nodes;
       })
-      .finally(() => (loadingNodes = false));
+      .catch((err) => {
+        console.log("Error", err);
+      })
+      .finally(() => {
+        loadingNodes = true;
+        nodeIdSelectField.options[0].label = label;
+      });
   }
 
   export let data: number;
@@ -122,16 +133,15 @@
 
       fetchFarmAndCountries(profile)
         .then(({ farms, countries }) => {
-          /* Handle farms */
           _setOptions(0, farms);
-          _setLabel(0, farmsLabel);
-
-          /* Handle countries */
           _setOptions(1, countries);
-          _setLabel(1, countriesLabel);
         })
         .catch((err) => {
           console.log("Error", err);
+        })
+        .finally(() => {
+          _setLabel(0, farmsLabel);
+          _setLabel(1, countriesLabel);
         });
     }
   }
@@ -139,7 +149,7 @@
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
 {#if nodeSelection === "automatic"}
-  <h5 class="is-size-7 has-text-weight-bold">Nodes Filter</h5>
+  <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     <Input bind:data={nodeFilters[field.symbol]} {field} />
   {/each}
