@@ -28,28 +28,28 @@
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text" },
-    { label: "Cluster Token", symbol: "secret", placeholder: "Your Cluster Token", type: "text" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your Public SSH Key", type: "text" },
-    { label: "Metadata", symbol: "metadata", placeholder: "Your Metadata", type: "text" },
-    { label: "Description", symbol: "description", placeholder: "Your Description", type: "textarea" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
+    // { label: "Metadata", symbol: "metadata", placeholder: "Metadata", type: "text" },
+    // { label: "Description", symbol: "description", placeholder: "Description", type: "textarea" },
   ];
 
   // prettier-ignore
   const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Your Network Name", type: "text" },
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Your Network IP Range", type: "text" },
+    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text" },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text" },
   ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Enter name", type: "text" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: 'number' },
-    { label: "Memory", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
+    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number' },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
-    { label: "Plantery Network", symbol: "plantery", placeholder: "", type: 'checkbox' },
+    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     // { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number' },
-    { label: "Root FS Size", symbol: "rootFsSize", placeholder: "Root File System Size", type: 'number' },
+    { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
   ];
 
   let data = new Kubernetes();

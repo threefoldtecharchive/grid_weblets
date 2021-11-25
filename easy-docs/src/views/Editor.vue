@@ -60,11 +60,11 @@ export default class Editor extends Vue {
     new Weblet("Virtual Machine", "vm", "vm"),
     new Weblet("Kubernetes", `kubernetes`, "k8s"),
     new Weblet("Deployments", "deployedlist"),
-    // new Weblet("Peertube", "peertube"),
-    new Weblet("Funkwhale", "funkwhale"),
 
+    new Weblet("Peertube", "peertube"),
+    new Weblet("Funkwhale", "funkwhale"),
   ];
-  public active = -1;
+  public active = 0;
 }
 </script>
 
