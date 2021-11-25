@@ -13,6 +13,7 @@
   export let memory: number;
   export let ssd: number;
   export let publicIp: boolean;
+  export let error: string = null;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
@@ -49,7 +50,6 @@
     ]
   };
   let nodeSelection: string = null;
-  const nodeIdField: IFormField = { label: "Node ID", symbol: "nodeId", type: "number", placeholder: "Your Node ID" }; // prettier-ignore
 
   const nodeFilters = {
     // boolean
@@ -165,5 +165,14 @@
 
   <Input bind:data field={nodeIdSelectField} />
 {:else if nodeSelection === "manual"}
-  <Input bind:data field={nodeIdField} />
+  <Input
+    bind:data
+    field={{
+      label: "Node ID",
+      symbol: "nodeId",
+      type: "number",
+      placeholder: "Your Node ID",
+      error,
+    }}
+  />
 {/if}

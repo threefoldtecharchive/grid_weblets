@@ -5,6 +5,7 @@
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
+  import validateNode from "../../utils/validateNode";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -95,11 +96,10 @@
   let message: string;
   let modalData: Object;
 
+  let nodeIdError: string;
   function onDeployVM() {
-    loading = true;
-    success = false;
-    failed = false;
-    message = undefined;
+    // const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
+    // const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -107,8 +107,19 @@
       }
     }
 
-    events.addListener("logs", onLogInfo);
+    loading = true;
+    // const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
+    // if (error) {
+    //   nodeIdError = error;
+    //   return;
+    // }
 
+    nodeIdError = null;
+    success = false;
+    failed = false;
+    message = undefined;
+
+    events.addListener("logs", onLogInfo);
     deployVM(data, profile)
       .then((data) => {
         deploymentStore.set(0);
@@ -117,7 +128,6 @@
       })
       .catch((err: Error) => {
         failed = true;
-
         message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
@@ -167,6 +177,7 @@
         {/each}
 
         <SelectNodeId
+          error={nodeIdError}
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
