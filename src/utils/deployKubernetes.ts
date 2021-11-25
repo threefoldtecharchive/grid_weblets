@@ -48,6 +48,6 @@ function createNode(data: Base) {
   node.memory = data.memory;
   node.public_ip = data.publicIp;
   node.rootfs_size = data.rootFsSize;
-  node.planetary = data.plantery;
+  node.planetary = data.planetary;
   return node;
 }
