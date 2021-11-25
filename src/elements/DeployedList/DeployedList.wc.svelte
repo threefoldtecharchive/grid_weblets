@@ -8,6 +8,9 @@
 
   export let tab: "k8s" | "vm" | "caprover" = undefined;
 
+  // components
+  import Modal from "../../components/DeploymentModal.svelte";
+
   // prettier-ignore
   const tabs = [
     { label: "Kubernetes" },
@@ -68,7 +71,7 @@
       });
   }
 
-  let infoToShow: string = "";
+  let infoToShow: Object;
 
   let _sub: any;
   onMount(() => {
@@ -190,11 +193,7 @@
                         <button
                           class="button is-outlined is-primary ml-2"
                           on:click={() => {
-                            infoToShow = JSON.stringify(
-                              row.details,
-                              undefined,
-                              4
-                            );
+                            infoToShow = row.details;
                           }}
                           disabled={removed.includes(row.name)}
                         >
@@ -252,39 +251,39 @@
                 </thead>
                 <tbody>
                   {#each rows as row, idx}
-                  {#if row.name }
-                    <tr>
-                      <th>{idx + 1}</th>
-                      <td>{row.name}</td>
-                      {#if row.publicIP}
-                        <td>{row.publicIP.ip}</td>
-                      {:else}
-                        <td>-</td>
-                      {/if}
-                      <td>{row.yggIP}</td>
-                      <td>{row.flist}</td>
-                      <td>
-                        <button
-                          class="button is-outlined is-primary  ml-2"
-                          on:click={() => {
-                            infoToShow = JSON.stringify(row, undefined, 4);
-                          }}
-                          disabled={removed.includes(row.name)}
-                        >
-                          Show Details
-                        </button>
-                        <button
-                          class={"button is-danger " +
-                            (removed.includes(row.name) ? "is-loading" : "")}
-                          on:click={() => onRemoveHandler("machines", row.name)}
-                          disabled={removed.includes(row.name)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  {/if}
-
+                    {#if row.name}
+                      <tr>
+                        <th>{idx + 1}</th>
+                        <td>{row.name}</td>
+                        {#if row.publicIP}
+                          <td>{row.publicIP.ip}</td>
+                        {:else}
+                          <td>-</td>
+                        {/if}
+                        <td>{row.yggIP}</td>
+                        <td>{row.flist}</td>
+                        <td>
+                          <button
+                            class="button is-outlined is-primary  ml-2"
+                            on:click={() => {
+                              infoToShow = row.details;
+                            }}
+                            disabled={removed.includes(row.name)}
+                          >
+                            Show Details
+                          </button>
+                          <button
+                            class={"button is-danger " +
+                              (removed.includes(row.name) ? "is-loading" : "")}
+                            on:click={() =>
+                              onRemoveHandler("machines", row.name)}
+                            disabled={removed.includes(row.name)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    {/if}
                   {/each}
                 </tbody>
               </table>
@@ -312,19 +311,7 @@
 </div>
 
 {#if infoToShow}
-  <div class="modal is-active">
-    <div class="modal-background" />
-    <div class="modal-content">
-      <div class="box" style="white-space: pre;">
-        {infoToShow}
-      </div>
-    </div>
-    <button
-      class="modal-close is-large"
-      aria-label="close"
-      on:click={() => (infoToShow = "")}
-    />
-  </div>
+  <Modal data={infoToShow} on:closed={() => (infoToShow = null)} />
 {/if}
 
 <style lang="scss" scoped>

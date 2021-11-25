@@ -44,6 +44,7 @@ export interface IFormField {
   tooltip?: string;
   placeholder?: string;
   options?: ISelectOption[];
+  disabled?: boolean;
 }
 
 export interface IFlist {

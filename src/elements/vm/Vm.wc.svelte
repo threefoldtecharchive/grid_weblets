@@ -163,6 +163,7 @@
         {/each}
 
         <SelectNodeId
+          publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(
