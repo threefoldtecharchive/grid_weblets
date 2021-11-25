@@ -4,7 +4,7 @@
   import VM, { Disk, Env } from "../../types/vm";
   import type { IFormField, ITab } from "../../types";
   const { events } = window.configs?.grid3_client ?? {};
-  import deployVM from "../../utils/deployVM";
+  import deployFunkwhale from "../../utils/deployFunkwhake";
   import type { IProfile } from "../../types/Profile";
 
     // Components
@@ -55,7 +55,7 @@
     }
     events.addListener("logs", onLogInfo);
 
-    deployVM(data, profile)
+    deployFunkwhale(data, profile)
       .then(() => {
         deploymentStore.set(0);  
         success = true;
