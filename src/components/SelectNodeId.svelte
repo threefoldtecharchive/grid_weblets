@@ -65,7 +65,7 @@
   };
   $: {
     if (cpu) nodeFilters.cru = cpu;
-    if (memory) nodeFilters.mru = Math.floor(memory / 1000);
+    if (memory) nodeFilters.mru = Math.round(memory / 1024);
     if (ssd) nodeFilters.sru = ssd;
   }
 

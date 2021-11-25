@@ -5,6 +5,10 @@
   import type { IFormField } from "../types";
   import { v4 } from "uuid";
 
+  // components
+  import "./Tooltip.svelte";
+  import Tooltip from "./Tooltip.svelte";
+
   const dispatch = createEventDispatcher<{ input: void }>();
   export let field: IFormField;
   export let data: any;
@@ -81,80 +85,82 @@
 </div>
 
 {#if field}
-  {#if _isInput()}
-    <div class="field" {id}>
-      <p class="label">{field.label}</p>
-      <div class="control">
-        {#if field.type === "textarea"}
-          <textarea
-            class="textarea"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {:else if field.type === "text"}
-          <input
-            type="text"
-            class="input"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {:else if field.type === "number"}
-          <input
-            type="number"
-            class="input"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {:else if field.type === "password"}
-          <input
-            type="password"
-            class="input"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {/if}
+  <tf-tooltip tooltip={field.tooltip}>
+    {#if _isInput()}
+      <div class="field" {id}>
+        <p class="label">{field.label}</p>
+        <div class="control">
+          {#if field.type === "textarea"}
+            <textarea
+              class="textarea"
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+            />
+          {:else if field.type === "text"}
+            <input
+              type="text"
+              class="input"
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+            />
+          {:else if field.type === "number"}
+            <input
+              type="number"
+              class="input"
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+            />
+          {:else if field.type === "password"}
+            <input
+              type="password"
+              class="input"
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+            />
+          {/if}
+        </div>
       </div>
-    </div>
-  {:else if field.type === "checkbox"}
-    <div style="display: flex; align-items: center;" class="mb-2">
-      <label class="switch">
-        <input
-          class="switch__input"
-          type="checkbox"
-          bind:checked={data}
-          {id}
-          on:input
-        />
-        <span class="slider" />
-      </label>
-      <label for={id} class="label ml-2" style="cursor: pointer;">
-        {field.label}
-      </label>
-    </div>
-  {:else if field.type === "select"}
-    {#if field.label}
-      <p class="label">{field.label}</p>
+    {:else if field.type === "checkbox"}
+      <div style="display: flex; align-items: center;" class="mb-2">
+        <label class="switch">
+          <input
+            class="switch__input"
+            type="checkbox"
+            bind:checked={data}
+            {id}
+            on:input
+          />
+          <span class="slider" />
+        </label>
+        <label for={id} class="label ml-2" style="cursor: pointer;">
+          {field.label}
+        </label>
+      </div>
+    {:else if field.type === "select"}
+      {#if field.label}
+        <p class="label">{field.label}</p>
+      {/if}
+      <div class="select mb-2" style="width: 100%;" {id}>
+        <select
+          style="width: 100%;"
+          bind:value={data}
+          on:change={_onSelectChange}
+        >
+          {#each field.options as option (option.value)}
+            <option
+              value={option.value}
+              selected={option.selected}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </option>
+          {/each}
+        </select>
+      </div>
     {/if}
-    <div class="select mb-2" style="width: 100%;" {id}>
-      <select
-        style="width: 100%;"
-        bind:value={data}
-        on:change={_onSelectChange}
-      >
-        {#each field.options as option (option.value)}
-          <option
-            value={option.value}
-            selected={option.selected}
-            disabled={option.disabled}
-          >
-            {option.label}
-          </option>
-        {/each}
-      </select>
-    </div>
-  {/if}
+  </tf-tooltip>
 {/if}
