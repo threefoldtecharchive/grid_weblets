@@ -91,11 +91,14 @@
     return oldLabel;
   }
 
-  function _setOptions(index: number, items: Array<{ name: string }>) {
+  function _setOptions(
+    index: number,
+    items: Array<{ name: string; code?: string }>
+  ) {
     const [option] = filtersFields[index].options;
     filtersFields[index].options = items.reduce(
-      (res, { name }) => {
-        const op = { label: name, value: name } as ISelectOption;
+      (res, { name, code }) => {
+        const op = { label: name, value: code || name } as ISelectOption;
         res.push(op);
         return res;
       },
