@@ -34,7 +34,7 @@ export default class DeployedList {
         return Promise.all(names.map((name) => this._loadK8s(name)));
       })
       .then((data) => {
-        return data.filter((x) => x !== null);
+        return data.filter((x) => [null, undefined].includes(x)  === false);
       });
   }
 
@@ -51,10 +51,12 @@ export default class DeployedList {
     return this.grid.machines
       .list()
       .then((names) => {
+        console.log("names: " + names);
         return Promise.all(names.map((name) => this._loadVm(name)));
       })
       .then((data) => {
-        return data.filter((x) => x !== null);
+        console.log(data);
+        return data.filter((x) => [null, undefined].includes(x)  === false);
       });
   }
 

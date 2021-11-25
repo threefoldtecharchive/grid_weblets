@@ -63,7 +63,7 @@
   };
   $: {
     if (cpu) nodeFilters.cru = cpu;
-    if (memory) nodeFilters.mru = memory;
+    if (memory) nodeFilters.mru = Math.floor(memory/1000);
     if (ssd) nodeFilters.sru = ssd;
   }
 
@@ -134,7 +134,7 @@
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
 {#if nodeSelection === "automatic"}
-  <h5 class="is-size-3 has-text-weight-bold">Nodes Filter</h5>
+  <h5 class="is-size-7 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     <Input bind:data={nodeFilters[field.symbol]} {field} />
   {/each}

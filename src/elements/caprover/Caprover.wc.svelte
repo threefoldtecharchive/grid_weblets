@@ -31,12 +31,12 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your caprover name", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
-    { label: "Memory", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
-    { label: "Disk Size", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "domain configured on your name provider", type: "text" },
-    { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key", type: "text" },
+    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
+    { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text" },
+    // { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key", type: "text" },
     // { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
 
   ];
