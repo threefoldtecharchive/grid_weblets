@@ -36,44 +36,33 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   network.ip_range = "10.1.0.0/16";
 
   // deploy redis
-  // await deployRedis(client, network, nodeId, name);
+  await deployRedis(client, network, nodeId, name);
 
   // get the info
-  // const redisInfo = await getRedisInfo(client, name + "_redis_vms");
-  // console.log(redisInfo);
-  // const redisIP = redisInfo[0]["interfaces"][0]["ip"];
-  // console.log(redisIP);
+  const redisInfo = await getRedisInfo(client, name + "_redis_vms");
+  const redisIP = redisInfo[0]["interfaces"][0]["ip"];
 
   // deploy postgres
-  // await deployPostgres(client, network, nodeId, name);
+  await deployPostgres(client, network, nodeId, name);
 
   // get the info
-  // const postgresInfo = await getPostgresInfo(client, name + "_postgres_vms");
-  // console.log(postgresInfo);
-  // const postgresIP = postgresInfo[0]["interfaces"][0]["ip"];
-  // console.log(postgresIP);
+  const postgresInfo = await getPostgresInfo(client, name + "_postgres_vms");
+  const postgresIP = postgresInfo[0]["interfaces"][0]["ip"];
 
   // deploy the peertube
-  // await deployPeertubeVM(client, network, redisIP, postgresIP, nodeId, name);
+  await deployPeertubeVM(client, network, redisIP, postgresIP, nodeId, name);
+
   // get the info
-  // const peertubeInfo = await getPeertubeInfo(
-  //   client,
-  //   "hellopeertube_peertube_vms"
-  // );
-  // console.log(peertubeInfo);
-  // const peertubeYggIp = peertubeInfo[0]["yggIP"];
-  // console.log(peertubeYggIp);
+  const peertubeInfo = await getPeertubeInfo(client, name + "_peertube_vms");
+  const peertubeYggIp = peertubeInfo[0]["yggIP"];
 
   // deploy the gateway
-  await deployPrefixGateway(
-    client,
-    "pt_gw",
-    "303:60c2:bb79:5147:d02c:7a8b:2c83:aa91"
-  );
-  // // return the info
-  const gatewayInfo = await getGatewayInfo(client, "pt_gw");
-  console.log(gatewayInfo);
+  await deployPrefixGateway(client, name, peertubeYggIp);
+
+  // return the info
+  const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
+
   console.log(gatewayDomain);
 }
 
@@ -201,7 +190,7 @@ async function deployPrefixGateway(client: any, name: string, backend: string) {
   // define specs
   const gw = new GatewayNameModel();
   gw.name = name;
-  gw.node_id = 7;
+  gw.node_id = 8;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:3000/`];
 
