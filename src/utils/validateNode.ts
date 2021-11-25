@@ -12,15 +12,15 @@ export default function validateNode(
   const filters = { cru, mru: mru / 1024, sru, publicIPs };
   return findNodes(filters, profile)
     .then((nodes) => {
-      return nodes.some((node) => node.value === nodeId.toString());
+      return nodes.some((node) => +node.value === +nodeId);
     })
     .then((valid) => {
       return valid
         ? null
-        : `The selected node(${nodeId}) doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`;
+        : `Inner The selected node(${nodeId}) doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`;
     })
     .catch(
       () =>
-        `The selected node(${nodeId}) doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`
+        `Outer The selected node(${nodeId}) doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`
     );
 }
