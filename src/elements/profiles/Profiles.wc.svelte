@@ -127,7 +127,7 @@
 
       <div style="display: flex; justify-content: center;">
         <button
-          class="button is-primary is-outlined mr-2"
+          class="button is-primary"
           type="button"
           disabled={password === ""}
           on:click={onEventHandler.bind(undefined, "load")}
@@ -136,7 +136,7 @@
         </button>
 
         <button
-          class="button is-primary"
+          class="button is-primary is-outlined mr-2"
           type="button"
           disabled={password === ""}
           on:click={onEventHandler.bind(undefined, "create")}
