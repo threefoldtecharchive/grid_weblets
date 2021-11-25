@@ -15,6 +15,7 @@
   import Alert from "../../components/Alert.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  import validateNode from "../../utils/validateNode";
 
   const data = new Caprover();
   let loading = false;
@@ -44,33 +45,42 @@
 
   let message: string;
   let modalData: Object;
+  let nodeIdError: string;
   function deployCaproverHandler() {
-    loading = true;
-    success = false;
-    failed = false;
-    message = undefined;
+    const { cpu, memory, nodeId, diskSize } = data;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
         message = msg;
       }
     }
+    validateNode(profile, cpu, memory, diskSize, true, nodeId)
+      .then(() => {
+        nodeIdError = null;
+        loading = true;
+        success = false;
+        failed = false;
+        message = undefined;
 
-    events.addListener("logs", onLogInfo);
+        events.addListener("logs", onLogInfo);
 
-    deployCaprover(data, profile)
-      .then((data) => {
-        modalData = data;
-        deploymentStore.set(0);
-        success = true;
+        deployCaprover(data, profile)
+          .then((data) => {
+            modalData = data;
+            deploymentStore.set(0);
+            success = true;
+          })
+          .catch((err: string) => {
+            failed = true;
+            message = err;
+          })
+          .finally(() => {
+            loading = false;
+            events.removeListener("logs", onLogInfo);
+          });
       })
-      .catch((err: string) => {
-        failed = true;
-        message = err;
-      })
-      .finally(() => {
-        loading = false;
-        events.removeListener("logs", onLogInfo);
+      .catch(({ message }: Error) => {
+        nodeIdError = message;
       });
   }
 </script>
@@ -102,6 +112,7 @@
           <Input bind:data={data[field.symbol]} {field} />
         {/each}
         <SelectNodeId
+          error={nodeIdError}
           cpu={data.cpu}
           memory={data.memory}
           publicIp={true}
