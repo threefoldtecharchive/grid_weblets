@@ -3,6 +3,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
+  // libs
   import baseConfigStore from "../../stores/baseConfig";
   import deploymentStore from "../../stores/deploymentStore";
 

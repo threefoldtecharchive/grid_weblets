@@ -6,7 +6,7 @@
 </script>
 
 <div class={"notification is-" + type}>
-  /> {message}
+   {message}
 </div>
 
 <style lang="scss" scoped>

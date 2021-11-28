@@ -14,11 +14,7 @@ export default function findNodes(
     const nodes = new Nodes(graphql, rmbProxy);
 
     try {
-      console.log(nodes);
-
       const items = await nodes.filterNodes(filters);
-      console.log({ items });
-
       const resNodes = items.map((node) => {
         return {
           label: `NodeID(${node.nodeId})`,
@@ -26,7 +22,8 @@ export default function findNodes(
         } as ISelectOption;
       });
       res(resNodes);
-    } catch {
+    } catch (err) {
+      console.log("Error findNodes", err);
       res([]);
     }
   });
