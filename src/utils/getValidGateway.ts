@@ -1,9 +1,9 @@
 import type { GridClient } from "grid3_client";
 
-export async function isValidName(name: string) {
+export function isValidName(name: string) {
   const filter1 = new RegExp(/[^a-z\d]/i);
   const filter2 = new RegExp(/^\d/);
-  return filter1.test(name) || filter2.test(name) ? false : true;
+  return !(filter1.test(name) || filter2.test(name));
 }
 
 export async function checkSuitableName(name: string) {
