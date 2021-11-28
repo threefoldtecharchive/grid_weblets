@@ -7,13 +7,13 @@ const { MachinesModel, DiskModel, GridClient, MachineModel } =
   window.configs?.grid3_client ?? {};
 
 const CAPROVER_FLIST =
-  "https://hub.grid.tf/samehabouelsaad.3bot/tf-caprover-main-a4f186da8d.flist";
+  "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
 export default async function deployCaprover(
   data: Caprover,
   profile: IProfile
 ) {
-  const { name, memory, nodeId, publicKey, cpu, domain, diskSize } = data;
+  const { name, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
   const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
@@ -41,6 +41,7 @@ export default async function deployCaprover(
     SWM_NODE_MODE: "leader",
     CAPROVER_ROOT_DOMAIN: domain,
     PUBLIC_KEY: publicKey,
+    DEFAULT_PASSWORD: password,
   };
 
   const machines = new MachinesModel();

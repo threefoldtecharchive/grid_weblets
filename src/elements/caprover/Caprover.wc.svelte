@@ -23,7 +23,7 @@
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -38,6 +38,7 @@
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text" },
+    { label: "Password", symbol: "password", placeholder: "Caprover new password", type: "text" },
     // { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key", type: "text" },
     // { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
 
