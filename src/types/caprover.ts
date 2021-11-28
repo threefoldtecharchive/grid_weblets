@@ -12,7 +12,8 @@ export default class Caprover {
     public nodeId = 3,
     public domain = "",
     public publicKey = "",
-    public diskSize = 100
+    public diskSize = 100,
+    public password = id.split("-").join("").slice(0, 8)
   ) {}
 
   public get valid(): boolean {
