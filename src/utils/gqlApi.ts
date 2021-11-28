@@ -1,12 +1,12 @@
 import type { IProfile } from "../types/Profile";
 const { GridClient } = window.configs?.grid3_client ?? {};
 
-export default function gqlApi(
+export default function gqlApi<T>(
   profile: IProfile,
-  name: string,
+  // name: string,
   query: string,
   variables: Object = {}
-) {
+): Promise<T> {
   const { networkEnv } = profile;
   const grid = new GridClient("" as any, "", "", null);
 
@@ -20,5 +20,5 @@ export default function gqlApi(
     body: JSON.stringify({ query, variables }),
   })
     .then((res) => res.json())
-    .then((res) => res.data[name]);
+    .then<T>(({ data }) => data);
 }

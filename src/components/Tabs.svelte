@@ -4,13 +4,19 @@
   import type { ITab } from "../types";
   import { createEventDispatcher } from "svelte";
 
-  const dispatch = createEventDispatcher<{ removed: number }>();
+  const dispatch = createEventDispatcher<{ removed: number; select: string }>();
 
   export let tabs: ITab[];
   export let active: string;
   export let centered: boolean = true;
 
   const onRemove = (idx: number) => () => dispatch("removed", idx);
+  function onSelectTab(tab: string) {
+    if (active !== tab) {
+      active = tab;
+      dispatch("select", tab);
+    }
+  }
 </script>
 
 <div class={"tabs " + (centered ? "is-centered" : "")}>
@@ -18,7 +24,10 @@
     {#if tabs}
       {#each tabs as tab, index (tab.label)}
         <li class={active === tab.value ? "is-active" : ""}>
-          <a href="#!" on:click|preventDefault={() => (active = tab.value)}>
+          <a
+            href="#!"
+            on:click|preventDefault={onSelectTab.bind(undefined, tab.value)}
+          >
             <span>{tab.label}</span>
             {#if tab.removable}
               <button

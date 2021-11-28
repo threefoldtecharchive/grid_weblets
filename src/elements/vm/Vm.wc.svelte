@@ -5,6 +5,7 @@
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
+  import validateNode from "../../utils/validateNode";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -15,6 +16,7 @@
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -46,7 +48,7 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Please select an image", value: null, selected: true, disabled: true },
+      // { label: "Please select an image", value: null, selected: true, disabled: true },
       { label: "Alpine", value: "0" },
       { label: "Ubuntu", value: "1" },
       { label: "Other", value: "other" }
@@ -89,14 +91,15 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
 
   let message: string;
-  function onDeployVM() {
-    loading = true;
-    success = false;
-    failed = false;
-    message = undefined;
+  let modalData: Object;
+
+  let nodeIdError: string;
+  async function onDeployVM() {
+    const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
+    const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -104,16 +107,28 @@
       }
     }
 
-    events.addListener("logs", onLogInfo);
+    const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
+    console.log({ error });
+    if (error) {
+      nodeIdError = error;
+      return;
+    }
 
+    loading = true;
+    nodeIdError = null;
+    success = false;
+    failed = false;
+    message = undefined;
+
+    events.addListener("logs", onLogInfo);
     deployVM(data, profile)
-      .then(() => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
+        modalData = data;
       })
       .catch((err: Error) => {
         failed = true;
-
         message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
@@ -138,7 +153,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+          if (detail) {
+            data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
+          }
         }}
       />
       <Tabs bind:active {tabs} />
@@ -163,6 +180,8 @@
         {/each}
 
         <SelectNodeId
+          error={nodeIdError}
+          publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(
@@ -223,6 +242,9 @@
     />
   </form>
 </div>
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

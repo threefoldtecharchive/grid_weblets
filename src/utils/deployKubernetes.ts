@@ -36,7 +36,10 @@ export default async function deployKubernetes(
   k8s.description = description;
   k8s.ssh_key = sshKey;
 
-  return grid.connect().then(() => grid.k8s.deploy(k8s));
+  return grid
+    .connect()
+    .then(() => grid.k8s.deploy(k8s))
+    .then(() => grid.machines.getObj(name));
 }
 
 function createNode(data: Base) {
