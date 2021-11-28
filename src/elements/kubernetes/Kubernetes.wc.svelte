@@ -61,7 +61,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
   let modalData: Object;
 
   function onDeployKubernetes() {
@@ -73,7 +73,6 @@
     const onLogInfo = (msg: string) => typeof msg === "string" ? (message = msg) : null; // prettier-ignore
     events.addListener("logs", onLogInfo);
 
-    console.log(data);
     deployKubernetes(data, profile)
       .then((data) => {
         modalData = data;
@@ -115,7 +114,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.sshKey = detail.sshKey;
+          if (detail) {
+            data.sshKey = detail.sshKey;
+          }
         }}
       />
       <Tabs bind:active {tabs} />

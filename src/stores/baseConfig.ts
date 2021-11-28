@@ -2,11 +2,16 @@ import { get, writable } from "svelte/store";
 import { enc } from "crypto-js";
 import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
+import { v4 } from "uuid";
 
-const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
+const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
 
 function createBaseConfig() {
-  const store = writable([createProfile("Profile 1")]);
+  const p = createProfile("Profile 1");
+  const store = writable({
+    profiles: [p],
+    activeProfile: null,
+  });
 
   function hashPassword(password: string) {
     return md5(password).toString();
@@ -24,43 +29,46 @@ function createBaseConfig() {
     update,
     updateMnemonics(idx: number, e: InputEvent) {
       return update((value) => {
-        value[idx].mnemonics = (e.target as any).value;
+        value.profiles[idx].mnemonics = (e.target as any).value;
         return value;
       });
     },
     updateStoreSecret(idx: number, e: InputEvent) {
       return update((value) => {
-        value[idx].storeSecret = (e.target as any).value;
+        value.profiles[idx].storeSecret = (e.target as any).value;
         return value;
       });
     },
     updateNetworkEnv(idx: number, e: Event) {
       return update((value) => {
-        value[idx].networkEnv = (e.target as any).selectedIndex === 0 ? "test" : "dev"; // prettier-ignore
+        value.profiles[idx].networkEnv = (e.target as any).selectedIndex === 0 ? "test" : "dev"; // prettier-ignore
         return value;
       });
     },
     updateName(idx: number, e: InputEvent) {
       return update((value) => {
-        value[idx].name = (e.target as any).value;
+        value.profiles[idx].name = (e.target as any).value;
         return value;
       });
     },
     updateSshKey(idx: number, e: InputEvent) {
       return update((value) => {
-        value[idx].sshKey = (e.target as any).value;
+        value.profiles[idx].sshKey = (e.target as any).value;
         return value;
       });
     },
     addProfile() {
       update((value) => {
-        value.push(createProfile());
+        value.profiles.push(createProfile());
         return value;
       });
     },
     deleteProfile(idx: number) {
       update((value) => {
-        value.splice(idx, 1);
+        if (value.profiles[idx].id === value.activeProfile) {
+          value.activeProfile = value.profiles[0].id;
+        }
+        value.profiles.splice(idx, 1);
         return value;
       });
     },
@@ -98,6 +106,27 @@ function createBaseConfig() {
       }
 
       localStorage.setItem(hash, getEncryptedStore(password));
+    },
+
+    setActiveProfile(id: string) {
+      return update((value) => {
+        value.activeProfile = id;
+        return value;
+      });
+    },
+
+    deActiveProfile() {
+      return update((value) => {
+        value.activeProfile = null;
+        return value;
+      });
+    },
+
+    getActiveProfile() {
+      const data = get(store);
+      if (data.activeProfile === null) return null;
+      const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
+      return data.profiles[idx];
     },
   };
 }

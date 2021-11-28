@@ -102,7 +102,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.publicKey = detail.sshKey;
+          if (detail) {
+            data.publicKey = detail.sshKey;
+          }
         }}
       />
       <Tabs bind:active {tabs} />

@@ -33,7 +33,7 @@ import { findInitialPage } from "@/utils/sidenav";
 })
 export default class App extends Vue {
   elements = [
-    "profiles",
+    // "profiles",
     "vm",
     "kubernetes",
     "deployedlist",

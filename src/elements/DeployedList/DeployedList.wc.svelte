@@ -2,7 +2,8 @@
 
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-
+  import type { IProfile } from "../../types/Profile";
+  import type { ITab } from "../../types";
   import DeployedList from "../../types/deployedList";
   import deleteContracts from "../../utils/deleteContracts";
 
@@ -10,24 +11,23 @@
 
   // components
   import Modal from "../../components/DeploymentModal.svelte";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
 
   // prettier-ignore
-  const tabs = [
-    { label: "Kubernetes" },
-    { label: "Virtual Machines" },
-    { label: "Caprover" }
+  const tabs: ITab[] = [
+    { label: "Kubernetes", value: "k8s" },
+    { label: "Virtual Machines", value: "vm" },
+    { label: "Caprover", value: "caprover" }
   ];
-  let active: string = "Kubernetes";
+  let active: string = "k8s";
 
   let loading = false;
   let configed = false;
   let list: DeployedList;
-  const configs = window.configs?.baseConfig;
   const deployedStore = window.configs?.deploymentStore;
-  let profileIdx: number = 0;
 
-  $: profiles = $configs;
-  $: profile = $configs[profileIdx];
+  let profile: IProfile;
 
   function onConfigHandler() {
     configed = true;
@@ -38,8 +38,6 @@
       })
       .finally(() => (loading = false));
   }
-
-  const onSelectProfile = (e: Event) => profileIdx = (e.target as any).selectedIndex; // prettier-ignore
 
   function _reloadTab() {
     const x = active;
@@ -55,6 +53,8 @@
 
   let removed: string[] = [];
   function onRemoveHandler(key: "k8s" | "machines", name: string) {
+    const remove = window.confirm(`Are you sure u want to delete '${name}'?`);
+    if (!remove) return;
     removed = [...removed, name];
     const idx = removed.length - 1;
     deleteContracts(profile, key, name)
@@ -75,7 +75,7 @@
 
   let _sub: any;
   onMount(() => {
-    _sub = deployedStore.subscribe((data) => {
+    _sub = deployedStore.subscribe(() => {
       _reloadTab();
     });
   });
@@ -85,6 +85,14 @@
   });
 </script>
 
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      onConfigHandler();
+    }
+  }}
+/>
 <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
@@ -98,69 +106,13 @@
     {#if loading}
       <p style="text-align: center; mt-2 mb-2">Loading...</p>
     {:else if !configed}
-      <form on:submit|preventDefault={onConfigHandler}>
-        <div style="display: flex; justify-content: center;">
-          <div
-            class="select mb-4"
-            style="display: flex; justify-content: flex-end;"
-          >
-            <select on:change={onSelectProfile}>
-              {#each profiles as profile, idx (idx)}
-                <option value={idx}
-                  >{#if profile.name}
-                    {profile.name}
-                  {:else}
-                    Profile {idx + 1}
-                  {/if}</option
-                >
-              {/each}
-            </select>
-          </div>
-        </div>
-        <div style="display: flex; justify-content: center;">
-          <button
-            disabled={!profile ||
-              profile.mnemonics === "" ||
-              profile.storeSecret === ""}
-            type="submit"
-            class="button is-primary"
-          >
-            List
-          </button>
-        </div>
-      </form>
-      <!--  -->
+      <p style="text-align: center; mt-2 mb-2">
+        Please activate a profile from profile manager
+      </p>
     {:else}
-      <!--  -->
-      <div style="display: flex">
-        <button
-          class="button is-primary is-outlined mr-2"
-          on:click={() => (configed = false)}
-        >
-          Back
-        </button>
+      <Tabs bind:active {tabs} />
 
-        {#if !tab}
-          <div style="width: 100%;">
-            <div class="tabs is-centered">
-              <ul>
-                {#each tabs as tab (tab.label)}
-                  <li class={active === tab.label ? "is-active" : ""}>
-                    <a
-                      href="#!"
-                      on:click|preventDefault={() => (active = tab.label)}
-                    >
-                      <span>{tab.label}</span>
-                    </a>
-                  </li>
-                {/each}
-              </ul>
-            </div>
-          </div>
-        {/if}
-      </div>
-
-      {#if (!tab && active === "Kubernetes") || tab === "k8s"}
+      {#if (!tab && active === "k8s") || tab === "k8s"}
         {#await list.loadK8s()}
           <div class="notification is-info mt-2">Loading...</div>
         {:then rows}
@@ -189,9 +141,9 @@
                       {/if}
                       <td>{row.master.yggIP}</td>
                       <td>{row.workers}</td>
-                      <td>
+                      <td class="is-flex">
                         <button
-                          class="button is-outlined is-primary ml-2"
+                          class="button is-outlined is-primary mr-2"
                           on:click={() => {
                             infoToShow = row.details;
                           }}
@@ -232,7 +184,7 @@
         {/await}
       {/if}
 
-      {#if active === "Virtual Machines" || active === "Caprover" || tab === "caprover" || tab === "vm"}
+      {#if active === "vm" || active === "caprover" || tab === "caprover" || tab === "vm"}
         {#await active === "Caprover" || tab === "caprover" ? list.loadCaprover() : list.loadVm()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
@@ -262,9 +214,9 @@
                         {/if}
                         <td>{row.yggIP}</td>
                         <td>{row.flist}</td>
-                        <td>
+                        <td class="is-flex">
                           <button
-                            class="button is-outlined is-primary  ml-2"
+                            class="button is-outlined is-primary"
                             on:click={() => {
                               infoToShow = row.details;
                             }}
@@ -273,7 +225,7 @@
                             Show Details
                           </button>
                           <button
-                            class={"button is-danger " +
+                            class={"button is-danger ml-2" +
                               (removed.includes(row.name) ? "is-loading" : "")}
                             on:click={() =>
                               onRemoveHandler("machines", row.name)}
@@ -283,6 +235,7 @@
                           </button>
                           {#if row.details.env && row.details.env.CAPROVER_ROOT_DOMAIN}
                             <a
+                              class="ml-2"
                               target="_blank"
                               href={"http://captain." +
                                 row.details.env.CAPROVER_ROOT_DOMAIN}
