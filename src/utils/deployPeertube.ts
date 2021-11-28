@@ -1,6 +1,8 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
+import { checkSuitableName, getSuitableName } from "./getValidGateway";
+
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
   GridClient,
@@ -14,7 +16,7 @@ const {
 export default async function deployPeertube(data: VM, profile: IProfile) {
   // connect
   const { envs, disks, ...base } = data;
-  const { name, flist, cpu, memory, entrypoint, network: nw } = base;
+  let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
@@ -30,40 +32,42 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   await client.connect();
 
+  // name = getSuitableName(client, name)
+
   // define a network
   const network = new NetworkModel();
   network.name = name + "_network";
   network.ip_range = "10.1.0.0/16";
 
   // deploy redis
-  await deployRedis(client, network, nodeId, name);
+  // await deployRedis(client, network, nodeId, name);
 
   // get the info
-  const redisInfo = await getRedisInfo(client, name + "_redis_vms");
-  const redisIP = redisInfo[0]["interfaces"][0]["ip"];
+  // const redisInfo = await getRedisInfo(client, name + "_redis_vms");
+  // const redisIP = redisInfo[0]["interfaces"][0]["ip"];
 
   // deploy postgres
-  await deployPostgres(client, network, nodeId, name);
+  // await deployPostgres(client, network, nodeId, name);
 
   // get the info
-  const postgresInfo = await getPostgresInfo(client, name + "_postgres_vms");
-  const postgresIP = postgresInfo[0]["interfaces"][0]["ip"];
+  // const postgresInfo = await getPostgresInfo(client, name + "_postgres_vms");
+  // const postgresIP = postgresInfo[0]["interfaces"][0]["ip"];
 
   // deploy the peertube
-  await deployPeertubeVM(client, network, redisIP, postgresIP, nodeId, name);
+  // await deployPeertubeVM(client, network, redisIP, postgresIP, nodeId, name);
 
   // get the info
-  const peertubeInfo = await getPeertubeInfo(client, name + "_peertube_vms");
-  const peertubeYggIp = peertubeInfo[0]["yggIP"];
+  // const peertubeInfo = await getPeertubeInfo(client, name + "_peertube_vms");
+  // const peertubeYggIp = peertubeInfo[0]["yggIP"];
 
   // deploy the gateway
-  await deployPrefixGateway(client, name, peertubeYggIp);
+  // await deployPrefixGateway(client, name, peertubeYggIp);
 
   // return the info
-  const gatewayInfo = await getGatewayInfo(client, name);
-  const gatewayDomain = gatewayInfo[0]["domain"];
+  // const gatewayInfo = await getGatewayInfo(client, name);
+  // const gatewayDomain = gatewayInfo[0]["domain"];
 
-  console.log(gatewayDomain);
+  // console.log(gatewayDomain);
 }
 
 async function deployRedis(client: any, net: any, nodeId: any, name: string) {
