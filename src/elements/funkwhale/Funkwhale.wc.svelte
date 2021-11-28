@@ -16,10 +16,6 @@
 //   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-	import { nameValidator, requiredValidator } from "../../utils/webletNameValidator"
-  import { createFieldValidator } from '../../utils/validation'
-
-  const [ validity, validate ] = createFieldValidator(requiredValidator(), nameValidator());
 
   const data = new VM(undefined, undefined, "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist");
   
@@ -32,7 +28,7 @@
   let loading = false;
   let success = false;
   let failed = false;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[0-9a-zA-Z]+$/); // prettier-ignore
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
 
@@ -78,8 +74,7 @@
   // regex wanted value.match(/^[0-9a-zA-Z]+$/))
   function validateNameHandler(e: Event) {
     const inp = e.target as HTMLInputElement;
-    nameField.
-    inp.value
+    nameField.error = inp.value.match(/^[0-9a-zA-Z]+$/)? null : "Invalid Name" ;
   }
 </script>
 
