@@ -1,7 +1,11 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
-import { checkSuitableName } from "./getValidGateway";
+import {
+  isValidName,
+  checkSuitableName,
+  getSuitableGateway,
+} from "./getValidGateway";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -32,17 +36,10 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   await client.connect();
 
-  try {
-    name = checkSuitableName(name);
-    console.log(name);
-  } catch (err) {
-    console.log(err);
-  }
-
   // define a network
-  const network = new NetworkModel();
-  network.name = name + "_network";
-  network.ip_range = "10.1.0.0/16";
+  // const network = new NetworkModel();
+  // network.name = name + "_network";
+  // network.ip_range = "10.1.0.0/16";
 
   // deploy redis
   // await deployRedis(client, network, nodeId, name);
@@ -73,6 +70,8 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   // const gatewayDomain = gatewayInfo[0]["domain"];
 
   // console.log(gatewayDomain);
+
+  console.log(await getSuitableGateway(client, name));
 }
 
 async function deployRedis(client: any, net: any, nodeId: any, name: string) {

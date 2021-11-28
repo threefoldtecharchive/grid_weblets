@@ -1,11 +1,24 @@
-export function checkSuitableName(name: string) {
-  const regex = new RegExp(/[^a-z\d]/i);
-  const isValid = (name: string) => {
-    return regex.test(name) ? false : true;
-  };
-  if (isValid(name)) {
+import type { GridClient } from "grid3_client";
+
+export async function isValidName(name: string) {
+  const filter1 = new RegExp(/[^a-z\d]/i);
+  const filter2 = new RegExp(/^\d/);
+  return filter1.test(name) || filter2.test(name) ? false : true;
+}
+
+export async function checkSuitableName(name: string) {
+  if (isValidName(name)) {
     return name;
   } else {
-    throw Error(`Domain name should be alphanumeric only`);
+    throw Error(`Name should be alphanumeric only`);
   }
+}
+
+export async function getSuitableGateway(client: GridClient, name: string) {
+  const info = await client.gateway.getObj(name);
+  return info.length == 0 ? name : name + getRandomInt();
+}
+
+function getRandomInt(): number {
+  return Math.floor(Math.random() * 1000);
 }
