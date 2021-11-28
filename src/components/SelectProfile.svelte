@@ -1,6 +1,25 @@
 <svelte:options tag="tf-select-profile" />
 
 <script lang="ts">
+  import { onMount, createEventDispatcher, onDestroy } from "svelte";
+  const configs = window.configs?.baseConfig;
+  import type { IProfile } from "../types/Profile";
+
+  const dispatch = createEventDispatcher<{ profile: IProfile }>();
+
+  let _sub: () => void;
+  onMount(() => {
+    _sub = configs.subscribe(() => {
+      dispatch("profile", configs.getActiveProfile());
+    });
+  });
+
+  onDestroy(() => {
+    _sub();
+  });
+</script>
+
+<!-- <script lang="ts">
   import { onDestroy, createEventDispatcher, onMount } from "svelte";
   import Input from "./Input.svelte";
   import type { IProfile } from "../types/Profile";
@@ -41,4 +60,4 @@
 
 <style lang="scss">
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-</style>
+</style> -->

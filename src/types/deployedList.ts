@@ -17,6 +17,10 @@ export default class DeployedList {
       this.grid.k8s
         .getObj(name)
         .then((data) => {
+          if (data.masters.length === 0) {
+            // Temp solution for now
+            return res(null);
+          }
           res({
             name,
             master: data.masters[0],
@@ -34,7 +38,7 @@ export default class DeployedList {
         return Promise.all(names.map((name) => this._loadK8s(name)));
       })
       .then((data) => {
-        return data.filter((x) => [null, undefined].includes(x)  === false);
+        return data.filter((x) => [null, undefined].includes(x) === false);
       });
   }
 
@@ -42,7 +46,15 @@ export default class DeployedList {
     return new Promise((res) => {
       this.grid.machines
         .getObj(name)
-        .then(([data]) => res(data))
+        .then(([data]) =>
+          res({
+            name,
+            publicIp: data.publicIP?.ip ?? "None",
+            yggIP: data.yggIP,
+            flist: data.flist,
+            details: data,
+          })
+        )
         .catch(() => res(null));
     });
   }
@@ -56,13 +68,13 @@ export default class DeployedList {
       })
       .then((data) => {
         console.log(data);
-        return data.filter((x) => [null, undefined].includes(x)  === false);
+        return data.filter((x) => [null, undefined].includes(x) === false);
       });
   }
 
   public loadCaprover(): Promise<any[]> {
     return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.name.startsWith("caprover_leader"));
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("caprover"));
     });
   }
 

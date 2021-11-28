@@ -72,6 +72,38 @@
     -ms-transform: translateX(26px);
     transform: translateX(26px);
   }
+
+  .tooltip {
+    position: relative;
+  }
+
+  .tooltip__text {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(51, 51, 51, 0.9);
+    color: white;
+    z-index: 9;
+    max-width: min(1000px, calc(100% - 30px));
+    display: block;
+
+    transition-property: opacity, transform, visibility;
+    transition-timing-function: ease;
+    transition-duration: 300ms;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(20px) scale(0);
+  }
+
+  .tooltip:hover > .tooltip__text {
+    pointer-events: all;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 </style>
 `;
 </script>
@@ -81,80 +113,108 @@
 </div>
 
 {#if field}
-  {#if _isInput()}
-    <div class="field" {id}>
-      <p class="label">{field.label}</p>
-      <div class="control">
-        {#if field.type === "textarea"}
-          <textarea
-            class="textarea"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {:else if field.type === "text"}
-          <input
-            type="text"
-            class="input"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {:else if field.type === "number"}
-          <input
-            type="number"
-            class="input"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
-        {:else if field.type === "password"}
-          <input
-            type="password"
-            class="input"
-            placeholder={field.placeholder}
-            bind:value={data}
-            on:input
-          />
+  <div class="tooltip mb-2">
+    {#if _isInput()}
+      <div class="field" {id}>
+        <p class="label">{field.label}</p>
+        <div class="control">
+          {#if field.type === "textarea"}
+            <textarea
+              class={"textarea" + (field.error ? " is-danger" : "")}
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+              disabled={field.disabled}
+            />
+          {:else if field.type === "text"}
+            <input
+              type="text"
+              class={"input" + (field.error ? " is-danger" : "")}
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+              disabled={field.disabled}
+            />
+          {:else if field.type === "number"}
+            <input
+              type="number"
+              class={"input" + (field.error ? " is-danger" : "")}
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+              disabled={field.disabled}
+            />
+          {:else if field.type === "password"}
+            <input
+              type="password"
+              class={"input" + (field.error ? " is-danger" : "")}
+              placeholder={field.placeholder}
+              bind:value={data}
+              on:input
+              disabled={field.disabled}
+            />
+          {/if}
+        </div>
+        {#if field.error}
+          <p class="help is-danger">
+            {field.error}
+          </p>
         {/if}
       </div>
-    </div>
-  {:else if field.type === "checkbox"}
-    <div style="display: flex; align-items: center;" class="mb-2">
-      <label class="switch">
-        <input
-          class="switch__input"
-          type="checkbox"
-          bind:checked={data}
-          {id}
-          on:input
-        />
-        <span class="slider" />
-      </label>
-      <label for={id} class="label ml-2" style="cursor: pointer;">
-        {field.label}
-      </label>
-    </div>
-  {:else if field.type === "select"}
-    {#if field.label}
-      <p class="label">{field.label}</p>
-    {/if}
-    <div class="select mb-2" style="width: 100%;" {id}>
-      <select
+    {:else if field.type === "checkbox"}
+      <div style="display: flex; align-items: center;" class="mb-2">
+        <label class="switch">
+          <input
+            class="switch__input"
+            type="checkbox"
+            bind:checked={data}
+            {id}
+            on:input
+            disabled={field.disabled}
+          />
+          <span class="slider" />
+        </label>
+        <label for={id} class="label ml-2" style="cursor: pointer;">
+          {field.label}
+        </label>
+      </div>
+    {:else if field.type === "select"}
+      {#if field.label}
+        <p class="label">{field.label}</p>
+      {/if}
+      <div
+        class={"select mb-2" + (field.error ? " is-danger" : "")}
         style="width: 100%;"
-        bind:value={data}
-        on:change={_onSelectChange}
+        {id}
       >
-        {#each field.options as option (option.value)}
-          <option
-            value={option.value}
-            selected={option.selected}
-            disabled={option.disabled}
-          >
-            {option.label}
-          </option>
-        {/each}
-      </select>
-    </div>
-  {/if}
+        <select
+          disabled={field.disabled}
+          style="width: 100%;"
+          bind:value={data}
+          on:change={_onSelectChange}
+        >
+          {#each field.options as option (option.value)}
+            <option
+              value={option.value}
+              selected={option.selected}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </option>
+          {/each}
+        </select>
+        {#if field.error}
+          <p class="help is-danger">
+            {field.error}
+          </p>
+        {/if}
+      </div>
+    {/if}
+
+    {#if field.tooltip}
+      <span class="tooltip__text">
+        {field.tooltip}
+      </span>
+    {/if}
+  </div>
 {/if}
