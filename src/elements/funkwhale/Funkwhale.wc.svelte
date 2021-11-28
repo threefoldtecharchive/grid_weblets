@@ -74,7 +74,7 @@
   // regex wanted value.match(/^[0-9a-zA-Z]+$/))
   function validateNameHandler(e: Event) {
     const inp = e.target as HTMLInputElement;
-    nameField.error = inp.value.match(/^[0-9a-zA-Z]+$/)? null : "Invalid Name" ;
+    nameField.error = inp.value.match(/^[0-9a-zA-Z]+$/)? null : "Only alphanumeric names are allowed" ;
   }
 </script>
 
