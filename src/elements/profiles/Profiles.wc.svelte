@@ -17,14 +17,20 @@
 
   let profiles: IProfile[];
   let activeProfile: IProfile;
+  let activeProfileId: string;
+  let opened: boolean = false;
 
   let tabs: ITab[] = [];
   $: {
-    profiles = $configs;
-    activeProfile = profiles[active];
-    tabs = profiles.map((profile, i) => {
-      return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
-    });
+    let s = $configs;
+    if (s) {
+      profiles = s.profiles;
+      activeProfile = profiles[active];
+      activeProfileId = s.activeProfile;
+      tabs = profiles.map((profile, i) => {
+        return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
+      });
+    }
   }
 
   // prettier-ignore
@@ -48,21 +54,44 @@
     }
   }
 
-  let saving: boolean = false;
-  async function onSave() {
-    saving = true;
-    const valids = await Promise.all(profiles.map((p) => validateMnemonics(p)));
-    if (valids.reduce((res, v) => res && v, true)) {
-      fields[2].error = null;
-      onEventHandler("save");
-    } else {
-      fields[2].error = "Invalid Mnemonics";
-    }
-    saving = false;
+  let activating: boolean = false;
+  function onActiveProfile() {
+    activating = true;
+    let invalid = false;
+    validateMnemonics(activeProfile)
+      .then((valid) => {
+        console.log("Valid Mnemonics", valid);
+        invalid = invalid || !valid;
+        fields[2].error = valid ? null : "Invalid Mnemonics";
+        return activeProfile.storeSecret !== "";
+      })
+      .then((valid) => {
+        console.log("Valid storeSecret", valid);
+        invalid = invalid || !valid;
+        fields[3].error = valid ? null : "Invalid storeSecret";
+        return activeProfile.sshKey !== "";
+      })
+      .then((valid) => {
+        console.log("Valid sshKey", valid);
+        invalid = invalid || !valid;
+        fields[4].error = valid ? null : "Invalid SSH Key";
+        return !invalid;
+      })
+      .then((valid) => {
+        if (valid) {
+          configs.setActiveProfile(activeProfile.id);
+        }
+      })
+      .finally(() => {
+        activating = false;
+      });
   }
 </script>
 
-<section style="padding: 15px;">
+<section
+  class="profile-container"
+  style={`transform: translateX(${opened ? "0" : "calc(100% - 50px)"})`}
+>
   <div class="box">
     <div
       style="display: flex; justify-content: space-between; align-items: center;"
@@ -79,9 +108,9 @@
             + Add Profile
           </button>
           <button
-            class={"button is-primary mr-2" + (saving ? " is-loading" : "")}
+            class="button is-primary mr-2"
             type="button"
-            on:click={onSave}
+            on:click={onEventHandler.bind(undefined, "save")}
           >
             Save
           </button>
@@ -113,41 +142,132 @@
         {tabs}
         centered={false}
         on:removed={({ detail }) => configs.deleteProfile(detail)}
+        on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
       />
 
-      {#each fields as field (field.symbol)}
-        <Input bind:data={activeProfile[field.symbol]} {field} />
-      {/each}
-    {:else}
-      <Input bind:data={password} field={secretField} />
-
-      {#if message}
-        <Alert type="danger" {message} />
-      {/if}
-
-      <div style="display: flex; justify-content: center;">
+      <div class="is-flex is-justify-content-flex-end">
         <button
-          class="button is-primary"
-          type="button"
-          disabled={password === ""}
-          on:click={onEventHandler.bind(undefined, "load")}
+          class={"button is-success" + (activating ? " is-loading" : "")}
+          disabled={activating || activeProfileId === activeProfile?.id}
+          on:click={onActiveProfile}
         >
-          Unlock Store
-        </button>
-
-        <button
-          class="button is-primary is-outlined mr-2"
-          type="button"
-          disabled={password === ""}
-          on:click={onEventHandler.bind(undefined, "create")}
-        >
-          Create a New Store
+          Activate
         </button>
       </div>
+
+      {#if activeProfile}
+        {#each fields as field (field.symbol)}
+          <Input
+            bind:data={activeProfile[field.symbol]}
+            field={{
+              ...field,
+              disabled: activeProfileId === activeProfile.id,
+            }}
+          />
+        {/each}
+      {/if}
+    {:else}
+      <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
+        <Input bind:data={password} field={secretField} />
+
+        {#if message}
+          <Alert type="danger" {message} />
+        {/if}
+
+        <div style="display: flex; justify-content: center;">
+          <button
+            class="button is-primary mr-2"
+            type="submit"
+            disabled={password === ""}
+          >
+            Unlock Store
+          </button>
+
+          <button
+            class="button is-primary is-outlined"
+            type="button"
+            disabled={password === ""}
+            on:click={onEventHandler.bind(undefined, "create")}
+          >
+            Create a New Store
+          </button>
+        </div>
+      </form>
     {/if}
   </div>
+  <button
+    class={"profile-toggle" + (opened ? " active" : "")}
+    on:click={() => (opened = !opened)}
+  >
+    <span />
+    <span />
+    <span />
+  </button>
 </section>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+
+  .profile-container {
+    position: fixed;
+    top: 25px;
+    right: 0;
+    width: calc(100% - 150px);
+    padding: 15px;
+    max-height: 90vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: transform 0.35s ease;
+    z-index: 9999;
+    padding-left: 50px;
+  }
+
+  .profile-toggle {
+    z-index: 9;
+    position: absolute;
+    top: 25px;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    border: none;
+    background-color: rgb(250, 250, 250);
+
+    > span {
+      position: absolute;
+      height: 5px;
+      width: 40px;
+      left: 5px;
+      top: 8px;
+      background-color: #555;
+      transition-property: opacity, transform, top;
+      transition-duration: 0.35s;
+      transition-timing-function: ease;
+
+      &:nth-of-type(2) {
+        top: 22px;
+        transform: rotate(0) !important;
+      }
+
+      &:nth-of-type(3) {
+        top: 36px;
+      }
+    }
+
+    &.active {
+      > span {
+        transform: rotate(45deg);
+        top: 22px;
+
+        &:nth-of-type(2) {
+          opacity: 0;
+        }
+
+        &:nth-of-type(3) {
+          top: 22px;
+          transform: rotate(-45deg);
+        }
+      }
+    }
+  }
 </style>

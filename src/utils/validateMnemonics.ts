@@ -17,5 +17,5 @@ export default function validateMnemonics(profile: IProfile) {
     .connect()
     .then(() => grid.disconnect())
     .then(() => true)
-    .catch(() => true); //FIXME later
+    .catch(() => false);
 }

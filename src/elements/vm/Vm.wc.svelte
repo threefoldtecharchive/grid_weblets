@@ -91,7 +91,7 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -153,7 +153,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+          if (detail) {
+            data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
+          }
         }}
       />
       <Tabs bind:active {tabs} />
