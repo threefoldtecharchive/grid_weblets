@@ -73,6 +73,14 @@
         events.removeListener("logs", onLogInfo);
       });
   }
+
+
+  // regex wanted value.match(/^[0-9a-zA-Z]+$/))
+  function validateNameHandler(e: Event) {
+    const inp = e.target as HTMLInputElement;
+    nameField.
+    inp.value
+  }
 </script>
 
 <div style="padding: 15px;">
@@ -95,7 +103,7 @@
       />
       <Tabs bind:active {tabs} />
       {#if active === "config"}
-        <Input bind:data={data.name} field={nameField} use:validate={data}/>
+        <Input bind:data={data.name} field={nameField} on:input={validateNameHandler}/>
 
         {#each baseFields as field (field.symbol)}
           <Input bind:data={data[field.symbol]} {field} />

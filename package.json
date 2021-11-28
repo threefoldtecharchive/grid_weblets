@@ -50,6 +50,7 @@
     "@polkadot/api": "^6.8.1",
     "@polkadot/extension-dapp": "^0.41.1",
     "add": "^2.0.6",
+    "bip39": "^3.0.4",
     "bulma": "^0.9.3",
     "chart.js": "^3.6.0",
     "crypto-js": "^4.1.1",

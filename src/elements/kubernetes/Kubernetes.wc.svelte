@@ -17,6 +17,7 @@
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -60,7 +61,8 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
+  let modalData: Object;
 
   function onDeployKubernetes() {
     loading = true;
@@ -71,9 +73,9 @@
     const onLogInfo = (msg: string) => typeof msg === "string" ? (message = msg) : null; // prettier-ignore
     events.addListener("logs", onLogInfo);
 
-    console.log(data);
     deployKubernetes(data, profile)
-      .then(() => {
+      .then((data) => {
+        modalData = data;
         deploymentStore.set(0);
         success = true;
       })
@@ -112,7 +114,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.sshKey = detail.sshKey;
+          if (detail) {
+            data.sshKey = detail.sshKey;
+          }
         }}
       />
       <Tabs bind:active {tabs} />
@@ -128,7 +132,14 @@
         {#each baseFields as field (field.symbol)}
           <Input bind:data={data.master[field.symbol]} {field} />
         {/each}
-        <SelectNodeId bind:data={data.master.node} {profile} />
+        <SelectNodeId
+          cpu={data.master.cpu}
+          memory={data.master.memory}
+          publicIp={data.master.publicIp}
+          ssd={data.master.diskSize}
+          bind:data={data.master.node}
+          {profile}
+        />
       {:else if active === "workers"}
         <AddBtn
           on:click={() => (data.workers = [...data.workers, new Worker()])}
@@ -144,7 +155,14 @@
               {#each baseFields as field (field.symbol)}
                 <Input bind:data={worker[field.symbol]} {field} />
               {/each}
-              <SelectNodeId bind:data={worker.node} {profile} />
+              <SelectNodeId
+                cpu={worker.cpu}
+                memory={worker.memory}
+                publicIp={worker.publicIp}
+                ssd={worker.diskSize}
+                bind:data={worker.node}
+                {profile}
+              />
             </div>
           {/each}
         </div>
@@ -160,6 +178,9 @@
     />
   </form>
 </div>
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <!-- </Layout> -->
 <style lang="scss" scoped>
