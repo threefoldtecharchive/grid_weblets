@@ -16,7 +16,11 @@
 //   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  
+	import { nameValidator, requiredValidator } from "../../utils/webletNameValidator"
+  import { createFieldValidator } from '../../utils/validation'
+
+  const [ validity, validate ] = createFieldValidator(requiredValidator(), nameValidator());
+
   const data = new VM(undefined, undefined, "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist");
   
   const tabs: ITab[] = [
@@ -30,7 +34,7 @@
   let failed = false;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text" }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
 
   // prettier-ignore
   const baseFields: IFormField[] = [
@@ -91,7 +95,7 @@
       />
       <Tabs bind:active {tabs} />
       {#if active === "config"}
-        <Input bind:data={data.name} field={nameField} />
+        <Input bind:data={data.name} field={nameField} use:validate={data}/>
 
         {#each baseFields as field (field.symbol)}
           <Input bind:data={data[field.symbol]} {field} />
