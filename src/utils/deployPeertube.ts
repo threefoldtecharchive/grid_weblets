@@ -1,7 +1,7 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
-import { checkSuitableName } from "./getValidGateway";
+import { checkSuitableName, getSuitableName } from "./getValidGateway";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -32,12 +32,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   await client.connect();
 
-  try {
-    name = checkSuitableName(name);
-    console.log(name);
-  } catch (err) {
-    console.log(err);
-  }
+  // name = getSuitableName(client, name)
 
   // define a network
   const network = new NetworkModel();
