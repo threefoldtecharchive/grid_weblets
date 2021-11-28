@@ -12,6 +12,8 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import { isValid } from "../../utils/getValidGateway";
+
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let data = new VM();
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text" }; // prettier-ignore
@@ -21,10 +23,20 @@
   let loading = false;
   let success = false;
   let failed = false;
+  let valid = true;
+
   let profile: IProfile;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
   let message: string;
-  function onDeployVM() {
+
+  async function onDeployVM() {
+    // // make a name validation
+    // try {
+    //   data.name = await checkSuitableName(data.name);
+    // } catch (err) {
+    //   valid = false;
+    // }
+    valid = isValid(data.name);
     loading = true;
     success = false;
     failed = false;
@@ -62,6 +74,11 @@
       <Alert type="success" message="Successfully deployed VM." />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
+    {:else if !valid}
+      <Alert
+        type="danger"
+        message={message || "Domain name should be alphanumeric only"}
+      />
     {:else}
       <SelectProfile
         on:profile={({ detail }) => {
@@ -73,7 +90,6 @@
 
       {#if active === "base"}
         <Input bind:data={data.name} field={nameField} />
-
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
