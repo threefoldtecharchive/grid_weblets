@@ -40,8 +40,8 @@
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "text" },
-    { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "text" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
+    { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
   ]
   const secretField: IFormField = { label: "Browser Session Secret", type: "password", placeholder: "Browser Session Secret", symbol: "secret", tooltip: "Browser Session Secret" }; // prettier-ignore
@@ -151,7 +151,7 @@
           disabled={activating || activeProfileId === activeProfile?.id}
           on:click={onActiveProfile}
         >
-          Activate
+          {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
         </button>
       </div>
 
