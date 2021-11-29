@@ -8,10 +8,27 @@ const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id:
 
 function createBaseConfig() {
   const p = createProfile("Profile 1");
-  const store = writable({
+  let _initData = {
     profiles: [p],
     activeProfile: null,
-  });
+    loaded: false,
+  };
+
+  const password = sessionStorage.getItem("session_password");
+  if (password) {
+    try {
+      const hash = hashPassword(password);
+      const data = localStorage.getItem(hash);
+      _initData = {
+        ...JSON.parse(decrypt(data, password).toString(enc.Utf8)),
+        loaded: true,
+      };
+    } catch {}
+  }
+
+  console.log({ data: _initData });
+
+  const store = writable(_initData);
 
   function hashPassword(password: string) {
     return md5(password).toString();
@@ -23,6 +40,7 @@ function createBaseConfig() {
   }
 
   const { subscribe, set, update } = store;
+
   return {
     subscribe,
     set,
@@ -81,6 +99,7 @@ function createBaseConfig() {
       }
 
       localStorage.setItem(hash, getEncryptedStore(password));
+      sessionStorage.setItem("session_password", password);
     },
 
     load(password: string) {
@@ -93,6 +112,7 @@ function createBaseConfig() {
 
       try {
         set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
+        sessionStorage.setItem("session_password", password);
       } catch {
         return "Incorrect data.";
       }

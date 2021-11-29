@@ -21,9 +21,14 @@
   let opened: boolean = false;
 
   let tabs: ITab[] = [];
+  let _init: boolean = false;
   $: {
     let s = $configs;
     if (s) {
+      if (!_init && s.loaded) {
+        _init = true;
+        configured = true;
+      }
       profiles = s.profiles;
       activeProfile = profiles[active];
       activeProfileId = s.activeProfile;
@@ -117,7 +122,10 @@
           <button
             class="button is-danger"
             type="button"
-            on:click={() => (configured = false)}
+            on:click={() => {
+              configured = false;
+              sessionStorage.removeItem("session_password");
+            }}
           >
             Back
           </button>
