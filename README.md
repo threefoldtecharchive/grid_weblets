@@ -99,3 +99,22 @@ yarn build
 - serve content in docs dir for path `/grid_weblets` so `play.grid.tf/grid_weblets`
 
 
+## Test a weblet
+
+### Create
+
+- Add new folder for your weblet as `src/elements/demo`
+- Import `Demo.wc` svelte into `App.svelte`
+- Add your weblet on elements list in `easy-docs/src/App.vue`
+- Append a weblet in `easy-docs/src/views/Editor.vue` by appending the weblets list
+
+### Build
+
+- Make sure to install dependencies in both `/` and `/easy-docs` by running `yarn`
+- `yarn serve:app`
+
+### Use
+
+- In profile Tab, Create or Load your profile
+- Begin to Deploy your weblet
+- List the info to access weblet

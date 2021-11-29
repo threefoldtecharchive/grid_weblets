@@ -8,6 +8,7 @@ import {
 } from "./getValidGateway";
 import { gatewayNodes, getNodeDomain } from "./gatewayNode";
 
+
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
   GridClient,
@@ -46,6 +47,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const gwNodeId = 8;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
+
 
   // define a network
   const network = new NetworkModel();

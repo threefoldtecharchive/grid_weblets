@@ -14,6 +14,8 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import validateNode from "../../utils/validateNode";
 
   const data = new Caprover();
   let loading = false;
@@ -42,22 +44,33 @@
   ];
 
   let message: string;
-  function deployCaproverHandler() {
-    loading = true;
-    success = false;
-    failed = false;
-    message = undefined;
+  let modalData: Object;
+  let nodeIdError: string;
+  async function deployCaproverHandler() {
+    const { cpu, memory, nodeId, diskSize } = data;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
         message = msg;
       }
     }
+    const error =  await validateNode(profile, cpu, memory, diskSize, true, nodeId); // prettier-ignore
+    console.log({ error });
+    if (error) {
+      nodeIdError = error;
+      return;
+    }
+    nodeIdError = null;
+    loading = true;
+    success = false;
+    failed = false;
+    message = undefined;
 
     events.addListener("logs", onLogInfo);
 
     deployCaprover(data, profile)
-      .then(() => {
+      .then((data) => {
+        modalData = data;
         deploymentStore.set(0);
         success = true;
       })
@@ -89,7 +102,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.publicKey = detail.sshKey;
+          if (detail) {
+            data.publicKey = detail.sshKey;
+          }
         }}
       />
       <Tabs bind:active {tabs} />
@@ -98,7 +113,15 @@
         {#each fields as field (field.symbol)}
           <Input bind:data={data[field.symbol]} {field} />
         {/each}
-        <SelectNodeId bind:data={data.nodeId} {profile} />
+        <SelectNodeId
+          error={nodeIdError}
+          cpu={data.cpu}
+          memory={data.memory}
+          publicIp={true}
+          ssd={data.diskSize}
+          bind:data={data.nodeId}
+          {profile}
+        />
       {/if}
     {/if}
 
@@ -118,6 +141,9 @@
     />
   </form>
 </div>
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

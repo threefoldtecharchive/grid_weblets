@@ -1,43 +1,48 @@
-<svelte:options tag="tf-peertube" />
+<svelte:options tag="tf-funkwhale" />
 
 <script lang="ts">
-  // Types
+  import VM, { Disk, Env } from "../../types/vm";
   import type { IFormField, ITab } from "../../types";
+  const { events } = window.configs?.grid3_client ?? {};
+  import deployFunkwhale from "../../utils/deployFunkwhake";
   import type { IProfile } from "../../types/Profile";
 
-  // Modules
-  import VM, { Env } from "../../types/vm";
-  import deployPeertube from "../../utils/deployPeertube";
-
-  // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
+    // Components
+    import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
+//   import DeleteBtn from "../../components/DeleteBtn.svelte";
+//   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  import { isValidName } from "../../utils/getValidGateway";
 
-  // Values
-  const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text" }; // prettier-ignore
-  const { events } = window.configs?.grid3_client ?? {};
+  const data = new VM(undefined, undefined, "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist");
+  
+  const tabs: ITab[] = [
+    { label: "Config", value: "config" },
+  ];
   const deploymentStore = window.configs?.deploymentStore;
-
-  let data = new VM();
-  let active: string = "base";
+  let profile: IProfile;
+  let active: string = "config";
   let loading = false;
   let success = false;
   let failed = false;
-  let valid = true;
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[0-9a-zA-Z]+$/) || !data.name.match(/^\d/); // prettier-ignore
 
-  let profile: IProfile;
+  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
+
+  // prettier-ignore
+  const baseFields: IFormField[] = [
+    { label: "CPU", symbol: 'cpu', placeholder: 'Your Cpu size.', type: 'number'},
+    { label: "Memory", symbol: 'memory', placeholder: 'Your Memory size.', type: 'number'},
+    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
+    { label: "Planetary", symbol: "planetary", placeholder: "", type: 'checkbox' },  
+  ];
+
   let message: string;
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
-
-  // doDeploy
   function onDeployVM() {
+
     loading = true;
     success = false;
     failed = false;
@@ -48,20 +53,14 @@
         message = msg;
       }
     }
-
     events.addListener("logs", onLogInfo);
 
-    deployPeertube(data, profile)
+    deployFunkwhale(data, profile)
       .then(() => {
-        deploymentStore.set(0);
-        if (isValidName(data.name)) {
-          success = true;
-        } else {
-          failed = true;
-          message = "Name should be alphanumiric only";
-        }
+        deploymentStore.set(0);  
+        success = true;
       })
-      .catch((err: Error) => {
+      .catch((err) => {
         failed = true;
         message = typeof err === "string" ? err : err.message;
       })
@@ -70,26 +69,26 @@
         events.removeListener("logs", onLogInfo);
       });
   }
+
+
+  // regex wanted value.match(/^[0-9a-zA-Z]+$/))
+  function validateNameHandler(e: Event) {
+    const inp = e.target as HTMLInputElement;
+    nameField.error = inp.value.match(/^[0-9a-zA-Z]+$/) || inp.value.match(/^\d/)? null : "Only alphanumeric names are allowed" ;
+  }
 </script>
 
 <div style="padding: 15px;">
-  <!-- Container -->
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Peertube Instance</h4>
+    <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
     <hr />
-
-    <!-- Status -->
+    
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
     {:else if success}
       <Alert type="success" message="Successfully deployed VM." />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
-    {:else if !valid}
-      <Alert
-        type="danger"
-        message={message || "Domain name should be alphanumeric only"}
-      />
     {:else}
       <SelectProfile
         on:profile={({ detail }) => {
@@ -97,12 +96,13 @@
           data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
         }}
       />
-
-      <!-- Tab Container -->
       <Tabs bind:active {tabs} />
+      {#if active === "config"}
+        <Input bind:data={data.name} field={nameField} on:input={validateNameHandler}/>
 
-      {#if active === "base"}
-        <Input bind:data={data.name} field={nameField} />
+        {#each baseFields as field (field.symbol)}
+          <Input bind:data={data[field.symbol]} {field} />
+        {/each}
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
@@ -113,9 +113,9 @@
           bind:data={data.nodeId}
           {profile}
         />
+        
       {/if}
     {/if}
-
     <DeployBtn
       {disabled}
       {loading}
@@ -134,6 +134,7 @@
 </div>
 
 <style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  // @import "../../assets/global.scss";
+    @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+    @import "../../assets/global.scss";
 </style>
+  
