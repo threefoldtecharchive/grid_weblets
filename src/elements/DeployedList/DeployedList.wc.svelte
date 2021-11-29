@@ -110,7 +110,9 @@
         Please activate a profile from profile manager
       </p>
     {:else}
-      <Tabs bind:active {tabs} />
+      {#if tab === "k8s" || tab === "vm" || tab === "caprover"}
+        <Tabs bind:active {tabs} />
+      {/if}
 
       {#if (!tab && active === "k8s") || tab === "k8s"}
         {#await list.loadK8s()}

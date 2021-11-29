@@ -17,7 +17,7 @@ export default async function deployCaprover(
   const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
-  const network = createNetwork(new Network(`caprover_network_${name}`, "10.200.0.0/16")); // prettier-ignore
+  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
 
   /* Docker disk */
   const disk = new DiskModel();
@@ -31,7 +31,7 @@ export default async function deployCaprover(
   machine.disks = [disk];
   machine.node_id = nodeId;
   machine.public_ip = true;
-  machine.name = `caprover_leader_${name}`;
+  machine.name = `CRL${name}`;
   machine.planetary = false;
   machine.flist = CAPROVER_FLIST;
   machine.qsfs_disks = [];
