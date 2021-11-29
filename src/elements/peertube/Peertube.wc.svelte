@@ -16,6 +16,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import { isValidName } from "../../utils/getValidGateway";
 
   // Values
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -51,7 +52,12 @@
     deployPeertube(data, profile)
       .then(() => {
         deploymentStore.set(0);
-        success = true;
+        if (isValidName(data.name)) {
+          success = true;
+        } else {
+          failed = true;
+          message = "Name should be alphanumiric only";
+        }
       })
       .catch((err: Error) => {
         failed = true;
