@@ -92,9 +92,7 @@
     <hr />
 
     {#if loading}
-      <div class="notification is-info">
-        <Alert type="info" message={message || "Loading..."} />
-      </div>
+      <Alert type="info" message={message || "Loading..."} />
     {:else if success}
       <Alert type="success" message="Successfully deployed Caprover." />
     {:else if failed}

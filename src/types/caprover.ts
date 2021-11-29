@@ -6,7 +6,7 @@ export default class Caprover {
     public id = v4(),
 
     /* Base info */
-    public name = "cr_" + id.split("-")[0],
+    public name = "CR" + id.split("-")[0],
     public cpu = 4,
     public memory = 1024 * 8,
     public nodeId = 3,
