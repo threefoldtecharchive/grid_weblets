@@ -57,5 +57,9 @@ export default async function deployCaprover(
     undefined,
     "tfkvstore" as any
   );
-  return grid.connect().then(() => grid.machines.deploy(machines));
+  return grid
+    .connect()
+    .then(() => grid.machines.deploy(machines))
+    .then(() => grid.machines.getObj(name))
+    .then(([vm]) => vm);
 }
