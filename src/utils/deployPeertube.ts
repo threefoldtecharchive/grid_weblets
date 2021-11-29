@@ -6,7 +6,7 @@ import {
   checkSuitableName,
   getSuitableGateway,
 } from "./getValidGateway";
-// import { gatewayNodes, getNodeDomain } from "./gatewayNode";
+import { gatewayNodes, getNodeDomain } from "./gatewayNode";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -38,49 +38,53 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   await client.connect();
 
-  // nodes
-  // const nodes = new Nodes(
-  //   GridClient.config.graphqlURL,
-  //   GridClient.config.rmbClient["proxyURL"]
-  // );
-  // // list all gateway nodes
-  // await gatewayNodes(nodes);
-  // // get node domain
-  // console.log(await getNodeDomain(nodes, "7"));
-
   // Make sure the name is valid
   name = await getSuitableGateway(client, name);
+  console.log(name);
+
+  // Gateway node Id and domain
+  const gwNodeId = 8;
+  const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
+  const gwDomain = await getNodeDomain(nodes, gwNodeId);
 
   // define a network
   const network = new NetworkModel();
-  network.name = name + "_network";
+  network.name = name + "NW";
   network.ip_range = "10.1.0.0/16";
 
-  // deploy redis
+  // // deploy redis
   await deployRedis(client, network, nodeId, name);
 
-  // get the info
-  const redisInfo = await getRedisInfo(client, name + "_redis_vms");
+  // // get the info
+  const redisInfo = await getRedisInfo(client, name + "RVMs");
   const redisIP = redisInfo[0]["interfaces"][0]["ip"];
 
-  // deploy postgres
+  // // deploy postgres
   await deployPostgres(client, network, nodeId, name);
 
-  // get the info
-  const postgresInfo = await getPostgresInfo(client, name + "_postgres_vms");
+  // // get the info
+  const postgresInfo = await getPostgresInfo(client, name + "PGVMs");
   const postgresIP = postgresInfo[0]["interfaces"][0]["ip"];
 
-  // deploy the peertube
-  await deployPeertubeVM(client, network, redisIP, postgresIP, nodeId, name);
+  // // deploy the peertube
+  await deployPeertubeVM(
+    client,
+    network,
+    redisIP,
+    postgresIP,
+    nodeId,
+    name,
+    gwDomain
+  );
 
-  // get the info
-  const peertubeInfo = await getPeertubeInfo(client, name + "_peertube_vms");
+  // // get the info
+  const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
   const peertubeYggIp = peertubeInfo[0]["yggIP"];
 
   // deploy the gateway
-  await deployPrefixGateway(client, name, peertubeYggIp);
+  await deployPrefixGateway(client, name, peertubeYggIp, gwNodeId);
 
-  // return the info
+  // // return the info
   const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
 
@@ -90,13 +94,13 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 async function deployRedis(client: any, net: any, nodeId: any, name: string) {
   // disk
   const disk1 = new DiskModel();
-  disk1.name = name + "_redis_data";
+  disk1.name = name + "Disk";
   disk1.size = 10;
   disk1.mountpoint = "/data";
 
   // vm specs
   const vm1 = new MachineModel();
-  vm1.name = name + "_redis_vm";
+  vm1.name = name + "RVM";
   vm1.node_id = nodeId;
   vm1.disks = [disk1];
   vm1.public_ip = false;
@@ -112,7 +116,7 @@ async function deployRedis(client: any, net: any, nodeId: any, name: string) {
 
   // vms specs
   const vms = new MachinesModel();
-  vms.name = name + "_redis_vms";
+  vms.name = name + "RVMs";
   vms.network = net;
   vms.machines = [vm1];
 
@@ -128,13 +132,13 @@ async function deployPostgres(
 ) {
   // disk
   const disk2 = new DiskModel();
-  disk2.name = name + "_postgres_data";
+  disk2.name = name + "Disk";
   disk2.size = 10;
   disk2.mountpoint = "/var/lib/postgresql/data";
 
   // vm specs
   const vm2 = new MachineModel();
-  vm2.name = name + "_postgres_vm";
+  vm2.name = name + "PGVM";
   vm2.node_id = nodeId;
   vm2.disks = [disk2];
   vm2.public_ip = false;
@@ -152,7 +156,7 @@ async function deployPostgres(
 
   // vms specs
   const vms = new MachinesModel();
-  vms.name = name + "_postgres_vms";
+  vms.name = name + "PGVMs";
   vms.network = net;
   vms.machines = [vm2];
 
@@ -166,17 +170,18 @@ async function deployPeertubeVM(
   redisIp: string,
   postgresIp: string,
   nodeId: any,
-  name: string
+  name: string,
+  gwDomain: string
 ) {
   // disk
   const disk3 = new DiskModel();
-  disk3.name = name + "_peertube_data";
+  disk3.name = name + "Disk";
   disk3.size = 10;
   disk3.mountpoint = "/data";
 
   // vm specs
   const vm = new MachineModel();
-  vm.name = name + "_peertube_vm";
+  vm.name = name + "PTVM";
   vm.node_id = nodeId;
   vm.disks = [disk3];
   vm.public_ip = false;
@@ -189,7 +194,7 @@ async function deployPeertubeVM(
   vm.entrypoint = "/start.sh";
   vm.env = {
     PEERTUBE_BIND_ADDRESS: "::",
-    PEERTUBE_WEBSERVER_HOSTNAME: name + ".gent02.dev.grid.tf",
+    PEERTUBE_WEBSERVER_HOSTNAME: name + gwDomain,
     PEERTUBE_DB_HOSTNAME: postgresIp,
     PEERTUBE_DB_USERNAME: "postgres",
     PEERTUBE_DB_PASSWORD: "omar123456",
@@ -199,7 +204,7 @@ async function deployPeertubeVM(
 
   // vms specs
   const vms = new MachinesModel();
-  vms.name = name + "_peertube_vms";
+  vms.name = name + "PTVMs";
   vms.network = net;
   vms.machines = [vm];
 
@@ -207,11 +212,16 @@ async function deployPeertubeVM(
   return client.machines.deploy(vms);
 }
 
-async function deployPrefixGateway(client: any, name: string, backend: string) {
+async function deployPrefixGateway(
+  client: any,
+  name: string,
+  backend: string,
+  gwNodeId: number
+) {
   // define specs
   const gw = new GatewayNameModel();
   gw.name = name;
-  gw.node_id = 8;
+  gw.node_id = gwNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:3000/`];
 
