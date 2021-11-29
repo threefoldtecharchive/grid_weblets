@@ -8,7 +8,6 @@ import {
 } from "./getValidGateway";
 import { gatewayNodes, getNodeDomain } from "./gatewayNode";
 
-
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
   GridClient,
@@ -47,7 +46,6 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const gwNodeId = 8;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
-
 
   // define a network
   const network = new NetworkModel();
@@ -196,7 +194,7 @@ async function deployPeertubeVM(
   vm.entrypoint = "/start.sh";
   vm.env = {
     PEERTUBE_BIND_ADDRESS: "::",
-    PEERTUBE_WEBSERVER_HOSTNAME: name + gwDomain,
+    PEERTUBE_WEBSERVER_HOSTNAME: name + "." + gwDomain,
     PEERTUBE_DB_HOSTNAME: postgresIp,
     PEERTUBE_DB_USERNAME: "postgres",
     PEERTUBE_DB_PASSWORD: "omar123456",
