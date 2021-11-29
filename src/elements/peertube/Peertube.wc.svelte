@@ -16,7 +16,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  import { isValidName } from "../../utils/getValidGateway";
+  import Modal from "../../components/DeploymentModal.svelte";
 
   // Values
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -33,8 +33,10 @@
 
   let profile: IProfile;
   let message: string;
+  let modalData: Object;
+  let nodeIdError: string;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || profile.mnemonics === "" || profile.storeSecret === ""; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) ; // prettier-ignore
 
   // doDeploy
   function onDeployVM() {
@@ -54,12 +56,7 @@
     deployPeertube(data, profile)
       .then(() => {
         deploymentStore.set(0);
-        if (isValidName(data.name)) {
-          success = true;
-        } else {
-          failed = true;
-          message = "Name should be alphanumiric only";
-        }
+        success = true;
       })
       .catch((err: Error) => {
         failed = true;
@@ -69,6 +66,13 @@
         loading = false;
         events.removeListener("logs", onLogInfo);
       });
+  }
+
+  function validateNameHandler(e: Event) {
+    const inp = e.target as HTMLInputElement;
+    nameField.error = inp.value.match(/^[a-z][a-z0-9]*$/i)
+      ? null
+      : "Only alphanumeric names are allowed";
   }
 </script>
 
@@ -85,16 +89,13 @@
       <Alert type="success" message="Successfully deployed VM." />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
-    {:else if !valid}
-      <Alert
-        type="danger"
-        message={message || "Domain name should be alphanumeric only"}
-      />
     {:else}
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+          if (detail) {
+            data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+          }
         }}
       />
 
@@ -102,7 +103,11 @@
       <Tabs bind:active {tabs} />
 
       {#if active === "base"}
-        <Input bind:data={data.name} field={nameField} />
+        <Input
+          bind:data={data.name}
+          field={nameField}
+          on:input={validateNameHandler}
+        />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
@@ -132,6 +137,9 @@
     />
   </form>
 </div>
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
