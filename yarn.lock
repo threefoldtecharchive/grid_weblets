@@ -2947,10 +2947,10 @@ graphql@^16.0.1:
   resolved "https://registry.npmjs.org/graphql/-/graphql-16.0.1.tgz"
   integrity sha512-oPvCuu6dlLdiz8gZupJ47o1clgb72r1u8NDBcQYjcV6G/iEdmE11B1bBlkhXRvV0LisP/SXRFP7tT6AgaTjpzg==
 
-grid3_client@0.0.28:
-  version "0.0.28"
-  resolved "https://registry.npmjs.org/grid3_client/-/grid3_client-0.0.28.tgz"
-  integrity sha512-6F6WT+9Mb89mGvnrPClsG3guUuoTyOtNq/UnIo3OB23fgR/dHMMoJXLTzncFDd4OksjQiLlJpyWaINLoTCMQGQ==
+grid3_client@0.0.29:
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.29.tgz#1c3ea2452145dca6187aff921c6d2a1f82b9a68a"
+  integrity sha512-1sQgb0l3xMfce0LvGgqQI6y4U8krvZGwXF7PVSxRrCJz7LiwoX0gBtAGBnydXKlbDHMazKlTk2TBM7yxgxrN0w==
   dependencies:
     appdata-path "^1.0.0"
     axios "^0.22.0"

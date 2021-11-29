@@ -14,7 +14,7 @@
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "front-matter": "^4.0.2",
-    "grid3_client": "0.0.28",
+    "grid3_client": "0.0.29",
     "marked": "^4.0.0",
     "ts-rmb-http-client": "^0.1.9",
     "vue": "^2.6.11",
