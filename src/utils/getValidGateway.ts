@@ -1,29 +1,27 @@
 import type { GridClient } from "grid3_client";
 
-export const isValid = (name: string) => {
-  const regex = new RegExp(/[^a-z\d]/i);
-  const regex2 = new RegExp(/^\d/);
-  return regex.test(name) ? false : regex2.test(name) ? false : true;
-};
+
+export function isValidName(name: string) {
+  const filter1 = new RegExp(/[^a-z\d]/i);
+  const filter2 = new RegExp(/^\d/);
+  return !(filter1.test(name) || filter2.test(name));
+}
 
 export async function checkSuitableName(name: string) {
-  const regex = new RegExp(/[^a-z\d]/i);
-  const regex2 = new RegExp(/^\d/);
-  const isValid = (name: string) => {
-    return regex.test(name) ? false : regex2.test(name) ? false : true;
-  };
-  if (isValid(name)) {
+  if (isValidName(name)) {
+
     return name;
   } else {
-    throw Error(`Domain name should be alphanumeric only`);
+    throw Error(`Name should be alphanumeric only`);
   }
 }
 
-export async function getSuitableName(client: GridClient, name: string) {
-  try {
-    name = await checkSuitableName(name);
-    console.log(name);
-  } catch (err) {
-    console.error(err);
-  }
+
+export async function getSuitableGateway(client: GridClient, name: string) {
+  const info = await client.gateway.getObj(name);
+  return info.length == 0 ? name : name + getRandomInt();
+}
+
+function getRandomInt(): number {
+  return Math.floor(Math.random() * 1000);
 }
