@@ -28,7 +28,7 @@
   let loading = false;
   let success = false;
   let failed = false;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[0-9a-zA-Z]+$/); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[0-9a-zA-Z]+$/) || !data.name.match(/^\d/); // prettier-ignore
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
 
@@ -74,7 +74,7 @@
   // regex wanted value.match(/^[0-9a-zA-Z]+$/))
   function validateNameHandler(e: Event) {
     const inp = e.target as HTMLInputElement;
-    nameField.error = inp.value.match(/^[0-9a-zA-Z]+$/)? null : "Only alphanumeric names are allowed" ;
+    nameField.error = inp.value.match(/^[0-9a-zA-Z]+$/) || inp.value.match(/^\d/)? null : "Only alphanumeric names are allowed" ;
   }
 </script>
 
