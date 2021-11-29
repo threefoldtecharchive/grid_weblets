@@ -29,10 +29,10 @@ export default class FarmingProfile {
   }
 
   public get su(): number {
-    const { hdd, ssd } = this;
+    const { hdd, ssd, cu } = this;
 
     const x = hdd / 1200;
-    const y = (ssd / 300) * 0.8;
+    const y = ((ssd - cu * 20) / 300) * 0.8;
     return x + y;
   }
 
@@ -95,19 +95,6 @@ export default class FarmingProfile {
 
   /* help functions for charts */
   public getTotalReward(current_price: number): number {
-    // const certifiedValue = this.certified ? 1.25 : 1;
-
-    // const rewardPerCu = (this.rewardPerCu / this.price) * certifiedValue;
-    // const rewardPerSu = (this.rewardPerSu / this.price) * certifiedValue;
-    // const rewardPerNu = this.rewardPerNu / this.price;
-
-    // const cu = rewardPerCu * this.cu;
-    // const su = rewardPerSu * this.su;
-    // const nu = this.publicIp ? rewardPerNu * this.nu : 0;
-
-    // const total = (cu + su + nu) * current_price;
-    // const powerCost = this.powerUtilization * this.powerCost;
-    // return total - powerCost;
     const tft = this.totalFarmingRewardInTft * 60;
     const grossProfit = tft * current_price;
     return grossProfit - this.totalCosts;
