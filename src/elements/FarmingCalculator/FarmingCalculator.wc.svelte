@@ -200,16 +200,16 @@
               {/each}
             </select>
           </div>
+        </div>
 
-          <div class="mt-4">
-            <button
-              disabled={activeProfile === null}
-              class="button is-primary"
-              on:click={onProfileChoosing}
-            >
-              Select Configuration
-            </button>
-          </div>
+        <div class="mt-4">
+          <button
+            disabled={activeProfile === null}
+            class="button is-primary"
+            on:click={onProfileChoosing}
+          >
+            Select Configuration
+          </button>
         </div>
       </div>
     {/if}
@@ -444,7 +444,8 @@
 
   .profile-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 
   .farming-content {
