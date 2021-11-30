@@ -5,7 +5,10 @@ export async function gatewayNodes(nodes: Nodes) {
   return gwNodes;
 }
 
-export async function getNodeDomain(nodes: Nodes, nodeId: number) {
+export async function getNodeDomain(
+  nodes: Nodes,
+  nodeId: number
+): Promise<string> {
   const gwNodes = await gatewayNodes(nodes);
   const node = gwNodes[nodeId];
   const domain = node["domain"];
