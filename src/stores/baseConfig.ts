@@ -126,6 +126,9 @@ function createBaseConfig() {
       }
 
       localStorage.setItem(hash, getEncryptedStore(password || session_password)); // prettier-ignore
+      requestAnimationFrame(() => {
+        alert("Saved!");
+      });
     },
 
     setActiveProfile(id: string) {

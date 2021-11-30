@@ -79,21 +79,23 @@
     let invalid = false;
     validateMnemonics(activeProfile)
       .then((valid) => {
-        console.log("Valid Mnemonics", valid);
         invalid = invalid || !valid;
         fields[2].error = valid ? null : "Invalid Mnemonics";
         return activeProfile.storeSecret !== "";
       })
       .then((valid) => {
-        console.log("Valid storeSecret", valid);
         invalid = invalid || !valid;
         fields[3].error = valid ? null : "Invalid storeSecret";
         return activeProfile.sshKey !== "";
       })
       .then((valid) => {
-        console.log("Valid sshKey", valid);
         invalid = invalid || !valid;
         fields[4].error = valid ? null : "Invalid SSH Key";
+        return activeProfile.name !== "";
+      })
+      .then((valid) => {
+        invalid = invalid || !valid;
+        fields[0].error = valid ? null : "Please provide a profile name";
         return !invalid;
       })
       .then((valid) => {
@@ -135,117 +137,119 @@
   {/if}
 </div>
 
-<section
-  class={"profile-container" + (opened ? " is-active" : "")}
-  on:click|stopPropagation
->
-  <div class="box">
-    <div
-      style="display: flex; justify-content: space-between; align-items: center;"
-    >
-      <h4 class="is-size-4">Profile Manager</h4>
-
-      {#if configured}
-        <div>
-          <button
-            class="button is-primary is-outlined mr-2"
-            type="button"
-            on:click={configs.addProfile}
-          >
-            + Add Profile
-          </button>
-          <button
-            class="button is-primary mr-2"
-            type="button"
-            on:click={onEventHandler.bind(undefined, "save")}
-          >
-            Save
-          </button>
-          <button
-            class="button is-danger"
-            type="button"
-            on:click={() => {
-              configured = false;
-              sessionStorage.removeItem("session_password");
-            }}
-          >
-            Back
-          </button>
-        </div>
-      {/if}
-    </div>
-
-    <p class="mt-4">
-      Please visit <a
-        href="https://library.threefold.me/info/threefold"
-        target="_blank"
+<div class={"profile-overlay" + (opened ? " is-active" : "")}>
+  <section
+    class={"profile-container" + (opened ? " is-active" : "")}
+    on:click|stopPropagation
+  >
+    <div class="box">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center;"
       >
-        the manual
-      </a>
-      to <strong>get started.</strong>
-    </p>
-    <hr />
+        <h4 class="is-size-4">Profile Manager</h4>
 
-    {#if configured}
-      <Tabs
-        bind:active
-        {tabs}
-        centered={false}
-        on:removed={({ detail }) => configs.deleteProfile(detail)}
-        on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
-      />
-
-      <div class="is-flex is-justify-content-flex-end">
-        <button
-          class={"button is-success" + (activating ? " is-loading" : "")}
-          disabled={activating || activeProfileId === activeProfile?.id}
-          on:click={onActiveProfile}
-        >
-          {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
-        </button>
+        {#if configured}
+          <div>
+            <button
+              class="button is-primary is-outlined mr-2"
+              type="button"
+              on:click={configs.addProfile}
+            >
+              + Add Profile
+            </button>
+            <button
+              class="button is-primary mr-2"
+              type="button"
+              on:click={onEventHandler.bind(undefined, "save")}
+            >
+              Save
+            </button>
+            <button
+              class="button is-danger"
+              type="button"
+              on:click={() => {
+                configured = false;
+                sessionStorage.removeItem("session_password");
+              }}
+            >
+              Back
+            </button>
+          </div>
+        {/if}
       </div>
 
-      {#if activeProfile}
-        {#each fields as field (field.symbol)}
-          <Input
-            bind:data={activeProfile[field.symbol]}
-            field={{
-              ...field,
-              disabled: activeProfileId === activeProfile.id,
-            }}
-          />
-        {/each}
-      {/if}
-    {:else}
-      <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
-        <Input bind:data={password} field={secretField} />
+      <p class="mt-4">
+        Please visit <a
+          href="https://library.threefold.me/info/threefold"
+          target="_blank"
+        >
+          the manual
+        </a>
+        to <strong>get started.</strong>
+      </p>
+      <hr />
 
-        {#if message}
-          <Alert type="danger" {message} />
-        {/if}
+      {#if configured}
+        <Tabs
+          bind:active
+          {tabs}
+          centered={false}
+          on:removed={({ detail }) => configs.deleteProfile(detail)}
+          on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
+        />
 
-        <div style="display: flex; justify-content: center;">
+        <div class="is-flex is-justify-content-flex-end">
           <button
-            class="button is-primary mr-2"
-            type="submit"
-            disabled={password === ""}
+            class={"button is-success" + (activating ? " is-loading" : "")}
+            disabled={activating || activeProfileId === activeProfile?.id}
+            on:click={onActiveProfile}
           >
-            Unlock Store
-          </button>
-
-          <button
-            class="button is-primary is-outlined"
-            type="button"
-            disabled={password === ""}
-            on:click={onEventHandler.bind(undefined, "create")}
-          >
-            Create a New Store
+            {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
           </button>
         </div>
-      </form>
-    {/if}
-  </div>
-</section>
+
+        {#if activeProfile}
+          {#each fields as field (field.symbol)}
+            <Input
+              bind:data={activeProfile[field.symbol]}
+              field={{
+                ...field,
+                disabled: activeProfileId === activeProfile.id,
+              }}
+            />
+          {/each}
+        {/if}
+      {:else}
+        <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
+          <Input bind:data={password} field={secretField} />
+
+          {#if message}
+            <Alert type="danger" {message} />
+          {/if}
+
+          <div style="display: flex; justify-content: center;">
+            <button
+              class="button is-primary mr-2"
+              type="submit"
+              disabled={password === ""}
+            >
+              Unlock Store
+            </button>
+
+            <button
+              class="button is-primary is-outlined"
+              type="button"
+              disabled={password === ""}
+              on:click={onEventHandler.bind(undefined, "create")}
+            >
+              Create a New Store
+            </button>
+          </div>
+        </form>
+      {/if}
+    </div>
+  </section>
+</div>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
@@ -268,7 +272,6 @@
       width: 60px;
       border-radius: 50%;
       border: none;
-      z-index: 999;
       cursor: inherit;
 
       font-weight: bold;
@@ -289,12 +292,35 @@
     }
   }
 
+  .profile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(black, 0.8);
+    z-index: 998;
+
+    transition-timing-function: ease;
+    transition-property: opacity, visibility;
+    transition-duration: 0.35s;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    &.is-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+    }
+  }
+
   .profile-container {
     position: fixed;
     top: 100px;
     right: 15px;
-    width: calc(100% - 330px);
-    z-index: 999;
+    width: calc(100% - 275px);
     padding: 15px;
 
     /* scroll */
@@ -302,16 +328,18 @@
     overflow-y: auto;
 
     transition-duration: 0.35s;
-    transition-property: transform, opacity;
+    transition-property: transform, opacity, visibility;
     transition-timing-function: ease;
     transform: translateY(50px);
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
   }
 
   .is-active {
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
     pointer-events: all;
   }
 </style>
