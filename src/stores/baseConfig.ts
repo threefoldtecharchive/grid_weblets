@@ -125,9 +125,7 @@ function createBaseConfig() {
         return "Password wasn't found.";
       }
 
-      console.log({ password: password || session_password, hash });
-
-      localStorage.setItem(hash, getEncryptedStore(password));
+      localStorage.setItem(hash, getEncryptedStore(password || session_password)); // prettier-ignore
     },
 
     setActiveProfile(id: string) {

@@ -17,6 +17,7 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -98,6 +99,7 @@
 
   let nodeIdError: string;
   async function onDeployVM() {
+    loading = true;
     const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
     const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
@@ -107,6 +109,14 @@
       }
     }
 
+    if (!hasEnoughBalance(profile)) {
+      failed = true;
+      loading = false;
+      message =
+        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      return;
+    }
+
     const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
     console.log({ error });
     if (error) {
@@ -114,7 +124,6 @@
       return;
     }
 
-    loading = true;
     nodeIdError = null;
     success = false;
     failed = false;
