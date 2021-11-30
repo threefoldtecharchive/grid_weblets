@@ -1,5 +1,7 @@
 <script lang="ts">
-  import FarmingCalculator from "./elements/FarmingCalculator/FarmingCalculator.wc.svelte";
+  import Base from "./elements/base/Base.wc.svelte";
+  import ProfileManager from "./elements/profiles/Profiles.wc.svelte";
 </script>
 
-<FarmingCalculator />
+<Base />
+<ProfileManager />

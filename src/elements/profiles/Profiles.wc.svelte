@@ -4,11 +4,13 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
+  import getBalance from "../../utils/getBalance";
 
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
+  import { onDestroy, onMount } from "svelte";
 
   const configs = window.configs?.baseConfig;
   let active = "0";
@@ -19,6 +21,9 @@
   let activeProfile: IProfile;
   let activeProfileId: string;
   let opened: boolean = false;
+  let currentProfile: IProfile;
+  let balance: number = null;
+  let loadingBalance: boolean = false;
 
   let tabs: ITab[] = [];
   let _init: boolean = false;
@@ -28,10 +33,21 @@
       if (!_init && s.loaded) {
         _init = true;
         configured = true;
+        loadingBalance = true;
+        // getBalance(configs.getActiveProfile())
+        //   .then((balance) => {
+        //     configs.setBalance(balance);
+        //   })
+        //   .catch((err) => {
+        //     console.log("Error", err);
+        //   })
+        //   .finally(() => (loadingBalance = false));
       }
       profiles = s.profiles;
+      balance = s.balance;
       activeProfile = profiles[active];
       activeProfileId = s.activeProfile;
+      currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
         return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
@@ -85,17 +101,45 @@
       .then((valid) => {
         if (valid) {
           configs.setActiveProfile(activeProfile.id);
+          loadingBalance = true;
+          return getBalance(activeProfile);
         }
+      })
+      .then((balance) => {
+        configs.setBalance(balance);
+      })
+      .catch((err) => {
+        console.log("Error", err);
       })
       .finally(() => {
         activating = false;
+        loadingBalance = false;
       });
   }
+
+  const onClickHandler = () => (opened = false);
+  onMount(() => window.addEventListener("click", onClickHandler));
+  onDestroy(() => window.removeEventListener("click", onClickHandler));
 </script>
 
+<div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
+  <button type="button"> PM </button>
+
+  {#if currentProfile}
+    <div class="profile-active">
+      <p>{currentProfile.name}</p>
+      {#if loadingBalance}
+        <p>Loading Account Balance</p>
+      {:else if balance}
+        <p>Balance: <span>{balance}</span> TFT</p>
+      {/if}
+    </div>
+  {/if}
+</div>
+
 <section
-  class="profile-container"
-  style={`transform: translateX(${opened ? "0" : "calc(100% - 50px)"})`}
+  class={"profile-container" + (opened ? " is-active" : "")}
+  on:click|stopPropagation
 >
   <div class="box">
     <div
@@ -203,79 +247,74 @@
       </form>
     {/if}
   </div>
-  <button
-    class={"profile-toggle" + (opened ? " active" : "")}
-    on:click={() => (opened = !opened)}
-  >
-    <span />
-    <span />
-    <span />
-  </button>
 </section>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 
-  .profile-container {
+  .profile-menu {
     position: fixed;
-    top: 25px;
-    right: 0;
-    width: calc(100% - 150px);
-    padding: 15px;
-    max-height: 90vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    transition: transform 0.35s ease;
-    z-index: 9999;
-    padding-left: 50px;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    z-index: 999;
+    padding: 10px;
+    background-color: white;
+    border-radius: 50px;
+    padding-right: 20px;
+    border: 1px solid #ddd8d8;
+    cursor: pointer;
+
+    button {
+      height: 60px;
+      width: 60px;
+      border-radius: 50%;
+      border: none;
+      z-index: 999;
+      cursor: inherit;
+
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .profile-active {
+      padding-left: 15px;
+
+      > p:first-of-type {
+        font-weight: bold;
+        margin-bottom: -5px;
+      }
+
+      > p:last-of-type span {
+        font-weight: bold;
+      }
+    }
   }
 
-  .profile-toggle {
-    z-index: 9;
-    position: absolute;
-    top: 25px;
-    left: 0;
-    height: 50px;
-    width: 50px;
-    cursor: pointer;
-    border: none;
-    background-color: rgb(250, 250, 250);
+  .profile-container {
+    position: fixed;
+    top: 100px;
+    right: 15px;
+    width: calc(100% - 330px);
+    z-index: 999;
+    padding: 15px;
 
-    > span {
-      position: absolute;
-      height: 5px;
-      width: 40px;
-      left: 5px;
-      top: 8px;
-      background-color: #555;
-      transition-property: opacity, transform, top;
-      transition-duration: 0.35s;
-      transition-timing-function: ease;
+    /* scroll */
+    max-height: calc(100vh - 115px);
+    overflow-y: auto;
 
-      &:nth-of-type(2) {
-        top: 22px;
-        transform: rotate(0) !important;
-      }
+    transition-duration: 0.35s;
+    transition-property: transform, opacity;
+    transition-timing-function: ease;
+    transform: translateY(50px);
+    opacity: 0;
+    pointer-events: none;
+  }
 
-      &:nth-of-type(3) {
-        top: 36px;
-      }
-    }
-
-    &.active {
-      > span {
-        transform: rotate(45deg);
-        top: 22px;
-
-        &:nth-of-type(2) {
-          opacity: 0;
-        }
-
-        &:nth-of-type(3) {
-          top: 22px;
-          transform: rotate(-45deg);
-        }
-      }
-    }
+  .is-active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
   }
 </style>
