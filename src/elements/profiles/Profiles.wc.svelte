@@ -22,7 +22,6 @@
   let activeProfileId: string;
   let opened: boolean = false;
   let currentProfile: IProfile;
-  let balance: number = null;
   let loadingBalance: boolean = false;
 
   let tabs: ITab[] = [];
@@ -34,17 +33,16 @@
         _init = true;
         configured = true;
         loadingBalance = true;
-        // getBalance(configs.getActiveProfile())
-        //   .then((balance) => {
-        //     configs.setBalance(balance);
-        //   })
-        //   .catch((err) => {
-        //     console.log("Error", err);
-        //   })
-        //   .finally(() => (loadingBalance = false));
+        getBalance(configs.getActiveProfile())
+          .then((balance) => {
+            configs.setBalance(balance);
+          })
+          .catch((err) => {
+            console.log("Error", err);
+          })
+          .finally(() => (loadingBalance = false));
       }
       profiles = s.profiles;
-      balance = s.balance;
       activeProfile = profiles[active];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
@@ -130,8 +128,8 @@
       <p>{currentProfile.name}</p>
       {#if loadingBalance}
         <p>Loading Account Balance</p>
-      {:else if balance}
-        <p>Balance: <span>{balance}</span> TFT</p>
+      {:else if currentProfile.balance}
+        <p>Balance: <span>{currentProfile.balance}</span> TFT</p>
       {/if}
     </div>
   {/if}
@@ -259,10 +257,9 @@
     display: flex;
     align-items: center;
     z-index: 999;
-    padding: 10px;
+    padding: 15px;
     background-color: white;
     border-radius: 50px;
-    padding-right: 20px;
     border: 1px solid #ddd8d8;
     cursor: pointer;
 
