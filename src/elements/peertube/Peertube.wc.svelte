@@ -8,6 +8,7 @@
   // Modules
   import VM, { Env } from "../../types/vm";
   import deployPeertube from "../../utils/deployPeertube";
+  import { gateway, peertubeYggIp } from "../../utils/deployPeertube";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -17,6 +18,7 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  import AlertDetailed from "../../components/AlertDetailed.svelte";
 
   // Values
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -29,12 +31,10 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let valid = true;
 
   let profile: IProfile;
   let message: string;
   let modalData: Object;
-  let nodeIdError: string;
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) ; // prettier-ignore
 
@@ -57,6 +57,8 @@
       .then(() => {
         deploymentStore.set(0);
         success = true;
+        console.log(gateway);
+        console.log(peertubeYggIp);
       })
       .catch((err: Error) => {
         failed = true;
@@ -86,7 +88,12 @@
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
     {:else if success}
-      <Alert type="success" message="Successfully deployed VM." />
+      <AlertDetailed
+        type="success"
+        message="Successfully Deployed A Peertube Instance"
+        planetaryIP={peertubeYggIp}
+        {gateway}
+      />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
