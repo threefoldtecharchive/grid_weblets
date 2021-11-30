@@ -110,7 +110,7 @@
         Please activate a profile from profile manager
       </p>
     {:else}
-      {#if tab === "k8s" || tab === "vm" || tab === "caprover"}
+      {#if !(tab === "k8s" || tab === "vm" || tab === "caprover")}
         <Tabs bind:active {tabs} />
       {/if}
 
