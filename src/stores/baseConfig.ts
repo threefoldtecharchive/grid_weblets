@@ -126,9 +126,7 @@ function createBaseConfig() {
       }
 
       localStorage.setItem(hash, getEncryptedStore(password || session_password)); // prettier-ignore
-      requestAnimationFrame(() => {
-        alert("Saved!");
-      });
+      window.configs.notificationStore.notify("success", "Saved!");
     },
 
     setActiveProfile(id: string) {
