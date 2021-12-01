@@ -116,6 +116,7 @@
           on:input={validateNameHandler}
         />
         <SelectNodeId
+          publicIp={false}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(
