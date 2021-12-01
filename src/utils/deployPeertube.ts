@@ -19,6 +19,8 @@ const {
   Nodes,
 } = window.configs?.grid3_client ?? {};
 
+export let gateway, peertubeYggIp;
+
 export default async function deployPeertube(data: VM, profile: IProfile) {
   // connect
   const { envs, disks, ...base } = data;
@@ -40,14 +42,16 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getSuitableGateway(client, name);
-  console.log(name);
+  // console.log(name);
 
   // Gateway node Id and domain
   const gwNodeId = 8;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
+  gateway = `${name}.${gwDomain}`;
+  // console.log(gateway);
 
-  // define a network
+  // // define a network
   const network = new NetworkModel();
   network.name = name + "NW";
   network.ip_range = "10.1.0.0/16";
@@ -74,12 +78,12 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     postgresIP,
     nodeId,
     name,
-    gwDomain
+    gateway
   );
 
   // // get the info
   const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
-  const peertubeYggIp = peertubeInfo[0]["yggIP"];
+  peertubeYggIp = peertubeInfo[0]["yggIP"];
 
   // deploy the gateway
   await deployPrefixGateway(client, name, peertubeYggIp, gwNodeId);
@@ -88,7 +92,10 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
 
-  console.log(gatewayDomain);
+  // // Expected gateway
+  // console.log(gateway);
+  // // Deployed gateway
+  // console.log(gatewayDomain);
 }
 
 async function deployRedis(client: any, net: any, nodeId: any, name: string) {
@@ -171,7 +178,7 @@ async function deployPeertubeVM(
   postgresIp: string,
   nodeId: any,
   name: string,
-  gwDomain: string
+  gateway: string
 ) {
   // disk
   const disk3 = new DiskModel();
@@ -194,7 +201,7 @@ async function deployPeertubeVM(
   vm.entrypoint = "/start.sh";
   vm.env = {
     PEERTUBE_BIND_ADDRESS: "::",
-    PEERTUBE_WEBSERVER_HOSTNAME: name + "." + gwDomain,
+    PEERTUBE_WEBSERVER_HOSTNAME: gateway,
     PEERTUBE_DB_HOSTNAME: postgresIp,
     PEERTUBE_DB_USERNAME: "postgres",
     PEERTUBE_DB_PASSWORD: "omar123456",
