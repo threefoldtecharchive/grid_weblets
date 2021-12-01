@@ -5,22 +5,15 @@
   export let message: string;
   export let gateway: string;
   export let planetaryIP: string;
+  export let info: Object;
 </script>
 
 <div class={"notification is-" + type}>
   {message}
   <hr />
-  <h3>Deployment Info:</h3>
-  <p>- Gateway: https://{gateway}/</p>
-  <p>- Planetary IP: {planetaryIP}</p>
+  <h3 style="font-weight: bold;">Deployment Info:</h3>
+  <ul style="list-style: circle;">
+    <li>Gateway: https://{gateway}/</li>
+    <li>Planetary IP: {planetaryIP}</li>
+  </ul>
 </div>
-
-<style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  ul {
-    list-style: circle;
-  }
-  h3 {
-    font-weight: bold;
-  }
-</style>
