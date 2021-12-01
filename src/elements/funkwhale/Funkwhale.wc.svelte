@@ -6,20 +6,25 @@
   const { events } = window.configs?.grid3_client ?? {};
   import deployFunkwhale from "../../utils/deployFunkwhale";
   import type { IProfile } from "../../types/Profile";
-    // Components
-    import SelectProfile from "../../components/SelectProfile.svelte";
+  // Components
+  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
-//   import DeleteBtn from "../../components/DeleteBtn.svelte";
-//   import AddBtn from "../../components/AddBtn.svelte";
+  //   import DeleteBtn from "../../components/DeleteBtn.svelte";
+  //   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  const data = new VM(undefined, undefined, "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist");
-  
-  const tabs: ITab[] = [
-    { label: "Config", value: "config" },
-  ];
+  import AlertDetailed from "../../components/AlertDetailed.svelte";
+  import { gateway, funkYggIp } from "../../utils/deployFunkwhale";
+
+  const data = new VM(
+    undefined,
+    undefined,
+    "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist"
+  );
+
+  const tabs: ITab[] = [{ label: "Config", value: "config" }];
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
   let active: string = "config";
@@ -49,8 +54,10 @@
     events.addListener("logs", onLogInfo);
     deployFunkwhale(data, profile)
       .then(() => {
-        deploymentStore.set(0);  
+        deploymentStore.set(0);
         success = true;
+        console.log(gateway);
+        console.log(funkYggIp);
       })
       .catch((err) => {
         failed = true;
@@ -64,7 +71,9 @@
   // regex wanted value.match(/^[0-9a-zA-Z]+$/))
   function validateNameHandler(e: Event) {
     const inp = e.target as HTMLInputElement;
-    nameField.error = inp.value.match(/^[a-z][a-z0-9]*$/i) ? null : "Only alphanumeric names are allowed" ;
+    nameField.error = inp.value.match(/^[a-z][a-z0-9]*$/i)
+      ? null
+      : "Only alphanumeric names are allowed";
   }
 </script>
 
@@ -72,11 +81,16 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
     <hr />
-    
+
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
     {:else if success}
-      <Alert type="success" message="Successfully deployed VM." />
+      <AlertDetailed
+        type="success"
+        message="Successfully Deployed A Peertube Instance"
+        planetaryIP={funkYggIp}
+        {gateway}
+      />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
@@ -88,12 +102,17 @@
       />
       <Tabs bind:active {tabs} />
       {#if active === "config"}
-        <Input bind:data={data.name} field={nameField} on:input={validateNameHandler}/>
+        <Input
+          bind:data={data.name}
+          field={nameField}
+          on:input={validateNameHandler}
+        />
 
         {#each baseFields as field (field.symbol)}
           <Input bind:data={data[field.symbol]} {field} />
         {/each}
         <SelectNodeId
+          publicIp={false}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(
@@ -103,7 +122,6 @@
           bind:data={data.nodeId}
           {profile}
         />
-        
       {/if}
     {/if}
     <DeployBtn
@@ -124,6 +142,6 @@
 </div>
 
 <style lang="scss" scoped>
-    @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-    // @import "../../assets/global.scss";
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  // @import "../../assets/global.scss";
 </style>
