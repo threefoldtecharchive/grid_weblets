@@ -1,4 +1,7 @@
 import type { default as VM, Disk, Env } from "../types/vm";
+import type { IProfile } from "../types/Profile";
+import { getSuitableGateway } from "./getValidGateway";
+import { getNodeDomain } from "./gatewayNode";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -10,9 +13,6 @@ const {
   NetworkModel,
   Nodes,
 } = window.configs?.grid3_client ?? {};
-import type { IProfile } from "../types/Profile";
-import { getSuitableGateway } from "./getValidGateway";
-import { getNodeDomain } from "./gatewayNode";
 
 export let gateway, funkYggIp;
 
@@ -48,7 +48,7 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   network.name = name + "NW";
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(grid, name, network, nodeId, gwDomain);
+  await deployFunkwhaleVM(grid, name, network, nodeId, gateway);
 
   const info = await getFunkwhaleInfo(grid, name);
   funkYggIp = info[0]["yggIP"];
@@ -60,15 +60,16 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
 
   // console.log(gatewayDomain);
 }
+
 async function deployFunkwhaleVM(
   client: any,
   name: string,
   network: any,
   nodeId: number,
-  gwDomain: string
+  gateway: string
 ) {
   const disk = new DiskModel();
-  disk.name = "diskName";
+  disk.name = name + "Disk";
   disk.size = 10;
   disk.mountpoint = "/data";
 
@@ -85,7 +86,7 @@ async function deployFunkwhaleVM(
   vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
-    FUNKWHALE_HOSTNAME: name + ".gent01.dev.grid.tf",
+    FUNKWHALE_HOSTNAME: gateway,
   };
   const vms = new MachinesModel();
   vms.name = name;
@@ -106,12 +107,12 @@ async function deployPrefixGateway(client: any, name: string, backend: string) {
   return client.gateway.deploy_name(gw);
 }
 
-async function getGatewayInfo(client: any, name: string) {
-  const info = await client.gateway.getObj(name);
+async function getFunkwhaleInfo(client: any, name: string) {
+  const info = await client.machines.getObj(name);
   return info;
 }
 
-async function getFunkwhaleInfo(client: any, name: string) {
-  const info = await client.machines.getObj(name);
+async function getGatewayInfo(client: any, name: string) {
+  const info = await client.gateway.getObj(name);
   return info;
 }
