@@ -4415,6 +4415,11 @@ decamelize@^1.2.0:
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
   integrity sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=
 
+decimal.js@^10.3.1:
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.3.1.tgz#d8c3a444a9c6774ba60ca6ad7261c3a94fd5e783"
+  integrity sha512-V0pfhfr8suzyPGOx3nmq4aHqabehUZn6Ch9kyFpV79TGDTWFmHqUqXdabR7QHqxzrYolF4+tVmJhUG4OURg5dQ==
+
 decode-uri-component@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
@@ -5842,10 +5847,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@0.0.29:
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.29.tgz#1c3ea2452145dca6187aff921c6d2a1f82b9a68a"
-  integrity sha512-1sQgb0l3xMfce0LvGgqQI6y4U8krvZGwXF7PVSxRrCJz7LiwoX0gBtAGBnydXKlbDHMazKlTk2TBM7yxgxrN0w==
+grid3_client@0.0.30:
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.30.tgz#6ce682fe8bc14076c398ef8a1cf7bba86c531a16"
+  integrity sha512-+ELuVKVr8GvgHv1mDDy8d6IoVktgP/1u0ZXwOKFoAbMugsFjlEQtMyWyt1saHRlXDfN5NKiLiaLFR1ZDEwMpDA==
   dependencies:
     appdata-path "^1.0.0"
     axios "^0.22.0"
@@ -5853,6 +5858,7 @@ grid3_client@0.0.29:
     class-transformer "^0.4.0"
     class-validator "^0.13.1"
     crypto-js "^4.1.1"
+    decimal.js "^10.3.1"
     http-server "^14.0.0"
     netaddr "^1.1.0"
     private-ip "^2.3.0"

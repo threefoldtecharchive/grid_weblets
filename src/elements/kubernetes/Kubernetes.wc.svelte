@@ -18,6 +18,8 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import validateNode from "../../utils/validateNode";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -64,13 +66,46 @@
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
   let modalData: Object;
 
-  function onDeployKubernetes() {
+  async function onDeployKubernetes() {
     loading = true;
+
+    if (!hasEnoughBalance(profile)) {
+      failed = true;
+      loading = false;
+      message =
+        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      return;
+    }
+
+    function onLogInfo(msg: string) {
+      if (typeof msg === "string") {
+        message = msg;
+      }
+    }
+
+    const { master, workers } = data;
+    const { cpu, memory, diskSize, rootFsSize, publicIp, node } = master;
+    const validateMaster = validateNode(profile, cpu, memory, diskSize + rootFsSize, publicIp, node); // prettier-ignore
+
+    // prettier-ignore
+    const validations = workers.reduce((promises, worker) => {
+      const { cpu, memory, diskSize, rootFsSize, publicIp, node } = worker;
+      promises.push(validateNode(profile, cpu, memory, diskSize + rootFsSize, publicIp, node));
+      return promises;
+    }, [validateMaster]);
+
+    const valid = (await Promise.all(validations)).reduce((res, c) => res && !!c, true); // prettier-ignore
+    if (!valid) {
+      failed = true;
+      loading = false;
+      message = "One of nodes doesn't have enough resources.";
+      return;
+    }
+
     success = false;
     failed = false;
     message = undefined;
 
-    const onLogInfo = (msg: string) => typeof msg === "string" ? (message = msg) : null; // prettier-ignore
     events.addListener("logs", onLogInfo);
 
     deployKubernetes(data, profile)
