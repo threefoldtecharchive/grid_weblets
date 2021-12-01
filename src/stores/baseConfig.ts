@@ -12,21 +12,21 @@ function createBaseConfig() {
     profiles: [p],
     activeProfile: null,
     loaded: false,
+    balance: null,
   };
 
-  const password = sessionStorage.getItem("session_password");
-  if (password) {
+  const session_password = sessionStorage.getItem("session_password");
+  if (session_password) {
     try {
-      const hash = hashPassword(password);
+      const hash = hashPassword(session_password);
       const data = localStorage.getItem(hash);
       _initData = {
-        ...JSON.parse(decrypt(data, password).toString(enc.Utf8)),
+        ...JSON.parse(decrypt(data, session_password).toString(enc.Utf8)),
         loaded: true,
+        balance: null,
       };
     } catch {}
   }
-
-  console.log({ data: _initData });
 
   const store = writable(_initData);
 
@@ -84,7 +84,7 @@ function createBaseConfig() {
     deleteProfile(idx: number) {
       update((value) => {
         if (value.profiles[idx].id === value.activeProfile) {
-          value.activeProfile = value.profiles[0].id;
+          value.activeProfile = null;
         }
         value.profiles.splice(idx, 1);
         return value;
@@ -119,13 +119,14 @@ function createBaseConfig() {
     },
 
     save(password: string) {
-      const hash = hashPassword(password);
+      const hash = hashPassword(password || session_password);
 
       if (localStorage.getItem(hash) === null) {
         return "Password wasn't found.";
       }
 
-      localStorage.setItem(hash, getEncryptedStore(password));
+      localStorage.setItem(hash, getEncryptedStore(password || session_password)); // prettier-ignore
+      window.configs.notificationStore.notify("success", "Saved!");
     },
 
     setActiveProfile(id: string) {
@@ -146,7 +147,16 @@ function createBaseConfig() {
       const data = get(store);
       if (data.activeProfile === null) return null;
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
-      return data.profiles[idx];
+      const profile = data.profiles[idx] as any;
+      profile.balance = data.balance;
+      return profile;
+    },
+
+    setBalance(balance: number) {
+      return update((value) => {
+        value.balance = balance;
+        return value;
+      });
     },
   };
 }
