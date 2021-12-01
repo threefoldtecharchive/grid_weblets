@@ -28,8 +28,13 @@
     dispatch("input", e);
   }
 
+  let showPassword: boolean = false;
+  let _password: HTMLInputElement;
+
   const selectStyle = `
 <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+
   .switch {
     position: relative;
     display: inline-block;
@@ -127,7 +132,10 @@
     {#if _isInput()}
       <div class="field" {id}>
         <p class="label">{field.label}</p>
-        <div class="control">
+        <div
+          class={"control" +
+            (field.type === "password" ? " has-icons-right" : "")}
+        >
           {#if field.type === "textarea"}
             <textarea
               class={"textarea" + (field.error || _error ? " is-danger" : "")}
@@ -162,7 +170,19 @@
               bind:value={data}
               on:input={_onInput}
               disabled={field.disabled}
+              bind:this={_password}
             />
+            <span
+              style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"
+              on:click={() => {
+                showPassword = !showPassword;
+                _password.type = showPassword ? "text" : "password";
+              }}
+            >
+              <i
+                class={"fas " + (showPassword ? "far fa-eye-slash" : "fa-eye")}
+              />
+            </span>
           {/if}
         </div>
         {#if field.error || _error}

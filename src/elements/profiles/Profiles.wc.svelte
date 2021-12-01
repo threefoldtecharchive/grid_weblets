@@ -4,11 +4,13 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
+  import getBalance from "../../utils/getBalance";
 
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
+  import { onDestroy, onMount } from "svelte";
 
   const configs = window.configs?.baseConfig;
   let active = "0";
@@ -19,6 +21,8 @@
   let activeProfile: IProfile;
   let activeProfileId: string;
   let opened: boolean = false;
+  let currentProfile: IProfile;
+  let loadingBalance: boolean = false;
 
   let tabs: ITab[] = [];
   let _init: boolean = false;
@@ -28,10 +32,20 @@
       if (!_init && s.loaded) {
         _init = true;
         configured = true;
+        loadingBalance = true;
+        getBalance(configs.getActiveProfile())
+          .then((balance) => {
+            configs.setBalance(balance);
+          })
+          .catch((err) => {
+            console.log("Error", err);
+          })
+          .finally(() => (loadingBalance = false));
       }
       profiles = s.profiles;
       activeProfile = profiles[active];
       activeProfileId = s.activeProfile;
+      currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
         return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
@@ -65,217 +79,267 @@
     let invalid = false;
     validateMnemonics(activeProfile)
       .then((valid) => {
-        console.log("Valid Mnemonics", valid);
         invalid = invalid || !valid;
         fields[2].error = valid ? null : "Invalid Mnemonics";
         return activeProfile.storeSecret !== "";
       })
       .then((valid) => {
-        console.log("Valid storeSecret", valid);
         invalid = invalid || !valid;
         fields[3].error = valid ? null : "Invalid storeSecret";
         return activeProfile.sshKey !== "";
       })
       .then((valid) => {
-        console.log("Valid sshKey", valid);
         invalid = invalid || !valid;
         fields[4].error = valid ? null : "Invalid SSH Key";
+        return activeProfile.name !== "";
+      })
+      .then((valid) => {
+        invalid = invalid || !valid;
+        fields[0].error = valid ? null : "Please provide a profile name";
         return !invalid;
       })
       .then((valid) => {
         if (valid) {
           configs.setActiveProfile(activeProfile.id);
+          loadingBalance = true;
+          return getBalance(activeProfile);
         }
+      })
+      .then((balance) => {
+        configs.setBalance(balance);
+      })
+      .catch((err) => {
+        console.log("Error", err);
       })
       .finally(() => {
         activating = false;
+        loadingBalance = false;
       });
   }
+
+  const onClickHandler = () => (opened = false);
+  onMount(() => window.addEventListener("click", onClickHandler));
+  onDestroy(() => window.removeEventListener("click", onClickHandler));
 </script>
 
-<section
-  class="profile-container"
-  style={`transform: translateX(${opened ? "0" : "calc(100% - 50px)"})`}
->
-  <div class="box">
-    <div
-      style="display: flex; justify-content: space-between; align-items: center;"
-    >
-      <h4 class="is-size-4">Profile Manager</h4>
+<div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
+  <button type="button"> PM </button>
 
-      {#if configured}
-        <div>
-          <button
-            class="button is-primary is-outlined mr-2"
-            type="button"
-            on:click={configs.addProfile}
-          >
-            + Add Profile
-          </button>
-          <button
-            class="button is-primary mr-2"
-            type="button"
-            on:click={onEventHandler.bind(undefined, "save")}
-          >
-            Save
-          </button>
-          <button
-            class="button is-danger"
-            type="button"
-            on:click={() => {
-              configured = false;
-              sessionStorage.removeItem("session_password");
-            }}
-          >
-            Back
-          </button>
-        </div>
+  {#if currentProfile}
+    <div class="profile-active">
+      <p>{currentProfile.name}</p>
+      {#if loadingBalance}
+        <p>Loading Account Balance</p>
+      {:else if currentProfile.balance}
+        <p>Balance: <span>{currentProfile.balance}</span> TFT</p>
       {/if}
     </div>
+  {/if}
+</div>
 
-    <p class="mt-4">
-      Please visit <a
-        href="https://library.threefold.me/info/threefold"
-        target="_blank"
+<div class={"profile-overlay" + (opened ? " is-active" : "")}>
+  <section
+    class={"profile-container" + (opened ? " is-active" : "")}
+    on:click|stopPropagation
+  >
+    <div class="box">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center;"
       >
-        the manual
-      </a>
-      to <strong>get started.</strong>
-    </p>
-    <hr />
+        <h4 class="is-size-4">Profile Manager</h4>
 
-    {#if configured}
-      <Tabs
-        bind:active
-        {tabs}
-        centered={false}
-        on:removed={({ detail }) => configs.deleteProfile(detail)}
-        on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
-      />
-
-      <div class="is-flex is-justify-content-flex-end">
-        <button
-          class={"button is-success" + (activating ? " is-loading" : "")}
-          disabled={activating || activeProfileId === activeProfile?.id}
-          on:click={onActiveProfile}
-        >
-          {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
-        </button>
+        {#if configured}
+          <div>
+            <button
+              class="button is-primary is-outlined mr-2"
+              type="button"
+              on:click={configs.addProfile}
+            >
+              + Add Profile
+            </button>
+            <button
+              class="button is-primary mr-2"
+              type="button"
+              on:click={onEventHandler.bind(undefined, "save")}
+            >
+              Save
+            </button>
+            <button
+              class="button is-danger"
+              type="button"
+              on:click={() => {
+                configured = false;
+                sessionStorage.removeItem("session_password");
+              }}
+            >
+              Back
+            </button>
+          </div>
+        {/if}
       </div>
 
-      {#if activeProfile}
-        {#each fields as field (field.symbol)}
-          <Input
-            bind:data={activeProfile[field.symbol]}
-            field={{
-              ...field,
-              disabled: activeProfileId === activeProfile.id,
-            }}
-          />
-        {/each}
-      {/if}
-    {:else}
-      <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
-        <Input bind:data={password} field={secretField} />
+      <p class="mt-4">
+        Please visit <a
+          href="https://library.threefold.me/info/threefold"
+          target="_blank"
+        >
+          the manual
+        </a>
+        to <strong>get started.</strong>
+      </p>
+      <hr />
 
-        {#if message}
-          <Alert type="danger" {message} />
-        {/if}
+      {#if configured}
+        <Tabs
+          bind:active
+          {tabs}
+          centered={false}
+          on:removed={({ detail }) => configs.deleteProfile(detail)}
+          on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
+        />
 
-        <div style="display: flex; justify-content: center;">
+        <div class="is-flex is-justify-content-flex-end">
           <button
-            class="button is-primary mr-2"
-            type="submit"
-            disabled={password === ""}
+            class={"button is-success" + (activating ? " is-loading" : "")}
+            disabled={activating || activeProfileId === activeProfile?.id}
+            on:click={onActiveProfile}
           >
-            Unlock Store
-          </button>
-
-          <button
-            class="button is-primary is-outlined"
-            type="button"
-            disabled={password === ""}
-            on:click={onEventHandler.bind(undefined, "create")}
-          >
-            Create a New Store
+            {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
           </button>
         </div>
-      </form>
-    {/if}
-  </div>
-  <button
-    class={"profile-toggle" + (opened ? " active" : "")}
-    on:click={() => (opened = !opened)}
-  >
-    <span />
-    <span />
-    <span />
-  </button>
-</section>
+
+        {#if activeProfile}
+          {#each fields as field (field.symbol)}
+            <Input
+              bind:data={activeProfile[field.symbol]}
+              field={{
+                ...field,
+                disabled: activeProfileId === activeProfile.id,
+              }}
+            />
+          {/each}
+        {/if}
+      {:else}
+        <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
+          <Input bind:data={password} field={secretField} />
+
+          {#if message}
+            <Alert type="danger" {message} />
+          {/if}
+
+          <div style="display: flex; justify-content: center;">
+            <button
+              class="button is-primary mr-2"
+              type="submit"
+              disabled={password === ""}
+            >
+              Unlock Store
+            </button>
+
+            <button
+              class="button is-primary is-outlined"
+              type="button"
+              disabled={password === ""}
+              on:click={onEventHandler.bind(undefined, "create")}
+            >
+              Create a New Store
+            </button>
+          </div>
+        </form>
+      {/if}
+    </div>
+  </section>
+</div>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 
-  .profile-container {
+  .profile-menu {
     position: fixed;
-    top: 25px;
-    right: 0;
-    width: calc(100% - 150px);
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    z-index: 999;
     padding: 15px;
-    max-height: 90vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    transition: transform 0.35s ease;
-    z-index: 9999;
-    padding-left: 50px;
+    background-color: white;
+    border-radius: 50px;
+    border: 1px solid #ddd8d8;
+    cursor: pointer;
+
+    button {
+      height: 60px;
+      width: 60px;
+      border-radius: 50%;
+      border: none;
+      cursor: inherit;
+
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .profile-active {
+      padding-left: 15px;
+
+      > p:first-of-type {
+        font-weight: bold;
+        margin-bottom: -5px;
+      }
+
+      > p:last-of-type span {
+        font-weight: bold;
+      }
+    }
   }
 
-  .profile-toggle {
-    z-index: 9;
-    position: absolute;
-    top: 25px;
+  .profile-overlay {
+    position: fixed;
+    top: 0;
     left: 0;
-    height: 50px;
-    width: 50px;
-    cursor: pointer;
-    border: none;
-    background-color: rgb(250, 250, 250);
+    bottom: 0;
+    right: 0;
+    background-color: rgba(black, 0.8);
+    z-index: 998;
 
-    > span {
-      position: absolute;
-      height: 5px;
-      width: 40px;
-      left: 5px;
-      top: 8px;
-      background-color: #555;
-      transition-property: opacity, transform, top;
-      transition-duration: 0.35s;
-      transition-timing-function: ease;
+    transition-timing-function: ease;
+    transition-property: opacity, visibility;
+    transition-duration: 0.35s;
 
-      &:nth-of-type(2) {
-        top: 22px;
-        transform: rotate(0) !important;
-      }
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 
-      &:nth-of-type(3) {
-        top: 36px;
-      }
+    &.is-active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
     }
+  }
 
-    &.active {
-      > span {
-        transform: rotate(45deg);
-        top: 22px;
+  .profile-container {
+    position: fixed;
+    top: 100px;
+    right: 15px;
+    width: calc(100% - 275px);
+    padding: 15px;
 
-        &:nth-of-type(2) {
-          opacity: 0;
-        }
+    /* scroll */
+    max-height: calc(100vh - 115px);
+    overflow-y: auto;
 
-        &:nth-of-type(3) {
-          top: 22px;
-          transform: rotate(-45deg);
-        }
-      }
-    }
+    transition-duration: 0.35s;
+    transition-property: transform, opacity, visibility;
+    transition-timing-function: ease;
+    transform: translateY(50px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .is-active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
   }
 </style>
