@@ -11,8 +11,8 @@
   {message}
   <hr />
   <h3 style="font-weight: bold;">Deployment Info:</h3>
-  <ul>
-    <li>Gateway: https://{gateway}/</li>
+  <ul class="ml-2">
+    <li>Domain: https://{gateway}/</li>
     <li>Planetary IP: {planetaryIP}</li>
   </ul>
 </div>

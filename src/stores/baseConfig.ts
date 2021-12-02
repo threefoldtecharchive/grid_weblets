@@ -119,6 +119,12 @@ function createBaseConfig() {
       try {
         set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
         sessionStorage.setItem("session_password", password);
+
+        /* TODO: should be removed after fixing issue #95 */
+        const newData = get(store);
+        if (newData.activeProfile) {
+          window.location.reload();
+        }
       } catch {
         return "Incorrect data.";
       }
@@ -135,11 +141,17 @@ function createBaseConfig() {
       window.configs.notificationStore.notify("success", "Saved!");
     },
 
-    setActiveProfile(id: string) {
-      return update((value) => {
+    setActiveProfile(id: string, password: string) {
+      update((value) => {
         value.activeProfile = id;
         return value;
       });
+      requestAnimationFrame(() => {
+        fullStore.save(password || session_password);
+      });
+
+      /* TODO: should be removed after fixing issue #95 */
+      window.location.reload();
     },
 
     deActiveProfile() {
