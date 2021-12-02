@@ -4,9 +4,9 @@
   interface IAction {
     type: "info" | "success" | "warning" | "danger";
     label: string;
-    click: (e: Event) => void;
-    disabled?: boolean;
-    loading?: boolean;
+    click: (e: Event, index: number) => void;
+    disabled?: (index: number) => boolean;
+    loading?: (index: number) => boolean;
   }
 
   export let headers: string[];
@@ -17,9 +17,11 @@
 <table class="table" style="width: 100%;">
   <thead>
     <tr>
-      {#each headers as hd (hd)}
-        <th title={hd}>{hd}</th>
-      {/each}
+      {#if headers}
+        {#each headers as hd (hd)}
+          <th title={hd}>{hd}</th>
+        {/each}
+      {/if}
 
       {#if actions.length}
         <th title="Actions">Actions</th>
@@ -28,36 +30,42 @@
   </thead>
 
   <tbody>
-    {#each rows as row}
-      <tr>
-        {#each row as item (item)}
-          <td>{item}</td>
-        {/each}
+    {#if rows}
+      {#each rows as row, idx}
+        <tr>
+          {#each row as item (item)}
+            <td>{item}</td>
+          {/each}
 
-        {#if actions.length}
-          <td>
-            <div class="buttons">
-              {#each actions as { type, label, click, disabled, loading }}
-                <button
-                  class={"button is-" + type + (loading ? " is-loading" : "")}
-                  on:click={click}
-                  {disabled}
-                >
-                  {label}
-                </button>
-              {/each}
-            </div>
-          </td>
-        {/if}
-      </tr>
-    {/each}
+          {#if actions.length}
+            <td>
+              <div class="buttons">
+                {#each actions as { type, label, click, disabled, loading }}
+                  <button
+                    class={"button is-" +
+                      type +
+                      (loading && loading(idx) ? " is-loading" : "")}
+                    on:click={(e) => click(e, idx)}
+                    disabled={disabled ? disabled(idx) : false}
+                  >
+                    {label}
+                  </button>
+                {/each}
+              </div>
+            </td>
+          {/if}
+        </tr>
+      {/each}
+    {/if}
   </tbody>
 
   <tfoot>
     <tr>
-      {#each headers as hd (hd)}
-        <th title={hd}>{hd}</th>
-      {/each}
+      {#if headers}
+        {#each headers as hd (hd)}
+          <th title={hd}>{hd}</th>
+        {/each}
+      {/if}
 
       {#if actions.length}
         <th title="Actions">Actions</th>

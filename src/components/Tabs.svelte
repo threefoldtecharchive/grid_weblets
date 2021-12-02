@@ -9,6 +9,7 @@
   export let tabs: ITab[];
   export let active: string;
   export let centered: boolean = true;
+  export let disabled: boolean = false;
 
   const onRemove = (idx: number) => () => dispatch("removed", idx);
   function onSelectTab(tab: string) {
@@ -20,7 +21,7 @@
 </script>
 
 <div class={"tabs " + (centered ? "is-centered" : "")}>
-  <ul>
+  <ul style={disabled ? "pointer-events: none; cursor: default;" : ""}>
     {#if tabs}
       {#each tabs as tab, index (tab.label)}
         <li class={active === tab.value ? "is-active" : ""}>
