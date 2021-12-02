@@ -6,10 +6,10 @@ export abstract class Base {
     public id = v4(),
     public name: string = "WR" + id.split("-")[0],
     public node: number = 0,
-    public cpu: number = 0,
+    public cpu: number = 2,
     public diskSize: number = 100,
     public publicIp: boolean = false,
-    public memory: number = 0,
+    public memory: number = 4096,
     public rootFsSize: number = 50,
     public planetary: boolean = true
   ) {}
