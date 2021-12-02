@@ -97,8 +97,8 @@
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, publicIP, yggIP, flist } = row;
-      return [i + 1, name, publicIP?.ip ?? "", yggIP, flist];
+      const { name, publicIp, yggIP, flist } = row;
+      return [i + 1, name, publicIp, yggIP, flist];
     });
   }
 </script>
