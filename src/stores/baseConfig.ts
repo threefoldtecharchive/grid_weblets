@@ -8,10 +8,27 @@ const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id:
 
 function createBaseConfig() {
   const p = createProfile("Profile 1");
-  const store = writable({
+  let _initData = {
     profiles: [p],
     activeProfile: null,
-  });
+    loaded: false,
+    balance: null,
+  };
+
+  const session_password = sessionStorage.getItem("session_password");
+  if (session_password) {
+    try {
+      const hash = hashPassword(session_password);
+      const data = localStorage.getItem(hash);
+      _initData = {
+        ...JSON.parse(decrypt(data, session_password).toString(enc.Utf8)),
+        loaded: true,
+        balance: null,
+      };
+    } catch {}
+  }
+
+  const store = writable(_initData);
 
   function hashPassword(password: string) {
     return md5(password).toString();
@@ -23,6 +40,7 @@ function createBaseConfig() {
   }
 
   const { subscribe, set, update } = store;
+
   return {
     subscribe,
     set,
@@ -66,7 +84,7 @@ function createBaseConfig() {
     deleteProfile(idx: number) {
       update((value) => {
         if (value.profiles[idx].id === value.activeProfile) {
-          value.activeProfile = value.profiles[0].id;
+          value.activeProfile = null;
         }
         value.profiles.splice(idx, 1);
         return value;
@@ -81,6 +99,7 @@ function createBaseConfig() {
       }
 
       localStorage.setItem(hash, getEncryptedStore(password));
+      sessionStorage.setItem("session_password", password);
     },
 
     load(password: string) {
@@ -93,19 +112,21 @@ function createBaseConfig() {
 
       try {
         set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
+        sessionStorage.setItem("session_password", password);
       } catch {
         return "Incorrect data.";
       }
     },
 
     save(password: string) {
-      const hash = hashPassword(password);
+      const hash = hashPassword(password || session_password);
 
       if (localStorage.getItem(hash) === null) {
         return "Password wasn't found.";
       }
 
-      localStorage.setItem(hash, getEncryptedStore(password));
+      localStorage.setItem(hash, getEncryptedStore(password || session_password)); // prettier-ignore
+      window.configs.notificationStore.notify("success", "Saved!");
     },
 
     setActiveProfile(id: string) {
@@ -126,7 +147,16 @@ function createBaseConfig() {
       const data = get(store);
       if (data.activeProfile === null) return null;
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
-      return data.profiles[idx];
+      const profile = data.profiles[idx] as any;
+      profile.balance = data.balance;
+      return profile;
+    },
+
+    setBalance(balance: number) {
+      return update((value) => {
+        value.balance = balance;
+        return value;
+      });
     },
   };
 }

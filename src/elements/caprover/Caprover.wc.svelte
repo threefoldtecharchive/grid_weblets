@@ -16,6 +16,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import validateNode from "../../utils/validateNode";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
 
   const data = new Caprover();
   let loading = false;
@@ -48,6 +49,7 @@
   let modalData: Object;
   let nodeIdError: string;
   async function deployCaproverHandler() {
+    loading = true;
     const { cpu, memory, nodeId, diskSize } = data;
 
     function onLogInfo(msg: string) {
@@ -55,14 +57,22 @@
         message = msg;
       }
     }
+
+    if (!hasEnoughBalance(profile)) {
+      failed = true;
+      loading = false;
+      message =
+        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      return;
+    }
+
     const error =  await validateNode(profile, cpu, memory, diskSize, true, nodeId); // prettier-ignore
-    console.log({ error });
     if (error) {
       nodeIdError = error;
+      loading = false;
       return;
     }
     nodeIdError = null;
-    loading = true;
     success = false;
     failed = false;
     message = undefined;
