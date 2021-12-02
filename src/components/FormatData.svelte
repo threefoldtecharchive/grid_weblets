@@ -60,7 +60,28 @@
       }}
     />
   {/if}
-
+  {#if vm.env.PEERTUBE_WEBSERVER_HOSTNAME}
+    <Input
+      data={"https://" + vm.env.PEERTUBE_WEBSERVER_HOSTNAME}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
+    {#if vm.env.FUNKWHALE_HOSTNAME}
+    <Input
+      data={"https://" + vm.env.FUNKWHALE_HOSTNAME}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
   {#if index + 1 !== vms.length}
     <hr />
   {/if}
