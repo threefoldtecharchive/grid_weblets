@@ -59,10 +59,11 @@ export default class Editor extends Vue {
     new Weblet("CapRover", "caprover", "caprover"), // "k8s" | "vm" | "caprover"
     new Weblet("Virtual Machine", "vm", "vm"),
     new Weblet("Kubernetes", `kubernetes`, "k8s"),
-    new Weblet("Deployments", "deployedlist"),
-
     new Weblet("Peertube", "peertube", "peertube"),
     new Weblet("Funkwhale", "funkwhale", "funkwhale"),
+
+    // Make sure [Deployments] always last one!
+    new Weblet("Deployments", "deployedlist"),
   ];
   public active = 0;
 }
