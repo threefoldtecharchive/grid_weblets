@@ -9,6 +9,7 @@ export default function validateNode(
   publicIPs: boolean,
   nodeId: number | string
 ) {
+  // TODO: validate the node existence separately
   const filters = { cru, mru: mru / 1024, sru, publicIPs };
   return findNodes(filters, profile)
     .then((nodes) => {
@@ -17,10 +18,10 @@ export default function validateNode(
     .then((valid) => {
       return valid
         ? null
-        : `The selected node(${nodeId}) doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`;
+        : `The selected node(${nodeId}) doesn't exist or doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`;
     })
     .catch(
       () =>
-        `The selected node(${nodeId}) doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`
+        `The selected node(${nodeId}) doesn't exist or doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`
     );
 }
