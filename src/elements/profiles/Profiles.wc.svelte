@@ -29,10 +29,11 @@
   $: {
     let s = $configs;
     if (s) {
-      if (!_init && s.loaded) {
+      if ((!_init && s.loaded) || s.reload_balance) {
         _init = true;
         configured = true;
         loadingBalance = true;
+        configs.setReloadBalance(false);
         getBalance(configs.getActiveProfile())
           .then((balance) => {
             configs.setBalance(balance);
@@ -42,6 +43,7 @@
           })
           .finally(() => (loadingBalance = false));
       }
+      // loadingBalance = s.loadingBalance;
       profiles = s.profiles;
       activeProfile = profiles[active];
       activeProfileId = s.activeProfile;
