@@ -80,7 +80,7 @@
     validateMnemonics(activeProfile)
       .then((valid) => {
         invalid = invalid || !valid;
-        fields[2].error = valid ? null : "Invalid Mnemonics";
+        fields[2].error = valid ? null : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
         return activeProfile.storeSecret !== "";
       })
       .then((valid) => {
