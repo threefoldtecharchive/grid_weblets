@@ -39,15 +39,16 @@ export default class DeployedList {
     return new Promise((res) => {
       this.grid.machines
         .getObj(name)
-        .then(([data]) =>
-          res({
+        .then(([data]) => {
+          console.log({ data });
+          return res({
             name,
             publicIp: (data.publicIP as any)?.ip ?? "None",
             yggIP: data.yggIP,
             flist: data.flist,
             details: data,
-          })
-        )
+          });
+        })
         .catch(() => res(null));
     });
   }
