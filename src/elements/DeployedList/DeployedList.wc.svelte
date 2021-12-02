@@ -82,6 +82,7 @@
 
   onDestroy(() => {
     _sub();
+    list?.grid.disconnect();
   });
 </script>
 
