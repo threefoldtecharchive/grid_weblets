@@ -19,7 +19,7 @@
   // const diskField: IFormField = { label: "Disk", symbol: "size", type: "number", disabled: true }; // prettier-ignore
   const wireguardField: IFormField = { label: "WireGuard", symbol: "wireguard", type: "text", disabled: true }; // prettier-ignore
   const flistField: IFormField = { label: "Flist", symbol: "flist", type: "text", disabled: true }; // prettier-ignore
-  const domainField: IFormField = { label: "Domain", symbol: "domain", type: "text", disabled: true, tooltip: "Default Password: captain42" }; // prettier-ignore
+  // const domainField: IFormField = { label: "Domain", symbol: "domain", type: "text", disabled: true, tooltip: "Default Password: captain42" }; // prettier-ignore
 </script>
 
 {#each vms as vm, index}
@@ -49,7 +49,15 @@
   {#if vm.env.CAPROVER_ROOT_DOMAIN}
     <Input
       data={"http://captain." + vm.env.CAPROVER_ROOT_DOMAIN}
-      field={domainField}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+        tooltip: `Default Password: ${
+          vm.env.DEFAULT_PASSWORD ? vm.env.DEFAULT_PASSWORD : "captain42"
+        }`,
+      }}
     />
   {/if}
 

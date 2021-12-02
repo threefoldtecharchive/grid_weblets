@@ -2,8 +2,9 @@ import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const { MachinesModel, DiskModel, GridClient, MachineModel } =
+import getGrid from "./getGrid";
+// const { HTTPMessageBusClient } = window.configs?.client ?? {};
+const { MachinesModel, DiskModel /* , GridClient */, MachineModel } =
   window.configs?.grid3_client ?? {};
 
 const CAPROVER_FLIST =
@@ -14,9 +15,8 @@ export default async function deployCaprover(
   profile: IProfile
 ) {
   const { name, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
-  const { mnemonics, storeSecret, networkEnv } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  // const http = new HTTPMessageBusClient(0, "");
   const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
 
   /* Docker disk */
@@ -50,17 +50,10 @@ export default async function deployCaprover(
   machines.network = network;
   machines.description = "caprover leader machine/node";
 
-  const grid = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
-  );
-  return grid
-    .connect()
-    .then(() => grid.machines.deploy(machines))
-    .then(() => grid.machines.getObj(name))
-    .then(([vm]) => vm);
+  return getGrid(profile, (grid) => {
+    return grid.machines
+      .deploy(machines)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
+  });
 }

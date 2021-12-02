@@ -1,16 +1,9 @@
+import getGrid from "../utils/getGrid";
 import type { IProfile } from "./Profile";
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const { GridClient } = window.configs?.grid3_client ?? {};
-// import type { GridClient } from "grid3_client";
+import type { GridClient } from "grid3_client";
 
-interface IData {
-  k8s?: any[];
-  machines?: any[];
-}
-
-type IKey = "k8s" | "machines";
 export default class DeployedList {
-  constructor(private readonly grid: any) {}
+  constructor(public readonly grid: GridClient) {}
 
   private _loadK8s(name: string) {
     return new Promise((res) => {
@@ -49,7 +42,7 @@ export default class DeployedList {
         .then(([data]) =>
           res({
             name,
-            publicIp: data.publicIP?.ip ?? "None",
+            publicIp: (data.publicIP as any)?.ip ?? "None",
             yggIP: data.yggIP,
             flist: data.flist,
             details: data,
@@ -78,18 +71,7 @@ export default class DeployedList {
     });
   }
 
-  public static async init(configs: IProfile): Promise<DeployedList> {
-    const { mnemonics, networkEnv, storeSecret } = configs;
-    const http = new HTTPMessageBusClient(0, "");
-    const grid = new GridClient(
-      networkEnv as any,
-      mnemonics,
-      storeSecret,
-      http,
-      "",
-      "tfkvstore" as any
-    );
-    await grid.connect();
-    return new DeployedList(grid);
+  public static async init(profile: IProfile): Promise<DeployedList> {
+    return new DeployedList(await getGrid(profile, (grid) => grid, false));
   }
 }

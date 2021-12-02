@@ -11,7 +11,7 @@
 
   const profiles = [
     new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
+    new FarmingProfile("Titan v2.1", 32, 8, 0, 1000, 0.06, 2), // prettier-ignore
   ];
 
   let profileChoosing: boolean = true;
@@ -28,7 +28,7 @@
   const inputFields = [
     { label: "Memory (GB)", symbol: "memory" },
     { label: "CPU (Cores)", symbol: "cpu" },
-    { label: "HDD (GB)", symbol: "hdd" },
+    { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
@@ -44,7 +44,7 @@
   const basicInputFields = [
     { label: "Memory (GB)", symbol: "memory" },
     { label: "CPU (Cores)", symbol: "cpu" },
-    { label: "HDD (GB)", symbol: "hdd" },
+    { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
@@ -200,16 +200,16 @@
               {/each}
             </select>
           </div>
+        </div>
 
-          <div class="mt-4">
-            <button
-              disabled={activeProfile === null}
-              class="button is-primary"
-              on:click={onProfileChoosing}
-            >
-              Select Configuration
-            </button>
-          </div>
+        <div class="mt-4">
+          <button
+            disabled={activeProfile === null}
+            class="button is-primary"
+            on:click={onProfileChoosing}
+          >
+            Select Configuration
+          </button>
         </div>
       </div>
     {/if}
@@ -233,29 +233,31 @@
         <div class="farming-content">
           <div class="farming-content--left">
             {#each basicInputFields as field (field.symbol)}
-              <div class="field">
-                <div class="control">
-                  {#if field.type === "checkbox"}
-                    <label class="checkbox">
-                      <p class="label">{field.label}</p>
-                      <input
-                        type="checkbox"
-                        bind:checked={activeProfile[field.symbol]}
-                      />
-                      {field.label}
-                    </label>
-                  {:else}
-                    <label class="label">
-                      <p>{field.label}</p>
-                      <input
-                        class="input"
-                        type="number"
-                        bind:value={activeProfile[field.symbol]}
-                      />
-                    </label>
-                  {/if}
+              {#if !field.only || field.only === activeProfile.name}
+                <div class="field">
+                  <div class="control">
+                    {#if field.type === "checkbox"}
+                      <label class="checkbox">
+                        <p class="label">{field.label}</p>
+                        <input
+                          type="checkbox"
+                          bind:checked={activeProfile[field.symbol]}
+                        />
+                        {field.label}
+                      </label>
+                    {:else}
+                      <label class="label">
+                        <p>{field.label}</p>
+                        <input
+                          class="input"
+                          type="number"
+                          bind:value={activeProfile[field.symbol]}
+                        />
+                      </label>
+                    {/if}
+                  </div>
                 </div>
-              </div>
+              {/if}
             {/each}
           </div>
           <div class="farming-content--right">
@@ -320,29 +322,31 @@
         <div class="farming-content">
           <div class="farming-content--left">
             {#each inputFields as field (field.symbol)}
-              <div class="field">
-                <div class="control">
-                  {#if field.type === "checkbox"}
-                    <label class="checkbox">
-                      <p class="label">{field.label}</p>
-                      <input
-                        type="checkbox"
-                        bind:checked={activeProfile[field.symbol]}
-                      />
-                      {field.label}
-                    </label>
-                  {:else}
-                    <label class="label">
-                      <p>{field.label}</p>
-                      <input
-                        class="input"
-                        type="number"
-                        bind:value={activeProfile[field.symbol]}
-                      />
-                    </label>
-                  {/if}
+              {#if !field.only || field.only === activeProfile.name}
+                <div class="field">
+                  <div class="control">
+                    {#if field.type === "checkbox"}
+                      <label class="checkbox">
+                        <p class="label">{field.label}</p>
+                        <input
+                          type="checkbox"
+                          bind:checked={activeProfile[field.symbol]}
+                        />
+                        {field.label}
+                      </label>
+                    {:else}
+                      <label class="label">
+                        <p>{field.label}</p>
+                        <input
+                          class="input"
+                          type="number"
+                          bind:value={activeProfile[field.symbol]}
+                        />
+                      </label>
+                    {/if}
+                  </div>
                 </div>
-              </div>
+              {/if}
             {/each}
           </div>
           <div class="farming-content--right">
@@ -440,7 +444,8 @@
 
   .profile-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 
   .farming-content {
