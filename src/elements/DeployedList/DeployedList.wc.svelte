@@ -14,6 +14,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Tabs from "../../components/Tabs.svelte";
+  import Table from "../../components/Table.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -117,7 +118,49 @@
     }
   }}
 />
-<div style="padding: 15px;">
+
+<!-- prettier-ignore -->
+<Table 
+  headers={["Pos", "Team", "Pld", "W", "D", "L", "GF", "GA", "GD", "Pts", "Qualification or relegation"]}
+  rows={[
+    ["1",	"Leicester City (C)",	"38",	"23",	"12",	"3",	"68",	"36",	"+32",	"81",	"Qualification for the Champions League group stage"],
+    ["1",	"Leicester City (C)",	"38",	"23",	"12",	"3",	"68",	"36",	"+32",	"81",	"Qualification for the Champions League group stage"],
+    ["1",	"Leicester City (C)",	"38",	"23",	"12",	"3",	"68",	"36",	"+32",	"81",	"Qualification for the Champions League group stage"],
+  
+  ]}
+  actions={[
+    {
+      type: "info",
+      label: "Delete",
+      click(e) {
+        console.log(e);
+      }
+    },
+    {
+      type: "danger",
+      label: "Delete",
+      click(e) {
+        console.log(e);
+      }
+    },
+    {
+      type: "success",
+      label: "Delete",
+      click(e) {
+        console.log(e);
+      }
+    },
+    {
+      type: "warning",
+      label: "Delete",
+      click(e) {
+        console.log(e);
+      }
+    },
+  ]}
+/>
+
+<!-- <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
       Deployment List
@@ -211,7 +254,6 @@
       {/if}
 
       {#if _loadData && (active === "vm" || active === "caprover" || tab === "caprover" || tab === "vm" || tab === "funkwhale" || active === "funkwhale" || active === "peertube" || tab === "peertube")}
-        <!-- prettier-ignore -->
         {#await list[_loadData]()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
@@ -300,7 +342,7 @@
       {/if}
     {/if}
   </section>
-</div>
+</div> -->
 
 {#if infoToShow}
   <Modal data={infoToShow} on:closed={() => (infoToShow = null)} />
