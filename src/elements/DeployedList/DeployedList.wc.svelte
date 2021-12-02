@@ -11,9 +11,11 @@
   export let tab: TabsType = undefined;
 
   // components
-  import Modal from "../../components/DeploymentModal.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Tabs from "../../components/Tabs.svelte";
+  import Table from "../../components/Table.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Alert from "../../components/Alert.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -24,6 +26,7 @@
     { label: "Peertube", value: "peertube" }
   ];
   let active: string = "k8s";
+  $: active = tab || active;
 
   let loading = false;
   let configed = false;
@@ -54,24 +57,21 @@
     });
   }
 
-  let removed: string[] = [];
+  let removing: string = null;
   function onRemoveHandler(key: "k8s" | "machines", name: string) {
     const remove = window.confirm(`Are you sure u want to delete '${name}'?`);
     if (!remove) return;
-    removed = [...removed, name];
-    const idx = removed.length - 1;
+
+    removing = name;
     deleteContracts(profile, key, name)
       .then((data) => {
         console.log("Removed", data);
-        if (data.deleted.length === 0) {
-          removed.splice(idx, 1);
-          removed = removed;
-        }
         _reloadTab();
       })
       .catch((err) => {
         console.log("Error while removing", err);
-      });
+      })
+      .finally(() => (removing = null));
   }
 
   let infoToShow: Object;
@@ -88,25 +88,19 @@
     list?.grid.disconnect();
   });
 
-  let _loadData: string;
-
-  // prettier-ignore
-  $: {
-    if (active === "caprover" || tab === "caprover") _loadData = "loadCaprover";
-    else if (tab === "vm" || active === "vm") _loadData = "loadVm";
-    else if (tab === "funkwhale" || active === "funkwhale") _loadData = "loadFunkwhale";
-    else if (active === "peertube" || tab === "peertube") _loadData = "loadPeertube";
+  function _createK8sRows(rows: any[]) {
+    return rows.map((row, i) => {
+      const { name, master, workers } = row;
+      return [i + 1, name, master.publicIP?.ip ?? "", master.yggIP, workers];
+    });
   }
 
-  // prettier-ignore
-  // function loadData() {
-  //   if (active === "caprover" || tab === "caprover") return list.loadCaprover();
-  //   if (tab === "vm" || active === "vm") return list.loadVm();
-  //   if (tab === "funkwhale" || active === "funkwhale") return list.loadFunkwhale();
-  //   if (active === "peertube" || tab === "peertube") return list.loadPeertube();
-  //   return Promise.resolve([]);
-  // }
-  const tabNames = tabs.map(({ value }) => value);
+  function _createVMRow(rows: any[]) {
+    return rows.map((row, i) => {
+      const { name, publicIP, yggIP, flist } = row;
+      return [i + 1, name, publicIP?.ip ?? "", yggIP, flist];
+    });
+  }
 </script>
 
 <SelectProfile
@@ -117,185 +111,272 @@
     }
   }}
 />
+
 <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
-      Deployment List
-      {#if tabNames.includes(tab)}
-        ({tab})
-      {/if}
+      Deployment List {tab ? `(${tab})` : ""}
     </h4>
     <hr />
 
     {#if loading}
-      <p style="text-align: center; mt-2 mb-2">Loading...</p>
+      <Alert type="info" message="Loading..." />
     {:else if !configed}
-      <p style="text-align: center; mt-2 mb-2">
-        Please activate a profile from profile manager
-      </p>
+      <Alert
+        type="info"
+        message="Please activate a profile from profile manager"
+      />
     {:else}
-      {#if !tabNames.includes(tab)}
-        <Tabs bind:active {tabs} />
+      {#if !tab}
+        <Tabs bind:active {tabs} disabled={removing !== null} />
       {/if}
 
-      {#if (!tab && active === "k8s") || tab === "k8s"}
+      <!-- K8S -->
+      {#if active === "k8s"}
         {#await list.loadK8s()}
-          <div class="notification is-info mt-2">Loading...</div>
+          <Alert type="info" message="Loading Kubernetes..." />
         {:then rows}
           {#if rows.length}
-            <div class="table-container mt-2">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th title="position">#</th>
-                    <th>Name</th>
-                    <th>Public IP</th>
-                    <th>Planetary Network IP</th>
-                    <th>Workers</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {#each rows as row, idx}
-                    <tr>
-                      <th>{idx + 1}</th>
-                      <td>{row.name}</td>
-                      {#if row.master.publicIP}
-                        <td>{row.master.publicIP.ip}</td>
-                      {:else}
-                        <td>-</td>
-                      {/if}
-                      <td>{row.master.yggIP}</td>
-                      <td>{row.workers}</td>
-                      <td class="is-flex">
-                        <button
-                          class="button is-outlined is-primary mr-2"
-                          on:click={() => {
-                            infoToShow = row.details;
-                          }}
-                          disabled={removed.includes(row.name)}
-                        >
-                          Show Details
-                        </button>
-                        <button
-                          class={"button is-danger " +
-                            (removed.includes(row.name) ? "is-loading" : "")}
-                          on:click={() => onRemoveHandler("k8s", row.name)}
-                          disabled={removed.includes(row.name)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Workers",
+              ]}
+              rows={_createK8sRows(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                },
+                {
+                  type: "danger",
+                  label: "Delete",
+                  click: (_, i) => onRemoveHandler("k8s", rows[i].name),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+              ]}
+            />
           {:else}
-            <p style="text-align: center;" class="mt-2">
-              No Deployments was found on this profile.
-            </p>
+            <Alert type="info" message="No Kubernetes found on this profile." />
           {/if}
         {:catch err}
-          <div class="notification is-danger mt-2">
-            &gt;
-            {#if err && err.message}
-              {err.message}
-            {:else if typeof err === "string"}
-              {err}
-            {:else}
-              Failed to list {active}.
-            {/if}
-          </div>
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Kubernetes"}
+          />
         {/await}
-      {/if}
 
-      {#if _loadData && (active === "vm" || active === "caprover" || tab === "caprover" || tab === "vm" || tab === "funkwhale" || active === "funkwhale" || active === "peertube" || tab === "peertube")}
-        <!-- prettier-ignore -->
-        {#await list[_loadData]()}
-          <div class="notification is-info mt-2">&gt; Loading...</div>
+        <!-- VM -->
+      {:else if active === "vm"}
+        {#await list.loadVm()}
+          <Alert type="info" message="Loading Virtual Machines..." />
         {:then rows}
           {#if rows.length}
-            <div class="table-container mt-2">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th title="position">#</th>
-                    <th>Name</th>
-                    <th>Public IP</th>
-                    <th>Planetary Network IP</th>
-                    <th>Flist</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {#each rows as row, idx}
-                    {#if row.name}
-                      <tr>
-                        <th>{idx + 1}</th>
-                        <td>{row.name}</td>
-                        {#if row.publicIP}
-                          <td>{row.publicIP.ip}</td>
-                        {:else}
-                          <td>-</td>
-                        {/if}
-                        <td>{row.yggIP}</td>
-                        <td>{row.flist}</td>
-                        <td class="is-flex">
-                          <button
-                            class="button is-outlined is-primary"
-                            on:click={() => {
-                              infoToShow = row.details;
-                            }}
-                            disabled={removed.includes(row.name)}
-                          >
-                            Show Details
-                          </button>
-                          <button
-                            class={"button is-danger ml-2" +
-                              (removed.includes(row.name) ? "is-loading" : "")}
-                            on:click={() =>
-                              onRemoveHandler("machines", row.name)}
-                            disabled={removed.includes(row.name)}
-                          >
-                            Delete
-                          </button>
-                          {#if row.details.env && row.details.env.CAPROVER_ROOT_DOMAIN}
-                            <a
-                              class="ml-2"
-                              target="_blank"
-                              href={"http://captain." +
-                                row.details.env.CAPROVER_ROOT_DOMAIN}
-                              disabled={removed.includes(row.details.name)}
-                            >
-                              <button class="button is-link">
-                                Admin Panel
-                              </button>
-                            </a>
-                          {/if}
-                        </td>
-                      </tr>
-                    {/if}
-                  {/each}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                },
+                {
+                  type: "danger",
+                  label: "Delete",
+                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+              ]}
+            />
           {:else}
-            <p style="text-align: center;" class="mt-2">
-              No Deployments was found on this profile.
-            </p>
+            <Alert type="info" message="No VMs found on this profile." />
           {/if}
         {:catch err}
-          <div class="notification is-danger mt-2">
-            &gt;
-            {#if err && err.message}
-              {err.message}
-            {:else if typeof err === "string"}
-              {err}
-            {:else}
-              Failed to list {active}.
-            {/if}
-          </div>
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list VMs"}
+          />
+        {/await}
+
+        <!-- Caprover -->
+      {:else if active === "caprover"}
+        {#await list.loadCaprover()}
+          <Alert type="info" message="Loading CapRover..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                },
+                {
+                  type: "danger",
+                  label: "Delete",
+                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Admin Panel",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
+                    window.open("http://captain." + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return (
+                      !env || !env.CAPROVER_ROOT_DOMAIN || removing !== null
+                    );
+                  },
+                },
+              ]}
+            />
+          {:else}
+            <Alert type="info" message="No CapRovers found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list CapRover"}
+          />
+        {/await}
+
+        <!-- Peertube -->
+      {:else if active === "peertube"}
+        {#await list.loadPeertube()}
+          <Alert type="info" message="Loading Peertube..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                },
+                {
+                  type: "danger",
+                  label: "Delete",
+                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain =
+                      rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return (
+                      !env ||
+                      !env.PEERTUBE_WEBSERVER_HOSTNAME ||
+                      removing !== null
+                    );
+                  },
+                },
+              ]}
+            />
+          {:else}
+            <Alert type="info" message="No Peertubes found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Peertube"}
+          />
+        {/await}
+
+        <!-- FunkWhale -->
+      {:else if active === "funkwhale"}
+        {#await list.loadFunkwhale()}
+          <Alert type="info" message="Loading Funkwhale..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                },
+                {
+                  type: "danger",
+                  label: "Delete",
+                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.FUNKWHALE_HOSTNAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.FUNKWHALE_HOSTNAME || removing !== null;
+                  },
+                },
+              ]}
+            />
+          {:else}
+            <Alert type="info" message="No Funkwhale found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Funkwhale"}
+          />
         {/await}
       {/if}
     {/if}
@@ -308,8 +389,4 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-
-  .table {
-    width: 100%;
-  }
 </style>
