@@ -7,7 +7,8 @@
   import DeployedList from "../../types/deployedList";
   import deleteContracts from "../../utils/deleteContracts";
 
-  export let tab: "k8s" | "vm" | "caprover" = undefined;
+  type TabsType = "k8s" | "vm" | "caprover" | "funkwhale" | "peertube";
+  export let tab: TabsType = undefined;
 
   // components
   import Modal from "../../components/DeploymentModal.svelte";
@@ -18,7 +19,9 @@
   const tabs: ITab[] = [
     { label: "Kubernetes", value: "k8s" },
     { label: "Virtual Machines", value: "vm" },
-    { label: "Caprover", value: "caprover" }
+    { label: "Caprover", value: "caprover" },
+    { label: "FunkWhale", value: "funkwhale" },
+    { label: "Peertube", value: "peertube" }
   ];
   let active: string = "k8s";
 
@@ -84,6 +87,26 @@
     _sub();
     list?.grid.disconnect();
   });
+
+  let _loadData: string;
+
+  // prettier-ignore
+  $: {
+    if (active === "caprover" || tab === "caprover") _loadData = "loadCaprover";
+    else if (tab === "vm" || active === "vm") _loadData = "loadVm";
+    else if (tab === "funkwhale" || active === "funkwhale") _loadData = "loadFunkwhale";
+    else if (active === "peertube" || tab === "peertube") _loadData = "loadPeertube";
+  }
+
+  // prettier-ignore
+  // function loadData() {
+  //   if (active === "caprover" || tab === "caprover") return list.loadCaprover();
+  //   if (tab === "vm" || active === "vm") return list.loadVm();
+  //   if (tab === "funkwhale" || active === "funkwhale") return list.loadFunkwhale();
+  //   if (active === "peertube" || tab === "peertube") return list.loadPeertube();
+  //   return Promise.resolve([]);
+  // }
+  const tabNames = tabs.map(({ value }) => value);
 </script>
 
 <SelectProfile
@@ -98,8 +121,8 @@
   <section class="box">
     <h4 class="is-size-4 mb-4">
       Deployment List
-      {#if tab === "k8s" || tab === "vm" || tab === "caprover"}
-        ({tab.toLocaleUpperCase()})
+      {#if tabNames.includes(tab)}
+        ({tab})
       {/if}
     </h4>
     <hr />
@@ -111,7 +134,7 @@
         Please activate a profile from profile manager
       </p>
     {:else}
-      {#if !(tab === "k8s" || tab === "vm" || tab === "caprover")}
+      {#if !tabNames.includes(tab)}
         <Tabs bind:active {tabs} />
       {/if}
 
@@ -187,8 +210,9 @@
         {/await}
       {/if}
 
-      {#if active === "vm" || active === "caprover" || tab === "caprover" || tab === "vm"}
-        {#await active === "Caprover" || tab === "caprover" ? list.loadCaprover() : list.loadVm()}
+      {#if _loadData && (active === "vm" || active === "caprover" || tab === "caprover" || tab === "vm" || tab === "funkwhale" || active === "funkwhale" || active === "peertube" || tab === "peertube")}
+        <!-- prettier-ignore -->
+        {#await list[_loadData]()}
           <div class="notification is-info mt-2">&gt; Loading...</div>
         {:then rows}
           {#if rows.length}

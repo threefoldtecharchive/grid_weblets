@@ -3,6 +3,8 @@ import { enc } from "crypto-js";
 import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
 import { v4 } from "uuid";
+import getBalance from "../utils/getBalance";
+import type { IProfile } from "../types/Profile";
 
 const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
 
@@ -13,6 +15,8 @@ function createBaseConfig() {
     activeProfile: null,
     loaded: false,
     balance: null,
+    reload_balance: false,
+    // loadingBalance: false,
   };
 
   const session_password = sessionStorage.getItem("session_password");
@@ -24,6 +28,8 @@ function createBaseConfig() {
         ...JSON.parse(decrypt(data, session_password).toString(enc.Utf8)),
         loaded: true,
         balance: null,
+        reload_balance: false,
+        // loadingBalance: false,
       };
     } catch {}
   }
@@ -41,7 +47,7 @@ function createBaseConfig() {
 
   const { subscribe, set, update } = store;
 
-  return {
+  const fullStore = {
     subscribe,
     set,
     update,
@@ -113,6 +119,12 @@ function createBaseConfig() {
       try {
         set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
         sessionStorage.setItem("session_password", password);
+
+        /* TODO: should be removed after fixing issue #95 */
+        const newData = get(store);
+        if (newData.activeProfile) {
+          window.location.reload();
+        }
       } catch {
         return "Incorrect data.";
       }
@@ -129,11 +141,17 @@ function createBaseConfig() {
       window.configs.notificationStore.notify("success", "Saved!");
     },
 
-    setActiveProfile(id: string) {
-      return update((value) => {
+    setActiveProfile(id: string, password: string) {
+      update((value) => {
         value.activeProfile = id;
         return value;
       });
+      requestAnimationFrame(() => {
+        fullStore.save(password || session_password);
+      });
+
+      /* TODO: should be removed after fixing issue #95 */
+      window.location.reload();
     },
 
     deActiveProfile() {
@@ -143,7 +161,7 @@ function createBaseConfig() {
       });
     },
 
-    getActiveProfile() {
+    getActiveProfile(): IProfile | null {
       const data = get(store);
       if (data.activeProfile === null) return null;
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
@@ -158,7 +176,37 @@ function createBaseConfig() {
         return value;
       });
     },
+
+    setReloadBalance(val: boolean = true) {
+      return update((value) => {
+        if (val) {
+          value.reload_balance = val;
+          value.balance = null;
+        }
+        return value;
+      });
+    },
+
+    // setLoadingBalance(val: boolean) {
+    //   return update((value) => {
+    //     value.loadingBalance = val;
+    //     return value;
+    //   });
+    // },
+
+    // async loadBalance() {
+    // fullStore.setLoadingBalance(true);
+    // return getBalance(fullStore.getActiveProfile())
+    //   .then((balance) => {
+    //     fullStore.setBalance(balance);
+    //     return balance;
+    //   })
+    //   .catch((err) => console.log("Error", err))
+    //   .finally(() => fullStore.setLoadingBalance(false));
+    // },
   };
+
+  return fullStore;
 }
 
 export default createBaseConfig();

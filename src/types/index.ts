@@ -33,10 +33,11 @@ export type Colors =
 
 export interface ISelectOption {
   label: string;
-  value: string;
+  value: string | number;
   selected?: boolean;
   disabled?: boolean;
 }
+
 export interface IFormField {
   type: "text" | "number" | "password" | "textarea" | "checkbox" | "select";
   label?: string;
@@ -46,6 +47,7 @@ export interface IFormField {
   options?: ISelectOption[];
   disabled?: boolean;
   error?: string;
+  validator?: (value: string | number | boolean) => string | undefined;
 }
 
 export interface IFlist {

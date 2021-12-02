@@ -25,6 +25,7 @@
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
+  const configs = window.configs?.baseConfig;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -92,6 +93,7 @@
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
+        configs.setReloadBalance();
       });
   }
 </script>
