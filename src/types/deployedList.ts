@@ -56,11 +56,9 @@ export default class DeployedList {
     return this.grid.machines
       .list()
       .then((names) => {
-        console.log("names: " + names);
         return Promise.all(names.map((name) => this._loadVm(name)));
       })
       .then((data) => {
-        console.log(data);
         return data.filter((x) => [null, undefined].includes(x) === false);
       });
   }
