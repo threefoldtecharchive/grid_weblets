@@ -1,25 +1,14 @@
 import type { default as VM, Disk, Env } from "../types/vm";
 import createNetwork from "./createNetwork";
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const { DiskModel, MachineModel, MachinesModel, GridClient } =
+const { DiskModel, MachineModel, MachinesModel } =
   window.configs?.grid3_client ?? {};
 import type { IProfile } from "../types/Profile";
+import getGrid from "./getGrid";
 
 export default async function deployVM(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
-  const { mnemonics, storeSecret, networkEnv } = profile;
-
-  const http = new HTTPMessageBusClient(0, "");
-  const grid = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
-  );
 
   const vm = new MachineModel();
   vm.name = name;
@@ -39,11 +28,12 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vms.network = createNetwork(nw);
   vms.machines = [vm];
 
-  return grid
-    .connect()
-    .then(() => grid.machines.deploy(vms))
-    .then(() => grid.machines.getObj(name))
-    .then(([vm]) => vm);
+  return getGrid(profile, (grid) => {
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
+  });
 }
 
 function createDisk({ name, size, mountpoint }: Disk) {
