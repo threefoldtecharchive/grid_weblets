@@ -123,8 +123,6 @@
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
-  <button type="button"> PM </button>
-
   {#if currentProfile}
     <div class="profile-active">
       <p>{currentProfile.name}</p>
