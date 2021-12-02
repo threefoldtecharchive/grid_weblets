@@ -50,7 +50,7 @@
     type: "select",
     options: [
       // { label: "Please select an image", value: null, selected: true, disabled: true },
-      { label: "Alpine", value: "0" },
+      { label: "Alpine", value: "0", selected: true },
       { label: "Ubuntu", value: "1" },
       { label: "Other", value: "other" }
     ]
@@ -60,7 +60,7 @@
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
-      const flist = flists[selectedFlist - 1];
+      const flist = flists[selectedFlist /*  - 1 */];
       data.flist = flist?.url;
       data.entrypoint = flist?.entryPoint;
     }

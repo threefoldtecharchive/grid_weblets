@@ -102,7 +102,7 @@
       })
       .then((valid) => {
         if (valid) {
-          configs.setActiveProfile(activeProfile.id);
+          configs.setActiveProfile(activeProfile.id, password);
           loadingBalance = true;
           return getBalance(activeProfile);
         }

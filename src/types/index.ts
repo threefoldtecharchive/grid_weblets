@@ -33,7 +33,7 @@ export type Colors =
 
 export interface ISelectOption {
   label: string;
-  value: string;
+  value: string | number;
   selected?: boolean;
   disabled?: boolean;
 }
