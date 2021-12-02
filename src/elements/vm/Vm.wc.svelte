@@ -93,6 +93,7 @@
   let failed = false;
   let profile: IProfile;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
+  const configs = window.configs?.baseConfig;
 
   let message: string;
   let modalData: Object;
@@ -143,6 +144,7 @@
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
+        configs.setReloadBalance();
       });
   }
 </script>

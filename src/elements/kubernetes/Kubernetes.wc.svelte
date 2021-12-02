@@ -65,6 +65,7 @@
   let message: string;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
   let modalData: Object;
+  const configs = window.configs?.baseConfig;
 
   async function onDeployKubernetes() {
     loading = true;
@@ -121,6 +122,7 @@
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
+        configs.setReloadBalance();
       });
   }
 
