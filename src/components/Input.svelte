@@ -5,17 +5,27 @@
   import type { IFormField } from "../types";
   import { v4 } from "uuid";
 
-  const dispatch = createEventDispatcher<{ input: void }>();
+  const dispatch = createEventDispatcher<{ input: Event }>();
   export let field: IFormField;
   export let data: any;
   export let selected: number = 0;
 
   const id = v4();
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
+  let _error: string;
+
   function _onSelectChange(e: Event) {
-    dispatch("input");
+    dispatch("input", e);
     const select = e.target as HTMLSelectElement;
     selected = select.selectedIndex;
+  }
+
+  function _onInput(e: Event) {
+    if (field.validator) {
+      const target = e.target as HTMLInputElement;
+      _error = field.validator(target.value);
+    }
+    dispatch("input", e);
   }
 
   let showPassword: boolean = false;
@@ -128,37 +138,37 @@
         >
           {#if field.type === "textarea"}
             <textarea
-              class={"textarea" + (field.error ? " is-danger" : "")}
+              class={"textarea" + (field.error || _error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
-              on:input
+              on:input={_onInput}
               disabled={field.disabled}
             />
           {:else if field.type === "text"}
             <input
               type="text"
-              class={"input" + (field.error ? " is-danger" : "")}
+              class={"input" + (field.error || _error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
-              on:input
+              on:input={_onInput}
               disabled={field.disabled}
             />
           {:else if field.type === "number"}
             <input
               type="number"
-              class={"input" + (field.error ? " is-danger" : "")}
+              class={"input" + (field.error || _error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
-              on:input
+              on:input={_onInput}
               disabled={field.disabled}
             />
           {:else if field.type === "password"}
             <input
               type="password"
-              class={"input" + (field.error ? " is-danger" : "")}
+              class={"input" + (field.error || _error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
-              on:input
+              on:input={_onInput}
               disabled={field.disabled}
               bind:this={_password}
             />
@@ -175,9 +185,9 @@
             </span>
           {/if}
         </div>
-        {#if field.error}
+        {#if field.error || _error}
           <p class="help is-danger">
-            {field.error}
+            {field.error || _error}
           </p>
         {/if}
       </div>
@@ -203,7 +213,7 @@
         <p class="label">{field.label}</p>
       {/if}
       <div
-        class={"select mb-2" + (field.error ? " is-danger" : "")}
+        class={"select mb-2" + (field.error || _error ? " is-danger" : "")}
         style="width: 100%;"
         {id}
       >
@@ -223,9 +233,9 @@
             </option>
           {/each}
         </select>
-        {#if field.error}
+        {#if field.error || _error}
           <p class="help is-danger">
-            {field.error}
+            {field.error || _error}
           </p>
         {/if}
       </div>

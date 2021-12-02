@@ -71,6 +71,18 @@ export default class DeployedList {
     });
   }
 
+  public loadFunkwhale(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("funk"));
+    });
+  }
+
+  public loadPeertube(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("peertube"));
+    });
+  }
+
   public static async init(profile: IProfile): Promise<DeployedList> {
     return new DeployedList(await getGrid(profile, (grid) => grid, false));
   }

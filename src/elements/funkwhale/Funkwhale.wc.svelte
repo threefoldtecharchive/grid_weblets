@@ -8,8 +8,10 @@
   const deploymentStore = window.configs?.deploymentStore;
 
   import VM, { Disk, Env } from "../../types/vm";
-  import deployFunkwhale from "../../utils/deployFunkwhale";
-  import { gateway, funkYggIp } from "../../utils/deployFunkwhale";
+  import deployFunkwhale, {
+    gateway,
+    funkYggIp,
+  } from "../../utils/deployFunkwhale";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";

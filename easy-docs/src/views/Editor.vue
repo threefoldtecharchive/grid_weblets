@@ -61,8 +61,8 @@ export default class Editor extends Vue {
     new Weblet("Kubernetes", `kubernetes`, "k8s"),
     new Weblet("Deployments", "deployedlist"),
 
-    new Weblet("Peertube", "peertube", "vm"),
-    new Weblet("Funkwhale", "funkwhale", "vm"),
+    new Weblet("Peertube", "peertube", "peertube"),
+    new Weblet("Funkwhale", "funkwhale", "funkwhale"),
   ];
   public active = 0;
 }
