@@ -45,7 +45,7 @@
     symbol: "value",
     options: [
       { label: "Choose a way to select node", value: null, selected: true, disabled: true },
-      { label: "Automatic", value: "automatic" },
+      { label: "Capacity filter", value: "automatic" },
       { label: "Manual", value: "manual" }
     ]
   };
@@ -160,7 +160,7 @@
     type="button"
     on:click={onLoadNodesHandler}
   >
-    Apply Filters
+    Apply filters and suggest nodes
   </button>
 
   <Input bind:data field={nodeIdSelectField} />
