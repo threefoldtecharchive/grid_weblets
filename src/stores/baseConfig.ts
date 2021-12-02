@@ -3,9 +3,9 @@ import { enc } from "crypto-js";
 import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
 import { v4 } from "uuid";
-import getBalance from "../utils/getBalance";
 import type { IProfile } from "../types/Profile";
 
+const PREFIX = "v2.";
 const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
 
 function createBaseConfig() {
@@ -37,7 +37,7 @@ function createBaseConfig() {
   const store = writable(_initData);
 
   function hashPassword(password: string) {
-    return md5(password).toString();
+    return PREFIX + md5(password).toString();
   }
 
   function getEncryptedStore(password: string) {
