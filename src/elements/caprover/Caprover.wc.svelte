@@ -48,7 +48,6 @@
 
   let message: string;
   let modalData: Object;
-  let nodeIdError: string;
   async function deployCaproverHandler() {
     loading = true;
     const { cpu, memory, nodeId, diskSize } = data;
@@ -69,11 +68,11 @@
 
     const error =  await validateNode(profile, cpu, memory, diskSize, true, nodeId); // prettier-ignore
     if (error) {
-      nodeIdError = error;
+      failed = true;
       loading = false;
+      message = error;
       return;
     }
-    nodeIdError = null;
     success = false;
     failed = false;
     message = undefined;
@@ -125,7 +124,6 @@
           <Input bind:data={data[field.symbol]} {field} />
         {/each}
         <SelectNodeId
-          error={nodeIdError}
           cpu={data.cpu}
           memory={data.memory}
           publicIp={true}
