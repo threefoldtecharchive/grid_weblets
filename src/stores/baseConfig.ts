@@ -121,10 +121,10 @@ function createBaseConfig() {
         sessionStorage.setItem("session_password", password);
 
         /* TODO: should be removed after fixing issue #95 */
-        const newData = get(store);
-        if (newData.activeProfile) {
-          window.location.reload();
-        }
+        // const newData = get(store);
+        // if (newData.activeProfile) {
+        //   window.location.reload();
+        // }
       } catch {
         return "Incorrect data.";
       }
@@ -151,7 +151,7 @@ function createBaseConfig() {
       });
 
       /* TODO: should be removed after fixing issue #95 */
-      window.location.reload();
+      // window.location.reload();
     },
 
     deActiveProfile() {
