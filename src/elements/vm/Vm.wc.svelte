@@ -98,7 +98,6 @@
   let message: string;
   let modalData: Object;
 
-  let nodeIdError: string;
   async function onDeployVM() {
     loading = true;
     const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
@@ -119,13 +118,13 @@
     }
 
     const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
-    console.log({ error });
     if (error) {
-      nodeIdError = error;
+      message = error;
+      failed = true;
+      loading = false;
       return;
     }
 
-    nodeIdError = null;
     success = false;
     failed = false;
     message = undefined;
@@ -191,7 +190,6 @@
         {/each}
 
         <SelectNodeId
-          error={nodeIdError}
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
