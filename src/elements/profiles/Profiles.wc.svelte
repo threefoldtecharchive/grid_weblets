@@ -123,6 +123,7 @@
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
+  <button type="button"> Manage </button>
   {#if currentProfile}
     <div class="profile-active">
       <p>{currentProfile.name}</p>
@@ -267,8 +268,8 @@
 
     button {
       height: 60px;
-      width: 60px;
-      border-radius: 50%;
+      width: 90px;
+      border-radius: 70%;
       border: none;
       cursor: inherit;
 
