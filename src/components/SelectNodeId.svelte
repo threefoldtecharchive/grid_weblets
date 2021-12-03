@@ -8,13 +8,46 @@
 
   // components
   import Input from "./Input.svelte";
+import nodeExists from "../utils/nodeExists";
+import findNodes from "../utils/findNodes";
+import validateNode from "../utils/validateNode";
 
   export let cpu: number;
   export let memory: number;
   export let ssd: number;
   export let publicIp: boolean;
   export let error: string = null;
+  export let data: number;
 
+
+  export let profile: IProfile;
+  let loadingNodes: boolean = false;
+  let manualNodeError: string = "";
+  let manualNodeInfo: string = "";
+
+  function setInfoError(info="", error="") {
+    manualNodeInfo = info;
+    manualNodeError = error;
+  }
+ $: {
+    if (!data) {
+      setInfoError("", "Please select a node")
+    } else { 
+      setInfoError(`Checking if node ${data} exists`, "");
+      profile && data && nodeExists(profile, data).then(exists => {
+        if (exists) {
+          setInfoError(`Node ${data} exists`, "");
+          validateNode(profile, cpu, memory, ssd, publicIp, data)
+          .then( errmsg => setInfoError("", errmsg))
+          .catch(err => setInfoError("", err));
+        } else{
+          setInfoError("", `Node ${data} does not exist`);
+        }
+      })
+    }
+
+
+  }
   // prettier-ignore
   const filtersFields: IFormField[] = [
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
@@ -71,8 +104,6 @@
     nodeFilters.publicIPs = publicIp;
   }
 
-  export let profile: IProfile;
-  let loadingNodes: boolean = false;
 
   function onLoadNodesHandler() {
     loadingNodes = true;
@@ -95,7 +126,6 @@
       });
   }
 
-  export let data: number;
 
   function _setLabel(index: number, label: string = "Loading...") {
     const oldLabel = filtersFields[index].options[0].label;
@@ -175,4 +205,10 @@
       error,
     }}
   />
+  {#if manualNodeInfo}
+    <p class="help is-success">{manualNodeInfo}</p>
+  {/if}
+  {#if manualNodeError}
+    <p class="help is-danger">{manualNodeError}</p>
+  {/if}
 {/if}
