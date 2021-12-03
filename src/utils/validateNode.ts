@@ -18,10 +18,10 @@ export default function validateNode(
     .then((valid) => {
       return valid
         ? null
-        : `The selected node(${nodeId}) doesn't exist or doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`;
+        : `The selected node(${nodeId}) doesn't have enough resources. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`;
     })
     .catch(
       () =>
-        `The selected node(${nodeId}) doesn't exist or doesn't have enough resource. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`
+        `The selected node(${nodeId}) doesn't have enough resources. CRU(${cru}) MRU(${mru}) SRU(${sru}) PublicIP(${publicIPs})`
     );
 }
