@@ -1,14 +1,12 @@
 import type { IProfile } from "../types/Profile";
 
 export default async function nodeExists(profile: IProfile, nodeId:number) : Promise<boolean> {
+  console.log("profile", profile);
   const { networkEnv } = profile;
   
-  return fetch(`gridproxy.${networkEnv}.grid.tf/nodes/${nodeId}`, {
+  return fetch(`https://gridproxy.${networkEnv}.grid.tf/nodes/${nodeId}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
   })
-    .then(() => true)
-    .catch(() => false);
+    .then((res) => {console.log(res); return (res.status >= 200 && res.status < 400) ? true : false})
+    .catch((err) => {console.log(err) ; return false});
 }
