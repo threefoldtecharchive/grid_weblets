@@ -124,7 +124,11 @@
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
-  <button type="button"> Manage </button>
+  <button type="button">
+    <span class="icon is-small">
+      <i class="fas fa-user-cog" />
+    </span>
+  </button>
   {#if currentProfile}
     <div class="profile-active">
       <p>{currentProfile.name}</p>
@@ -257,6 +261,7 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
   .profile-menu {
     position: fixed;
@@ -273,7 +278,7 @@
 
     button {
       height: 60px;
-      width: 90px;
+      width: 60px;
       border-radius: 70%;
       border: none;
       cursor: inherit;
