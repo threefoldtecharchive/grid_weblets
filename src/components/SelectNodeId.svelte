@@ -55,19 +55,16 @@
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
       { label: "Please select a country", value: null, selected: true }
     ] },
-    { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
-    { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
-    { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
+    // { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
+    // { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
+    // { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
   ];
 
   // prettier-ignore
-  const nodeIdSelectField: IFormField = { 
-    label: "Node ID", 
-    type: "select",
-    symbol: "nodeId",
+  const nodeIdSelectField /* : IFormField */ = {
     options: [
       { label: "Please select a node id.", value: null, selected: true, disabled: true },
-    ]
+    ] as ISelectOption[]
   };
 
   // prettier-ignore
@@ -203,7 +200,15 @@
     Apply filters and suggest nodes
   </button>
 
-  <Input bind:data field={nodeIdSelectField} />
+  <Input
+    bind:data
+    field={{
+      label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+      type: "select",
+      symbol: "nodeId",
+      options: nodeIdSelectField.options,
+    }}
+  />
 {:else if nodeSelection === "manual"}
   <Input
     bind:data
