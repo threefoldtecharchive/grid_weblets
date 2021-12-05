@@ -197,7 +197,9 @@
             (total, disk) => total + disk.size,
             data.rootFsSize
           )}
+          bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
+          filters={data.selection.filters}
           {profile}
         />
       {:else if active === "env"}

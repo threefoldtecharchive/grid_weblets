@@ -1,6 +1,7 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import { Network } from "./kubernetes";
+import NodeID from "./nodeId";
 
 export class Env {
   constructor(
@@ -47,7 +48,9 @@ export default class VM {
 
     public envs: Env[] = [],
     public disks: Disk[] = [],
-    public publicIp = false
+    public publicIp = false,
+
+    public selection = new NodeID()
   ) {}
 
   public get valid(): boolean {

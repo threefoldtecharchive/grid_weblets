@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
+import NodeID from "./nodeId";
 
 export abstract class Base {
   public constructor(
@@ -11,7 +12,9 @@ export abstract class Base {
     public publicIp: boolean = false,
     public memory: number = 4096,
     public rootFsSize: number = 50,
-    public planetary: boolean = true
+    public planetary: boolean = true,
+
+    public selection = new NodeID()
   ) {}
 
   public get valid(): boolean {
