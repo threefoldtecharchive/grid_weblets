@@ -2,9 +2,10 @@
 
 <script lang="ts">
   import type { ITab } from "../types";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
 
-  const dispatch = createEventDispatcher<{ removed: number; select: string }>();
+  const dispatch =
+    createEventDispatcher<{ removed: number; select: string; init: void }>();
 
   export let tabs: ITab[];
   export let active: string;
@@ -18,6 +19,10 @@
       dispatch("select", tab);
     }
   }
+
+  onMount(() => {
+    dispatch("init");
+  });
 </script>
 
 <div class={"tabs " + (centered ? "is-centered" : "")}>

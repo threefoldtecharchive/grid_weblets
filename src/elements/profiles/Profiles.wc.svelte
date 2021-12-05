@@ -13,7 +13,6 @@
   import { onDestroy, onMount } from "svelte";
 
   const configs = window.configs?.baseConfig;
-  let active = "0";
   let password: string = "";
   let configured: boolean = false;
 
@@ -43,7 +42,7 @@
           .finally(() => (loadingBalance = false));
       }
       profiles = s.profiles;
-      activeProfile = profiles[active];
+      activeProfile = profiles[s.selectedIdx];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
@@ -80,7 +79,9 @@
     validateMnemonics(activeProfile)
       .then((valid) => {
         invalid = invalid || !valid;
-        fields[2].error = valid ? null : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
+        fields[2].error = valid
+          ? null
+          : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
         return activeProfile.storeSecret !== "";
       })
       .then((valid) => {
@@ -190,11 +191,15 @@
 
       {#if configured}
         <Tabs
-          bind:active
+          active={$configs.selectedIdx}
           {tabs}
           centered={false}
           on:removed={({ detail }) => configs.deleteProfile(detail)}
-          on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
+          on:select={(p) => {
+            [2, 3, 4].forEach((i) => (fields[i].error = null));
+            configs.setSelectedIdx(p.detail);
+          }}
+          on:init={() => configs.setSelectedIdx("0")}
         />
 
         <div class="is-flex is-justify-content-flex-end">
