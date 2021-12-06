@@ -12,6 +12,8 @@
   export let headers: string[];
   export let rows: string[][];
   export let actions: IAction[] = [];
+
+  $: footer = rows && rows.length > 49;
 </script>
 
 <table class="table" style="width: 100%;">
@@ -59,17 +61,19 @@
     {/if}
   </tbody>
 
-  <tfoot>
-    <tr>
-      {#if headers}
-        {#each headers as hd (hd)}
-          <th title={hd}>{hd}</th>
-        {/each}
-      {/if}
+  {#if footer}
+    <tfoot>
+      <tr>
+        {#if headers}
+          {#each headers as hd (hd)}
+            <th title={hd}>{hd}</th>
+          {/each}
+        {/if}
 
-      {#if actions.length}
-        <th title="Actions">Actions</th>
-      {/if}
-    </tr>
-  </tfoot>
+        {#if actions.length}
+          <th title="Actions">Actions</th>
+        {/if}
+      </tr>
+    </tfoot>
+  {/if}
 </table>
