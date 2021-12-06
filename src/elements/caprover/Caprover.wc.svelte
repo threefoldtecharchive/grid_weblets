@@ -15,7 +15,6 @@
   import Alert from "../../components/Alert.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
-  import validateNode from "../../utils/validateNode";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
 
   const data = new Caprover();
@@ -24,8 +23,9 @@
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
   const configs = window.configs?.baseConfig;
+  let status: "valid" | "invalid";
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid"; // prettier-ignore
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -41,16 +41,12 @@
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text" },
     { label: "Password", symbol: "password", placeholder: "Caprover new password", type: "text" },
-    // { label: "Public Key", symbol: "publicKey", placeholder: "Your Public Key", type: "text" },
-    // { label: "Node ID", symbol: "nodeId", placeholder: "Node Id", type: "number" },
-
   ];
 
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
     loading = true;
-    const { cpu, memory, nodeId, diskSize } = data;
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -66,13 +62,6 @@
       return;
     }
 
-    const error =  await validateNode(profile, cpu, memory, diskSize, true, nodeId); // prettier-ignore
-    if (error) {
-      failed = true;
-      loading = false;
-      message = error;
-      return;
-    }
     success = false;
     failed = false;
     message = undefined;
@@ -92,7 +81,6 @@
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
-        configs.setReloadBalance();
       });
   }
 </script>
@@ -130,6 +118,7 @@
           ssd={data.diskSize}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
+          bind:status
           filters={data.selection.filters}
           {profile}
         />

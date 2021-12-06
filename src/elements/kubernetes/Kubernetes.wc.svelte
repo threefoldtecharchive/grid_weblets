@@ -19,7 +19,6 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateNode from "../../utils/validateNode";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -33,8 +32,6 @@
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text" },
     { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "text" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
-    // { label: "Metadata", symbol: "metadata", placeholder: "Metadata", type: "text" },
-    // { label: "Description", symbol: "description", placeholder: "Description", type: "textarea" },
   ];
 
   // prettier-ignore
@@ -51,7 +48,6 @@
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
-    // { label: "Node ID", symbol: "node", placeholder: "Node ID", type: 'number' },
     { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
   ];
 
@@ -63,7 +59,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false); // prettier-ignore
   let modalData: Object;
   const configs = window.configs?.baseConfig;
 
@@ -82,25 +78,6 @@
       if (typeof msg === "string") {
         message = msg;
       }
-    }
-
-    const { master, workers } = data;
-    const { cpu, memory, diskSize, rootFsSize, publicIp, node } = master;
-    const validateMaster = validateNode(profile, cpu, memory, diskSize + rootFsSize, publicIp, node); // prettier-ignore
-
-    // prettier-ignore
-    const validations = workers.reduce((promises, worker) => {
-      const { cpu, memory, diskSize, rootFsSize, publicIp, node } = worker;
-      promises.push(validateNode(profile, cpu, memory, diskSize + rootFsSize, publicIp, node));
-      return promises;
-    }, [validateMaster]);
-
-    const valid = (await Promise.all(validations)).reduce((res, c) => res && !!c, true); // prettier-ignore
-    if (!valid) {
-      failed = true;
-      loading = false;
-      message = "One of nodes doesn't have enough resources.";
-      return;
     }
 
     success = false;
@@ -122,7 +99,6 @@
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
-        configs.setReloadBalance();
       });
   }
 
@@ -177,6 +153,7 @@
           bind:data={data.master.node}
           bind:nodeSelection={data.master.selection.type}
           filters={data.master.selection.filters}
+          bind:status={data.master.status}
           {profile}
         />
       {:else if active === "workers"}
@@ -202,6 +179,7 @@
                 filters={worker.selection.filters}
                 bind:data={worker.node}
                 bind:nodeSelection={worker.selection.type}
+                bind:status={worker.status}
                 {profile}
               />
             </div>

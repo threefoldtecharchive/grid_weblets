@@ -6,7 +6,7 @@ export abstract class Base {
   public constructor(
     public id = v4(),
     public name: string = "WR" + id.split("-")[0],
-    public node: number = 0,
+    public node: number = null,
     public cpu: number = 2,
     public diskSize: number = 100,
     public publicIp: boolean = false,
@@ -14,7 +14,8 @@ export abstract class Base {
     public rootFsSize: number = 50,
     public planetary: boolean = true,
 
-    public selection = new NodeID()
+    public selection = new NodeID(),
+    public status: "valid" | "invalid" = null
   ) {}
 
   public get valid(): boolean {

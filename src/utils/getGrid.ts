@@ -1,6 +1,4 @@
 import type { IProfile } from "../types/Profile";
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const grid3 = window.configs?.grid3_client;
 import type { GridClient } from "grid3_client";
 
 export default function getGrid<T>(
@@ -9,13 +7,13 @@ export default function getGrid<T>(
   disconnect: boolean = true
 ): Promise<T> {
   const { networkEnv, mnemonics, storeSecret } = profile;
-  const grid = new grid3.GridClient(
+  const grid = new window.configs.grid3_client.GridClient(
     networkEnv as any,
     mnemonics,
     storeSecret,
-    new HTTPMessageBusClient(0, ""),
+    new window.configs.client.HTTPMessageBusClient(0, ""),
     undefined,
-    grid3.BackendStorageType.tfkvstore
+    window.configs.grid3_client.BackendStorageType.tfkvstore
   );
 
   return grid

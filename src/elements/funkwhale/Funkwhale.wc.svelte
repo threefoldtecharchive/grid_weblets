@@ -7,7 +7,7 @@
   const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
 
-  import VM, { Disk, Env } from "../../types/vm";
+  import VM, { Env } from "../../types/vm";
   import deployFunkwhale, {
     gateway,
     funkYggIp,
@@ -22,7 +22,6 @@
   import Alert from "../../components/Alert.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateNode from "../../utils/validateNode";
 
   const data = new VM();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -32,8 +31,8 @@
   let loading = false;
   let success = false;
   let failed = false;
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) ; // prettier-ignore
+  let status: "valid" | "invalid";
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "valid"; // prettier-ignore
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
 
@@ -44,9 +43,6 @@
     success = false;
     failed = false;
     message = undefined;
-
-    const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
-    const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -59,14 +55,6 @@
       loading = false;
       message =
         "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
-      return;
-    }
-
-    const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
-    if (error) {
-      message = error;
-      failed = true;
-      loading = false;
       return;
     }
 
@@ -137,6 +125,7 @@
           )}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
+          bind:status
           filters={data.selection.filters}
           {profile}
         />
