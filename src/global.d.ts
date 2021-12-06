@@ -7,6 +7,7 @@ import * as grid3_client from "grid3_client";
 import baseConfigStore from "./stores/baseConfig";
 import deploymentStore from "./stores/deploymentStore";
 import notificationStore from "./stores/notifications";
+import currentDeploymentStore from "./stores/currentDeployment";
 
 interface AppConfigs {
   client: typeof client;
@@ -14,6 +15,7 @@ interface AppConfigs {
   baseConfig: typeof baseConfigStore;
   deploymentStore: typeof deploymentStore;
   notificationStore: typeof notificationStore;
+  currentDeploymentStore: typeof currentDeploymentStore;
 }
 
 declare global {

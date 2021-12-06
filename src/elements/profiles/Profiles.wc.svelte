@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-  import getBalance from "../../utils/getBalance";
 
   // Components
   import Input from "../../components/Input.svelte";
@@ -24,24 +23,11 @@
   let loadingBalance: boolean = false;
 
   let tabs: ITab[] = [];
-  let _init: boolean = false;
   $: {
     let s = $configs;
     if (s) {
-      if (!_init && s.loaded) {
-        _init = true;
-        configured = true;
-        loadingBalance = true;
-        getBalance(configs.getActiveProfile())
-          .then((balance) => {
-            configs.setBalance(balance);
-          })
-          .catch((err) => {
-            console.log("Error", err);
-          })
-          .finally(() => (loadingBalance = false));
-      }
       profiles = s.profiles;
+      loadingBalance = s.loadingBalance;
       activeProfile = profiles[s.selectedIdx];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
@@ -76,6 +62,8 @@
   function onActiveProfile() {
     activating = true;
     let invalid = false;
+    console.log({ activeProfile });
+
     validateMnemonics(activeProfile)
       .then((valid) => {
         invalid = invalid || !valid;
@@ -102,24 +90,27 @@
       .then((valid) => {
         if (valid) {
           configs.setActiveProfile(activeProfile.id, password);
-          loadingBalance = true;
-          return getBalance(activeProfile);
         }
-      })
-      .then((balance) => {
-        configs.setBalance(balance);
       })
       .catch((err) => {
         console.log("Error", err);
       })
       .finally(() => {
         activating = false;
-        loadingBalance = false;
       });
   }
 
   const onClickHandler = () => (opened = false);
-  onMount(() => window.addEventListener("click", onClickHandler));
+  onMount(() => {
+    window.addEventListener("click", onClickHandler);
+    const session_password = sessionStorage.getItem("session_password");
+    if (session_password) {
+      password = session_password;
+      configs.load(password);
+      configured = true;
+      // requestAnimationFrame(() => onActiveProfile());
+    }
+  });
   onDestroy(() => window.removeEventListener("click", onClickHandler));
 </script>
 
@@ -174,6 +165,7 @@
               on:click={() => {
                 configured = false;
                 sessionStorage.removeItem("session_password");
+                configs.setActiveProfile(null, password);
               }}
             >
               Back

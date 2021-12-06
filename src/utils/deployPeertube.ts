@@ -232,8 +232,13 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:3000/`];
 
+  window.configs.currentDeploymentStore.deploy("Peertube", name);
   // deploy
-  return client.gateway.deploy_name(gw);
+  return client.gateway.deploy_name(gw).then((res) => {
+    window.configs.baseConfig.updateBalance();
+    window.configs.currentDeploymentStore.clear();
+    return res;
+  });
 }
 
 async function getRedisInfo(client: any, name: string) {

@@ -50,10 +50,15 @@ export default async function deployCaprover(
   machines.network = network;
   machines.description = "caprover leader machine/node";
 
+  window.configs.currentDeploymentStore.deploy("CapRover", name);
   return getGrid(profile, (grid) => {
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+      .then(([vm]) => {
+        window.configs.baseConfig.updateBalance();
+        window.configs.currentDeploymentStore.clear();
+        return vm;
+      });
   });
 }

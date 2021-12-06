@@ -10,7 +10,7 @@ export default class Caprover {
     public name = "CR" + id.split("-")[0],
     public cpu = 4,
     public memory = 1024 * 8,
-    public nodeId = 3,
+    public nodeId: number = null,
     public domain = "",
     public publicKey = "",
     public diskSize = 100,
