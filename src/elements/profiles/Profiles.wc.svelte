@@ -13,7 +13,6 @@
   import { onDestroy, onMount } from "svelte";
 
   const configs = window.configs?.baseConfig;
-  let active = "0";
   let password: string = "";
   let configured: boolean = false;
 
@@ -43,7 +42,7 @@
           .finally(() => (loadingBalance = false));
       }
       profiles = s.profiles;
-      activeProfile = profiles[active];
+      activeProfile = profiles[s.selectedIdx];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
@@ -80,7 +79,9 @@
     validateMnemonics(activeProfile)
       .then((valid) => {
         invalid = invalid || !valid;
-        fields[2].error = valid ? null : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
+        fields[2].error = valid
+          ? null
+          : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
         return activeProfile.storeSecret !== "";
       })
       .then((valid) => {
@@ -123,7 +124,11 @@
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
-  <button type="button"> Manage </button>
+  <button type="button">
+    <span class="icon is-small">
+      <i class="fas fa-user-cog" />
+    </span>
+  </button>
   {#if currentProfile}
     <div class="profile-active">
       <p>{currentProfile.name}</p>
@@ -190,11 +195,15 @@
 
       {#if configured}
         <Tabs
-          bind:active
+          active={$configs.selectedIdx}
           {tabs}
           centered={false}
           on:removed={({ detail }) => configs.deleteProfile(detail)}
-          on:select={() => [2, 3, 4].forEach((i) => (fields[i].error = null))}
+          on:select={(p) => {
+            [2, 3, 4].forEach((i) => (fields[i].error = null));
+            configs.setSelectedIdx(p.detail);
+          }}
+          on:init={() => configs.setSelectedIdx("0")}
         />
 
         <div class="is-flex is-justify-content-flex-end">
@@ -252,6 +261,7 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
   .profile-menu {
     position: fixed;
@@ -268,7 +278,7 @@
 
     button {
       height: 60px;
-      width: 90px;
+      width: 60px;
       border-radius: 70%;
       border: none;
       cursor: inherit;

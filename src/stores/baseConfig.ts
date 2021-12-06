@@ -16,6 +16,7 @@ function createBaseConfig() {
     loaded: false,
     balance: null,
     reload_balance: false,
+    selectedIdx: "0",
     // loadingBalance: false,
   };
 
@@ -29,6 +30,7 @@ function createBaseConfig() {
         loaded: true,
         balance: null,
         reload_balance: false,
+        selectedIdx: "0",
         // loadingBalance: false,
       };
     } catch {}
@@ -83,7 +85,9 @@ function createBaseConfig() {
     },
     addProfile() {
       update((value) => {
-        value.profiles.push(createProfile());
+        value.selectedIdx = (
+          value.profiles.push(createProfile()) - 1
+        ).toString();
         return value;
       });
     },
@@ -204,6 +208,13 @@ function createBaseConfig() {
     //   .catch((err) => console.log("Error", err))
     //   .finally(() => fullStore.setLoadingBalance(false));
     // },
+
+    setSelectedIdx(val: string) {
+      return update((value) => {
+        value.selectedIdx = val;
+        return value;
+      });
+    },
   };
 
   return fullStore;
