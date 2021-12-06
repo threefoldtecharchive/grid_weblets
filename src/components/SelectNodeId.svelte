@@ -8,45 +8,20 @@
 
   // components
   import Input from "./Input.svelte";
-  import nodeExists from "../utils/nodeExists";
-  import validateNode from "../utils/validateNode";
-  import type { FilterOptions } from "grid3_client";
+  import gqlApi from "../utils/gqlApi";
+  const { GridClient } = window.configs?.grid3_client ?? {};
 
   export let cpu: number;
   export let memory: number;
   export let ssd: number;
   export let publicIp: boolean;
-  export let error: string = null;
   export let data: number;
+  export let status: "up" | "down";
+  // export let error: string = null;
 
   export let profile: IProfile;
   let loadingNodes: boolean = false;
-  let manualNodeError: string = "";
-  let manualNodeInfo: string = "";
 
-  function setInfoError(info = "", error = "") {
-    manualNodeInfo = info;
-    manualNodeError = error;
-  }
-  $: {
-    if (!data) {
-      setInfoError("", "Please select a node");
-    } else {
-      setInfoError(`Checking if node ${data} exists`, "");
-      profile &&
-        data &&
-        nodeExists(profile, data).then((exists) => {
-          if (exists) {
-            setInfoError(`Node ${data} exists`, "");
-            validateNode(profile, cpu, memory, ssd, publicIp, data)
-              .then((errmsg) => setInfoError("", errmsg))
-              .catch((err) => setInfoError("", err));
-          } else {
-            setInfoError("", `Node ${data} does not exist`);
-          }
-        });
-    }
-  }
   // prettier-ignore
   const filtersFields: IFormField[] = [
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
@@ -55,9 +30,6 @@
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
       { label: "Please select a country", value: null, selected: true }
     ] },
-    // { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
-    // { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
-    // { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
   ];
 
   // prettier-ignore
@@ -178,6 +150,91 @@
       filters.update(key, inp.value);
     };
   }
+
+  function _nodeValidator(value: number) {
+    value = +value;
+    if (typeof value !== "number") return "Please select a node.";
+    if (value < 1) return "Please select a valid node";
+  }
+
+  const nodeIdField: IFormField = {
+    label: "Node ID",
+    symbol: "nodeId",
+    type: "number",
+    placeholder: "Your Node ID",
+    validator: _nodeValidator,
+  };
+
+  interface IResources { cru: number; sru: number; hru: number; mru: number; ipv4u: number; } // prettier-ignore
+  interface ICapacity { total: IResources; used: IResources; } // prettier-ignore
+
+  let _ctrl: AbortController;
+  let _nodeId: number;
+  let validating: boolean = false;
+  $: {
+    if (profile && _nodeId !== data) {
+      if (!!_nodeValidator(data) && _ctrl) {
+        _ctrl.abort();
+        _ctrl = null;
+        validating = true;
+        status = null;
+      } else {
+        _nodeId = data;
+        if (_ctrl) _ctrl.abort();
+        _ctrl = new AbortController();
+
+        const { networkEnv } = profile;
+        const grid = new GridClient("" as any, "", "", null);
+        const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
+
+        validating = true;
+        status = null;
+        let _capacity: ICapacity;
+        fetch(`${rmbProxy}/nodes/${data}`, {
+          method: "GET",
+          signal: _ctrl.signal,
+        })
+          .then<{ capacity: ICapacity }>((res) => res.json())
+          .then(({ capacity }) => {
+            _capacity = capacity;
+            const { total, used } = capacity;
+            // prettier-ignore
+            let valid = (total.cru - used.cru) >= filters.cru &&
+                        ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
+                        ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
+
+            if (!valid) {
+              status = "down";
+              return;
+            }
+
+            if (filters.publicIPs) {
+              return gqlApi<{ nodes: { id: number }[] }>(
+                profile,
+                "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
+                { id: data }
+              )
+                .then(({ nodes: [{ id }] }) => {
+                  return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
+                })
+                .then(({ publicIps: ips }) => {
+                  status = ips.length > 0 ? "up" : "down";
+                });
+            } else {
+              status = "up";
+            }
+          })
+          .catch((err: Error) => {
+            console.log("Error", err);
+            if (err.message.includes("aborted a request")) return;
+            status = "down";
+          })
+          .finally(() => {
+            validating = false;
+          });
+      }
+    }
+  }
 </script>
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
@@ -210,20 +267,20 @@
     }}
   />
 {:else if nodeSelection === "manual"}
-  <Input
-    bind:data
-    field={{
-      label: "Node ID",
-      symbol: "nodeId",
-      type: "number",
-      placeholder: "Your Node ID",
-      error,
-    }}
-  />
-  {#if manualNodeInfo}
-    <p class="help is-success">{manualNodeInfo}</p>
+  <Input bind:data field={nodeIdField} />
+  {#if validating}
+    <p class="help is-success">Validating node {data}</p>
   {/if}
-  {#if manualNodeError}
-    <p class="help is-danger">{manualNodeError}</p>
+  {#if !validating}
+    {#if status == "up"}
+      <p class="help is-success">
+        Node(<strong>{data}</strong>) is up and has enough resources
+      </p>
+    {:else if status === "down"}
+      <p class="help is-danger">
+        Node(<strong>{data}</strong>) might be down or doesn't have enough
+        resources
+      </p>
+    {/if}
   {/if}
 {/if}

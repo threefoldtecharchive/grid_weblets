@@ -19,7 +19,6 @@
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
-  import validateNode from "../../utils/validateNode";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
 
   // Values
@@ -37,8 +36,9 @@
   let profile: IProfile;
   let message: string;
   let modalData: Object;
+  let status: "up" | "down";
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) ; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "up"; // prettier-ignore
 
   // doDeploy
   async function onDeployVM() {
@@ -46,9 +46,6 @@
     success = false;
     failed = false;
     message = undefined;
-
-    const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
-    const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -61,14 +58,6 @@
       loading = false;
       message =
         "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
-      return;
-    }
-
-    const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
-    if (error) {
-      message = error;
-      failed = true;
-      loading = false;
       return;
     }
 
@@ -146,6 +135,7 @@
           )}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
+          bind:status
           filters={data.selection.filters}
           {profile}
         />
@@ -174,5 +164,4 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  // @import "../../assets/global.scss";
 </style>
