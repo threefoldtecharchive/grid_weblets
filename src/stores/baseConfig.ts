@@ -97,6 +97,9 @@ function createBaseConfig() {
           value.activeProfile = null;
         }
         value.profiles.splice(idx, 1);
+        if (value.selectedIdx === idx.toString()) {
+          value.selectedIdx = (idx - 1).toString();
+        }
         return value;
       });
     },
