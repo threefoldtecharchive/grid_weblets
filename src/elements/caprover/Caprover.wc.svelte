@@ -129,6 +129,8 @@
           publicIp={true}
           ssd={data.diskSize}
           bind:data={data.nodeId}
+          bind:nodeSelection={data.selection.type}
+          filters={data.selection.filters}
           {profile}
         />
       {/if}

@@ -145,6 +145,8 @@
             data.rootFsSize
           )}
           bind:data={data.nodeId}
+          bind:nodeSelection={data.selection.type}
+          filters={data.selection.filters}
           {profile}
         />
       {/if}
