@@ -8,9 +8,9 @@
 
   // components
   import Input from "./Input.svelte";
-import nodeExists from "../utils/nodeExists";
-import findNodes from "../utils/findNodes";
-import validateNode from "../utils/validateNode";
+  import nodeExists from "../utils/nodeExists";
+  import validateNode from "../utils/validateNode";
+  import type { FilterOptions } from "grid3_client";
 
   export let cpu: number;
   export let memory: number;
@@ -19,34 +19,33 @@ import validateNode from "../utils/validateNode";
   export let error: string = null;
   export let data: number;
 
-
   export let profile: IProfile;
   let loadingNodes: boolean = false;
   let manualNodeError: string = "";
   let manualNodeInfo: string = "";
 
-  function setInfoError(info="", error="") {
+  function setInfoError(info = "", error = "") {
     manualNodeInfo = info;
     manualNodeError = error;
   }
- $: {
+  $: {
     if (!data) {
-      setInfoError("", "Please select a node")
-    } else { 
+      setInfoError("", "Please select a node");
+    } else {
       setInfoError(`Checking if node ${data} exists`, "");
-      profile && data && nodeExists(profile, data).then(exists => {
-        if (exists) {
-          setInfoError(`Node ${data} exists`, "");
-          validateNode(profile, cpu, memory, ssd, publicIp, data)
-          .then( errmsg => setInfoError("", errmsg))
-          .catch(err => setInfoError("", err));
-        } else{
-          setInfoError("", `Node ${data} does not exist`);
-        }
-      })
+      profile &&
+        data &&
+        nodeExists(profile, data).then((exists) => {
+          if (exists) {
+            setInfoError(`Node ${data} exists`, "");
+            validateNode(profile, cpu, memory, ssd, publicIp, data)
+              .then((errmsg) => setInfoError("", errmsg))
+              .catch((err) => setInfoError("", err));
+          } else {
+            setInfoError("", `Node ${data} does not exist`);
+          }
+        });
     }
-
-
   }
   // prettier-ignore
   const filtersFields: IFormField[] = [
@@ -56,19 +55,16 @@ import validateNode from "../utils/validateNode";
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
       { label: "Please select a country", value: null, selected: true }
     ] },
-    { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
-    { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
-    { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
+    // { label: "CPU (Cores)", symbol: "cru", type: "number", placeholder: "Enter CPU" },
+    // { label: "Memory (GB)", symbol: "mru", type: "number", placeholder: "Enter Memory" },
+    // { label: "SSD (GB)", symbol: "sru", type: "number", placeholder: "Enter SSD size" },
   ];
 
   // prettier-ignore
-  const nodeIdSelectField: IFormField = { 
-    label: "Node ID", 
-    type: "select",
-    symbol: "nodeId",
+  const nodeIdSelectField /* : IFormField */ = {
     options: [
       { label: "Please select a node id.", value: null, selected: true, disabled: true },
-    ]
+    ] as ISelectOption[]
   };
 
   // prettier-ignore
@@ -82,35 +78,35 @@ import validateNode from "../utils/validateNode";
       { label: "Manual", value: "manual" }
     ]
   };
-  let nodeSelection: string = null;
+  export let nodeSelection: string;
 
-  const nodeFilters = {
-    // boolean
-    publicIPs: null, // -
+  export let filters: any;
 
-    // string
-    country: null,
-    farmName: null, // *
-
-    // number
-    cru: null, // *
-    mru: null, // *
-    sru: null, // *
-  };
   $: {
-    if (cpu) nodeFilters.cru = cpu;
-    if (memory) nodeFilters.mru = Math.round(memory / 1024);
-    if (ssd) nodeFilters.sru = ssd;
-    nodeFilters.publicIPs = publicIp;
+    if (filters) {
+      if (cpu) filters.update("cru", cpu);
+      if (memory) filters.update("mru", Math.round(memory / 1024));
+      if (ssd) filters.update("sru", ssd);
+      filters.update("publicIPs", publicIp);
+    }
   }
-
 
   function onLoadNodesHandler() {
     loadingNodes = true;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
 
-    findNodes(nodeFilters, profile)
+    findNodes(
+      {
+        publicIPs: filters.publicIPs,
+        country: filters.country,
+        farmName: filters.farmName,
+        cru: filters.cru,
+        mru: filters.mru,
+        sru: filters.sru,
+      },
+      profile
+    )
       .then((_nodes) => {
         nodeIdSelectField.options[0].label = label;
         const [option] = nodeIdSelectField.options;
@@ -125,7 +121,6 @@ import validateNode from "../utils/validateNode";
         nodeIdSelectField.options[0].label = label;
       });
   }
-
 
   function _setLabel(index: number, label: string = "Loading...") {
     const oldLabel = filtersFields[index].options[0].label;
@@ -176,14 +171,26 @@ import validateNode from "../utils/validateNode";
         });
     }
   }
+
+  function _update(key: string) {
+    return (e: { detail: Event }) => {
+      const inp = e.detail.target as HTMLInputElement;
+      filters.update(key, inp.value);
+    };
+  }
 </script>
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />
 {#if nodeSelection === "automatic"}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
-    <Input bind:data={nodeFilters[field.symbol]} {field} />
+    <Input
+      data={filters[field.symbol]}
+      {field}
+      on:input={_update(field.symbol)}
+    />
   {/each}
+
   <button
     class={"button is-primary mt-2 " + (loadingNodes ? "is-loading" : "")}
     disabled={loadingNodes}
@@ -193,7 +200,15 @@ import validateNode from "../utils/validateNode";
     Apply filters and suggest nodes
   </button>
 
-  <Input bind:data field={nodeIdSelectField} />
+  <Input
+    bind:data
+    field={{
+      label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+      type: "select",
+      symbol: "nodeId",
+      options: nodeIdSelectField.options,
+    }}
+  />
 {:else if nodeSelection === "manual"}
   <Input
     bind:data

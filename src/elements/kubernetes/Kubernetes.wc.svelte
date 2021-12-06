@@ -175,6 +175,8 @@
           publicIp={data.master.publicIp}
           ssd={data.master.diskSize}
           bind:data={data.master.node}
+          bind:nodeSelection={data.master.selection.type}
+          filters={data.master.selection.filters}
           {profile}
         />
       {:else if active === "workers"}
@@ -197,7 +199,9 @@
                 memory={worker.memory}
                 publicIp={worker.publicIp}
                 ssd={worker.diskSize}
+                filters={worker.selection.filters}
                 bind:data={worker.node}
+                bind:nodeSelection={worker.selection.type}
                 {profile}
               />
             </div>

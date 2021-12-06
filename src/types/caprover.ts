@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
+import NodeID from "./nodeId";
 
 export default class Caprover {
   constructor(
@@ -13,7 +14,9 @@ export default class Caprover {
     public domain = "",
     public publicKey = "",
     public diskSize = 100,
-    public password = id.split("-").join("").slice(0, 8)
+    public password = id.split("-").join("").slice(0, 8),
+
+    public selection = new NodeID()
   ) {}
 
   public get valid(): boolean {
