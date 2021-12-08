@@ -1,28 +1,13 @@
 import type { IProfile } from "../types/Profile";
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const { GridClient } = window.configs?.grid3_client ?? {};
+import getGrid from "./getGrid";
 
 export default async function getBalance(profile: IProfile) {
   if (!profile) return null;
 
-  const { networkEnv, mnemonics, storeSecret } = profile;
-
-  const grid = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    new HTTPMessageBusClient(0, ""),
-    undefined,
-    "tfkvstore" as any
-  );
-
-  return grid
-    .connect()
-    .then<{ free: number }>(() => {
-      return grid.balance.getMyBalance();
-    })
-    .then(async ({ free }) => {
-      grid.disconnect();
-      return free;
-    });
+  return getGrid(profile, (grid) => {
+    // prettier-ignore
+    return grid.balance
+      .getMyBalance()
+      .then((res) => res.free as number);
+  });
 }
