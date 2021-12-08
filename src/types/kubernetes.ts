@@ -14,7 +14,8 @@ export abstract class Base {
     public rootFsSize: number = 50,
     public planetary: boolean = true,
 
-    public selection = new NodeID()
+    public selection = new NodeID(),
+    public status: "valid" | "invalid" = null
   ) {}
 
   public get valid(): boolean {
