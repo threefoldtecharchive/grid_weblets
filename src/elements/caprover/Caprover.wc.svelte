@@ -24,8 +24,8 @@
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
   const configs = window.configs?.baseConfig;
-  let status: "up" | "down";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "up"; // prettier-ignore
+  let status: "valid" | "invalid";
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid"; // prettier-ignore
 
   // prettier-ignore
   const tabs: ITab[] = [

@@ -36,9 +36,9 @@
   let profile: IProfile;
   let message: string;
   let modalData: Object;
-  let status: "up" | "down";
+  let status: "valid" | "invalid";
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "up"; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "valid"; // prettier-ignore
 
   // doDeploy
   async function onDeployVM() {

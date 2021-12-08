@@ -59,7 +59,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "up" || data.workers.reduce((res, { status }) => res || status !== "up", false); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false); // prettier-ignore
   let modalData: Object;
   const configs = window.configs?.baseConfig;
 

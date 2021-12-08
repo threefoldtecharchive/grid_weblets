@@ -16,7 +16,7 @@
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number;
-  export let status: "up" | "down";
+  export let status: "valid" | "invalid";
   // export let error: string = null;
 
   export let profile: IProfile;
@@ -176,7 +176,7 @@
       if (!!_nodeValidator(data) && _ctrl) {
         _ctrl.abort();
         _ctrl = null;
-        validating = true;
+        validating = false;
         status = null;
       } else {
         _nodeId = data;
@@ -189,14 +189,12 @@
 
         validating = true;
         status = null;
-        let _capacity: ICapacity;
         fetch(`${rmbProxy}/nodes/${data}`, {
           method: "GET",
           signal: _ctrl.signal,
         })
           .then<{ capacity: ICapacity }>((res) => res.json())
           .then(({ capacity }) => {
-            _capacity = capacity;
             const { total, used } = capacity;
             // prettier-ignore
             let valid = (total.cru - used.cru) >= filters.cru &&
@@ -204,7 +202,7 @@
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
 
             if (!valid) {
-              status = "down";
+              status = "invalid";
               return;
             }
 
@@ -218,16 +216,16 @@
                   return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
                 })
                 .then(({ publicIps: ips }) => {
-                  status = ips.length > 0 ? "up" : "down";
+                  status = ips.length > 0 ? "valid" : "invalid";
                 });
             } else {
-              status = "up";
+              status = "valid";
             }
           })
           .catch((err: Error) => {
             console.log("Error", err);
             if (err.message.includes("aborted a request")) return;
-            status = "down";
+            status = "invalid";
           })
           .finally(() => {
             validating = false;
@@ -268,15 +266,15 @@
   />
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
-  {#if validating}
+  {#if validating && data}
     <p class="help is-success">Validating node {data}</p>
   {/if}
-  {#if !validating}
-    {#if status == "up"}
+  {#if !validating && data}
+    {#if status == "valid"}
       <p class="help is-success">
         Node(<strong>{data}</strong>) is up and has enough resources
       </p>
-    {:else if status === "down"}
+    {:else if status === "invalid"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
         resources

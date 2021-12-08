@@ -31,8 +31,8 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let status: "up" | "down";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "up"; // prettier-ignore
+  let status: "valid" | "invalid";
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "valid"; // prettier-ignore
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
 
