@@ -5,7 +5,6 @@
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
-  import validateNode from "../../utils/validateNode";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -49,7 +48,6 @@
     symbol: "flist",
     type: "select",
     options: [
-      // { label: "Please select an image", value: null, selected: true, disabled: true },
       { label: "Alpine", value: "0", selected: true },
       { label: "Ubuntu", value: "1" },
       { label: "Other", value: "other" }
@@ -60,7 +58,7 @@
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
-      const flist = flists[selectedFlist /*  - 1 */];
+      const flist = flists[selectedFlist];
       data.flist = flist?.url;
       data.entrypoint = flist?.entryPoint;
     }
@@ -92,16 +90,15 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile; // prettier-ignore
   const configs = window.configs?.baseConfig;
 
   let message: string;
   let modalData: Object;
+  let status: "valid" | "invalid";
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid"; // prettier-ignore
 
   async function onDeployVM() {
     loading = true;
-    const { cpu, memory, publicIp, disks, rootFsSize, nodeId } = data;
-    const size = disks.reduce((total, disk) => total + disk.size, rootFsSize);
 
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
@@ -114,14 +111,6 @@
       loading = false;
       message =
         "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
-      return;
-    }
-
-    const error =  await validateNode(profile, cpu, memory, size, publicIp, nodeId); // prettier-ignore
-    if (error) {
-      message = error;
-      failed = true;
-      loading = false;
       return;
     }
 
@@ -199,6 +188,7 @@
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
+          bind:status
           {profile}
         />
       {:else if active === "env"}
