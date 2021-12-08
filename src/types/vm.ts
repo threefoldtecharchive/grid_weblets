@@ -40,7 +40,7 @@ export default class VM {
     public memory = 1024 * 8,
     public entrypoint = "/sbin/zinit init",
     public planetary = true,
-    public nodeId = 1,
+    public nodeId: number = null,
     public rootFsSize = 25,
 
     /* Network */

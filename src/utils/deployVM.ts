@@ -32,7 +32,10 @@ export default async function deployVM(data: VM, profile: IProfile) {
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+      .then(([vm]) => {
+        window.configs.baseConfig.updateBalance();
+        return vm;
+      });
   });
 }
 
