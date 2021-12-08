@@ -15,7 +15,7 @@ export abstract class Base {
     public planetary: boolean = true,
 
     public selection = new NodeID(),
-    public status: "up" | "down" = null
+    public status: "valid" | "invalid" = null
   ) {}
 
   public get valid(): boolean {

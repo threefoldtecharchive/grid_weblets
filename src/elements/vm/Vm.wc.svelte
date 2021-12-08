@@ -94,8 +94,8 @@
 
   let message: string;
   let modalData: Object;
-  let status: "up" | "down";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "up"; // prettier-ignore
+  let status: "valid" | "invalid";
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid"; // prettier-ignore
 
   async function onDeployVM() {
     loading = true;
