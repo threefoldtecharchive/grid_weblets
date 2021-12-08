@@ -143,7 +143,6 @@
       .finally(() => {
         loading = false;
         events.removeListener("logs", onLogInfo);
-        configs.setReloadBalance();
       });
   }
 </script>
