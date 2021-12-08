@@ -176,7 +176,7 @@
 
       <p class="mt-4">
         Please visit <a
-          href="https://library.threefold.me/info/threefold"
+          href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
           target="_blank"
         >
           the manual
