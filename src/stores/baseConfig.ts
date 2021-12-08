@@ -5,6 +5,7 @@ import { encrypt, decrypt } from "crypto-js/aes";
 import { v4 } from "uuid";
 import type { IProfile } from "../types/Profile";
 import getBalance from "../utils/getBalance";
+import getGrid from "../utils/getGrid";
 
 const PREFIX = "v2.";
 const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
@@ -16,6 +17,8 @@ function createBaseConfig() {
     balance: null,
     selectedIdx: "0",
     loadingBalance: false,
+    twinId: null,
+    address: null,
   });
 
   function hashPassword(password: string) {
@@ -109,6 +112,7 @@ function createBaseConfig() {
 
         if (get(store).activeProfile) {
           fullStore.updateBalance();
+          fullStore._loadActiveProfileInfo();
         }
       } catch {
         return "Incorrect data.";
@@ -128,6 +132,18 @@ function createBaseConfig() {
       });
     },
 
+    _loadActiveProfileInfo() {
+      getGrid(fullStore.getActiveProfile(), (grid) => {
+        grid.twins.get_my_twin_id().then((twin) => {
+          update((value) => {
+            value.twinId = twin;
+            value.address = grid.twins.client.client.address;
+            return value;
+          });
+        });
+      });
+    },
+
     updateBalance() {
       const { activeProfile } = get(store);
       if (!activeProfile) {
@@ -138,16 +154,12 @@ function createBaseConfig() {
       fullStore._setLoadingBalance(true);
       getBalance(fullStore.getActiveProfile())
         .then((balance) => {
-          console.log({ balance });
-
           fullStore._setBalance(balance);
         })
         .catch((err) => {
           console.log("Error while loading balance", err);
         })
         .finally(() => {
-          console.log({ fullStore });
-
           fullStore._setLoadingBalance(false);
         });
     },
@@ -166,11 +178,16 @@ function createBaseConfig() {
     setActiveProfile(id: string, password: string) {
       update((value) => {
         value.activeProfile = id;
+        value.twinId = null;
+        value.address = null;
         return value;
       });
       requestAnimationFrame(() => {
         fullStore.updateBalance();
         fullStore.save(password);
+        setTimeout(() => {
+          fullStore._loadActiveProfileInfo();
+        }, 1000);
       });
     },
 
