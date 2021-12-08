@@ -233,7 +233,10 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:3000/`];
 
   // deploy
-  return client.gateway.deploy_name(gw);
+  return client.gateway.deploy_name(gw).then((res) => {
+    window.configs.baseConfig.updateBalance();
+    return res;
+  });
 }
 
 async function getRedisInfo(client: any, name: string) {

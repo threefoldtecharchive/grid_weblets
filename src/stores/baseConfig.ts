@@ -4,39 +4,19 @@ import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
 import { v4 } from "uuid";
 import type { IProfile } from "../types/Profile";
+import getBalance from "../utils/getBalance";
 
 const PREFIX = "v2.";
 const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
 
 function createBaseConfig() {
-  const p = createProfile("Profile 1");
-  let _initData = {
-    profiles: [p],
+  const store = writable({
+    profiles: [createProfile("Profile 1")],
     activeProfile: null,
-    loaded: false,
     balance: null,
-    reload_balance: false,
     selectedIdx: "0",
-    // loadingBalance: false,
-  };
-
-  const session_password = sessionStorage.getItem("session_password");
-  if (session_password) {
-    try {
-      const hash = hashPassword(session_password);
-      const data = localStorage.getItem(hash);
-      _initData = {
-        ...JSON.parse(decrypt(data, session_password).toString(enc.Utf8)),
-        loaded: true,
-        balance: null,
-        reload_balance: false,
-        selectedIdx: "0",
-        // loadingBalance: false,
-      };
-    } catch {}
-  }
-
-  const store = writable(_initData);
+    loadingBalance: false,
+  });
 
   function hashPassword(password: string) {
     return PREFIX + md5(password).toString();
@@ -97,6 +77,9 @@ function createBaseConfig() {
           value.activeProfile = null;
         }
         value.profiles.splice(idx, 1);
+        if (value.selectedIdx === idx.toString()) {
+          value.selectedIdx = (idx - 1).toString();
+        }
         return value;
       });
     },
@@ -124,24 +107,59 @@ function createBaseConfig() {
         set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
         sessionStorage.setItem("session_password", password);
 
-        /* TODO: should be removed after fixing issue #95 */
-        // const newData = get(store);
-        // if (newData.activeProfile) {
-        //   window.location.reload();
-        // }
+        if (get(store).activeProfile) {
+          fullStore.updateBalance();
+        }
       } catch {
         return "Incorrect data.";
       }
     },
 
+    _setBalance(balance: number) {
+      return update((value) => {
+        value.balance = balance;
+        return value;
+      });
+    },
+    _setLoadingBalance(loading: boolean) {
+      return update((value) => {
+        value.loadingBalance = loading;
+        return value;
+      });
+    },
+
+    updateBalance() {
+      const { activeProfile } = get(store);
+      if (!activeProfile) {
+        fullStore._setLoadingBalance(false);
+        return fullStore._setBalance(null);
+      }
+
+      fullStore._setLoadingBalance(true);
+      getBalance(fullStore.getActiveProfile())
+        .then((balance) => {
+          console.log({ balance });
+
+          fullStore._setBalance(balance);
+        })
+        .catch((err) => {
+          console.log("Error while loading balance", err);
+        })
+        .finally(() => {
+          console.log({ fullStore });
+
+          fullStore._setLoadingBalance(false);
+        });
+    },
+
     save(password: string) {
-      const hash = hashPassword(password || session_password);
+      const hash = hashPassword(password);
 
       if (localStorage.getItem(hash) === null) {
         return "Password wasn't found.";
       }
 
-      localStorage.setItem(hash, getEncryptedStore(password || session_password)); // prettier-ignore
+      localStorage.setItem(hash, getEncryptedStore(password)); // prettier-ignore
       window.configs.notificationStore.notify("success", "Saved!");
     },
 
@@ -151,17 +169,8 @@ function createBaseConfig() {
         return value;
       });
       requestAnimationFrame(() => {
-        fullStore.save(password || session_password);
-      });
-
-      /* TODO: should be removed after fixing issue #95 */
-      // window.location.reload();
-    },
-
-    deActiveProfile() {
-      return update((value) => {
-        value.activeProfile = null;
-        return value;
+        fullStore.updateBalance();
+        fullStore.save(password);
       });
     },
 
@@ -173,41 +182,6 @@ function createBaseConfig() {
       profile.balance = data.balance;
       return profile;
     },
-
-    setBalance(balance: number) {
-      return update((value) => {
-        value.balance = balance;
-        return value;
-      });
-    },
-
-    setReloadBalance(val: boolean = true) {
-      return update((value) => {
-        if (val) {
-          value.reload_balance = val;
-          value.balance = null;
-        }
-        return value;
-      });
-    },
-
-    // setLoadingBalance(val: boolean) {
-    //   return update((value) => {
-    //     value.loadingBalance = val;
-    //     return value;
-    //   });
-    // },
-
-    // async loadBalance() {
-    // fullStore.setLoadingBalance(true);
-    // return getBalance(fullStore.getActiveProfile())
-    //   .then((balance) => {
-    //     fullStore.setBalance(balance);
-    //     return balance;
-    //   })
-    //   .catch((err) => console.log("Error", err))
-    //   .finally(() => fullStore.setLoadingBalance(false));
-    // },
 
     setSelectedIdx(val: string) {
       return update((value) => {
