@@ -25,7 +25,13 @@ export default async function deployKubernetes(
   k8s.ssh_key = sshKey;
 
   return getGrid(profile, (grid) => {
-    return grid.k8s.deploy(k8s).then(() => grid.machines.getObj(name));
+    return grid.k8s
+      .deploy(k8s)
+      .then(() => grid.machines.getObj(name))
+      .then((vm) => {
+        window.configs.baseConfig.updateBalance();
+        return vm;
+      });
   });
 }
 
