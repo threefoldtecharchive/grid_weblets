@@ -128,7 +128,7 @@ function createBaseConfig() {
       });
     },
 
-    updateBalance() {
+    updateBalance(times: number = 0) {
       const { activeProfile } = get(store);
       if (!activeProfile) {
         fullStore._setLoadingBalance(false);
@@ -138,16 +138,13 @@ function createBaseConfig() {
       fullStore._setLoadingBalance(true);
       getBalance(fullStore.getActiveProfile())
         .then((balance) => {
-          console.log({ balance });
-
           fullStore._setBalance(balance);
         })
-        .catch((err) => {
-          console.log("Error while loading balance", err);
+        .catch((/* err */) => {
+          // console.log("Error while loading balance", err);
+          if (times < 3) fullStore.updateBalance(times + 1);
         })
         .finally(() => {
-          console.log({ fullStore });
-
           fullStore._setLoadingBalance(false);
         });
     },
