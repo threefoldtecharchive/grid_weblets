@@ -248,7 +248,7 @@
 
   <button
     class={"button is-primary mt-2 " + (loadingNodes ? "is-loading" : "")}
-    disabled={loadingNodes}
+    disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}
   >

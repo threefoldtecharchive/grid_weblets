@@ -47,8 +47,10 @@
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
     { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
-  ]
+  ];
   const secretField: IFormField = { label: "Browser Session Secret", type: "password", placeholder: "Browser Session Secret", symbol: "secret", tooltip: "Browser Session Secret" }; // prettier-ignore
+  const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
+  const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true }; // prettier-ignore
 
   let message: string;
   function onEventHandler(event: "create" | "load" | "save") {
@@ -176,7 +178,7 @@
 
       <p class="mt-4">
         Please visit <a
-          href="https://library.threefold.me/info/threefold"
+          href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
           target="_blank"
         >
           the manual
@@ -218,6 +220,10 @@
               }}
             />
           {/each}
+          {#if activeProfileId === activeProfile?.id}
+            <Input data={$configs.twinId} field={twinField} />
+            <Input data={$configs.address} field={addressField} />
+          {/if}
         {/if}
       {:else}
         <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>

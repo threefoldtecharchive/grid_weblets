@@ -12,10 +12,6 @@
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
-      <div class="notification is-warning m-2">
-        <strong>Warning!</strong> Make sure to not leave the page if there is an
-        <strong>in-progress</strong> deployment.
-      </div>
       <div v-html="weblets[active].html" />
     </div>
     <div class="editor__area" v-if="active >= 0">
@@ -25,13 +21,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import { parse } from "marked";
 
 class Weblet {
   private _md: string;
   public html: string;
-  public constructor(public name: string, symbol: string, deployment?: string) {
+  public constructor(
+    public name: string,
+    public symbol: string,
+    deployment?: string
+  ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
       this._md += `<tf-deployedlist tab="${deployment}"></tf-deployedlist>`;
@@ -70,12 +70,16 @@ export default class Editor extends Vue {
     new Weblet("Deployments", "deployedlist"),
   ];
   public active = 0;
+
+  @Watch("$route.params", { deep: true, immediate: true })
+  public onRouterChange(to: { component?: string }) {
+    const idx = this.weblets.findIndex((w) => w.symbol === to.component);
+    this.active = idx > -1 ? idx : 0;
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-@import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-
 @mixin nice-scroll {
   &::-webkit-scrollbar {
     width: 10px;

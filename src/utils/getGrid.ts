@@ -1,7 +1,7 @@
 import type { IProfile } from "../types/Profile";
 import type { GridClient } from "grid3_client";
 
-export default function getGrid<T>(
+export default async function getGrid<T>(
   profile: IProfile,
   cb: (grid: GridClient) => T,
   disconnect: boolean = true
@@ -16,14 +16,9 @@ export default function getGrid<T>(
     window.configs.grid3_client.BackendStorageType.tfkvstore
   );
 
-  return grid
-    .connect()
-    .then(() => {
-      return cb(grid);
-    })
-    .finally(() => {
-      if (disconnect) {
-        grid.disconnect();
-      }
-    });
+  try {
+    await grid.connect();
+  } catch {}
+
+  return cb(grid);
 }
