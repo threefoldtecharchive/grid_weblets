@@ -106,8 +106,11 @@ async function deployPrefixGateway(client: any, name: string, backend: string) {
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
 
+  window.configs.currentDeploymentStore.deploy("Funkwhale", name);
   // deploy
-  return client.gateway.deploy_name(gw);
+  return client.gateway.deploy_name(gw).finally(() => {
+    window.configs.currentDeploymentStore.clear();
+  });
 }
 
 async function getFunkwhaleInfo(client: any, name: string) {
