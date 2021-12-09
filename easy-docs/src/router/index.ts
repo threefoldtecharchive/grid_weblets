@@ -5,6 +5,11 @@ Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
+    path: "/:component",
+    name: "editor",
+    component: () => import("../views/Editor.vue"),
+  },
+  {
     path: "*",
     name: "editor",
     component: () => import("../views/Editor.vue"),

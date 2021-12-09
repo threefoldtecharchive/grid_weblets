@@ -9,6 +9,7 @@
   export let field: IFormField;
   export let data: any;
   export let selected: number = 0;
+  export let invalid = false;
 
   const id = v4();
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
@@ -23,7 +24,9 @@
   function _onInput(e: Event) {
     if (field.validator) {
       const target = e.target as HTMLInputElement;
-      _error = field.validator(target.value);
+      let __err = field.validator(target.value);
+      _error = typeof __err === "string" ? __err : undefined;
+      invalid = !!__err;
     }
     dispatch("input", e);
   }

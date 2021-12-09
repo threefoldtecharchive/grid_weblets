@@ -47,7 +47,8 @@ export interface IFormField {
   options?: ISelectOption[];
   disabled?: boolean;
   error?: string;
-  validator?: (value: string | number | boolean) => string | undefined;
+  validator?: (value: string | number | boolean) => string | void;
+  invalid?: boolean;
 }
 
 export interface IFlist {
