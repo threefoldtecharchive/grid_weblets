@@ -7,18 +7,22 @@ It solves such problem where you had to write complex HTML (and associated style
 
 [^1]: In case you wonder what is [svelte](https://github.com/sveltejs/svelte), It's a compiler that takes your declarative components and converts them into efficient JavaScript that surgically updates the DOM. if your are interested to learn more about Sevlte and how to get started with it you can check this [tutorial](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Svelte_getting_started)
 
-## The Contents
-- [Getting Started](getting-started)
+# The Contents
+  - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
-    - [Run The Playground](run-the-playground)
-- [Elements](elements)
-    - [K8S](#kubernetes)
-    - [VM](#virtual-machine)
+    - [Run The Playground](#run-the-playground)
+  - [Elements](#elements)
+    - [Kubernetes](#kubernetes)
+    - [Virtual Machine](#virtual-machine)
     - [Caprover](#caprover)
     - [Deployed List](#deployed-list)
-- [Add New Weblet](#add-new-weblet)
-
+  - [Add New Weblet](#add-new-weblet)
+  - [Playground](#playground)
+  - [Test a weblet](#test-a-weblet)
+    - [Create](#create)
+    - [Build](#build)
+    - [Use](#use)
 
 ## Getting Started
 In order to work with this project you need to have `Node.js` installed. It's recommended that you use the Active long-term support (LTS) version 16. Node includes `npm` (the node package manager), and `npx` (the node package runner). Note that it is recommended to use the Yarn package manager in place of npm, we'll assume you are using `yarn` in these Docs.
@@ -46,7 +50,7 @@ You can see the following for more information about installing other versions o
   [install Node.js on Debian and Ubuntu based distributions](https://github.com/nodesource/distributions/blob/master/README.md)
 
 
-### installation
+### Installation
 - **Clone the repo**
   ```
   git clone https://github.com/threefoldtech/grid_weblets.git
@@ -108,7 +112,7 @@ You can see the following for more information about installing other versions o
 ```
 ![image](https://user-images.githubusercontent.com/31689104/140759852-e056e5bb-bcc7-4096-9b7c-7110afc05284.png)
 
-### Caprover
+### Deployed List
 ```html
 <tf-deployedlist></tf-deployedlist> <!-- to show all tabs -->
 <!-- Accept tab attribute      tab =  'vm' | 'k8s' | 'caprover' -->
@@ -170,7 +174,7 @@ yarn build
 
 
 
-## playground
+## Playground
 
 - `cd easy-docs`
 - `yarn build`  will output in the docs directory
