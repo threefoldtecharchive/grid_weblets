@@ -219,11 +219,13 @@
                 disabled: activeProfileId === activeProfile.id,
               }}
             />
+            {#if activeProfileId === activeProfile?.id }
+              {#if field.symbol === "mnemonics"}
+                <Input data={$configs.twinId} field={twinField} />
+                <Input data={$configs.address} field={addressField} />
+              {/if}
+            {/if}
           {/each}
-          {#if activeProfileId === activeProfile?.id}
-            <Input data={$configs.twinId} field={twinField} />
-            <Input data={$configs.address} field={addressField} />
-          {/if}
         {/if}
       {:else}
         <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
