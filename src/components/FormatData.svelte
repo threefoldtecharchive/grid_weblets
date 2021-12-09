@@ -20,9 +20,11 @@
   const wireguardField: IFormField = { label: "WireGuard", symbol: "wireguard", type: "text", disabled: true }; // prettier-ignore
   const flistField: IFormField = { label: "Flist", symbol: "flist", type: "text", disabled: true }; // prettier-ignore
   // const domainField: IFormField = { label: "Domain", symbol: "domain", type: "text", disabled: true, tooltip: "Default Password: captain42" }; // prettier-ignore
+  const contractIdField: IFormField = { label: "Contract ID", symbol: "contractId", type: "number", disabled: true }; // prettier-ignore
 </script>
 
 {#each vms as vm, index}
+  <Input data={vm.contractId} field={contractIdField} />
   <Input data={vm.name} field={nameField} />
   <Input data={!!vm.publicIP} field={publicIpField} />
   {#if vm.planetary}
@@ -71,7 +73,7 @@
       }}
     />
   {/if}
-    {#if vm.env.FUNKWHALE_HOSTNAME}
+  {#if vm.env.FUNKWHALE_HOSTNAME}
     <Input
       data={"https://" + vm.env.FUNKWHALE_HOSTNAME}
       field={{
