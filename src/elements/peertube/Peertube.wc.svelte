@@ -80,13 +80,6 @@
         events.removeListener("logs", onLogInfo);
       });
   }
-
-  // function validateNameHandler(e: Event) {
-  //   const inp = e.target as HTMLInputElement;
-  //   nameField.error = inp.value.match(/^[a-z][a-z0-9]*$/i)
-  //     ? null
-  //     : "Only alphanumeric names are allowed";
-  // }
 </script>
 
 <div style="padding: 15px;">
