@@ -9,7 +9,7 @@
 
   import VM, { Env } from "../../types/vm";
   import deployFunkwhale, {
-    gateway,
+    domain,
     funkYggIp,
   } from "../../utils/deployFunkwhale";
 
@@ -64,7 +64,7 @@
       .then(() => {
         deploymentStore.set(0);
         success = true;
-        console.log(gateway);
+        console.log(domain);
         console.log(funkYggIp);
       })
       .catch((err) => {
@@ -90,7 +90,7 @@
         type="success"
         message="Successfully Deployed A Funkwhale Instance"
         planetaryIP={funkYggIp}
-        domain={gateway}
+        {domain}
         deployed={true}
       />
     {:else if failed}
