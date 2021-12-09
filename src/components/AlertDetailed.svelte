@@ -12,7 +12,11 @@
   <hr />
   <h3 style="font-weight: bold;">Deployment Info:</h3>
   <ul class="ml-2">
-    <li>Domain: https://{gateway}/</li>
+    <li>
+      Domain: <a href={`https://${gateway}/`} target="_blank">
+        https://{gateway}/
+      </a>
+    </li>
     <li>Planetary IP: {planetaryIP}</li>
   </ul>
 </div>
