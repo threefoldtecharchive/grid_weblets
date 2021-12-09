@@ -17,6 +17,7 @@
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import validateName from "../../utils/validateName";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -34,7 +35,7 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text" }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   // prettier-ignore
   const flists: IFlist[] = [
@@ -95,7 +96,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid"; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
 
   async function onDeployVM() {
     loading = true;
@@ -159,7 +160,11 @@
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
-        <Input bind:data={data.name} field={nameField} />
+        <Input
+          bind:data={data.name}
+          bind:invalid={nameField.invalid}
+          field={nameField}
+        />
 
         <Input
           bind:data={flistSelectValue}
