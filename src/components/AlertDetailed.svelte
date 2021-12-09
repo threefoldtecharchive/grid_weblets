@@ -3,7 +3,7 @@
 <script lang="ts">
   export let type: "info" | "success" | "danger";
   export let message: string;
-  export let gateway: string;
+  export let domain: string;
   export let planetaryIP: string;
 </script>
 
@@ -13,8 +13,8 @@
   <h3 style="font-weight: bold;">Deployment Info:</h3>
   <ul class="ml-2">
     <li>
-      Domain: <a href={`https://${gateway}/`} target="_blank">
-        https://{gateway}/
+      Domain: <a href={`https://${domain}/`} target="_blank">
+        https://{domain}/
       </a>
     </li>
     <li>Planetary IP: {planetaryIP}</li>

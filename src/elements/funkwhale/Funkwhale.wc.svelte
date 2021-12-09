@@ -90,7 +90,7 @@
         type="success"
         message="Successfully Deployed A Funkwhale Instance"
         planetaryIP={funkYggIp}
-        {gateway}
+        domain={gateway}
       />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
