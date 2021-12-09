@@ -145,7 +145,11 @@
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
     {:else if success}
-      <Alert type="success" message="Successfully deployed VM." />
+      <Alert
+        type="success"
+        message="Successfully deployed VM."
+        deployed={true}
+      />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
