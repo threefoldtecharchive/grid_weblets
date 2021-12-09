@@ -9,10 +9,6 @@
   export let disabled: boolean;
 
   $: deployment = $currentDeployment;
-
-  $: {
-    console.log(deployment);
-  }
 </script>
 
 <div class="is-flex is-justify-content-space-between is-align-items-center">
