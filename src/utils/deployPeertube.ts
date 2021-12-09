@@ -19,7 +19,7 @@ const {
   Nodes,
 } = window.configs?.grid3_client ?? {};
 
-export let gateway, peertubeYggIp;
+export let domain, peertubeYggIp;
 
 export default async function deployPeertube(data: VM, profile: IProfile) {
   // connect
@@ -48,7 +48,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const gwNodeId = 8;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
-  gateway = `${name}.${gwDomain}`;
+  domain = `${name}.${gwDomain}`;
   // console.log(gateway);
 
   // // define a network
@@ -78,7 +78,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     postgresIP,
     nodeId,
     name,
-    gateway
+    domain
   );
 
   // // get the info
