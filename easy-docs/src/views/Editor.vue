@@ -12,10 +12,6 @@
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
-      <div class="notification is-warning m-2">
-        <strong>Warning!</strong> Make sure to not leave the page if there is an
-        <strong>in-progress</strong> deployment.
-      </div>
       <div v-html="weblets[active].html" />
     </div>
     <div class="editor__area" v-if="active >= 0">
@@ -74,8 +70,6 @@ export default class Editor extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-
 @mixin nice-scroll {
   &::-webkit-scrollbar {
     width: 10px;
