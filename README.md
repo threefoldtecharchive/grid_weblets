@@ -3,7 +3,7 @@
 
 A svelte[^1] project for creating web components - which are reusable custom elements with their functionality encapsulated away from the rest of the code — that interact with TF Grid 3 and could be utilized from other web apps.
 
-it solve such problem where you had to write complex HTML (and associated style and script) to render custom UI controls (eg, to deploy some workload on the TF Grid 3), and how using them multiple times in different projects can be a miss if you are not careful.
+It solves such problem where you had to write complex HTML (and associated style and script) to render custom UI controls (eg, to deploy some workload on the TF Grid 3), and how using them multiple times in different projects can be a miss if you are not careful.
 
 [^1]: in case you wonder what is [svelte](https://github.com/sveltejs/svelte), It's a compiler that takes your declarative components and converts them into efficient JavaScript that surgically updates the DOM. if your are interested to learn more about Sevlte and how to get started with it you can check this [tutorial](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Svelte_getting_started)
 
