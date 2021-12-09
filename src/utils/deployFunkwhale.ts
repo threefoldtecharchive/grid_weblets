@@ -14,7 +14,7 @@ const {
   Nodes,
 } = window.configs?.grid3_client ?? {};
 
-export let gateway, funkYggIp;
+export let domain, funkYggIp;
 
 export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
@@ -42,13 +42,13 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const gwNodeId = 8;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
-  gateway = `${name}.${gwDomain}`;
+  domain = `${name}.${gwDomain}`;
 
   const network = new NetworkModel();
   network.name = name + "NW";
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(grid, name, network, nodeId, gateway);
+  await deployFunkwhaleVM(grid, name, network, nodeId, domain);
 
   const info = await getFunkwhaleInfo(grid, name);
   funkYggIp = info[0]["yggIP"];
