@@ -45,6 +45,8 @@
       { label: "Devnet", value: "dev" }
     ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
+    // { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true },
+    // { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true },
     { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
   ];
@@ -219,11 +221,13 @@
                 disabled: activeProfileId === activeProfile.id,
               }}
             />
+            {#if activeProfileId === activeProfile?.id }
+              {#if field.symbol === "mnemonics"}
+                <Input data={$configs.twinId} field={twinField} />
+                <Input data={$configs.address} field={addressField} />
+              {/if}
+            {/if}
           {/each}
-          {#if activeProfileId === activeProfile?.id}
-            <Input data={$configs.twinId} field={twinField} />
-            <Input data={$configs.address} field={addressField} />
-          {/if}
         {/if}
       {:else}
         <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
