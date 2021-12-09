@@ -21,7 +21,7 @@ it solve such problem where you had to write complex HTML (and associated style 
 
 
 ## Getting Started
-In order to work with this project you need to have `Node.js` installed. It's recommended that you use the Active long-term support (LTS) version 16. Node includes `npm` (the node package manager), and `npx` (the node package runner). Note that it is recommended to use the Yarn package manager in place of npm, we'll assume you are using `yarn` in this Docs.
+In order to work with this project you need to have `Node.js` installed. It's recommended that you use the Active long-term support (LTS) version 16. Node includes `npm` (the node package manager), and `npx` (the node package runner). Note that it is recommended to use the Yarn package manager in place of npm, we'll assume you are using `yarn` in these Docs.
 
 ### Prerequisites
 - Node.js >= 14
