@@ -19,6 +19,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import validateName from "../../utils/validateName";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -29,7 +30,7 @@
 
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text", validator: validateName, invalid: false },
     { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "text" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
   ];
@@ -59,7 +60,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || baseFields[0].invalid; // prettier-ignore
   let modalData: Object;
   const configs = window.configs?.baseConfig;
 
@@ -140,7 +141,11 @@
 
       {#if active === "config"}
         {#each kubernetesFields as field (field.symbol)}
-          <Input bind:data={data[field.symbol]} {field} />
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
         {/each}
         {#each networkFields as field (field.symbol)}
           <Input bind:data={data.network[field.symbol]} {field} />
