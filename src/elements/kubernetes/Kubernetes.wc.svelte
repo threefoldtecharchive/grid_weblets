@@ -120,7 +120,11 @@
     {#if loading}
       <Alert type="info" message={message || "Loading..."} />
     {:else if success}
-      <Alert type="success" message="Successfully deployed K8S." />
+      <Alert
+        type="success"
+        message="Successfully deployed K8S."
+        deployed={true}
+      />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}

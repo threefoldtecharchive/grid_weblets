@@ -103,6 +103,7 @@
         message="Successfully Deployed A Peertube Instance"
         planetaryIP={peertubeYggIp}
         {gateway}
+        deployed={true}
       />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
