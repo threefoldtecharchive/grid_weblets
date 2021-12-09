@@ -21,13 +21,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import { parse } from "marked";
 
 class Weblet {
   private _md: string;
   public html: string;
-  public constructor(public name: string, symbol: string, deployment?: string) {
+  public constructor(
+    public name: string,
+    public symbol: string,
+    deployment?: string
+  ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
       this._md += `<tf-deployedlist tab="${deployment}"></tf-deployedlist>`;
@@ -66,6 +70,12 @@ export default class Editor extends Vue {
     new Weblet("Deployments", "deployedlist"),
   ];
   public active = 0;
+
+  @Watch("$route.params", { deep: true, immediate: true })
+  public onRouterChange(to: { component?: string }) {
+    const idx = this.weblets.findIndex((w) => w.symbol === to.component);
+    this.active = idx > -1 ? idx : 0;
+  }
 }
 </script>
 
