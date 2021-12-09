@@ -74,7 +74,7 @@ You can see the following for more information about installing other versions o
 
   *JavaScript heap out of memory error:*
 
-    In some cases you could an error like this: `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory`
+    In some cases you could see an error like this: `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory`
 
     As Rollup needs to keep all module information in memory simultaneously to be able to analyze relevant side effects for tree-shaking, it is possible that bundling large projects reaches Node's memory limit. If this happens, it can help to increase this limit by running Rollup via
 
