@@ -22,6 +22,7 @@
   import Alert from "../../components/Alert.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import validateName from "../../utils/validateName";
 
   const data = new VM();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -32,9 +33,9 @@
   let success = false;
   let failed = false;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || !data.name.match(/^[a-z][a-z0-9]*$/i) || status !== "valid"; // prettier-ignore
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text"}; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
 
   let message: string;
 
@@ -75,13 +76,6 @@
         events.removeListener("logs", onLogInfo);
       });
   }
-
-  function validateNameHandler(e: Event) {
-    const inp = e.target as HTMLInputElement;
-    nameField.error = inp.value.match(/^[a-z][a-z0-9]*$/i)
-      ? null
-      : "Only alphanumeric names are allowed";
-  }
 </script>
 
 <div style="padding: 15px;">
@@ -111,8 +105,8 @@
       {#if active === "base"}
         <Input
           bind:data={data.name}
+          bind:invalid={nameField.invalid}
           field={nameField}
-          on:input={validateNameHandler}
         />
 
         <SelectNodeId
