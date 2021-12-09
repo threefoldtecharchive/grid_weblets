@@ -15,8 +15,8 @@
   <div style="width: 100%; padding-right: 15px;">
     {#if loading}
       <div class="notification is-warning">
-        <strong>Warning!</strong> if you want to follow the progress of your deployment,
-        don't leave this page.
+        <strong>Warning!</strong> Make sure to not leave the page if there is an
+        in-progress deployment or deletion.
       </div>
     {:else if deployment}
       <div class="notification is-warning">
