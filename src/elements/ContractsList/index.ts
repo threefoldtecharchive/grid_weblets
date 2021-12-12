@@ -1,0 +1,1 @@
+import "./ContractsList.wc.svelte";
