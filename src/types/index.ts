@@ -19,18 +19,6 @@ export type Colors =
   | "warning"
   | "danger";
 
-// export interface IFormField {
-//   label: string;
-//   placeholder?: string;
-//   symbol: string;
-//   textarea?: boolean;
-//   type?: "text" | "number" | "checkbox" | "password";
-//   link?: {
-//     url: string;
-//     label: string;
-//   };
-// }
-
 export interface ISelectOption {
   label: string;
   value: string | number;
@@ -49,6 +37,8 @@ export interface IFormField {
   error?: string;
   validator?: (value: string | number | boolean) => string | void;
   invalid?: boolean;
+  min?: string | number;
+  max?: string | number;
 }
 
 export interface IFlist {
