@@ -114,11 +114,15 @@
 
       {#if active === "config"}
         {#each fields as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
         {/each}
         <SelectNodeId
           cpu={data.cpu}
