@@ -10,7 +10,7 @@ export default class FarmingProfile {
     public maximumTokenPrice: number = 2,
     public powerUtilization: number = 40,
     public powerCost: number = 0.15,
-    public certified: boolean = true,
+    public certified: boolean = false,
     public publicIp: boolean = false,
     public investmentCostHW: number = 1040,
     public nuRequiredPerCu: number = 30
