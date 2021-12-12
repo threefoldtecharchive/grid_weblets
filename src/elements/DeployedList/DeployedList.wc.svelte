@@ -59,14 +59,10 @@
 
   let removing: string = null;
   function onRemoveHandler(key: "k8s" | "machines", name: string) {
-    const remove = window.confirm(`Are you sure u want to delete '${name}'?`);
-    if (!remove) return;
-
     removing = name;
-    deleteContracts(profile, key, name)
+    return deleteContracts(profile, key, name)
       .then((data) => {
         console.log("Removed", data);
-        _reloadTab();
       })
       .catch((err) => {
         console.log("Error while removing", err);
@@ -98,8 +94,24 @@
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
       const { name, publicIp, yggIP, flist } = row;
-      return [i + 1, name, publicIp, yggIP, flist];
+      return [i + 1, name, publicIp, yggIP ?? "", flist];
     });
+  }
+
+  let selectedRows: any[] = [];
+  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
+
+  async function onDeleteHandler() {
+    const names = selectedRows.map(({ name }) => name).join(", ");
+    const remove = window.confirm(`Are you sure u want to delete '${names}'?`);
+    if (!remove) return;
+
+    const key = active === "k8s" ? "k8s" : "machines";
+    for (const row of selectedRows) {
+      await onRemoveHandler(key, row.name);
+    }
+    selectedRows = [];
+    _reloadTab();
   }
 </script>
 
@@ -128,8 +140,23 @@
       />
     {:else}
       {#if !tab}
-        <Tabs bind:active {tabs} disabled={removing !== null} />
+        <Tabs
+          bind:active
+          {tabs}
+          disabled={removing !== null}
+          on:select={() => (selectedRows = [])}
+        />
       {/if}
+
+      <div class="is-flex is-justify-content-flex-end mt-2 mb-2">
+        <button
+          class={"button is-danger " + (removing ? "is-loading" : "")}
+          disabled={selectedRows.length === 0 || removing !== null}
+          on:click={onDeleteHandler}
+        >
+          Delete
+        </button>
+      </div>
 
       <!-- K8S -->
       {#if active === "k8s"}
@@ -138,6 +165,7 @@
         {:then rows}
           {#if rows.length}
             <Table
+              rowsData={rows}
               headers={[
                 "#",
                 "Name",
@@ -152,15 +180,10 @@
                   label: "Show Details",
                   click: (_, i) => (infoToShow = rows[i].details),
                   disabled: () => removing !== null,
-                },
-                {
-                  type: "danger",
-                  label: "Delete",
-                  click: (_, i) => onRemoveHandler("k8s", rows[i].name),
-                  disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
                 },
               ]}
+              on:selected={_onSelectRowHandler}
             />
           {:else}
             <Alert type="info" message="No Kubernetes found on this profile." />
@@ -179,6 +202,7 @@
         {:then rows}
           {#if rows.length}
             <Table
+              rowsData={rows}
               headers={[
                 "#",
                 "Name",
@@ -193,15 +217,10 @@
                   label: "Show Details",
                   click: (_, i) => (infoToShow = rows[i].details),
                   disabled: () => removing !== null,
-                },
-                {
-                  type: "danger",
-                  label: "Delete",
-                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
-                  disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
                 },
               ]}
+              on:selected={_onSelectRowHandler}
             />
           {:else}
             <Alert type="info" message="No VMs found on this profile." />
@@ -220,6 +239,7 @@
         {:then rows}
           {#if rows.length}
             <Table
+              rowsData={rows}
               headers={[
                 "#",
                 "Name",
@@ -233,12 +253,6 @@
                   type: "info",
                   label: "Show Details",
                   click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                },
-                {
-                  type: "danger",
-                  label: "Delete",
-                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
                   disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
                 },
@@ -257,6 +271,7 @@
                   },
                 },
               ]}
+              on:selected={_onSelectRowHandler}
             />
           {:else}
             <Alert type="info" message="No CapRovers found on this profile." />
@@ -275,6 +290,7 @@
         {:then rows}
           {#if rows.length}
             <Table
+              rowsData={rows}
               headers={[
                 "#",
                 "Name",
@@ -288,12 +304,6 @@
                   type: "info",
                   label: "Show Details",
                   click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                },
-                {
-                  type: "danger",
-                  label: "Delete",
-                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
                   disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
                 },
@@ -315,6 +325,7 @@
                   },
                 },
               ]}
+              on:selected={_onSelectRowHandler}
             />
           {:else}
             <Alert type="info" message="No Peertubes found on this profile." />
@@ -333,6 +344,7 @@
         {:then rows}
           {#if rows.length}
             <Table
+              rowsData={rows}
               headers={[
                 "#",
                 "Name",
@@ -346,12 +358,6 @@
                   type: "info",
                   label: "Show Details",
                   click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                },
-                {
-                  type: "danger",
-                  label: "Delete",
-                  click: (_, i) => onRemoveHandler("machines", rows[i].name),
                   disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
                 },
@@ -368,6 +374,7 @@
                   },
                 },
               ]}
+              on:selected={_onSelectRowHandler}
             />
           {:else}
             <Alert type="info" message="No Funkwhale found on this profile." />
