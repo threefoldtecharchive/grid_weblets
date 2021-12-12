@@ -99,7 +99,9 @@
       <SelectProfile
         on:profile={({ detail }) => {
           profile = detail;
-          data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+          if (detail) {
+            data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+          }
         }}
       />
       <Tabs bind:active {tabs} />
