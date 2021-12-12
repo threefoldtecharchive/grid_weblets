@@ -9,6 +9,10 @@
     buildLineChart,
   } from "../../utils/FarmingCalculatorCharts";
 
+  // Components
+  import Input from "../../components/Input.svelte";
+  import type { IFormField } from "../../types";
+
   const profiles = [
     new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
     new FarmingProfile("Titan v2.1", 32, 8, 0, 1000, 0.06, 2), // prettier-ignore
@@ -116,6 +120,7 @@
 
   function onBackProfileChoosing() {
     profileChoosing = true;
+    activeProfile = null;
     _pieChart = null;
     _lineCanvas = null;
   }
@@ -161,6 +166,19 @@
       _updateLineCanvas(); // prettier-ignore
     }
   }
+
+  // prettier-ignore
+  const createNumberField = ({ label, symbol }: any): IFormField => ({ 
+    label, 
+    symbol, 
+    type: "number", 
+    min: 0,
+    validator(val: number) {
+      val = +val;
+      if (isNaN(val)) return "Invalid number";
+      if (val < 0) return "Value must be positive";
+    }  
+  });
 </script>
 
 <section class="farming-container">
@@ -246,14 +264,10 @@
                         {field.label}
                       </label>
                     {:else}
-                      <label class="label">
-                        <p>{field.label}</p>
-                        <input
-                          class="input"
-                          type="number"
-                          bind:value={activeProfile[field.symbol]}
-                        />
-                      </label>
+                      <Input
+                        bind:data={activeProfile[field.symbol]}
+                        field={createNumberField(field)}
+                      />
                     {/if}
                   </div>
                 </div>
@@ -335,14 +349,10 @@
                         {field.label}
                       </label>
                     {:else}
-                      <label class="label">
-                        <p>{field.label}</p>
-                        <input
-                          class="input"
-                          type="number"
-                          bind:value={activeProfile[field.symbol]}
-                        />
-                      </label>
+                      <Input
+                        bind:data={activeProfile[field.symbol]}
+                        field={createNumberField(field)}
+                      />
                     {/if}
                   </div>
                 </div>
@@ -357,14 +367,13 @@
               <div class="chart">
                 <div class="field">
                   <div class="control">
-                    <label class="label">
-                      <p>Token price after 5 years (USD)</p>
-                      <input
-                        class="input"
-                        type="number"
-                        bind:value={activeProfile.priceAfter5Years}
-                      />
-                    </label>
+                    <Input
+                      bind:data={activeProfile.priceAfter5Years}
+                      field={createNumberField({
+                        label: "Token price after 5 years (USD)",
+                        symbol: "priceAfter5Years",
+                      })}
+                    />
                   </div>
                 </div>
                 <hr />
