@@ -51,7 +51,8 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   await deployFunkwhaleVM(grid, name, network, nodeId, domain);
 
   const info = await getFunkwhaleInfo(grid, name);
-  funkYggIp = info[0]["yggIP"];
+  funkYggIp = info[0]["planetary"];
+  console.log(funkYggIp);
 
   await deployPrefixGateway(grid, name, funkYggIp);
 
