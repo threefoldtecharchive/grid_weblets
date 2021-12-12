@@ -1,6 +1,10 @@
 <svelte:options tag="tf-table" />
 
 <script lang="ts">
+  import { createEventDispatcher, onMount } from "svelte";
+
+  const dispatch = createEventDispatcher<{ selected: any[] }>();
+
   interface IAction {
     type: "info" | "success" | "warning" | "danger";
     label: string;
@@ -9,16 +13,35 @@
     loading?: (index: number) => boolean;
   }
 
+  export let rowsData: any[] = [];
   export let headers: string[];
   export let rows: string[][];
   export let actions: IAction[] = [];
+  export let selectable: boolean = true;
 
   $: footer = rows && rows.length > 49;
+
+  const _selectedRows: number[] = [];
+
+  function onSelectHandler(idx: number) {
+    const i = _selectedRows.indexOf(idx);
+    if (i > -1) {
+      _selectedRows.splice(i, 1);
+    } else {
+      _selectedRows.push(idx);
+    }
+
+    dispatch("selected", _selectedRows.map(i => rowsData[i])); // prettier-ignore
+  }
 </script>
 
 <table class="table" style="width: 100%;">
   <thead>
     <tr>
+      {#if selectable}
+        <th />
+      {/if}
+
       {#if headers}
         {#each headers as hd (hd)}
           <th title={hd}>{hd}</th>
@@ -35,6 +58,15 @@
     {#if rows}
       {#each rows as row, idx}
         <tr>
+          {#if selectable}
+            <td>
+              <input
+                type="checkbox"
+                on:change={onSelectHandler.bind(undefined, idx)}
+              />
+            </td>
+          {/if}
+
           {#each row as item (item)}
             <td>{item}</td>
           {/each}
