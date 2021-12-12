@@ -116,6 +116,7 @@
 
   function onBackProfileChoosing() {
     profileChoosing = true;
+    activeProfile = null;
     _pieChart = null;
     _lineCanvas = null;
   }
