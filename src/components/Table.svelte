@@ -1,7 +1,7 @@
 <svelte:options tag="tf-table" />
 
 <script lang="ts">
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher<{ selected: any[] }>();
 
