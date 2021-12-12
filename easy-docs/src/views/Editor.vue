@@ -3,7 +3,11 @@
     <aside class="editor__side menu">
       <p class="menu-label">Threefold Weblets</p>
       <ul class="menu-list">
-        <li v-for="(el, idx) in weblets" :key="el.name" @click="active = idx">
+        <li
+          v-for="(el, idx) in weblets"
+          :key="el.name"
+          @click="$router.push('/' + el.symbol)"
+        >
           <a v-bind:class="{ 'is-active': idx === active }">
             {{ el.name }}
           </a>
