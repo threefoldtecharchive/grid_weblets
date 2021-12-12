@@ -141,11 +141,15 @@
 
       {#if active === "config"}
         {#each kubernetesFields as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
         {/each}
         {#each networkFields as field (field.symbol)}
           <Input bind:data={data.network[field.symbol]} {field} />
