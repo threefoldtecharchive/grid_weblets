@@ -57,8 +57,10 @@ export default async function deployCaprover(
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => {
         window.configs.baseConfig.updateBalance();
-        window.configs.currentDeploymentStore.clear();
         return vm;
+      })
+      .finally(() => {
+        window.configs.currentDeploymentStore.clear();
       });
   });
 }
