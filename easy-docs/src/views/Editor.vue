@@ -71,6 +71,7 @@ export default class Editor extends Vue {
     new Weblet("Funkwhale", "funkwhale", "funkwhale"),
 
     // Make sure [Deployments] always last one!
+    new Weblet("Contracts", "contractslist"),
     new Weblet("Deployments", "deployedlist"),
   ];
   public active = 0;
