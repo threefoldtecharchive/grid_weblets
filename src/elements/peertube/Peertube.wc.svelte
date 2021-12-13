@@ -133,6 +133,8 @@
           bind:status
           filters={data.selection.filters}
           {profile}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
+          nodes={data.selection.nodes}
         />
       {/if}
     {/if}

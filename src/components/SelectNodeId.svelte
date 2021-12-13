@@ -1,6 +1,7 @@
 <svelte:options tag="tf-select-node-id" />
 
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
@@ -11,12 +12,14 @@
   import gqlApi from "../utils/gqlApi";
   const { GridClient } = window.configs?.grid3_client ?? {};
 
+  const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
   export let cpu: number;
   export let memory: number;
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number;
   export let status: "valid" | "invalid";
+  export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
   export let profile: IProfile;
@@ -67,31 +70,27 @@
     loadingNodes = true;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
+    const _filters = {
+      publicIPs: filters.publicIPs,
+      country: filters.country,
+      farmName: filters.farmName,
+      cru: filters.cru,
+      mru: filters.mru,
+      sru: filters.sru,
+    };
 
-    findNodes(
-      {
-        publicIPs: filters.publicIPs,
-        country: filters.country,
-        farmName: filters.farmName,
-        cru: filters.cru,
-        mru: filters.mru,
-        sru: filters.sru,
-      },
-      profile
-    )
-      .then((_nodes) => {
-        nodeIdSelectField.options[0].label = label;
-        const [option] = nodeIdSelectField.options;
-        _nodes.unshift(option);
-        nodeIdSelectField.options = _nodes;
-      })
-      .catch((err) => {
-        console.log("Error", err);
-      })
+    findNodes(_filters, profile)
+      .then((_nodes) => dispatch("fetch", _nodes))
+      .catch((err) => console.log("Error", err))
       .finally(() => {
         loadingNodes = false;
         nodeIdSelectField.options[0].label = label;
       });
+  }
+
+  $: {
+    const [option] = nodeIdSelectField.options;
+    nodeIdSelectField.options = [option, ...nodes];
   }
 
   function _setLabel(index: number, label: string = "Loading...") {

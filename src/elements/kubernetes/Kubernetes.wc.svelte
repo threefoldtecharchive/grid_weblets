@@ -168,6 +168,8 @@
           filters={data.master.selection.filters}
           bind:status={data.master.status}
           {profile}
+          on:fetch={({ detail }) => (data.master.selection.nodes = detail)}
+          nodes={data.master.selection.nodes}
         />
       {:else if active === "workers"}
         <AddBtn
@@ -194,6 +196,8 @@
                 bind:nodeSelection={worker.selection.type}
                 bind:status={worker.status}
                 {profile}
+                on:fetch={({ detail }) => (worker.selection.nodes = detail)}
+                nodes={worker.selection.nodes}
               />
             </div>
           {/each}
