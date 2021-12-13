@@ -90,10 +90,16 @@ async function deployFunkwhaleVM(
   vms.name = name;
   vms.network = network;
   vms.machines = [vm];
-  return client.machines.deploy(vms).then((res) => {
-    window.configs.baseConfig.updateBalance();
-    return res;
-  });
+  window.configs.currentDeploymentStore.deploy("Funkwhale", name);
+  return client.machines
+    .deploy(vms)
+    .then((res) => {
+      window.configs.baseConfig.updateBalance();
+      return res;
+    })
+    .finally(() => {
+      window.configs.currentDeploymentStore.clear();
+    });
 }
 
 async function deployPrefixGateway(client: any, name: string, backend: string) {
