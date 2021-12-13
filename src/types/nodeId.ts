@@ -1,3 +1,5 @@
+import type { ISelectOption } from "./index";
+
 export default class NodeID {
   constructor(
     public type: "automatic" | "manual" = null,
@@ -18,6 +20,7 @@ export default class NodeID {
       update: (key: string, value: any) => {
         this.filters[key] = value;
       },
-    }
+    },
+    public nodes: ISelectOption[] = []
   ) {}
 }
