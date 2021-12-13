@@ -199,6 +199,8 @@
           filters={data.selection.filters}
           bind:status
           {profile}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
+          nodes={data.selection.nodes}
         />
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
