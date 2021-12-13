@@ -45,10 +45,12 @@
     }
   }
 
+  let message: string;
   function onDeleteHandler() {
     if (!window.confirm("Are you sure u want to delete your contracts?"))
       return;
 
+    message = null;
     deleting = true;
     deletingType = "all";
     return getGrid(profile, (grid) => {
@@ -59,6 +61,7 @@
         })
         .catch((err) => {
           console.log("Error", err);
+          message = err.message || err;
         })
         .finally(() => {
           deleting = false;
@@ -71,20 +74,21 @@
     // prettier-ignore
     if (!window.confirm("Are you sure u want to delete the selected contracts?")) return;
 
+    message = null;
     deleting = true;
     deletingType = "selected";
     return getGrid(profile, async (grid) => {
-      try {
-        for (const contract of selectedContracts) {
+      for (const contract of selectedContracts) {
+        try {
           await grid.contracts.cancel({ id: contract.id });
+          contracts = contracts.filter((c) => c.id !== contract.id);
+        } catch (err) {
+          console.log("Error", err);
+          message = err.message || err;
         }
-        deleting = false;
-        deletingType = null;
-        const ids = selectedContracts.map(({ id }) => id);
-        contracts = contracts.filter((c) => !ids.includes(c.id));
-      } catch (err) {
-        console.log("Error", err);
       }
+      deleting = false;
+      deletingType = null;
     });
   }
 </script>
@@ -109,27 +113,36 @@
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
       />
-      <div class="is-flex is-justify-content-flex-end">
-        <button
-          class={"button is-danger is-outlined mr-2 " +
-            (deleting && deletingType === "selected" ? "is-loading" : "")}
-          disabled={!profile ||
-            loading ||
-            deleting ||
-            contracts.length === 0 ||
-            selectedContracts.length === 0}
-          on:click={onDeleteSelectedHandler}
-        >
-          Delete Selected
-        </button>
-        <button
-          class={"button is-danger " +
-            (deleting && deletingType === "all" ? "is-loading" : "")}
-          disabled={!profile || loading || deleting || contracts.length === 0}
-          on:click={onDeleteHandler}
-        >
-          Delete All
-        </button>
+      <div
+        class="is-flex is-justify-content-space-between is-align-items-center"
+      >
+        <div style="flex-grow: 1;" class="mr-2">
+          {#if message}
+            <Alert type="danger" {message} />
+          {/if}
+        </div>
+        <div>
+          <button
+            class={"button is-danger is-outlined mr-2 " +
+              (deleting && deletingType === "selected" ? "is-loading" : "")}
+            disabled={!profile ||
+              loading ||
+              deleting ||
+              contracts.length === 0 ||
+              selectedContracts.length === 0}
+            on:click={onDeleteSelectedHandler}
+          >
+            Delete Selected
+          </button>
+          <button
+            class={"button is-danger " +
+              (deleting && deletingType === "all" ? "is-loading" : "")}
+            disabled={!profile || loading || deleting || contracts.length === 0}
+            on:click={onDeleteHandler}
+          >
+            Delete All
+          </button>
+        </div>
       </div>
     {:else}
       <Alert
