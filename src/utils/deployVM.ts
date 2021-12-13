@@ -28,15 +28,17 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vms.network = createNetwork(nw);
   vms.machines = [vm];
 
-  window.configs.currentDeploymentStore.deploy("Peertube", name);
+  window.configs.currentDeploymentStore.deploy("VM", name);
   return getGrid(profile, (grid) => {
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => {
         window.configs.baseConfig.updateBalance();
-        window.configs.currentDeploymentStore.clear();
         return vm;
+      })
+      .finally(() => {
+        window.configs.currentDeploymentStore.clear();
       });
   });
 }
