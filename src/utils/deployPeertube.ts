@@ -83,7 +83,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // // get the info
   const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
-  peertubeYggIp = peertubeInfo[0]["yggIP"];
+  peertubeYggIp = peertubeInfo[0]["planetary"];
 
   // deploy the gateway
   await deployPrefixGateway(client, name, peertubeYggIp, gwNodeId);
@@ -178,7 +178,7 @@ async function deployPeertubeVM(
   postgresIp: string,
   nodeId: any,
   name: string,
-  gateway: string
+  domain: string
 ) {
   // disk
   const disk3 = new DiskModel();
@@ -201,7 +201,7 @@ async function deployPeertubeVM(
   vm.entrypoint = "/start.sh";
   vm.env = {
     PEERTUBE_BIND_ADDRESS: "::",
-    PEERTUBE_WEBSERVER_HOSTNAME: gateway,
+    PEERTUBE_WEBSERVER_HOSTNAME: domain,
     PEERTUBE_DB_HOSTNAME: postgresIp,
     PEERTUBE_DB_USERNAME: "postgres",
     PEERTUBE_DB_PASSWORD: "omar123456",

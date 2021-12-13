@@ -64,7 +64,7 @@ async function deployFunkwhaleVM(
   name: string,
   network: any,
   nodeId: number,
-  gateway: string
+  domain: string
 ) {
   const disk = new DiskModel();
   disk.name = name + "Disk";
@@ -84,7 +84,7 @@ async function deployFunkwhaleVM(
   vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
-    FUNKWHALE_HOSTNAME: gateway,
+    FUNKWHALE_HOSTNAME: domain,
   };
   const vms = new MachinesModel();
   vms.name = name;
