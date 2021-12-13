@@ -170,7 +170,7 @@
                 configs.setActiveProfile(null, password);
               }}
             >
-              Back
+              Deactivate
             </button>
           </div>
         {/if}
