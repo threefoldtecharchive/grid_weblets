@@ -4,6 +4,7 @@ const { DiskModel, MachineModel, MachinesModel } =
   window.configs?.grid3_client ?? {};
 import type { IProfile } from "../types/Profile";
 import getGrid from "./getGrid";
+import deploy from "./deploy";
 
 export default async function deployVM(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
@@ -28,18 +29,11 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vms.network = createNetwork(nw);
   vms.machines = [vm];
 
-  window.configs.currentDeploymentStore.deploy("VM", name);
-  return getGrid(profile, (grid) => {
+  return deploy(profile, "VM", name, (grid) => {
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
-      .then(([vm]) => {
-        window.configs.baseConfig.updateBalance();
-        return vm;
-      })
-      .finally(() => {
-        window.configs.currentDeploymentStore.clear();
-      });
+      .then(([vm]) => vm);
   });
 }
 
