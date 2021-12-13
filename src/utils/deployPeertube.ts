@@ -128,7 +128,16 @@ async function deployRedis(client: any, net: any, nodeId: any, name: string) {
   vms.machines = [vm1];
 
   // deploy
-  return client.machines.deploy(vms);
+  window.configs.currentDeploymentStore.deploy("Peertube", name);
+  return client.machines
+    .deploy(vms)
+    .then((vm) => {
+      window.configs.baseConfig.updateBalance();
+      return vm;
+    })
+    .finally(() => {
+      window.configs.currentDeploymentStore.clear();
+    });
 }
 
 async function deployPostgres(

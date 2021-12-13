@@ -1,6 +1,7 @@
 import type { default as Kubernetes, Base } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
+import deploy from "./deploy";
 import getGrid from "./getGrid";
 const { K8SModel, KubernetesNodeModel } = window.configs?.grid3_client ?? {};
 
@@ -24,16 +25,8 @@ export default async function deployKubernetes(
   k8s.description = description;
   k8s.ssh_key = sshKey;
 
-  window.configs.currentDeploymentStore.deploy("Kubernetes", name);
-  return getGrid(profile, (grid) => {
-    return grid.k8s
-      .deploy(k8s)
-      .then(() => grid.machines.getObj(name))
-      .then((vm) => {
-        window.configs.baseConfig.updateBalance();
-        window.configs.currentDeploymentStore.clear();
-        return vm;
-      });
+  return deploy(profile, "Kubernetes", name, (grid) => {
+    return grid.k8s.deploy(k8s).then(() => grid.machines.getObj(name));
   });
 }
 
