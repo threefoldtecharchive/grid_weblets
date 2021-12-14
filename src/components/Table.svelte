@@ -21,25 +21,38 @@
 
   $: footer = rows && rows.length > 49;
 
-  const _selectedRows: number[] = [];
+  let _selectedRows: number[] = [];
 
   function onSelectHandler(idx: number) {
     const i = _selectedRows.indexOf(idx);
     if (i > -1) {
-      _selectedRows.splice(i, 1);
+      _selectedRows = _selectedRows.filter((_, i) => i !== idx);
     } else {
-      _selectedRows.push(idx);
+      _selectedRows = [..._selectedRows, idx];
     }
-
     dispatch("selected", _selectedRows.map(i => rowsData[i])); // prettier-ignore
   }
+
+  function onSelectAllHandler(e: Event) {
+    const inp = e.target as HTMLInputElement;
+    _selectedRows = inp.checked ? Array.from({ length: rows.length }, (_, i) => i) : []; // prettier-ignore
+    dispatch("selected", inp.checked ? rowsData : []);
+  }
+
+  $: allChecked = _selectedRows.length === rows?.length;
 </script>
 
 <table class="table" style="width: 100%;">
   <thead>
     <tr>
       {#if selectable}
-        <th />
+        <th>
+          <input
+            type="checkbox"
+            on:change={onSelectAllHandler}
+            checked={allChecked}
+          />
+        </th>
       {/if}
 
       {#if headers}
@@ -63,6 +76,7 @@
               <input
                 type="checkbox"
                 on:change={onSelectHandler.bind(undefined, idx)}
+                checked={_selectedRows.includes(idx)}
               />
             </td>
           {/if}
