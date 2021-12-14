@@ -44,11 +44,10 @@
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
-    { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
+    { label: "Mnemonics from your TFChain account (12 words)", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
   ];
-  const secretField: IFormField = { label: "Browser Session Secret", type: "password", placeholder: "Browser Session Secret", symbol: "secret", tooltip: "Browser Session Secret" }; // prettier-ignore
+  const secretField: IFormField = { label: "Profile Manager Password", type: "password", placeholder: "Profile Manager Password", symbol: "secret", tooltip: "Profile Manager Password" }; // prettier-ignore
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
   const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true }; // prettier-ignore
 
@@ -66,22 +65,17 @@
     let invalid = false;
     console.log({ activeProfile });
 
-    validateMnemonics(activeProfile)
+    validateMnemonics({ ...activeProfile, storeSecret: password })
       .then((valid) => {
         invalid = invalid || !valid;
         fields[2].error = valid
           ? null
           : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
-        return activeProfile.storeSecret !== "";
-      })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[3].error = valid ? null : "Invalid storeSecret";
         return activeProfile.sshKey !== "";
       })
       .then((valid) => {
         invalid = invalid || !valid;
-        fields[4].error = valid ? null : "Invalid SSH Key";
+        fields[3].error = valid ? null : "Invalid SSH Key";
         return activeProfile.name !== "";
       })
       .then((valid) => {
@@ -194,7 +188,7 @@
           centered={false}
           on:removed={({ detail }) => configs.deleteProfile(detail)}
           on:select={(p) => {
-            [2, 3, 4].forEach((i) => (fields[i].error = null));
+            [2, 3].forEach((i) => (fields[i].error = null));
             configs.setSelectedIdx(p.detail);
           }}
           on:init={() => configs.setSelectedIdx("0")}
@@ -219,7 +213,7 @@
                 disabled: activeProfileId === activeProfile.id,
               }}
             />
-            {#if activeProfileId === activeProfile?.id }
+            {#if activeProfileId === activeProfile?.id}
               {#if field.symbol === "mnemonics"}
                 <Input data={$configs.twinId} field={twinField} />
                 <Input data={$configs.address} field={addressField} />
@@ -229,29 +223,43 @@
         {/if}
       {:else}
         <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
-          <Input bind:data={password} field={secretField} />
-
           {#if message}
             <Alert type="danger" {message} />
           {/if}
-
-          <div style="display: flex; justify-content: center;">
-            <button
-              class="button is-primary mr-2"
-              type="submit"
-              disabled={password === ""}
-            >
-              Unlock Store
-            </button>
-
-            <button
-              class="button is-primary is-outlined"
-              type="button"
-              disabled={password === ""}
-              on:click={onEventHandler.bind(undefined, "create")}
-            >
-              Create a New Store
-            </button>
+          <div
+            class="tile is-ancestor"
+            style="display: flex; justify-content: center;"
+          >
+            <div class="tile is-vertical">
+              <Input bind:data={password} field={secretField} />
+              <div class="container">
+                <button
+                  class="button is-primary mr-2 center"
+                  type="submit"
+                  disabled={password === ""}
+                >
+                  Load Profile Manager
+                </button>
+              </div>
+            </div>
+            <div class="tile is-vertical is-1">
+              <div class="container vertical-line" />
+              <div class="container"><strong>Or</strong></div>
+              <div class="container vertical-line" />
+            </div>
+            <div class="tile is-vertical">
+              <Input bind:data={password} field={secretField} />
+              <div class="container">
+                <button
+                  class="button is-primary is-outlined"
+                  type="button"
+                  disabled={password === ""}
+                  on:click={onEventHandler.bind(undefined, "create")}
+                >
+                  Create a new Profile Manager
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       {/if}
@@ -350,5 +358,10 @@
     opacity: 1;
     visibility: visible;
     pointer-events: all;
+  }
+
+  .vertical-line {
+    border-left: 4px solid black;
+    height: 100%;
   }
 </style>
