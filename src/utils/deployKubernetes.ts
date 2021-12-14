@@ -26,7 +26,7 @@ export default async function deployKubernetes(
   k8s.ssh_key = sshKey;
 
   return deploy(profile, "Kubernetes", name, (grid) => {
-    return grid.k8s.deploy(k8s).then(() => grid.machines.getObj(name));
+    return grid.k8s.deploy(k8s).then(() => grid.k8s.getObj(name));
   });
 }
 
