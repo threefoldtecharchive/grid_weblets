@@ -172,9 +172,11 @@
   let validating: boolean = false;
   $: {
     if (profile && _nodeId !== data) {
-      if (!!_nodeValidator(data) && _ctrl) {
-        _ctrl.abort();
-        _ctrl = null;
+      if (!data || !!_nodeValidator(data)) {
+        if (_ctrl) {
+          _ctrl.abort();
+          _ctrl = null;
+        }
         validating = false;
         status = null;
       } else {
