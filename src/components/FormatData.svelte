@@ -21,12 +21,19 @@
   const flistField: IFormField = { label: "Flist", symbol: "flist", type: "text", disabled: true }; // prettier-ignore
   // const domainField: IFormField = { label: "Domain", symbol: "domain", type: "text", disabled: true, tooltip: "Default Password: captain42" }; // prettier-ignore
   const contractIdField: IFormField = { label: "Contract ID", symbol: "contractId", type: "number", disabled: true }; // prettier-ignore
+  const publicIpValueField: IFormField = { label: "Public IP", symbol: "publicIP", type: "text", disabled: true }; // prettier-ignore
 </script>
 
 {#each vms as vm, index}
-  <Input data={vm.contractId} field={contractIdField} />
+  {#if vm.contractId}
+    <Input data={vm.contractId} field={contractIdField} />
+  {/if}
   <Input data={vm.name} field={nameField} />
-  <Input data={!!vm.publicIP} field={publicIpField} />
+  {#if !!vm.publicIP}
+    <Input data={vm.publicIP.ip} field={publicIpValueField} />
+  {:else}
+    <Input data={false} field={publicIpField} />
+  {/if}
   {#if vm.planetary}
     <Input data={vm.yggIP} field={yggIpField} />
   {/if}
