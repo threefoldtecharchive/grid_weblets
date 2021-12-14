@@ -45,7 +45,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   console.log(name);
 
   // Gateway node Id and domain
-  const gwNodeId = 8;
+  const gwNodeId = 7;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
   domain = `${name}.${gwDomain}`;
@@ -61,11 +61,11 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // // get the info
   const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
-  peertubePubIp = peertubeInfo[0]["publicIP"]["ip"].split("/")[0];
+  // peertubePubIp = peertubeInfo[0]["publicIP"]["ip"].split("/")[0];
   peertubeYggIp = peertubeInfo[0]["planetary"];
 
   // // deploy the gateway
-  await deployPrefixGateway(client, name, peertubePubIp, gwNodeId);
+  await deployPrefixGateway(client, name, peertubeYggIp, gwNodeId);
 
   // // // return the info
   const gatewayInfo = await getGatewayInfo(client, name);
@@ -95,13 +95,13 @@ async function deployPeertubeVM(
   vm.name = name + "PTVM";
   vm.node_id = nodeId;
   vm.disks = [disk3];
-  vm.public_ip = true;
+  vm.public_ip = false;
   vm.planetary = true;
   vm.cpu = 3;
   vm.memory = 1024 * 4;
   vm.rootfs_size = 1;
   vm.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.flist";
+    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.2.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
     SSH_KEY:
@@ -115,6 +115,7 @@ async function deployPeertubeVM(
     PEERTUBE_SMTP_HOSTNAME: "https://app.sendgrid.com",
     PEERTUBE_SMTP_USERNAME: "Threefold",
     PEERTUBE_SMTP_PASSWORD: "%k00@$MtPAKce$$2^$mtp!%x",
+    PEERTUBE_BIND_ADDRESS: "::",
   };
 
   // vms specs
@@ -138,7 +139,7 @@ async function deployPrefixGateway(
   gw.name = name;
   gw.node_id = gwNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://${backend}:9000`];
+  gw.backends = [`http://[${backend}]:9000`];
 
   window.configs.currentDeploymentStore.deploy("Peertube", name);
   // deploy
