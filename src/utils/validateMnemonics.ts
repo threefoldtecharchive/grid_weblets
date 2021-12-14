@@ -17,5 +17,8 @@ export default function validateMnemonics(profile: IProfile) {
     .connect()
     .then(() => grid.disconnect())
     .then(() => true)
-    .catch(() => false);
+    .catch((err) => {
+      console.log("Error", err);
+      return false;
+    });
 }

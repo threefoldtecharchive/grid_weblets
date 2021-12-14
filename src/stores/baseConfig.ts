@@ -14,6 +14,7 @@ function createBaseConfig() {
   const store = writable({
     profiles: [createProfile("Profile 1")],
     activeProfile: null,
+    storeSecret: null,
     balance: null,
     selectedIdx: "0",
     loadingBalance: false,
@@ -178,6 +179,7 @@ function createBaseConfig() {
     setActiveProfile(id: string, password: string) {
       update((value) => {
         value.activeProfile = id;
+        value.storeSecret = id === null ? null : password
         value.twinId = null;
         value.address = null;
         return value;
@@ -197,6 +199,7 @@ function createBaseConfig() {
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
       const profile = data.profiles[idx] as any;
       profile.balance = data.balance;
+      profile.storeSecret = data.storeSecret
       return profile;
     },
 
