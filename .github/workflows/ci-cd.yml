@@ -1,0 +1,68 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to play.dev.grid.tf
+
+name: CI/CD pipeline 
+
+on:
+  push:
+    branches:
+      - master
+      - development
+concurrency:
+  # one instance of runing pipeline allowed per branch.
+  # On master, we want all builds to complete even if merging happens faster for better reliability and to make it easier to discover at which point something broke.
+  # on developmetn, new workflow trigger will cancel the in progress job, and start a new one..
+  group: ${{ format('ci-{0}', github.ref) }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+jobs:
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+        cache-dependency-path: '**/yarn.lock'
+
+    - name: Install dependencies
+      run: |
+        yarn install
+        cd easy-docs
+        yarn install
+        cd ..
+
+    - name: Build
+      run: yarn build:app
+
+    - name: Copying files to staging server
+      if: ${{ github.ref == 'refs/heads/development' }}
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.DEV_REMOTE_HOST }}
+        username: ${{ secrets.DEV_REMOTE_USER }}
+        key: ${{ secrets.DEV_SSH_KEY }}
+        passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
+        rm: true
+        source: "docs/"
+        target: "${{ secrets.DEV_REMOTE_DIR }}"
+
+    - name: Copying files to production server
+      if: ${{ github.ref == 'refs/heads/master' }}
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.PROD_REMOTE_HOST }}
+        username: ${{ secrets.PROD_REMOTE_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        passphrase: ${{ secrets.PROD_SSH_KEY_PASSPHRASE }}
+        rm: true
+        source: "docs/"
+        target: "${{ secrets.PROD_REMOTE_DIR }}"
