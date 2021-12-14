@@ -42,14 +42,12 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getSuitableGateway(client, name);
-  console.log(name);
 
   // Gateway node Id and domain
   const gwNodeId = 7;
   const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
   const gwDomain = await getNodeDomain(nodes, gwNodeId);
   domain = `${name}.${gwDomain}`;
-  console.log(domain);
 
   // // define a network
   const network = new NetworkModel();
@@ -61,7 +59,6 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // // get the info
   const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
-  // peertubePubIp = peertubeInfo[0]["publicIP"]["ip"].split("/")[0];
   peertubeYggIp = peertubeInfo[0]["planetary"];
 
   // // deploy the gateway
@@ -70,11 +67,6 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   // // // return the info
   const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
-
-  // Expected gateway
-  console.log(domain);
-  // Deployed gateway
-  console.log(gatewayDomain);
 }
 
 async function deployPeertubeVM(
@@ -104,8 +96,6 @@ async function deployPeertubeVM(
     "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.2.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
-    SSH_KEY:
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDZnBgLQt77C1suFHsBH5sNdbTxcCCiowDPB+U8h0OsT7onOg/HCYGEguUh9yl5VlacODXSexBhg9LsFTDuO/nBTf/DQVpjqRGQs1QenoGrpaxxaI5Svo5GBLE3Jogva/fhbJtwK9yEgW+1zltO3rTp+sdQ7JFG3uZGnlLSN1U+PCJVzONM2BaAGkQ6XHHuCCiisMlNgWXUzN3T+DjkzHWbXyqPEoK/gSkV20QzWbDRzxM/FJNIOZZh70H+n3QcSl9Q5VTfhc2K1rMNnGRQrl2QHcBsPoO/8dYJxKGt/u9pZI3wkE5C0coYtNvfXIcNj7cSsSJIvCdYYl6x4LkxXhwrOomOwmtZTmJEewe0nhClDU4gMm4s3eET7j2GPe73Ft2OVuF9j+3z0K3jUFQ/2m3HmDDtNVYlB7IOL5479cLRfBBvvQuNpd0p1yBUopxoBureFdqgZYa5887BcUENOKiR58JgF1mZ15g4nnUrdkXqm7KhQgniAp9E68MdsJEg9t0= omar@jarvis",
     PEERTUBE_DB_SUFFIX: "_prod",
     PEERTUBE_DB_USERNAME: "peertube",
     PEERTUBE_DB_PASSWORD: "peertube",
