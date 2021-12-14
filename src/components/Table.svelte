@@ -26,7 +26,7 @@
   function onSelectHandler(idx: number) {
     const i = _selectedRows.indexOf(idx);
     if (i > -1) {
-      _selectedRows = _selectedRows.filter((_, i) => i !== idx);
+      _selectedRows = _selectedRows.filter((i) => i !== idx);
     } else {
       _selectedRows = [..._selectedRows, idx];
     }
