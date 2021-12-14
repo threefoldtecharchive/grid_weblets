@@ -73,10 +73,6 @@
           : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
         return activeProfile.sshKey !== "";
       })
-      // .then((_) => {
-      //   // use password as storeSecret (managed in baseConfigs store)
-      //   return activeProfile.sshKey !== "";
-      // })
       .then((valid) => {
         invalid = invalid || !valid;
         fields[3].error = valid ? null : "Invalid SSH Key";
