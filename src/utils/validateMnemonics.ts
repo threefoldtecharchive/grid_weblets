@@ -3,7 +3,6 @@ const { GridClient } = window.configs?.grid3_client ?? {};
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 export default function validateMnemonics(profile: IProfile) {
-  console.log({ profile });
   const { networkEnv, mnemonics, storeSecret } = profile;
   const http = new HTTPMessageBusClient(0, "");
   const grid = new GridClient(
