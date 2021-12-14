@@ -55,7 +55,7 @@
     ]
   };
   let selectedFlist: number = 0;
-  let flistSelectValue: string = null;
+  let flistSelectValue: string = "0";
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
