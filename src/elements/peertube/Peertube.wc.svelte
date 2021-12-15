@@ -8,7 +8,6 @@
   // Modules
   import VM, { Env } from "../../types/vm";
   import deployPeertube from "../../utils/deployPeertube";
-  import { fullDomain, peertubeYggIp } from "../../utils/deployPeertube";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -41,7 +40,8 @@
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
 
-  // doDeploy
+  let domain: string, planetaryIP: string;
+
   async function onDeployVM() {
     loading = true;
     success = false;
@@ -65,11 +65,13 @@
     events.addListener("logs", onLogInfo);
 
     deployPeertube(data, profile)
-      .then(() => {
+      .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
         success = true;
-        console.log(fullDomain);
-        console.log(peertubeYggIp);
+        domain = d;
+        planetaryIP = ip;
+        console.log({ domain });
+        console.log({ planetaryIP });
       })
       .catch((err: Error) => {
         failed = true;
@@ -95,8 +97,8 @@
       <AlertDetailed
         type="success"
         message="Successfully Deployed A Peertube Instance"
-        planetaryIP={peertubeYggIp}
-        domain={fullDomain}
+        {planetaryIP}
+        {domain}
         deployed={true}
       />
     {:else if failed}

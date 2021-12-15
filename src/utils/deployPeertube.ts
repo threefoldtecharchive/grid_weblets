@@ -2,6 +2,7 @@ import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
 import { getSuitableGateway } from "./getValidGateway";
+import { selectGatewayNode } from "./gatewayHelpers";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -11,15 +12,9 @@ const {
   MachineModel,
   MachinesModel,
   GatewayNameModel,
-  Nodes,
-  FilterOptions,
-  randomChoice,
 } = window.configs?.grid3_client ?? {};
 
-export let fullDomain, peertubeYggIp, peertubePubIp;
-
 export default async function deployPeertube(data: VM, profile: IProfile) {
-  // connect
   const { envs, disks, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
@@ -39,41 +34,36 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getSuitableGateway(client, name);
+  console.log({ name });
 
   // Dynamically select node to deploy the gateway
-  const nodes = new Nodes(
-    GridClient.config.graphqlURL,
-    GridClient.config.rmbClient["proxyURL"]
-  );
-
-  const filter = new FilterOptions();
-  filter.gateway = true;
-
-  const selectedNode = randomChoice(await nodes.filterNodes(filter));
-
-  const gwNodeId = selectedNode.nodeId;
-  const gwNodeDomain = selectedNode.publicConfig.domain;
-
-  fullDomain = `${name}.${gwNodeDomain}`;
+  let [gwNodeId, gwDomain] = await selectGatewayNode();
+  const domain = `${name}.${gwDomain}`;
+  console.log({ gwNodeId });
+  console.log({ domain });
 
   // define a network
   const network = new NetworkModel();
-  network.name = name + "NW";
+  network.name = name + "Net";
   network.ip_range = "10.1.0.0/16";
 
   // deploy the peertube
-  await deployPeertubeVM(client, network, nodeId, name, fullDomain);
+  await deployPeertubeVM(client, network, nodeId, name, domain);
 
   // get the info of peertube deployment
-  const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
-  peertubeYggIp = peertubeInfo[0]["planetary"];
+  const peertubeInfo = await getPeertubeInfo(client, name + "VMs");
+  console.log({ peertubeInfo });
+  const planetaryIP = peertubeInfo[0]["planetary"];
+  console.log({ planetaryIP });
 
   // deploy the gateway
-  await deployPrefixGateway(client, name, peertubeYggIp, gwNodeId);
+  await deployPrefixGateway(client, name, planetaryIP, gwNodeId);
 
   // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
+  console.log({ gatewayDomain });
+  return { domain, planetaryIP };
 }
 
 async function deployPeertubeVM(
@@ -84,16 +74,16 @@ async function deployPeertubeVM(
   domain: string
 ) {
   // disk
-  const disk3 = new DiskModel();
-  disk3.name = name + "Data";
-  disk3.size = 10;
-  disk3.mountpoint = "/data";
+  const disk = new DiskModel();
+  disk.name = name + "Data";
+  disk.size = 10;
+  disk.mountpoint = "/data";
 
   // vm specs
   const vm = new MachineModel();
-  vm.name = name + "PTVM";
+  vm.name = name + "VM";
   vm.node_id = nodeId;
-  vm.disks = [disk3];
+  vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
   vm.cpu = 3;
@@ -114,12 +104,21 @@ async function deployPeertubeVM(
 
   // vms specs
   const vms = new MachinesModel();
-  vms.name = name + "PTVMs";
+  vms.name = name + "VMs";
   vms.network = net;
   vms.machines = [vm];
 
   // deploy
-  return client.machines.deploy(vms);
+  window.configs.currentDeploymentStore.deploy("Peertube", name);
+  return client.machines
+    .deploy(vms)
+    .then((res) => {
+      window.configs.baseConfig.updateBalance();
+      return res;
+    })
+    .finally(() => {
+      window.configs.currentDeploymentStore.clear();
+    });
 }
 
 async function deployPrefixGateway(
