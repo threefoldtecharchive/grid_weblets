@@ -44,10 +44,11 @@
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },
-    { label: "Mnemonics from your TFChain account (12 words)", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
+    // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
   ];
-  const secretField: IFormField = { label: "Profile Manager Password", type: "password", placeholder: "Profile Manager Password", symbol: "secret", tooltip: "Profile Manager Password" }; // prettier-ignore
+
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
   const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true }; // prettier-ignore
 
@@ -60,40 +61,36 @@
   }
 
   let activating: boolean = false;
-  function onActiveProfile() {
+  async function onActiveProfile() {
     activating = true;
-    let invalid = false;
-    console.log({ activeProfile });
 
-    validateMnemonics({ ...activeProfile, storeSecret: password })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[2].error = valid
-          ? null
-          : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
-        return activeProfile.sshKey !== "";
-      })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[3].error = valid ? null : "Invalid SSH Key";
-        return activeProfile.name !== "";
-      })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[0].error = valid ? null : "Please provide a profile name";
-        return !invalid;
-      })
-      .then((valid) => {
-        if (valid) {
-          configs.setActiveProfile(activeProfile.id, password);
-        }
-      })
-      .catch((err) => {
-        console.log("Error", err);
-      })
-      .finally(() => {
-        activating = false;
-      });
+    let invalid = false;
+    try {
+      const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
+      invalid = !mnIsValid;
+      fields.find((f) => f.symbol === "mnemonics").error = invalid
+        ? "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?"
+        : null;
+    } catch (err) {
+      console.log("Error", err);
+    }
+
+    const sshIsValid = activeProfile.sshKey !== "";
+    invalid = invalid || !sshIsValid;
+    fields.find((f) => f.symbol === "sshKey").error = sshIsValid
+      ? null
+      : "Invalid SSH Key";
+
+    const nameIsValid = activeProfile.name !== "";
+    invalid = invalid || nameIsValid;
+    fields.find((f) => f.symbol === "name").error = nameIsValid
+      ? null
+      : "Please provide a profile name";
+
+    activating = false;
+    if (invalid) return;
+
+    configs.setActiveProfile(activeProfile.id, password);
   }
 
   const onClickHandler = () => (opened = false);
@@ -108,6 +105,13 @@
     }
   });
   onDestroy(() => window.removeEventListener("click", onClickHandler));
+
+  //  bind:active={activePassword} tabs={tabsPassword}
+  const tabsPassword: ITab[] = [
+    { label: "Activate Profile Manager", value: "load" },
+    { label: "Create Profile Manager", value: "create" },
+  ];
+  let activePassword: string = "load";
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
@@ -222,44 +226,46 @@
           {/each}
         {/if}
       {:else}
-        <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
+        <Tabs
+          bind:active={activePassword}
+          tabs={tabsPassword}
+          centered={false}
+        />
+
+        <form
+          on:submit|preventDefault={onEventHandler.bind(
+            undefined,
+            activePassword
+          )}
+        >
+          <Input
+            bind:data={password}
+            field={{
+              label: "Password",
+              type: "password",
+              placeholder: "Browser Session Secret",
+              symbol: "secret",
+              tooltip:
+                activePassword === "load"
+                  ? "Password to activate a previously configured profile manager"
+                  : "Password will be used to encrypt data in the browser",
+            }}
+          />
+
           {#if message}
             <Alert type="danger" {message} />
           {/if}
-          <div
-            class="tile is-ancestor"
-            style="display: flex; justify-content: center;"
-          >
-            <div class="tile is-vertical">
-              <Input bind:data={password} field={secretField} />
-              <div class="container">
-                <button
-                  class="button is-primary mr-2 center"
-                  type="submit"
-                  disabled={password === ""}
-                >
-                  Load Profile Manager
-                </button>
-              </div>
-            </div>
-            <div class="tile is-vertical is-1">
-              <div class="container vertical-line" />
-              <div class="container"><strong>Or</strong></div>
-              <div class="container vertical-line" />
-            </div>
-            <div class="tile is-vertical">
-              <Input bind:data={password} field={secretField} />
-              <div class="container">
-                <button
-                  class="button is-primary is-outlined"
-                  type="button"
-                  disabled={password === ""}
-                  on:click={onEventHandler.bind(undefined, "create")}
-                >
-                  Create a new Profile Manager
-                </button>
-              </div>
-            </div>
+
+          <div style="display: flex; justify-content: center;">
+            <button
+              class="button is-primary"
+              type="submit"
+              disabled={password === ""}
+            >
+              {activePassword === "load"
+                ? "Unlock Store"
+                : "Create a New Store"}
+            </button>
           </div>
         </form>
       {/if}
