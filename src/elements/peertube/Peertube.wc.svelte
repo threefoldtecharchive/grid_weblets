@@ -8,7 +8,7 @@
   // Modules
   import VM, { Env } from "../../types/vm";
   import deployPeertube from "../../utils/deployPeertube";
-  import { domain, peertubeYggIp } from "../../utils/deployPeertube";
+  import { fullDomain, peertubeYggIp } from "../../utils/deployPeertube";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -68,7 +68,7 @@
       .then(() => {
         deploymentStore.set(0);
         success = true;
-        console.log(domain);
+        console.log(fullDomain);
         console.log(peertubeYggIp);
       })
       .catch((err: Error) => {
@@ -96,7 +96,7 @@
         type="success"
         message="Successfully Deployed A Peertube Instance"
         planetaryIP={peertubeYggIp}
-        {domain}
+        {fullDomain}
         deployed={true}
       />
     {:else if failed}
