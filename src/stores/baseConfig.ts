@@ -200,7 +200,9 @@ function createBaseConfig() {
       requestAnimationFrame(() => {
         fullStore.updateBalance();
         fullStore.save(password);
-        fullStore._loadActiveProfileInfo();
+        setTimeout(() => {
+          fullStore._loadActiveProfileInfo();
+        }, 1000);
       });
     },
 
