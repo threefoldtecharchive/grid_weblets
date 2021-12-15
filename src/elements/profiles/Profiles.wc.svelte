@@ -114,6 +114,13 @@
     }
   });
   onDestroy(() => window.removeEventListener("click", onClickHandler));
+
+  //  bind:active={activePassword} tabs={tabsPassword}
+  const tabsPassword: ITab[] = [
+    { label: "Load Profile", value: "load" },
+    { label: "Create New Profile", value: "create" },
+  ];
+  let activePassword: string = "load";
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
@@ -219,7 +226,7 @@
                 disabled: activeProfileId === activeProfile.id,
               }}
             />
-            {#if activeProfileId === activeProfile?.id }
+            {#if activeProfileId === activeProfile?.id}
               {#if field.symbol === "mnemonics"}
                 <Input data={$configs.twinId} field={twinField} />
                 <Input data={$configs.address} field={addressField} />
@@ -228,7 +235,18 @@
           {/each}
         {/if}
       {:else}
-        <form on:submit|preventDefault={onEventHandler.bind(undefined, "load")}>
+        <Tabs
+          bind:active={activePassword}
+          tabs={tabsPassword}
+          centered={false}
+        />
+
+        <form
+          on:submit|preventDefault={onEventHandler.bind(
+            undefined,
+            activePassword
+          )}
+        >
           <Input bind:data={password} field={secretField} />
 
           {#if message}
@@ -237,20 +255,13 @@
 
           <div style="display: flex; justify-content: center;">
             <button
-              class="button is-primary mr-2"
+              class="button is-primary"
               type="submit"
               disabled={password === ""}
             >
-              Unlock Store
-            </button>
-
-            <button
-              class="button is-primary is-outlined"
-              type="button"
-              disabled={password === ""}
-              on:click={onEventHandler.bind(undefined, "create")}
-            >
-              Create a New Store
+              {activePassword === "load"
+                ? "Unlock Store"
+                : "Create a New Store"}
             </button>
           </div>
         </form>
