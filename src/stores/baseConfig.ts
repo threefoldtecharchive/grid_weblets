@@ -194,12 +194,11 @@ function createBaseConfig() {
         value.storeSecret = id === null ? null : password;
         value.twinId = null;
         value.address = null;
-        value.storeSecret = null;
         return value;
       });
       requestAnimationFrame(() => {
-        fullStore.updateBalance();
         fullStore.save(password);
+        fullStore.updateBalance();
         setTimeout(() => {
           fullStore._loadActiveProfileInfo();
         }, 1000);
