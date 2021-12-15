@@ -16,6 +16,11 @@
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-end mt-2 mb-2 mr-2">
+          <tf-profiles></tf-profiles>
+        </div>
+      </nav>
       <div v-html="weblets[active].html" />
     </div>
     <div class="editor__area" v-if="active >= 0">
