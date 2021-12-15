@@ -1,8 +1,7 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
-import { getSuitableGateway } from "./getValidGateway";
-import { selectGatewayNode } from "./gatewayHelpers";
+import { getUniqueName, selectGatewayNode } from "./gatewayHelpers";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -33,7 +32,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   await client.connect();
 
   // Make sure the name is valid
-  name = await getSuitableGateway(client, name);
+  name = await getUniqueName(client, name);
   console.log({ name });
 
   // Dynamically select node to deploy the gateway
