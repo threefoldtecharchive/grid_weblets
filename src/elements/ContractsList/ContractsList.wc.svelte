@@ -71,6 +71,8 @@
   }
 
   function onDeleteSelectedHandler() {
+    if (selectedContracts.length === contracts.length) return onDeleteHandler();
+
     // prettier-ignore
     if (!window.confirm("Are you sure u want to delete the selected contracts?")) return;
 
