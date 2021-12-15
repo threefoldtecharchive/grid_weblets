@@ -278,12 +278,12 @@
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
   .profile-menu {
-    position: fixed;
+    /*position: fixed;
     top: 15px;
     right: 15px;
-    display: flex;
+    z-index: 999;*/
+    display: inline-flex;
     align-items: center;
-    z-index: 999;
     padding: 15px;
     background-color: white;
     border-radius: 50px;
