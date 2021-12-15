@@ -192,7 +192,7 @@
           centered={false}
           on:removed={({ detail }) => configs.deleteProfile(detail)}
           on:select={(p) => {
-            [2, 3, 4].forEach((i) => (fields[i].error = null));
+            [2, 3].forEach((i) => (fields[i].error = null));
             configs.setSelectedIdx(p.detail);
           }}
           on:init={() => configs.setSelectedIdx("0")}
@@ -364,5 +364,10 @@
     opacity: 1;
     visibility: visible;
     pointer-events: all;
+  }
+
+  .vertical-line {
+    border-left: 4px solid black;
+    height: 100%;
   }
 </style>
