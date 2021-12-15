@@ -1,7 +1,7 @@
 import type { default as VM, Disk, Env } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 import { getSuitableGateway } from "./getValidGateway";
-import { getNodeDomain } from "./gatewayNode";
+import { selectGatewayNode } from "./gatewayHelpers";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -11,7 +11,7 @@ const {
   GridClient,
   GatewayNameModel,
   NetworkModel,
-  Nodes,
+  // Nodes,
 } = window.configs?.grid3_client ?? {};
 
 export let domain, funkYggIp;
@@ -39,10 +39,10 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   console.log(name);
 
   // Gateway node Id and domain
-  const gwNodeId = 8;
-  const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
-  const gwDomain = await getNodeDomain(nodes, gwNodeId);
+  let [gwNodeId, gwDomain] = await selectGatewayNode();
   domain = `${name}.${gwDomain}`;
+  console.log({ gwNodeId });
+  console.log(domain);
 
   const network = new NetworkModel();
   network.name = name + "NW";
@@ -53,10 +53,10 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const info = await getFunkwhaleInfo(grid, name);
   funkYggIp = info[0]["planetary"];
 
-  await deployPrefixGateway(grid, name, funkYggIp);
+  await deployPrefixGateway(grid, name, funkYggIp, gwNodeId);
 
   const gatewayInfo = await getGatewayInfo(grid, name);
-
+  return { domain, funkYggIp };
 }
 
 async function deployFunkwhaleVM(
@@ -102,11 +102,16 @@ async function deployFunkwhaleVM(
     });
 }
 
-async function deployPrefixGateway(client: any, name: string, backend: string) {
+async function deployPrefixGateway(
+  client: any,
+  name: string,
+  backend: string,
+  nodeId: number
+) {
   // define specs
   const gw = new GatewayNameModel();
   gw.name = name;
-  gw.node_id = 8;
+  gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
 
