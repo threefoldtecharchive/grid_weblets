@@ -103,16 +103,13 @@ async function deployPeertubeVM(
     "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.2.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
+    PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
+    PEERTUBE_BIND_ADDRESS: "::",
+    PEERTUBE_WEBSERVER_HOSTNAME: domain,
+    PEERTUBE_WEBSERVER_PORT: "443",
     PEERTUBE_DB_SUFFIX: "_prod",
     PEERTUBE_DB_USERNAME: "peertube",
     PEERTUBE_DB_PASSWORD: "peertube",
-    PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
-    PEERTUBE_WEBSERVER_HOSTNAME: domain,
-    PEERTUBE_WEBSERVER_PORT: "443",
-    PEERTUBE_SMTP_HOSTNAME: "https://app.sendgrid.com",
-    PEERTUBE_SMTP_USERNAME: "Threefold",
-    PEERTUBE_SMTP_PASSWORD: "6172661f7gr",
-    PEERTUBE_BIND_ADDRESS: "::",
   };
 
   // vms specs
