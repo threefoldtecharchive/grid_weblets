@@ -45,10 +45,10 @@
       { label: "Devnet", value: "dev" }
     ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
-    { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
+    // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
   ];
-  const secretField: IFormField = { label: "Browser Session Secret", type: "password", placeholder: "Browser Session Secret", symbol: "secret", tooltip: "Browser Session Secret" }; // prettier-ignore
+
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
   const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true }; // prettier-ignore
 
@@ -61,45 +61,36 @@
   }
 
   let activating: boolean = false;
-  function onActiveProfile() {
+  async function onActiveProfile() {
     activating = true;
-    let invalid = false;
-    console.log({ activeProfile });
 
-    validateMnemonics(activeProfile)
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[2].error = valid
-          ? null
-          : "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?";
-        return activeProfile.storeSecret !== "";
-      })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[3].error = valid ? null : "Invalid storeSecret";
-        return activeProfile.sshKey !== "";
-      })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[4].error = valid ? null : "Invalid SSH Key";
-        return activeProfile.name !== "";
-      })
-      .then((valid) => {
-        invalid = invalid || !valid;
-        fields[0].error = valid ? null : "Please provide a profile name";
-        return !invalid;
-      })
-      .then((valid) => {
-        if (valid) {
-          configs.setActiveProfile(activeProfile.id, password);
-        }
-      })
-      .catch((err) => {
-        console.log("Error", err);
-      })
-      .finally(() => {
-        activating = false;
-      });
+    let invalid = false;
+    try {
+      const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
+      invalid = !mnIsValid;
+      fields.find((f) => f.symbol === "mnemonics").error = invalid
+        ? "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?"
+        : null;
+    } catch (err) {
+      console.log("Error", err);
+    }
+
+    const sshIsValid = activeProfile.sshKey !== "";
+    invalid = invalid || !sshIsValid;
+    fields.find((f) => f.symbol === "sshKey").error = sshIsValid
+      ? null
+      : "Invalid SSH Key";
+
+    const nameIsValid = activeProfile.name !== "";
+    invalid = invalid || nameIsValid;
+    fields.find((f) => f.symbol === "name").error = nameIsValid
+      ? null
+      : "Please provide a profile name";
+
+    activating = false;
+    if (invalid) return;
+
+    configs.setActiveProfile(activeProfile.id, password);
   }
 
   const onClickHandler = () => (opened = false);
@@ -117,8 +108,8 @@
 
   //  bind:active={activePassword} tabs={tabsPassword}
   const tabsPassword: ITab[] = [
-    { label: "Load Profile", value: "load" },
-    { label: "Create New Profile", value: "create" },
+    { label: "Activate Profile Manager", value: "load" },
+    { label: "Create Profile Manager", value: "create" },
   ];
   let activePassword: string = "load";
 </script>
@@ -247,7 +238,19 @@
             activePassword
           )}
         >
-          <Input bind:data={password} field={secretField} />
+          <Input
+            bind:data={password}
+            field={{
+              label: "Password",
+              type: "password",
+              placeholder: "Browser Session Secret",
+              symbol: "secret",
+              tooltip:
+                activePassword === "load"
+                  ? "Password to activate a previously configured profile manager"
+                  : "Password will be used to encrypt data in the browser",
+            }}
+          />
 
           {#if message}
             <Alert type="danger" {message} />

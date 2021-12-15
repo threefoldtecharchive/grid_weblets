@@ -8,7 +8,7 @@ import getBalance from "../utils/getBalance";
 import getGrid from "../utils/getGrid";
 
 const PREFIX = "v2.";
-const createProfile = (name = "", m = "", s = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: s, networkEnv: n, sshKey: key }); // prettier-ignore
+const createProfile = (name = "", m = "", n = "dev", key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: "", networkEnv: n, sshKey: key }); // prettier-ignore
 
 function createBaseConfig() {
   const store = writable({
@@ -19,6 +19,7 @@ function createBaseConfig() {
     loadingBalance: false,
     twinId: null,
     address: null,
+    storeSecret: null,
   });
 
   function hashPassword(password: string) {
@@ -42,12 +43,12 @@ function createBaseConfig() {
         return value;
       });
     },
-    updateStoreSecret(idx: number, e: InputEvent) {
-      return update((value) => {
-        value.profiles[idx].storeSecret = (e.target as any).value;
-        return value;
-      });
-    },
+    // updateStoreSecret(idx: number, e: InputEvent) {
+    //   return update((value) => {
+    //     value.profiles[idx].storeSecret = (e.target as any).value;
+    //     return value;
+    //   });
+    // },
     updateNetworkEnv(idx: number, e: Event) {
       return update((value) => {
         value.profiles[idx].networkEnv = (e.target as any).selectedIndex === 0 ? "test" : "dev"; // prettier-ignore
@@ -109,6 +110,10 @@ function createBaseConfig() {
       try {
         set(JSON.parse(decrypt(data, password).toString(enc.Utf8)));
         sessionStorage.setItem("session_password", password);
+        update((value) => {
+          value.storeSecret = password;
+          return value;
+        });
 
         if (get(store).activeProfile) {
           fullStore.updateBalance();
@@ -134,13 +139,18 @@ function createBaseConfig() {
 
     _loadActiveProfileInfo() {
       getGrid(fullStore.getActiveProfile(), (grid) => {
-        grid.twins.get_my_twin_id().then((twin) => {
-          update((value) => {
-            value.twinId = twin;
-            value.address = grid.twins.client.client.address;
-            return value;
+        grid.twins
+          .get_my_twin_id()
+          .then((twin) => {
+            update((value) => {
+              value.twinId = twin;
+              value.address = grid.twins.client.client.address;
+              return value;
+            });
+          })
+          .catch((err) => {
+            console.log("Error", err);
           });
-        });
       });
     },
 
@@ -152,11 +162,14 @@ function createBaseConfig() {
       }
 
       fullStore._setLoadingBalance(true);
+
+      console.log("Balance Profile", fullStore.getActiveProfile());
       getBalance(fullStore.getActiveProfile())
         .then((balance) => {
           fullStore._setBalance(balance);
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log("Balance Error", err);
           if (times < 3) fullStore.updateBalance(times + 1);
         })
         .finally(() => {
@@ -180,14 +193,13 @@ function createBaseConfig() {
         value.activeProfile = id;
         value.twinId = null;
         value.address = null;
+        value.storeSecret = null;
         return value;
       });
       requestAnimationFrame(() => {
         fullStore.updateBalance();
         fullStore.save(password);
-        setTimeout(() => {
-          fullStore._loadActiveProfileInfo();
-        }, 1000);
+        fullStore._loadActiveProfileInfo();
       });
     },
 
@@ -195,8 +207,9 @@ function createBaseConfig() {
       const data = get(store);
       if (data.activeProfile === null) return null;
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
-      const profile = data.profiles[idx] as any;
+      const profile = data.profiles[idx] as IProfile;
       profile.balance = data.balance;
+      profile.storeSecret = data.storeSecret;
       return profile;
     },
 
