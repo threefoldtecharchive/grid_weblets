@@ -87,7 +87,7 @@
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
       const { name, master, workers } = row;
-      return [i + 1, name, master.publicIP?.ip ?? "", master.yggIP, workers];
+      return [i + 1, name, master.publicIP?.ip ?? "", master.yggIP ?? "", workers]; // prettier-ignore
     });
   }
 
