@@ -1,12 +1,7 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 
-import {
-  isValidName,
-  checkSuitableName,
-  getSuitableGateway,
-} from "./getValidGateway";
-import { gatewayNodes, getNodeDomain } from "./gatewayNode";
+import { getSuitableGateway } from "./getValidGateway";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -17,9 +12,11 @@ const {
   MachinesModel,
   GatewayNameModel,
   Nodes,
+  FilterOptions,
+  randomChoice,
 } = window.configs?.grid3_client ?? {};
 
-export let domain, peertubeYggIp, peertubePubIp;
+export let fullDomain, peertubeYggIp, peertubePubIp;
 
 export default async function deployPeertube(data: VM, profile: IProfile) {
   // connect
@@ -43,28 +40,38 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   // Make sure the name is valid
   name = await getSuitableGateway(client, name);
 
-  // Gateway node Id and domain
-  const gwNodeId = 7;
-  const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.rmbClient["proxyURL"]); // prettier-ignore
-  const gwDomain = await getNodeDomain(nodes, gwNodeId);
-  domain = `${name}.${gwDomain}`;
+  // Dynamically select node to deploy the gateway
+  const nodes = new Nodes(
+    GridClient.config.graphqlURL,
+    GridClient.config.rmbClient["proxyURL"]
+  );
 
-  // // define a network
+  const filter = new FilterOptions();
+  filter.gateway = true;
+
+  const selectedNode = randomChoice(await nodes.filterNodes(filter));
+
+  const gwNodeId = selectedNode.nodeId;
+  const gwNodeDomain = selectedNode.publicConfig.domain;
+
+  fullDomain = `${name}.${gwNodeDomain}`;
+
+  // define a network
   const network = new NetworkModel();
   network.name = name + "NW";
   network.ip_range = "10.1.0.0/16";
 
-  // // deploy the peertube
-  await deployPeertubeVM(client, network, nodeId, name, domain);
+  // deploy the peertube
+  await deployPeertubeVM(client, network, nodeId, name, fullDomain);
 
-  // // get the info
+  // get the info of peertube deployment
   const peertubeInfo = await getPeertubeInfo(client, name + "PTVMs");
   peertubeYggIp = peertubeInfo[0]["planetary"];
 
-  // // deploy the gateway
+  // deploy the gateway
   await deployPrefixGateway(client, name, peertubeYggIp, gwNodeId);
 
-  // // // return the info
+  // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
 }
@@ -99,12 +106,12 @@ async function deployPeertubeVM(
     PEERTUBE_DB_SUFFIX: "_prod",
     PEERTUBE_DB_USERNAME: "peertube",
     PEERTUBE_DB_PASSWORD: "peertube",
-    PEERTUBE_ADMIN_EMAIL: "ashraf.m.fouda@gmail.com",
+    PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
     PEERTUBE_WEBSERVER_PORT: "443",
     PEERTUBE_SMTP_HOSTNAME: "https://app.sendgrid.com",
     PEERTUBE_SMTP_USERNAME: "Threefold",
-    PEERTUBE_SMTP_PASSWORD: "%k00@$MtPAKce$$2^$mtp!%x",
+    PEERTUBE_SMTP_PASSWORD: "6172661f7gr",
     PEERTUBE_BIND_ADDRESS: "::",
   };
 
