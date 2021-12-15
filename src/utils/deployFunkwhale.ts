@@ -1,5 +1,6 @@
-import type { default as VM, Disk, Env } from "../types/vm";
+import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
+
 import { getSuitableGateway } from "./getValidGateway";
 import { selectGatewayNode } from "./gatewayHelpers";
 
@@ -11,10 +12,7 @@ const {
   GridClient,
   GatewayNameModel,
   NetworkModel,
-  // Nodes,
 } = window.configs?.grid3_client ?? {};
-
-export let domain, funkYggIp;
 
 export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
@@ -23,7 +21,7 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
-  const grid = new GridClient(
+  const client = new GridClient(
     networkEnv as any,
     mnemonics,
     storeSecret,
@@ -32,31 +30,35 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
     "tfkvstore" as any
   );
 
-  await grid.connect();
+  await client.connect();
 
   // Make sure the name is valid
-  name = await getSuitableGateway(grid, name);
-  console.log(name);
+  name = await getSuitableGateway(client, name);
+  console.log({ name });
 
   // Gateway node Id and domain
   let [gwNodeId, gwDomain] = await selectGatewayNode();
-  domain = `${name}.${gwDomain}`;
+  const domain = `${name}.${gwDomain}`;
   console.log({ gwNodeId });
-  console.log(domain);
+  console.log({ domain });
 
+  // define network
   const network = new NetworkModel();
-  network.name = name + "NW";
+  network.name = name + "Net";
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(grid, name, network, nodeId, domain);
+  await deployFunkwhaleVM(client, name, network, nodeId, domain);
 
-  const info = await getFunkwhaleInfo(grid, name);
-  funkYggIp = info[0]["planetary"];
+  const info = await getFunkwhaleInfo(client, name + "VMs");
+  console.log({ info });
+  const planetaryIP = info[0]["planetary"];
+  console.log({ planetaryIP });
 
-  await deployPrefixGateway(grid, name, funkYggIp, gwNodeId);
+  await deployPrefixGateway(client, name, planetaryIP, gwNodeId);
 
-  const gatewayInfo = await getGatewayInfo(grid, name);
-  return { domain, funkYggIp };
+  const gatewayInfo = await getGatewayInfo(client, name);
+  console.log({ gatewayInfo });
+  return { domain, planetaryIP };
 }
 
 async function deployFunkwhaleVM(
@@ -72,24 +74,25 @@ async function deployFunkwhaleVM(
   disk.mountpoint = "/data";
 
   const vm = new MachineModel();
-  vm.name = name;
+  vm.name = name + "VM";
   vm.node_id = nodeId;
-
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 4;
-  vm.memory = 8192;
+  vm.cpu = 2;
+  vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
   vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,
   };
+
   const vms = new MachinesModel();
-  vms.name = name;
+  vms.name = name + "VMs";
   vms.network = network;
   vms.machines = [vm];
+
   window.configs.currentDeploymentStore.deploy("Funkwhale", name);
   return client.machines
     .deploy(vms)
@@ -108,7 +111,6 @@ async function deployPrefixGateway(
   backend: string,
   nodeId: number
 ) {
-  // define specs
   const gw = new GatewayNameModel();
   gw.name = name;
   gw.node_id = nodeId;
@@ -116,7 +118,6 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:80/`];
 
   window.configs.currentDeploymentStore.deploy("Funkwhale", name);
-  // deploy
   return client.gateway.deploy_name(gw).finally(() => {
     window.configs.currentDeploymentStore.clear();
   });

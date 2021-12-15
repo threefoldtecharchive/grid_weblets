@@ -36,7 +36,7 @@
 
   let message: string;
 
-  let domain: string, funkYggIp: string;
+  let domain: string, planetaryIP: string;
 
   async function onDeployVM() {
     loading = true;
@@ -60,13 +60,13 @@
 
     events.addListener("logs", onLogInfo);
     deployFunkwhale(data, profile)
-      .then(({ domain: d, funkYggIp: f }) => {
+      .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
         success = true;
         domain = d;
-        funkYggIp = f;
-        console.log(domain);
-        console.log(funkYggIp);
+        planetaryIP = ip;
+        console.log({ domain });
+        console.log({ planetaryIP });
       })
       .catch((err) => {
         failed = true;
@@ -90,8 +90,8 @@
       <AlertDetailed
         type="success"
         message="Successfully Deployed A Funkwhale Instance"
-        planetaryIP={funkYggIp}
-        fullDomain={domain}
+        {planetaryIP}
+        {domain}
         deployed={true}
       />
     {:else if failed}

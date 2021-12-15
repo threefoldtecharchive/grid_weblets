@@ -96,7 +96,7 @@
         type="success"
         message="Successfully Deployed A Peertube Instance"
         planetaryIP={peertubeYggIp}
-        {fullDomain}
+        domain={fullDomain}
         deployed={true}
       />
     {:else if failed}

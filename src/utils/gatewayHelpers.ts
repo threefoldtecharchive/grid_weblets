@@ -1,5 +1,4 @@
-const { GridClient, Nodes, FilterOptions, randomChoice } =
-  window.configs?.grid3_client ?? {};
+const { GridClient, Nodes, randomChoice } = window.configs?.grid3_client ?? {};
 
 export async function selectGatewayNode() {
   const nodes = new Nodes(
