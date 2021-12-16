@@ -243,7 +243,7 @@
             field={{
               label: "Password",
               type: "password",
-              placeholder: "Browser Session Secret",
+              placeholder: "Profile Manager password",
               symbol: "secret",
               tooltip:
                 activePassword === "load"
