@@ -50,7 +50,7 @@ export default class Kubernetes {
   public constructor(
     public id = v4(),
     public master = new Master(),
-    public workers = [new Worker()],
+    public workers = [],
     public network = new Network(),
     public name: string = "K8S" + id.split("-")[0],
     public secret: string = v4().split("-")[0],
