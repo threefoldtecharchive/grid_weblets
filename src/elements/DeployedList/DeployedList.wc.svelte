@@ -86,15 +86,22 @@
 
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, master, workers } = row;
-      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers]; // prettier-ignore
+      const { name, master, workers, consumption } = row;
+      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers, consumption]; // prettier-ignore
     });
   }
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, publicIp, planetary, flist } = row;
-      return [i + 1, name, publicIp ?? "", planetary ?? "None", flist];
+      const { name, publicIp, planetary, flist, consumption } = row;
+      return [
+        i + 1,
+        name,
+        publicIp ?? "",
+        planetary ?? "None",
+        flist,
+        consumption,
+      ];
     });
   }
 
@@ -172,6 +179,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Workers",
+                "Consumption",
               ]}
               rows={_createK8sRows(rows)}
               actions={[
@@ -209,6 +217,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -246,6 +255,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -297,6 +307,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -351,6 +362,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
