@@ -21,12 +21,15 @@ export default class DeployedList {
             ...data.workers.map(({ contractId }) => this.grid.contracts.getConsumption({ id: contractId }).catch(() => 0))
           ]);
 
+          const value = prices.reduce((a, b) => a + b, 0);
+
           res({
             name,
             master: data.masters[0],
             workers: data.workers.length,
             details: data,
-            consumption: prices.reduce((a, b) => a + b, 0) + " TFT/Hour",
+            consumption:
+              value === 0 ? "No Data Available" : value + " TFT/Hour",
           });
         })
         .catch(() => res(null));
@@ -53,12 +56,14 @@ export default class DeployedList {
             publicIp: (data.publicIP as any)?.ip ?? "None",
             planetary: data.planetary,
             flist: data.flist,
-            consumption:
-              (await this.grid.contracts
-                .getConsumption({
-                  id: data.contractId as number,
-                })
-                .catch(() => 0)) + " TFT/Hour",
+            consumption: await this.grid.contracts
+              .getConsumption({
+                id: data.contractId as number,
+              })
+              .then((res) =>
+                res === 0 ? "No Data Available" : res + " TFT/Hour"
+              )
+              .catch(() => "No Data Available"),
             details: data,
           });
         })

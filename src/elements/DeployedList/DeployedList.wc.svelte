@@ -177,7 +177,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Workers",
-                "Consumption",
+                "Billing Rate",
               ]}
               rows={_createK8sRows(rows)}
               actions={[
@@ -215,7 +215,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
-                "Consumption",
+                "Billing Rate",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -253,7 +253,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
-                "Consumption",
+                "Billing Rate",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -305,7 +305,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
-                "Consumption",
+                "Billing Rate",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -360,7 +360,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
-                "Consumption",
+                "Billing Rate",
               ]}
               rows={_createVMRow(rows)}
               actions={[
