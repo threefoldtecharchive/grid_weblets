@@ -132,6 +132,7 @@
       {loading}
       {failed}
       {success}
+      {profile}
       on:click={(e) => {
         if (success || failed) {
           e.preventDefault();

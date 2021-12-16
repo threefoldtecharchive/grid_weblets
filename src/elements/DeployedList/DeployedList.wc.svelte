@@ -16,6 +16,7 @@
   import Table from "../../components/Table.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import Alert from "../../components/Alert.svelte";
+  import { noActiveProfile } from "../../utils/message";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -86,15 +87,22 @@
 
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, master, workers } = row;
-      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers]; // prettier-ignore
+      const { name, master, workers, consumption } = row;
+      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers, consumption]; // prettier-ignore
     });
   }
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, publicIp, planetary, flist } = row;
-      return [i + 1, name, publicIp ?? "", planetary ?? "None", flist];
+      const { name, publicIp, planetary, flist, consumption } = row;
+      return [
+        i + 1,
+        name,
+        publicIp ?? "",
+        planetary ?? "None",
+        flist,
+        consumption,
+      ];
     });
   }
 
@@ -134,10 +142,7 @@
     {#if loading}
       <Alert type="info" message="Loading..." />
     {:else if !configed}
-      <Alert
-        type="info"
-        message="Please activate a profile from profile manager"
-      />
+      <Alert type="info" message={noActiveProfile} />
     {:else}
       {#if !tab}
         <Tabs
@@ -172,6 +177,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Workers",
+                "Consumption",
               ]}
               rows={_createK8sRows(rows)}
               actions={[
@@ -209,6 +215,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -246,6 +253,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -297,6 +305,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[
@@ -351,6 +360,7 @@
                 "Public IP",
                 "Planetary Network IP",
                 "Flist",
+                "Consumption",
               ]}
               rows={_createVMRow(rows)}
               actions={[

@@ -9,16 +9,24 @@ export default class DeployedList {
     return new Promise((res) => {
       this.grid.k8s
         .getObj(name)
-        .then((data) => {
+        .then(async (data) => {
           if (data.masters.length === 0) {
             // Temp solution for now
             return res(null);
           }
+
+          // prettier-ignore
+          const prices = await Promise.all([
+            this.grid.contracts.getConsumption({ id: data.masters[0].contractId }).catch(() => 0),
+            ...data.workers.map(({ contractId }) => this.grid.contracts.getConsumption({ id: contractId }).catch(() => 0))
+          ]);
+
           res({
             name,
             master: data.masters[0],
             workers: data.workers.length,
             details: data,
+            consumption: prices.reduce((a, b) => a + b, 0) + " TFT/Hour",
           });
         })
         .catch(() => res(null));
@@ -39,13 +47,18 @@ export default class DeployedList {
     return new Promise((res) => {
       this.grid.machines
         .getObj(name)
-        .then(([data]) => {
-          console.log({ data });
+        .then(async ([data]) => {
           return res({
             name,
             publicIp: (data.publicIP as any)?.ip ?? "None",
             planetary: data.planetary,
             flist: data.flist,
+            consumption:
+              (await this.grid.contracts
+                .getConsumption({
+                  id: data.contractId as number,
+                })
+                .catch(() => 0)) + " TFT/Hour",
             details: data,
           });
         })
