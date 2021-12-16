@@ -4,12 +4,9 @@
   // Types
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
-
   // Modules
   import VM, { Env } from "../../types/vm";
   import deployPeertube from "../../utils/deployPeertube";
-  import { fullDomain, peertubeYggIp } from "../../utils/deployPeertube";
-
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
@@ -21,39 +18,32 @@
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
-
   // Values
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
-
   let data = new VM();
   let active: string = "base";
   let loading = false;
   let success = false;
   let failed = false;
-
   let profile: IProfile;
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
-
-  // doDeploy
+  let domain: string, planetaryIP: string;
   async function onDeployVM() {
     loading = true;
     success = false;
     failed = false;
     message = undefined;
-
     function onLogInfo(msg: string) {
       if (typeof msg === "string") {
         message = msg;
       }
     }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -61,15 +51,13 @@
         "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
       return;
     }
-
     events.addListener("logs", onLogInfo);
-
     deployPeertube(data, profile)
-      .then(() => {
+      .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
         success = true;
-        console.log(fullDomain);
-        console.log(peertubeYggIp);
+        domain = d;
+        planetaryIP = ip;
       })
       .catch((err: Error) => {
         failed = true;
@@ -95,8 +83,8 @@
       <AlertDetailed
         type="success"
         message="Successfully Deployed A Peertube Instance"
-        planetaryIP={peertubeYggIp}
-        {fullDomain}
+        {planetaryIP}
+        {domain}
         deployed={true}
       />
     {:else if failed}

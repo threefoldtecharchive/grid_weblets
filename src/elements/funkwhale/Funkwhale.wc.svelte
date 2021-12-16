@@ -8,10 +8,7 @@
   const deploymentStore = window.configs?.deploymentStore;
 
   import VM, { Env } from "../../types/vm";
-  import deployFunkwhale, {
-    domain,
-    funkYggIp,
-  } from "../../utils/deployFunkwhale";
+  import deployFunkwhale from "../../utils/deployFunkwhale";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -39,6 +36,8 @@
 
   let message: string;
 
+  let domain: string, planetaryIP: string;
+
   async function onDeployVM() {
     loading = true;
     success = false;
@@ -61,11 +60,11 @@
 
     events.addListener("logs", onLogInfo);
     deployFunkwhale(data, profile)
-      .then(() => {
+      .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
         success = true;
-        console.log(domain);
-        console.log(funkYggIp);
+        domain = d;
+        planetaryIP = ip;
       })
       .catch((err) => {
         failed = true;
@@ -89,7 +88,7 @@
       <AlertDetailed
         type="success"
         message="Successfully Deployed A Funkwhale Instance"
-        planetaryIP={funkYggIp}
+        {planetaryIP}
         {domain}
         deployed={true}
       />
