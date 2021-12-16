@@ -99,13 +99,13 @@
   }
 
   let loadingConsumption: boolean = false;
-  let consumptions: number[] = [];
+  let consumptions: string[] = [];
   $: {
     if (profile) {
       loadingConsumption = true;
       getContractsConsumption(profile, contracts)
         .then((res) => {
-          consumptions = res as unknown as number[];
+          consumptions = res as unknown as string[];
         })
         .catch((err) => {
           console.log("Error", err);
@@ -129,12 +129,12 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "Consumption"]}
+        headers={["#", "ID", "Type", "Billing Rate"]}
         rows={contracts.map(({ id, type }, idx) => [
           idx.toString(),
           id.toString(),
           type,
-          loadingConsumption ? "Loading..." : consumptions[idx] + " TFT/Hour",
+          loadingConsumption ? "Loading..." : consumptions[idx],
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}

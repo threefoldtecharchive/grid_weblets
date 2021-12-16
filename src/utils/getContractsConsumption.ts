@@ -8,7 +8,10 @@ export interface IContract {
 }
 
 function _getConsumption(id: number, grid: GridClient) {
-  return grid.contracts.getConsumption({ id }).catch(() => 0);
+  return grid.contracts
+    .getConsumption({ id })
+    .then((res) => (res === 0 ? "No Data Available" : res + " TFT/Hour"))
+    .catch(() => "No Data Available");
 }
 
 export default function getContractsConsumption(

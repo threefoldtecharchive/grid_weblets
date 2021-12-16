@@ -12,6 +12,7 @@
   export let invalid = false;
   export let min: string | number = undefined;
   export let max: string | number = undefined;
+  export let required: boolean = true;
 
   const id = v4();
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
@@ -24,9 +25,14 @@
   }
 
   function _onInput(e: Event) {
+    const target = e.target as HTMLInputElement;
     if (field.validator) {
-      const target = e.target as HTMLInputElement;
       let __err = field.validator(target.value);
+      _error = typeof __err === "string" ? __err : undefined;
+      invalid = !!__err;
+      /* Hack for now */
+    } else if (target.type === "number") {
+      let __err = +target.value <= 0 ? "Value must be positive" : null;
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
     }
@@ -148,6 +154,7 @@
               bind:value={data}
               on:input={_onInput}
               disabled={field.disabled}
+              {required}
             />
           {:else if field.type === "text"}
             <input
@@ -157,6 +164,7 @@
               bind:value={data}
               on:input={_onInput}
               disabled={field.disabled}
+              {required}
             />
           {:else if field.type === "number"}
             <input
@@ -168,6 +176,7 @@
               disabled={field.disabled}
               {min}
               {max}
+              {required}
             />
           {:else if field.type === "password"}
             <input
@@ -178,6 +187,7 @@
               on:input={_onInput}
               disabled={field.disabled}
               bind:this={_password}
+              {required}
             />
             <span
               style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"
