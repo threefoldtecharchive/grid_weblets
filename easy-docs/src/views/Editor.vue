@@ -1,7 +1,7 @@
 <template>
   <section class="editor">
     <aside class="editor__side menu">
-      <p class="menu-label">Threefold Weblets</p>
+      <!-- <p class="menu-label">Threefold Weblets</p>
       <ul class="menu-list">
         <li
           v-for="(el, idx) in weblets"
@@ -12,7 +12,41 @@
             {{ el.name }}
           </a>
         </li>
-      </ul>
+      </ul> -->
+      <template v-for="section in sections">
+        <p class="menu-label" :key="section + 'label'">{{ section }}</p>
+        <ul class="menu-list" :key="section + 'items'">
+          <template v-for="(el, idx) in weblets">
+            <li
+              :key="el.name"
+              @click="
+                section === 'coming soon' ? null : $router.push('/' + el.symbol)
+              "
+              v-if="el.section === section"
+            >
+              <a
+                v-if="section !== 'coming soon'"
+                v-bind:class="{ 'is-active': idx === active }"
+              >
+                {{ el.name }}
+              </a>
+
+              <p
+                v-if="section === 'coming soon'"
+                class="menu-label"
+                style="
+                  text-transform: inherit;
+                  margin-left: 1rem;
+                  margin-bottom: 0.5rem;
+                  font-size: 0.8rem;
+                "
+              >
+                {{ el.name }}
+              </p>
+            </li>
+          </template>
+        </ul>
+      </template>
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
@@ -39,7 +73,8 @@ class Weblet {
   public constructor(
     public name: string,
     public symbol: string,
-    deployment?: string
+    deployment = "",
+    public section: "deployment" | "calculator" | "coming soon"
   ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
@@ -66,25 +101,25 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
+  public sections = ["deployment", "calculator", "coming soon"];
   public weblets: Weblet[] = [
-    // new Weblet("Profile Manager", "profiles"),
-    new Weblet("Farming Calculator", "farming-calculator"),
-    new Weblet("CapRover", "caprover", "caprover"), // "k8s" | "vm" | "caprover"
-    new Weblet("Virtual Machine", "vm", "vm"),
-    new Weblet("Kubernetes", `kubernetes`, "k8s"),
-    new Weblet("Peertube", "peertube", "peertube"),
-    new Weblet("Funkwhale", "funkwhale", "funkwhale"),
+    new Weblet("CapRover", "caprover", "caprover", "deployment"),
+    new Weblet("Virtual Machine", "vm", "vm", "deployment"),
+    new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
+    new Weblet("Contracts", "contractslist", "", "deployment"),
+    new Weblet("Deployments", "deployedlist", "", "deployment"),
 
-    // Make sure [Deployments] always last one!
-    new Weblet("Contracts", "contractslist"),
-    new Weblet("Deployments", "deployedlist"),
+    new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
+
+    new Weblet("Peertube", "peertube", "peertube", "coming soon"),
+    new Weblet("Funkwhale", "funkwhale", "funkwhale", "coming soon"),
   ];
   public active = 0;
 
   @Watch("$route.params", { deep: true, immediate: true })
   public onRouterChange(to: { component?: string }) {
     const idx = this.weblets.findIndex((w) => w.symbol === to.component);
-    this.active = idx > -1 ? idx : 0;
+    this.active = idx > -1 && idx < 6 ? idx : 0;
   }
 }
 </script>
