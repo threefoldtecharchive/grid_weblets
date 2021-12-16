@@ -1,5 +1,6 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
+import deploy from "./deploy";
 
 import { getUniqueName, selectGatewayNode } from "./gatewayHelpers";
 
@@ -44,14 +45,14 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   network.ip_range = "10.1.0.0/16";
 
   // deploy the peertube
-  await deployPeertubeVM(client, network, nodeId, name, domain);
+  await deployPeertubeVM(profile, client, network, nodeId, name, domain);
 
   // get the info of peertube deployment
   const peertubeInfo = await getPeertubeInfo(client, name + "VMs");
   const planetaryIP = peertubeInfo[0]["planetary"];
 
   // deploy the gateway
-  await deployPrefixGateway(client, name, planetaryIP, gwNodeId);
+  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
 
   // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, name);
@@ -60,6 +61,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 }
 
 async function deployPeertubeVM(
+  profile: IProfile,
   client: any,
   net: any,
   nodeId: any,
@@ -101,19 +103,16 @@ async function deployPeertubeVM(
   vms.machines = [vm];
 
   // deploy
-  window.configs.currentDeploymentStore.deploy("Peertube", name);
-  return client.machines
-    .deploy(vms)
-    .then((res) => {
-      window.configs.baseConfig.updateBalance();
-      return res;
-    })
-    .finally(() => {
-      window.configs.currentDeploymentStore.clear();
-    });
+  return deploy(profile, "Peertube", name, (grid) => {
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
+  });
 }
 
 async function deployPrefixGateway(
+  profile: IProfile,
   client: any,
   name: string,
   backend: string,
@@ -126,12 +125,11 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  window.configs.currentDeploymentStore.deploy("Peertube", name);
-  // deploy
-  return client.gateway.deploy_name(gw).then((res) => {
-    window.configs.baseConfig.updateBalance();
-    window.configs.currentDeploymentStore.clear();
-    return res;
+  return deploy(profile, "Peertube", name, (grid) => {
+    return grid.gateway
+      .deploy_name(gw)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
 

@@ -1,5 +1,6 @@
 import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
+import deploy from "./deploy";
 
 import { getUniqueName, selectGatewayNode } from "./gatewayHelpers";
 
@@ -43,18 +44,19 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   network.name = name + "Net";
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(client, name, network, nodeId, domain);
+  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain);
 
   const info = await getFunkwhaleInfo(client, name + "VMs");
   const planetaryIP = info[0]["planetary"];
 
-  await deployPrefixGateway(client, name, planetaryIP, gwNodeId);
+  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
 
   const gatewayInfo = await getGatewayInfo(client, name);
   return { domain, planetaryIP };
 }
 
 async function deployFunkwhaleVM(
+  profile: IProfile,
   client: any,
   name: string,
   network: any,
@@ -86,19 +88,16 @@ async function deployFunkwhaleVM(
   vms.network = network;
   vms.machines = [vm];
 
-  window.configs.currentDeploymentStore.deploy("Funkwhale", name);
-  return client.machines
-    .deploy(vms)
-    .then((res) => {
-      window.configs.baseConfig.updateBalance();
-      return res;
-    })
-    .finally(() => {
-      window.configs.currentDeploymentStore.clear();
-    });
+  return deploy(profile, "Funkwhale", name, (grid) => {
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
+  });
 }
 
 async function deployPrefixGateway(
+  profile: IProfile,
   client: any,
   name: string,
   backend: string,
@@ -110,9 +109,11 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
 
-  window.configs.currentDeploymentStore.deploy("Funkwhale", name);
-  return client.gateway.deploy_name(gw).finally(() => {
-    window.configs.currentDeploymentStore.clear();
+  return deploy(profile, "Funkwhale", name, (grid) => {
+    return grid.gateway
+      .deploy_name(gw)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
 
