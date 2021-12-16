@@ -88,14 +88,14 @@
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
       const { name, master, workers } = row;
-      return [i + 1, name, master.publicIP?.ip ?? "", master.planetary ?? "", workers]; // prettier-ignore
+      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers]; // prettier-ignore
     });
   }
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
       const { name, publicIp, planetary, flist } = row;
-      return [i + 1, name, publicIp ?? "", planetary ?? "", flist];
+      return [i + 1, name, publicIp ?? "", planetary ?? "None", flist];
     });
   }
 
