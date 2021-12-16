@@ -65,8 +65,6 @@
         success = true;
         domain = d;
         planetaryIP = ip;
-        console.log({ domain });
-        console.log({ planetaryIP });
       })
       .catch((err) => {
         failed = true;
