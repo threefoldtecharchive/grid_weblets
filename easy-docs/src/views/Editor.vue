@@ -57,9 +57,9 @@
       </nav>
       <div v-html="weblets[active].html" />
     </div>
-    <div class="editor__area" v-if="active >= 0">
+    <!-- <div class="editor__area" v-if="active >= 0">
       <textarea spellcheck="false" v-model="weblets[active].md" />
-    </div>
+    </div> -->
   </section>
 </template>
 
