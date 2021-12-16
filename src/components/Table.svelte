@@ -18,6 +18,7 @@
   export let rows: string[][];
   export let actions: IAction[] = [];
   export let selectable: boolean = true;
+  export let selectedRows: number[] = [];
 
   $: footer = rows && rows.length > 49;
 
@@ -40,6 +41,13 @@
   }
 
   $: allChecked = _selectedRows.length === rows?.length;
+  $: {
+    _selectedRows = selectedRows;
+    dispatch(
+      "selected",
+      selectedRows.map((i) => rowsData[i])
+    );
+  }
 </script>
 
 <table class="table" style="width: 100%;">
