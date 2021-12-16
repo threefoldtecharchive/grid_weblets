@@ -2764,6 +2764,11 @@ autoprefixer@^9.8.6:
     postcss "^7.0.32"
     postcss-value-parser "^4.1.0"
 
+await-lock@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/await-lock/-/await-lock-2.1.0.tgz#bc78c51d229a34d5d90965a1c94770e772c6145e"
+  integrity sha512-t7Zm5YGgEEc/3eYAicF32m/TNvL+XOeYZy9CvBUeJY/szM7frLolFylhrlZNWV/ohWhcUXygrBGjYmoQdxF4CQ==
+
 aws-sign2@~0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/aws-sign2/-/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
@@ -5766,12 +5771,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@0.0.34:
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.34.tgz#9e574f5937b2420d1b0db17e3e809fa288711a84"
-  integrity sha512-bofPVlAx0iwziXyr9Ko5HDulZtlw0FTUlNE+ugdKLlF8RkRY4Mafhzc+wo61ZLrFSuR08dlzAUE8hOpaAlxuug==
+grid3_client@0.0.35:
+  version "0.0.35"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.35.tgz#d9c317847f9ff52731c361bd1bcfa6445df1ad44"
+  integrity sha512-JcposMwZAA05q/PXjA7JOooo8x2vwq5CQ4POIX3lcifmnnB4m07p2GjnCgJjTaksUqhXMZuVrw0OsJiwGf5nOg==
   dependencies:
     appdata-path "^1.0.0"
+    await-lock "^2.1.0"
     axios "^0.24.0"
     buffer "^6.0.3"
     class-transformer "^0.5.1"
