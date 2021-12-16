@@ -6,7 +6,7 @@
   import type { IProfile } from "../../types/Profile";
   // Modules
   import VM, { Env } from "../../types/vm";
-  import deployPeertube from "../../utils/deployPeertue";
+  import deployPeertube from "../../utils/deployPeertube";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";

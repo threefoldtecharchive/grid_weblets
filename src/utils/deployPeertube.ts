@@ -33,13 +33,10 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getUniqueName(client, name);
-  console.log({ name });
 
   // Dynamically select node to deploy the gateway
   let [gwNodeId, gwDomain] = await selectGatewayNode();
   const domain = `${name}.${gwDomain}`;
-  console.log({ gwNodeId });
-  console.log({ domain });
 
   // define a network
   const network = new NetworkModel();
@@ -51,9 +48,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // get the info of peertube deployment
   const peertubeInfo = await getPeertubeInfo(client, name + "VMs");
-  console.log({ peertubeInfo });
   const planetaryIP = peertubeInfo[0]["planetary"];
-  console.log({ planetaryIP });
 
   // deploy the gateway
   await deployPrefixGateway(client, name, planetaryIP, gwNodeId);

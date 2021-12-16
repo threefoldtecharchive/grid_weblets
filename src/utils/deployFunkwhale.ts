@@ -34,13 +34,9 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   // Make sure the name is valid
   name = await getUniqueName(client, name);
 
-  console.log({ name });
-
   // Gateway node Id and domain
   let [gwNodeId, gwDomain] = await selectGatewayNode();
   const domain = `${name}.${gwDomain}`;
-  console.log({ gwNodeId });
-  console.log({ domain });
 
   // define network
   const network = new NetworkModel();
@@ -50,14 +46,11 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   await deployFunkwhaleVM(client, name, network, nodeId, domain);
 
   const info = await getFunkwhaleInfo(client, name + "VMs");
-  console.log({ info });
   const planetaryIP = info[0]["planetary"];
-  console.log({ planetaryIP });
 
   await deployPrefixGateway(client, name, planetaryIP, gwNodeId);
 
   const gatewayInfo = await getGatewayInfo(client, name);
-  console.log({ gatewayInfo });
   return { domain, planetaryIP };
 }
 
