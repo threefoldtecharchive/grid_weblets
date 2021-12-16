@@ -210,6 +210,7 @@
       {loading}
       {failed}
       {success}
+      {profile}
       on:click={onResetHandler}
     />
   </form>

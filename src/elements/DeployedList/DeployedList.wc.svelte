@@ -16,6 +16,7 @@
   import Table from "../../components/Table.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import Alert from "../../components/Alert.svelte";
+  import { noActiveProfile } from "../../utils/message";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -134,10 +135,7 @@
     {#if loading}
       <Alert type="info" message="Loading..." />
     {:else if !configed}
-      <Alert
-        type="info"
-        message="Please activate a profile from profile manager"
-      />
+      <Alert type="info" message={noActiveProfile} />
     {:else}
       {#if !tab}
         <Tabs
