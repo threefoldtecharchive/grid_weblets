@@ -1,18 +1,6 @@
 <template>
   <section class="editor">
     <aside class="editor__side menu">
-      <!-- <p class="menu-label">Threefold Weblets</p>
-      <ul class="menu-list">
-        <li
-          v-for="(el, idx) in weblets"
-          :key="el.name"
-          @click="$router.push('/' + el.symbol)"
-        >
-          <a v-bind:class="{ 'is-active': idx === active }">
-            {{ el.name }}
-          </a>
-        </li>
-      </ul> -->
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
@@ -20,7 +8,9 @@
             <li
               :key="el.name"
               @click="
-                section === 'coming soon' ? null : $router.push('/' + el.symbol)
+                section === 'coming soon' || idx === active
+                  ? null
+                  : route(el.symbol)
               "
               v-if="el.section === section"
             >
@@ -120,6 +110,10 @@ export default class Editor extends Vue {
   public onRouterChange(to: { component?: string }) {
     const idx = this.weblets.findIndex((w) => w.symbol === to.component);
     this.active = idx > -1 && idx < 6 ? idx : 0;
+  }
+
+  route(symbol: string): void {
+    this.$router.push("/" + symbol).catch();
   }
 }
 </script>
