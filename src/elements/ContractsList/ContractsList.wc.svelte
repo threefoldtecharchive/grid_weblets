@@ -20,6 +20,7 @@
   let selectedContracts: IContract[] = [];
   let deleting: boolean = false;
   let deletingType: "all" | "selected" = null;
+  let selectedRows: number[] = [];
 
   function onLoadProfile(_profile: IProfile) {
     profile = _profile;
@@ -64,6 +65,7 @@
           message = err.message || err;
         })
         .finally(() => {
+          selectedRows = [];
           deleting = false;
           deletingType = null;
         });
@@ -83,12 +85,15 @@
       for (const contract of selectedContracts) {
         try {
           await grid.contracts.cancel({ id: contract.id });
-          contracts = contracts.filter((c) => c.id !== contract.id);
         } catch (err) {
           console.log("Error", err);
           message = err.message || err;
         }
       }
+      contracts = contracts.filter((c) => {
+        return selectedContracts.findIndex((sc) => sc.id === c.id) === -1;
+      });
+      selectedRows = [];
       deleting = false;
       deletingType = null;
     });
@@ -114,6 +119,7 @@
           type,
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
+        {selectedRows}
       />
       <div
         class="is-flex is-justify-content-space-between is-align-items-center"
