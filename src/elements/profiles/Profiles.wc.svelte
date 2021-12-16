@@ -263,8 +263,8 @@
               disabled={password === ""}
             >
               {activePassword === "load"
-                ? "Unlock Store"
-                : "Create a New Store"}
+                ? "Load profiles"
+                : "Create new profile manager"}
             </button>
           </div>
         </form>
