@@ -8,6 +8,8 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
   import Table from "../../components/Table.svelte";
+  import { noActiveProfile } from "../../utils/message";
+
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
 
@@ -171,9 +173,7 @@
     {:else}
       <Alert
         type="info"
-        message={!profile
-          ? "Please select a profile"
-          : "No contracts were found"}
+        message={!profile ? noActiveProfile : "No contracts were found"}
       />
     {/if}
   </div>
