@@ -29,9 +29,10 @@
   <button
     class={"button is-primary " + (loading ? "is-loading" : "")}
     type="submit"
-    disabled={disabled || !!deployment}
     on:click
+    disabled={!!deployment}
   >
+    <!-- disabled={disabled || !!deployment} -->
     {#if success || failed}
       Back
     {:else}
