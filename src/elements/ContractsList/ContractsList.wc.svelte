@@ -8,11 +8,8 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
   import Table from "../../components/Table.svelte";
-
-  interface IContract {
-    id: number;
-    type: "name" | "node";
-  }
+  import type { IContract } from "../../utils/getContractsConsumption";
+  import getContractsConsumption from "../../utils/getContractsConsumption";
 
   let profile: IProfile;
   let contracts: IContract[] = [];
@@ -98,6 +95,24 @@
       deletingType = null;
     });
   }
+
+  let loadingConsumption: boolean = false;
+  let consumptions: number[] = [];
+  $: {
+    if (profile) {
+      loadingConsumption = true;
+      getContractsConsumption(profile, contracts)
+        .then((res) => {
+          consumptions = res as unknown as number[];
+        })
+        .catch((err) => {
+          console.log("Error", err);
+        })
+        .finally(() => {
+          loadingConsumption = false;
+        });
+    }
+  }
 </script>
 
 <SelectProfile on:profile={({ detail }) => onLoadProfile(detail)} />
@@ -112,11 +127,12 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "id", "type"]}
+        headers={["#", "ID", "Type", "Consumption"]}
         rows={contracts.map(({ id, type }, idx) => [
           idx.toString(),
           id.toString(),
           type,
+          loadingConsumption ? "Loading..." : consumptions[idx] + " TFT/Hour",
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}

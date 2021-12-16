@@ -44,7 +44,7 @@ export default class DeployedList {
           return res({
             name,
             publicIp: (data.publicIP as any)?.ip ?? "None",
-            yggIP: data.yggIP,
+            planetary: data.planetary,
             flist: data.flist,
             details: data,
           });
