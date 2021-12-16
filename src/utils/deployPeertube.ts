@@ -56,7 +56,6 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, name);
   const gatewayDomain = gatewayInfo[0]["domain"];
-  console.log({ gatewayDomain });
   return { domain, planetaryIP };
 }
 
