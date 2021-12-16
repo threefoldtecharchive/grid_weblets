@@ -17,6 +17,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
+import validateDomainName from "../../utils/validateDomainName";
 
   const data = new Caprover();
   let loading = false;
@@ -39,11 +40,11 @@
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text" },
+    { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
     { label: "Password", symbol: "password", placeholder: "Caprover new password", type: "text" },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || fields[0].invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || fields[0].invalid || fields[4].invalid; // prettier-ignore
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
