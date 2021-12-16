@@ -161,7 +161,7 @@
       <!-- K8S -->
       {#if active === "k8s"}
         {#await list.loadK8s()}
-          <Alert type="info" message="Loading Kubernetes..." />
+          <Alert type="info" message="Listing Kubernetes..." />
         {:then rows}
           {#if rows.length}
             <Table
@@ -198,7 +198,7 @@
         <!-- VM -->
       {:else if active === "vm"}
         {#await list.loadVm()}
-          <Alert type="info" message="Loading Virtual Machines..." />
+          <Alert type="info" message="Listing Virtual Machines..." />
         {:then rows}
           {#if rows.length}
             <Table
@@ -235,7 +235,7 @@
         <!-- Caprover -->
       {:else if active === "caprover"}
         {#await list.loadCaprover()}
-          <Alert type="info" message="Loading CapRover..." />
+          <Alert type="info" message="Listing CapRover..." />
         {:then rows}
           {#if rows.length}
             <Table
@@ -286,7 +286,7 @@
         <!-- Peertube -->
       {:else if active === "peertube"}
         {#await list.loadPeertube()}
-          <Alert type="info" message="Loading Peertube..." />
+          <Alert type="info" message="Listing Peertube..." />
         {:then rows}
           {#if rows.length}
             <Table
@@ -340,7 +340,7 @@
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
         {#await list.loadFunkwhale()}
-          <Alert type="info" message="Loading Funkwhale..." />
+          <Alert type="info" message="Listing Funkwhale..." />
         {:then rows}
           {#if rows.length}
             <Table
