@@ -125,11 +125,11 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  return deploy(profile, "Peertube", name, (grid) => {
+  return deploy(profile, "GatewayName", name, (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+      .then(() => grid.gateway.getObj(name))
+      .then(([gw]) => gw);
   });
 }
 

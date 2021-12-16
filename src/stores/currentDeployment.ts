@@ -1,7 +1,13 @@
 import { writable } from "svelte/store";
 
 export interface IStore {
-  type: "Kubernetes" | "VM" | "CapRover" | "Peertube" | "Funkwhale";
+  type:
+    | "Kubernetes"
+    | "VM"
+    | "CapRover"
+    | "Peertube"
+    | "Funkwhale"
+    | "GatewayName";
   name: string;
 }
 
