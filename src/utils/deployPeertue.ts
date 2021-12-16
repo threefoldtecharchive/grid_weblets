@@ -5,15 +5,15 @@ import { getUniqueName, selectGatewayNode } from "./gatewayHelpers";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
+  GridClient,
+  NetworkModel,
   DiskModel,
   MachineModel,
   MachinesModel,
-  GridClient,
   GatewayNameModel,
-  NetworkModel,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployFunkwhale(data: VM, profile: IProfile) {
+export default async function deployPeertube(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
@@ -33,67 +33,81 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getUniqueName(client, name);
-
   console.log({ name });
 
-  // Gateway node Id and domain
+  // Dynamically select node to deploy the gateway
   let [gwNodeId, gwDomain] = await selectGatewayNode();
   const domain = `${name}.${gwDomain}`;
   console.log({ gwNodeId });
   console.log({ domain });
 
-  // define network
+  // define a network
   const network = new NetworkModel();
   network.name = name + "Net";
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(client, name, network, nodeId, domain);
+  // deploy the peertube
+  await deployPeertubeVM(client, network, nodeId, name, domain);
 
-  const info = await getFunkwhaleInfo(client, name + "VMs");
-  console.log({ info });
-  const planetaryIP = info[0]["planetary"];
+  // get the info of peertube deployment
+  const peertubeInfo = await getPeertubeInfo(client, name + "VMs");
+  console.log({ peertubeInfo });
+  const planetaryIP = peertubeInfo[0]["planetary"];
   console.log({ planetaryIP });
 
+  // deploy the gateway
   await deployPrefixGateway(client, name, planetaryIP, gwNodeId);
 
+  // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, name);
-  console.log({ gatewayInfo });
+  const gatewayDomain = gatewayInfo[0]["domain"];
+  console.log({ gatewayDomain });
   return { domain, planetaryIP };
 }
 
-async function deployFunkwhaleVM(
+async function deployPeertubeVM(
   client: any,
+  net: any,
+  nodeId: any,
   name: string,
-  network: any,
-  nodeId: number,
   domain: string
 ) {
+  // disk
   const disk = new DiskModel();
-  disk.name = name + "Disk";
+  disk.name = name + "Data";
   disk.size = 10;
   disk.mountpoint = "/data";
 
+  // vm specs
   const vm = new MachineModel();
   vm.name = name + "VM";
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 2;
-  vm.memory = 1024 * 2;
-  vm.rootfs_size = 2;
-  vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist";
-  vm.entrypoint = "/init.sh";
+  vm.cpu = 3;
+  vm.memory = 1024 * 4;
+  vm.rootfs_size = 1;
+  vm.flist =
+    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.flist";
+  vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
-    FUNKWHALE_HOSTNAME: domain,
+    PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
+    PEERTUBE_WEBSERVER_HOSTNAME: domain,
+    PEERTUBE_WEBSERVER_PORT: "443",
+    PEERTUBE_DB_SUFFIX: "_prod",
+    PEERTUBE_DB_USERNAME: "peertube",
+    PEERTUBE_DB_PASSWORD: "peertube",
   };
 
+  // vms specs
   const vms = new MachinesModel();
   vms.name = name + "VMs";
-  vms.network = network;
+  vms.network = net;
   vms.machines = [vm];
 
-  window.configs.currentDeploymentStore.deploy("Funkwhale", name);
+  // deploy
+  window.configs.currentDeploymentStore.deploy("Peertube", name);
   return client.machines
     .deploy(vms)
     .then((res) => {
@@ -109,21 +123,25 @@ async function deployPrefixGateway(
   client: any,
   name: string,
   backend: string,
-  nodeId: number
+  gwNodeId: number
 ) {
+  // define specs
   const gw = new GatewayNameModel();
   gw.name = name;
-  gw.node_id = nodeId;
+  gw.node_id = gwNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${backend}]:80/`];
+  gw.backends = [`http://[${backend}]:9000`];
 
-  window.configs.currentDeploymentStore.deploy("Funkwhale", name);
-  return client.gateway.deploy_name(gw).finally(() => {
+  window.configs.currentDeploymentStore.deploy("Peertube", name);
+  // deploy
+  return client.gateway.deploy_name(gw).then((res) => {
+    window.configs.baseConfig.updateBalance();
     window.configs.currentDeploymentStore.clear();
+    return res;
   });
 }
 
-async function getFunkwhaleInfo(client: any, name: string) {
+async function getPeertubeInfo(client: any, name: string) {
   const info = await client.machines.getObj(name);
   return info;
 }
