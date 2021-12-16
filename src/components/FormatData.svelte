@@ -12,7 +12,7 @@
   // fields
   const nameField: IFormField = { label: "Name", symbol: "name", type: "text", disabled: true }; // prettier-ignore
   const publicIpField: IFormField = { label: "Public IP", symbol: "publicIP", type: "checkbox", disabled: true }; // prettier-ignore
-  const yggIpField: IFormField = { label: "	Planetary Network IP", symbol: "yggIP", type: "text", disabled: true }; // prettier-ignore
+  const yggIpField: IFormField = { label: "	Planetary Network IP", symbol: "planetary", type: "text", disabled: true }; // prettier-ignore
   const networkField: IFormField = { label: "Network Name", symbol: "network", type: "text", disabled: true }; // prettier-ignore
   const cpuField: IFormField = { label: "CPU", symbol: "cpu", type: "number", disabled: true }; // prettier-ignore
   const memoryField: IFormField = { label: "Memory", symbol: "memory", type: "number", disabled: true }; // prettier-ignore
@@ -35,7 +35,7 @@
     <Input data={false} field={publicIpField} />
   {/if}
   {#if vm.planetary}
-    <Input data={vm.yggIP} field={yggIpField} />
+    <Input data={vm.planetary} field={yggIpField} />
   {/if}
   <Input data={vm.interfaces[0].network} field={networkField} />
   <Input data={vm.capacity.cpu} field={cpuField} />
