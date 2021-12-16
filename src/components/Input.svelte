@@ -12,6 +12,7 @@
   export let invalid = false;
   export let min: string | number = undefined;
   export let max: string | number = undefined;
+  export let required: boolean = true;
 
   const id = v4();
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
@@ -148,6 +149,7 @@
               bind:value={data}
               on:input={_onInput}
               disabled={field.disabled}
+              {required}
             />
           {:else if field.type === "text"}
             <input
@@ -157,6 +159,7 @@
               bind:value={data}
               on:input={_onInput}
               disabled={field.disabled}
+              {required}
             />
           {:else if field.type === "number"}
             <input
@@ -168,6 +171,7 @@
               disabled={field.disabled}
               {min}
               {max}
+              {required}
             />
           {:else if field.type === "password"}
             <input
@@ -178,6 +182,7 @@
               on:input={_onInput}
               disabled={field.disabled}
               bind:this={_password}
+              {required}
             />
             <span
               style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"
