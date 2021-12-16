@@ -89,6 +89,14 @@
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
     <h4 class="is-size-4 mb-4">Caprover Deployer</h4>
+    <p>
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading}
