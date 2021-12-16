@@ -130,6 +130,7 @@
 
       fetchFarmAndCountries(profile)
         .then(({ farms, countries }) => {
+          farms.sort((f1, f2) => f1.name.localeCompare(f2.name));
           _setOptions(0, farms);
           _setOptions(1, countries);
         })
