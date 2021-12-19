@@ -40,7 +40,9 @@
   // prettier-ignore
   const flists: IFlist[] = [
     { name: "Ubuntu", url: "https://hub.grid.tf/omar0.3bot/omarelawady-ubuntu-20.04.flist", entryPoint: "/init.sh" },
-    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/base:latest.flist", entryPoint: "/sbin/zinit init" },
+    { name: "Alpine", url: "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-alpine-3.flist", entryPoint: "/entrypoint.sh" },
+    { name: "CentOS", url: "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-centos-8.flist", entryPoint: "/entrypoint.sh" },
+
   ];
 
   // prettier-ignore
@@ -50,7 +52,8 @@
     type: "select",
     options: [
       { label: "Ubuntu", value: "0", selected: true },
-      { label: "Alpine (Coming Soon)", value: "1", disabled: true },
+      { label: "Alpine", value: "1" },
+      { label: "CentOS", value: "2" },
       { label: "Other", value: "other" }
     ]
   };
