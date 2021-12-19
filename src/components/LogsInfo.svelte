@@ -7,14 +7,11 @@
 
 {#if logs && logs.message}
   <div
+    class="notification is-info"
     style="
 position: fixed; 
 bottom: 15px; 
-left: 15px; 
-padding: 20px; 
-border: 1px solid #ccc;
-background-color: white;
-color: #333;
+left: 15px;
 z-index: 9999;
 "
   >
