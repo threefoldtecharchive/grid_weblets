@@ -63,7 +63,7 @@
     removing = name;
     return deleteContracts(profile, key, name)
       .then((data) => {
-        console.log("Removed", data);
+        // console.log("Removed", data);
       })
       .catch((err) => {
         console.log("Error while removing", err);
