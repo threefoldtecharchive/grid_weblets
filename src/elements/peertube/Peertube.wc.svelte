@@ -82,7 +82,7 @@
     {:else if success}
       <AlertDetailed
         type="success"
-        message="Successfully Deployed a Peertube Instance"
+        message="Successfully deployed a Peertube instance"
         {planetaryIP}
         {domain}
         deployed={true}

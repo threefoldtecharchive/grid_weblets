@@ -28,17 +28,17 @@
   // prettier-ignore
   const filtersFields: IFormField[] = [
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
-      { label: "Please Select a Farm", value: null, selected: true }
+      { label: "Please select a farm", value: null, selected: true }
     ] },
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter Country Name", options: [
-      { label: "Please Select a Country", value: null, selected: true }
+      { label: "Please select a country", value: null, selected: true }
     ] },
   ];
 
   // prettier-ignore
   const nodeIdSelectField /* : IFormField */ = {
     options: [
-      { label: "Please Select a Node ID.", value: null, selected: true, disabled: true },
+      { label: "Please select a node id.", value: null, selected: true, disabled: true },
     ] as ISelectOption[]
   };
 
@@ -153,8 +153,8 @@
 
   function _nodeValidator(value: number) {
     value = +value;
-    if (typeof value !== "number") return "Please Select a Node.";
-    if (value < 1) return "Please Select a Valid Node";
+    if (typeof value !== "number") return "Please select a node.";
+    if (value < 1) return "Please select a valid node";
   }
 
   const nodeIdField: IFormField = {
@@ -254,7 +254,7 @@
     type="button"
     on:click={onLoadNodesHandler}
   >
-    Apply filters and suggest nodes
+    Apply Filters and Suggest Nodes
   </button>
 
   <Input

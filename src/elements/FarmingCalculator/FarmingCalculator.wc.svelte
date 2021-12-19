@@ -175,7 +175,7 @@
     min: 0,
     validator(val: number) {
       val = +val;
-      if (isNaN(val)) return "Invalid number";
+      if (isNaN(val)) return "Invalid Number";
       if (val < 0) return "Value must be positive";
     }  
   });

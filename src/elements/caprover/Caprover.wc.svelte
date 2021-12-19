@@ -40,7 +40,7 @@ import validateDomainName from "../../utils/validateDomainName";
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "Domain Configured in Your Name Provider.", type: "text", validator: validateDomainName, invalid: false },
+    { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "text" },
   ];
 

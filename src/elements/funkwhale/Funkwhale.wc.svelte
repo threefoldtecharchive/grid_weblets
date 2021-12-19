@@ -87,13 +87,13 @@
     {:else if success}
       <AlertDetailed
         type="success"
-        message="Successfully Deployed a Funkwhale Instance"
+        message="Successfully deployed a Funkwhale instance"
         {planetaryIP}
         {domain}
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || "Failed to deploy Funkwhale"} />
     {:else}
       <SelectProfile
         on:profile={({ detail }) => {
