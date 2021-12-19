@@ -125,7 +125,7 @@
       <p>{currentProfile.name}</p>
       {#if loadingBalance}
         <p>Loading Account Balance</p>
-      {:else if currentProfile.balance}
+      {:else if currentProfile.balance !== null}
         <p>Balance: <span>{currentProfile.balance}</span> TFT</p>
       {/if}
     </div>
