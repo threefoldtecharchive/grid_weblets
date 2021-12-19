@@ -27,18 +27,18 @@
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
-    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
-      { label: "Please select a farm", value: null, selected: true }
+    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
+      { label: "Please Select a Farm", value: null, selected: true }
     ] },
-    { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
-      { label: "Please select a country", value: null, selected: true }
+    { label: "Country", symbol: "country", type: "select", placeholder: "Enter Country Name", options: [
+      { label: "Please Select a Country", value: null, selected: true }
     ] },
   ];
 
   // prettier-ignore
   const nodeIdSelectField /* : IFormField */ = {
     options: [
-      { label: "Please select a node id.", value: null, selected: true, disabled: true },
+      { label: "Please Select a Node ID.", value: null, selected: true, disabled: true },
     ] as ISelectOption[]
   };
 
@@ -49,7 +49,7 @@
     symbol: "value",
     options: [
       { label: "Choose a way to select node", value: null, selected: true, disabled: true },
-      { label: "Capacity filter", value: "automatic" },
+      { label: "Capacity Filter", value: "automatic" },
       { label: "Manual", value: "manual" }
     ]
   };
@@ -153,8 +153,8 @@
 
   function _nodeValidator(value: number) {
     value = +value;
-    if (typeof value !== "number") return "Please select a node.";
-    if (value < 1) return "Please select a valid node";
+    if (typeof value !== "number") return "Please Select a Node.";
+    if (value < 1) return "Please Select a Valid Node";
   }
 
   const nodeIdField: IFormField = {
@@ -274,12 +274,12 @@
   {#if !validating && data}
     {#if status == "valid"}
       <p class="help is-success">
-        Node(<strong>{data}</strong>) is up and has enough resources
+        Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
     {:else if status === "invalid"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
-        resources
+        resources.
       </p>
     {/if}
   {/if}

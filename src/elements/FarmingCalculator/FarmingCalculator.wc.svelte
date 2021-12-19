@@ -206,11 +206,11 @@
     {#if profileChoosing}
       <div class="profile-container">
         <div>
-          <p class="mb-2">Choose configuration</p>
+          <p class="mb-2">Choose Configuration</p>
 
           <div class="select">
             <select on:change={onSelectProfile}>
-              <option disabled selected>Please select configuration</option>
+              <option disabled selected>Please Select Configuration</option>
               {#each profiles as profile (profile.name)}
                 <option>
                   {profile.name}
