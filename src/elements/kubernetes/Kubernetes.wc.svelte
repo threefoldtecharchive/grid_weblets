@@ -1,7 +1,6 @@
 <svelte:options tag="tf-kubernetes" />
 
 <script lang="ts">
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
   import Kubernetes, { Worker } from "../../types/kubernetes";
   import deployKubernetes from "../../utils/deployKubernetes";
@@ -62,7 +61,6 @@
   let message: string;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || baseFields[0].invalid; // prettier-ignore
   let modalData: Object;
-  const configs = window.configs?.baseConfig;
 
   async function onDeployKubernetes() {
     loading = true;
@@ -75,17 +73,9 @@
       return;
     }
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     success = false;
     failed = false;
     message = undefined;
-
-    events.addListener("logs", onLogInfo);
 
     deployKubernetes(data, profile)
       .then((data) => {
@@ -99,7 +89,6 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
 

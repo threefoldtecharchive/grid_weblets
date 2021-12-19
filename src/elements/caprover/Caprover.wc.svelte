@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import { default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
-  const { events } = window.configs?.grid3_client ?? {};
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -17,7 +16,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
-import validateDomainName from "../../utils/validateDomainName";
+  import validateDomainName from "../../utils/validateDomainName";
 
   const data = new Caprover();
   let loading = false;
@@ -50,12 +49,6 @@ import validateDomainName from "../../utils/validateDomainName";
   async function deployCaproverHandler() {
     loading = true;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -67,8 +60,6 @@ import validateDomainName from "../../utils/validateDomainName";
     success = false;
     failed = false;
     message = undefined;
-
-    events.addListener("logs", onLogInfo);
 
     deployCaprover(data, profile)
       .then((data) => {
@@ -82,7 +73,6 @@ import validateDomainName from "../../utils/validateDomainName";
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
 </script>

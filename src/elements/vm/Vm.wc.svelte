@@ -84,7 +84,6 @@
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text" },
   ];
 
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";
   let loading = false;
@@ -101,12 +100,6 @@
   async function onDeployVM() {
     loading = true;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -119,7 +112,6 @@
     failed = false;
     message = undefined;
 
-    events.addListener("logs", onLogInfo);
     deployVM(data, profile)
       .then((data) => {
         deploymentStore.set(0);
@@ -132,7 +124,6 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
 </script>

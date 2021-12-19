@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
 
   import VM, { Env } from "../../types/vm";
@@ -44,12 +43,6 @@
     failed = false;
     message = undefined;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -58,7 +51,6 @@
       return;
     }
 
-    events.addListener("logs", onLogInfo);
     deployFunkwhale(data, profile)
       .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
@@ -72,7 +64,6 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
 </script>
