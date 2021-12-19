@@ -163,7 +163,6 @@ function createBaseConfig() {
 
       fullStore._setLoadingBalance(true);
 
-      console.log("Balance Profile", fullStore.getActiveProfile());
       getBalance(fullStore.getActiveProfile())
         .then((balance) => {
           fullStore._setBalance(balance);
