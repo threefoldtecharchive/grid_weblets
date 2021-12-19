@@ -34,6 +34,7 @@
   let status: "valid" | "invalid";
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   let domain: string, planetaryIP: string;
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
     loading = true;
@@ -63,6 +64,8 @@
         loading = false;
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -72,8 +75,8 @@
     <hr />
 
     <!-- Status -->
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Peertube")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <AlertDetailed
         type="success"

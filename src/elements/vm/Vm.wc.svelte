@@ -96,6 +96,7 @@
   let modalData: Object;
   let status: "valid" | "invalid";
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
     loading = true;
@@ -126,6 +127,8 @@
         loading = false;
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -133,8 +136,8 @@
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "VM")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <Alert
         type="success"

@@ -8,6 +8,7 @@
   import deploymentStore from "../../stores/deploymentStore";
   import notificationStore from "../../stores/notifications";
   import currentDeploymentStore from "../../stores/currentDeployment";
+  import LogsInfo from "../../components/LogsInfo.svelte";
 
   window.configs = window.configs || ({} as any);
   window.configs.baseConfig = baseConfigStore;
@@ -28,3 +29,5 @@
     };
   });
 </script>
+
+<LogsInfo />

@@ -32,6 +32,7 @@
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
 
@@ -66,6 +67,8 @@
         loading = false;
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -73,8 +76,8 @@
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Funkwhale")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <AlertDetailed
         type="success"

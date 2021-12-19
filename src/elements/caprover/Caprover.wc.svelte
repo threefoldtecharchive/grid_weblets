@@ -24,8 +24,8 @@
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  const configs = window.configs?.baseConfig;
   let status: "valid" | "invalid";
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -75,6 +75,8 @@
         loading = false;
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -90,8 +92,8 @@
     </p>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "CapRover")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <Alert
         type="success"
