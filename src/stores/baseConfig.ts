@@ -15,7 +15,7 @@ function createBaseConfig() {
     profiles: [createProfile("Profile 1")],
     activeProfile: null,
     balance: null,
-    selectedIdx: "0",
+    // selectedIdx: "0",
     loadingBalance: false,
     twinId: null,
     address: null,
@@ -68,24 +68,27 @@ function createBaseConfig() {
       });
     },
     addProfile() {
+      let _idx: string;
       update((value) => {
-        value.selectedIdx = (
-          value.profiles.push(createProfile()) - 1
-        ).toString();
+        value.profiles.push(createProfile());
+        _idx = (value.profiles.push(createProfile()) - 1).toString();
         return value;
       });
+      return _idx;
     },
-    deleteProfile(idx: number) {
+    deleteProfile(idx: number, current: string) {
+      let _idx: string;
       update((value) => {
         if (value.profiles[idx].id === value.activeProfile) {
           value.activeProfile = null;
         }
         value.profiles.splice(idx, 1);
-        if (value.selectedIdx === idx.toString()) {
-          value.selectedIdx = (idx - 1).toString();
+        if (current === idx.toString()) {
+          _idx = (idx - 1).toString();
         }
         return value;
       });
+      return _idx ? _idx : current;
     },
 
     create(password: string) {
@@ -215,12 +218,12 @@ function createBaseConfig() {
       return profile;
     },
 
-    setSelectedIdx(val: string) {
-      return update((value) => {
-        value.selectedIdx = val;
-        return value;
-      });
-    },
+    // setSelectedIdx(val: string) {
+    //   return update((value) => {
+    //     value.selectedIdx = val;
+    //     return value;
+    //   });
+    // },
   };
 
   return fullStore;

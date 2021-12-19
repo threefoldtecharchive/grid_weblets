@@ -21,6 +21,7 @@
   let opened: boolean = false;
   let currentProfile: IProfile;
   let loadingBalance: boolean = false;
+  let selectedIdx: string = "0";
 
   let tabs: ITab[] = [];
   $: {
@@ -28,7 +29,7 @@
     if (s) {
       profiles = s.profiles;
       loadingBalance = s.loadingBalance;
-      activeProfile = profiles[s.selectedIdx];
+      activeProfile = profiles[selectedIdx];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
@@ -148,7 +149,9 @@
             <button
               class="button is-primary is-outlined mr-2"
               type="button"
-              on:click={configs.addProfile}
+              on:click={() => {
+                selectedIdx = configs.addProfile();
+              }}
             >
               + Add Profile
             </button>
@@ -187,15 +190,17 @@
 
       {#if configured}
         <Tabs
-          active={$configs.selectedIdx}
+          active={selectedIdx}
           {tabs}
           centered={false}
-          on:removed={({ detail }) => configs.deleteProfile(detail)}
+          on:removed={({ detail }) => {
+            selectedIdx = configs.deleteProfile(detail, selectedIdx);
+          }}
           on:select={(p) => {
             [2, 3].forEach((i) => (fields[i].error = null));
-            configs.setSelectedIdx(p.detail);
+            selectedIdx = p.detail;
           }}
-          on:init={() => configs.setSelectedIdx("0")}
+          on:init={() => (selectedIdx = "0")}
         />
 
         <div class="is-flex is-justify-content-flex-end">
