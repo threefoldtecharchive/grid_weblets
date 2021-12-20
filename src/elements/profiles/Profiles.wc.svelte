@@ -61,6 +61,11 @@
     }
   }
 
+  function _updateError(symbol: string, valid: boolean, msg: string) {
+    const idx = fields.findIndex((f) => f.symbol === symbol);
+    fields[idx].error = valid ? null : msg;
+  }
+
   let activating: boolean = false;
   async function onActiveProfile() {
     activating = true;
@@ -69,24 +74,22 @@
     try {
       const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
       invalid = !mnIsValid;
-      fields.find((f) => f.symbol === "mnemonics").error = invalid
-        ? "Invalid Mnemonics! Could it be that your account is not activated? Are you using the correct network?"
-        : null;
+      _updateError(
+        "mnemonics",
+        mnIsValid,
+        "Invalid Mnemonics! Could it be that your account is not activated? Are you using the correct network?"
+      );
     } catch (err) {
       console.log("Error", err);
     }
 
     const sshIsValid = activeProfile.sshKey !== "";
     invalid = invalid || !sshIsValid;
-    fields.find((f) => f.symbol === "sshKey").error = sshIsValid
-      ? null
-      : "Invalid SSH Key";
+    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
 
     const nameIsValid = activeProfile.name !== "";
     invalid = invalid || !nameIsValid;
-    fields.find((f) => f.symbol === "name").error = nameIsValid
-      ? null
-      : "Please provide a profile name";
+    _updateError("name", nameIsValid, "Please provide a profile name");
 
     activating = false;
     if (invalid) return;
