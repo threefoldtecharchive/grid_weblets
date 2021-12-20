@@ -35,6 +35,7 @@
   const deployedStore = window.configs?.deploymentStore;
 
   let profile: IProfile;
+  let message: string = null;
 
   function onConfigHandler() {
     configed = true;
@@ -67,6 +68,7 @@
       })
       .catch((err) => {
         console.log("Error while removing", err);
+        message = err.message || err;
       })
       .finally(() => (removing = null));
   }
@@ -110,8 +112,11 @@
   const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
 
   async function onDeleteHandler() {
+    message = null;
     const names = selectedRows.map(({ name }) => name).join(", ");
-    const remove = window.confirm(`Are you sure you want to delete '${names}'?`);
+    const remove = window.confirm(
+      `Are you sure you want to delete '${names}'?`
+    );
     if (!remove) return;
 
     const key = active === "k8s" ? "k8s" : "machines";
@@ -155,9 +160,16 @@
         />
       {/if}
 
-      <div class="is-flex is-justify-content-flex-end mt-2 mb-2">
+      <div
+        class="is-flex is-justify-content-space-between is-align-items-center mt-2 mb-2"
+      >
+        <div style="width: 100%;">
+          {#if message}
+            <Alert type="danger" {message} />
+          {/if}
+        </div>
         <button
-          class={"button is-danger " + (removing ? "is-loading" : "")}
+          class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
           disabled={selectedRows.length === 0 || removing !== null}
           on:click={onDeleteHandler}
         >
