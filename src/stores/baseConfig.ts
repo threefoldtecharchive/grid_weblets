@@ -217,13 +217,6 @@ function createBaseConfig() {
       profile.storeSecret = data.storeSecret;
       return profile;
     },
-
-    // setSelectedIdx(val: string) {
-    //   return update((value) => {
-    //     value.selectedIdx = val;
-    //     return value;
-    //   });
-    // },
   };
 
   return fullStore;
