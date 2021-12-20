@@ -77,7 +77,7 @@ async function deployFunkwhaleVM(
   vm.cpu = 2;
   vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
-  vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-funk-latest.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,

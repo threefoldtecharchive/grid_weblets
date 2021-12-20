@@ -39,9 +39,9 @@
 
   // prettier-ignore
   const flists: IFlist[] = [
-    { name: "Ubuntu", url: "https://hub.grid.tf/omar0.3bot/omarelawady-ubuntu-20.04.flist", entryPoint: "/init.sh" },
-    { name: "Alpine", url: "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-alpine-3.flist", entryPoint: "/entrypoint.sh" },
-    { name: "CentOS", url: "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-centos-8.flist", entryPoint: "/entrypoint.sh" },
+    { name: "Ubuntu", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-20.04.flist", entryPoint: "/init.sh" },
+    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist", entryPoint: "/entrypoint.sh" },
+    { name: "CentOS", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist", entryPoint: "/entrypoint.sh" },
 
   ];
 
