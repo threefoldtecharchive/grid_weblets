@@ -437,7 +437,6 @@
 
     > .box {
       min-height: 100px;
-      padding-top: 50px;
       max-height: 100vh;
       overflow-x: hidden;
       overflow-y: auto;
