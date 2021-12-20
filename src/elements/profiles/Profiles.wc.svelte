@@ -200,7 +200,7 @@
             selectedIdx = configs.deleteProfile(detail, selectedIdx);
           }}
           on:select={(p) => {
-            [2, 3].forEach((i) => (fields[i].error = null));
+            fields.forEach((_, i) => (fields[i].error = null));
             selectedIdx = p.detail;
           }}
           on:init={() => (selectedIdx = "0")}

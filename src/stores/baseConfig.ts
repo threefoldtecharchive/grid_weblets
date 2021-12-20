@@ -70,7 +70,6 @@ function createBaseConfig() {
     addProfile() {
       let _idx: string;
       update((value) => {
-        value.profiles.push(createProfile());
         _idx = (value.profiles.push(createProfile()) - 1).toString();
         return value;
       });
