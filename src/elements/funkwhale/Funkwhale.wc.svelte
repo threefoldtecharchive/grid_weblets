@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
 
   import VM, { Env } from "../../types/vm";
@@ -33,6 +32,7 @@
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
 
@@ -44,12 +44,6 @@
     failed = false;
     message = undefined;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -58,7 +52,6 @@
       return;
     }
 
-    events.addListener("logs", onLogInfo);
     deployFunkwhale(data, profile)
       .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
@@ -72,9 +65,10 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -82,8 +76,8 @@
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Funkwhale")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <AlertDetailed
         type="success"

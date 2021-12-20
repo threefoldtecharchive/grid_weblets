@@ -1,7 +1,6 @@
 <svelte:options tag="tf-kubernetes" />
 
 <script lang="ts">
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
   import Kubernetes, { Worker } from "../../types/kubernetes";
   import deployKubernetes from "../../utils/deployKubernetes";
@@ -53,6 +52,7 @@
   ];
 
   let data = new Kubernetes();
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   let active: string = "config";
   let loading = false;
@@ -62,7 +62,6 @@
   let message: string;
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || baseFields[0].invalid; // prettier-ignore
   let modalData: Object;
-  const configs = window.configs?.baseConfig;
 
   async function onDeployKubernetes() {
     loading = true;
@@ -75,17 +74,9 @@
       return;
     }
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     success = false;
     failed = false;
     message = undefined;
-
-    events.addListener("logs", onLogInfo);
 
     deployKubernetes(data, profile)
       .then((data) => {
@@ -99,7 +90,6 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
 
@@ -111,6 +101,8 @@
       loading = false;
     }
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -118,8 +110,8 @@
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Kubernetes")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <Alert
         type="success"

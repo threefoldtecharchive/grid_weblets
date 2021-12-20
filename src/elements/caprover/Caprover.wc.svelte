@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import { default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
-  const { events } = window.configs?.grid3_client ?? {};
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -17,7 +16,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
-import validateDomainName from "../../utils/validateDomainName";
+  import validateDomainName from "../../utils/validateDomainName";
 
   const data = new Caprover();
   let loading = false;
@@ -25,8 +24,8 @@ import validateDomainName from "../../utils/validateDomainName";
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  const configs = window.configs?.baseConfig;
   let status: "valid" | "invalid";
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -50,12 +49,6 @@ import validateDomainName from "../../utils/validateDomainName";
   async function deployCaproverHandler() {
     loading = true;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -67,8 +60,6 @@ import validateDomainName from "../../utils/validateDomainName";
     success = false;
     failed = false;
     message = undefined;
-
-    events.addListener("logs", onLogInfo);
 
     deployCaprover(data, profile)
       .then((data) => {
@@ -82,9 +73,10 @@ import validateDomainName from "../../utils/validateDomainName";
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -100,8 +92,8 @@ import validateDomainName from "../../utils/validateDomainName";
     </p>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "CapRover")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <Alert
         type="success"

@@ -87,7 +87,6 @@
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text" },
   ];
 
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";
   let loading = false;
@@ -100,15 +99,10 @@
   let modalData: Object;
   let status: "valid" | "invalid";
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
     loading = true;
-
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
 
     if (!hasEnoughBalance(profile)) {
       failed = true;
@@ -122,7 +116,6 @@
     failed = false;
     message = undefined;
 
-    events.addListener("logs", onLogInfo);
     deployVM(data, profile)
       .then((data) => {
         deploymentStore.set(0);
@@ -135,9 +128,10 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -145,8 +139,8 @@
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "VM")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <Alert
         type="success"

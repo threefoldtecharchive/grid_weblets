@@ -21,7 +21,7 @@
   // Values
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-  const { events } = window.configs?.grid3_client ?? {};
+
   const deploymentStore = window.configs?.deploymentStore;
   let data = new VM();
   let active: string = "base";
@@ -34,16 +34,14 @@
   let status: "valid" | "invalid";
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   let domain: string, planetaryIP: string;
+  const currentDeployment = window.configs?.currentDeploymentStore;
+
   async function onDeployVM() {
     loading = true;
     success = false;
     failed = false;
     message = undefined;
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
+
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
@@ -51,7 +49,6 @@
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    events.addListener("logs", onLogInfo);
     deployPeertube(data, profile)
       .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
@@ -65,9 +62,10 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
 
 <div style="padding: 15px;">
@@ -77,8 +75,8 @@
     <hr />
 
     <!-- Status -->
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Peertube")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if success}
       <AlertDetailed
         type="success"
