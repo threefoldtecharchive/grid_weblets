@@ -111,7 +111,7 @@
 
   async function onDeleteHandler() {
     const names = selectedRows.map(({ name }) => name).join(", ");
-    const remove = window.confirm(`Are you sure u want to delete '${names}'?`);
+    const remove = window.confirm(`Are you sure you want to delete '${names}'?`);
     if (!remove) return;
 
     const key = active === "k8s" ? "k8s" : "machines";
@@ -389,7 +389,7 @@
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Funkwhale found on this profile." />
+            <Alert type="info" message="No Funkwhales found on this profile." />
           {/if}
         {:catch err}
           <Alert

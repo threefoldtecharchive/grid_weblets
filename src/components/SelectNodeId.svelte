@@ -27,10 +27,10 @@
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
-    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
+    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
       { label: "Please select a farm", value: null, selected: true }
     ] },
-    { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
+    { label: "Country", symbol: "country", type: "select", placeholder: "Enter Country Name", options: [
       { label: "Please select a country", value: null, selected: true }
     ] },
   ];
@@ -49,7 +49,7 @@
     symbol: "value",
     options: [
       { label: "Choose a way to select node", value: null, selected: true, disabled: true },
-      { label: "Capacity filter", value: "automatic" },
+      { label: "Capacity Filter", value: "automatic" },
       { label: "Manual", value: "manual" }
     ]
   };
@@ -254,7 +254,7 @@
     type="button"
     on:click={onLoadNodesHandler}
   >
-    Apply filters and suggest nodes
+    Apply Filters and Suggest Nodes
   </button>
 
   <Input
@@ -274,12 +274,12 @@
   {#if !validating && data}
     {#if status == "valid"}
       <p class="help is-success">
-        Node(<strong>{data}</strong>) is up and has enough resources
+        Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
     {:else if status === "invalid"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
-        resources
+        resources.
       </p>
     {/if}
   {/if}

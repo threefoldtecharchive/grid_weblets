@@ -71,7 +71,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 

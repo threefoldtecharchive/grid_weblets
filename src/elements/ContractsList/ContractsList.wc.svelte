@@ -47,7 +47,7 @@
 
   let message: string;
   function onDeleteHandler() {
-    if (!window.confirm("Are you sure u want to delete your contracts?"))
+    if (!window.confirm("Are you sure you want to delete your contracts?"))
       return;
 
     message = null;
@@ -75,7 +75,7 @@
     if (selectedContracts.length === contracts.length) return onDeleteHandler();
 
     // prettier-ignore
-    if (!window.confirm("Are you sure u want to delete the selected contracts?")) return;
+    if (!window.confirm("Are you sure you want to delete the selected contracts?")) return;
 
     message = null;
     deleting = true;

@@ -48,7 +48,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
     events.addListener("logs", onLogInfo);
@@ -82,7 +82,7 @@
     {:else if success}
       <AlertDetailed
         type="success"
-        message="Successfully Deployed A Peertube Instance"
+        message="Successfully deployed a Peertube instance"
         {planetaryIP}
         {domain}
         deployed={true}

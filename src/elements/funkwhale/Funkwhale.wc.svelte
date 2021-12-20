@@ -54,7 +54,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -87,13 +87,13 @@
     {:else if success}
       <AlertDetailed
         type="success"
-        message="Successfully Deployed A Funkwhale Instance"
+        message="Successfully deployed a Funkwhale instance"
         {planetaryIP}
         {domain}
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || "Failed to deploy Funkwhale"} />
     {:else}
       <SelectProfile
         on:profile={({ detail }) => {

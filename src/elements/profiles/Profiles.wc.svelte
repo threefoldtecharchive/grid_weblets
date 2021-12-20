@@ -40,18 +40,18 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile name", type: "text" },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
     { label: "Network Environment", symbol: "networkEnv", type: "select", options: [
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
-  const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true }; // prettier-ignore
+  const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address...", disabled: true }; // prettier-ignore
 
   let message: string;
   function onEventHandler(event: "create" | "load" | "save") {
@@ -70,7 +70,7 @@
       const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
       invalid = !mnIsValid;
       fields.find((f) => f.symbol === "mnemonics").error = invalid
-        ? "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?"
+        ? "Invalid Mnemonics! Could it be that your account is not activated? Are you using the correct network?"
         : null;
     } catch (err) {
       console.log("Error", err);
@@ -248,7 +248,7 @@
             field={{
               label: "Password",
               type: "password",
-              placeholder: "Profile Manager password",
+              placeholder: "Profile Manager Password",
               symbol: "secret",
               tooltip:
                 activePassword === "load"
@@ -268,8 +268,8 @@
               disabled={password === ""}
             >
               {activePassword === "load"
-                ? "Load profiles"
-                : "Create new profile manager"}
+                ? "Load Profiles"
+                : "Create New Profile Manager"}
             </button>
           </div>
         </form>

@@ -36,12 +36,12 @@ import validateDomainName from "../../utils/validateDomainName";
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text", validator: validateName, invalid: false },
+    { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
-    { label: "Password", symbol: "password", placeholder: "Caprover new password", type: "text" },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number" },
+    { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
+    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "text" },
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || fields[0].invalid || fields[4].invalid; // prettier-ignore
@@ -60,7 +60,7 @@ import validateDomainName from "../../utils/validateDomainName";
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -105,11 +105,11 @@ import validateDomainName from "../../utils/validateDomainName";
     {:else if success}
       <Alert
         type="success"
-        message="Successfully deployed Caprover."
+        message="Successfully Deployed Caprover."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Caprover."} />
+      <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
     {:else}
       <SelectProfile
         on:profile={({ detail }) => {
