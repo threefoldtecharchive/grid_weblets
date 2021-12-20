@@ -124,6 +124,27 @@
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
+          {#if field.symbol === "domain"}
+            <div class="notification is-warning is-light">
+              <p>
+                You will need to point a wildcard DNS entry for the domain you
+                entered above to this CapRover instance IP Address after
+                deployment,<br />
+                otherwise, you won't be able to access the CapRover dashboard using
+                this domain.
+              </p>
+              <br />
+              <strong>
+                If you don't know what Captain root domain is, make sure to
+                visit <a
+                  target="_blank"
+                  href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
+                >
+                  the Quick start documentation
+                </a>.
+              </strong>
+            </div>
+          {/if}
         {/each}
         <SelectNodeId
           cpu={data.cpu}
