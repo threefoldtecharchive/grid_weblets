@@ -154,6 +154,7 @@
               type="button"
               on:click={() => {
                 selectedIdx = configs.addProfile();
+                fields.forEach((_, i) => (fields[i].error = null));
               }}
             >
               + Add Profile
