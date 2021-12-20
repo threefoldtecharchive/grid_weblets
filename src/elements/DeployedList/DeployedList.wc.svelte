@@ -143,6 +143,8 @@
       <Alert type="info" message="Loading..." />
     {:else if !configed}
       <Alert type="info" message={noActiveProfile} />
+    {:else if !list}
+      <Alert type="info" message="Initializing..." />
     {:else}
       {#if !tab}
         <Tabs
