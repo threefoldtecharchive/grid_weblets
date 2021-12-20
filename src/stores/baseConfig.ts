@@ -21,6 +21,18 @@ function createBaseConfig() {
     address: null,
     storeSecret: null,
   });
+  let _updateBalanceInterval: any = null;
+  const clearBalanceInterval = () => {
+    if (_updateBalanceInterval) {
+      clearInterval(_updateBalanceInterval);
+      _updateBalanceInterval = null;
+    }
+  };
+  const setBalanceInterval = (fn: () => void) => {
+    clearBalanceInterval();
+    fn();
+    _updateBalanceInterval = setInterval(fn, 1000 * 60);
+  };
 
   function hashPassword(password: string) {
     return PREFIX + md5(password).toString();
@@ -119,7 +131,7 @@ function createBaseConfig() {
         });
 
         if (get(store).activeProfile) {
-          fullStore.updateBalance();
+          setBalanceInterval(fullStore.updateBalance);
           fullStore._loadActiveProfileInfo();
         }
       } catch {
@@ -200,10 +212,14 @@ function createBaseConfig() {
       });
       requestAnimationFrame(() => {
         fullStore.save(password);
-        fullStore.updateBalance();
-        setTimeout(() => {
-          fullStore._loadActiveProfileInfo();
-        }, 1000);
+        if (id !== null) {
+          setBalanceInterval(fullStore.updateBalance);
+          setTimeout(() => {
+            fullStore._loadActiveProfileInfo();
+          }, 1000);
+        } else {
+          clearBalanceInterval();
+        }
       });
     },
 
