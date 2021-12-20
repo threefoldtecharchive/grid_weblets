@@ -126,7 +126,6 @@
           {/if}
           {#if field.symbol === "domain"}
             <div class="notification is-warning is-light">
-              <strong>Note:</strong>
               <p>
                 You will need to point a wildcard DNS entry for the domain you
                 entered above to this CapRover instance IP Address after
