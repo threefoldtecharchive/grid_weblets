@@ -91,7 +91,7 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
-  public sections = ["deployment", "calculator", "coming soon"];
+  public sections = ["deployment", "calculator"];
   public weblets: Weblet[] = [
     new Weblet("CapRover", "caprover", "caprover", "deployment"),
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
@@ -101,15 +101,15 @@ export default class Editor extends Vue {
 
     new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
 
-    new Weblet("Peertube", "peertube", "peertube", "coming soon"),
-    new Weblet("Funkwhale", "funkwhale", "funkwhale", "coming soon"),
+    new Weblet("Peertube", "peertube", "peertube", "deployment"),
+    new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
   ];
   public active = 0;
 
   @Watch("$route.params", { deep: true, immediate: true })
   public onRouterChange(to: { component?: string }) {
     const idx = this.weblets.findIndex((w) => w.symbol === to.component);
-    this.active = idx > -1 && idx < 6 ? idx : 0;
+    this.active = idx > -1 ? idx : 0;
   }
 
   route(symbol: string): void {
