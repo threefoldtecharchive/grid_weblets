@@ -5,7 +5,7 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
-  import VM, { Env } from "../../types/vm";
+  import VM, { Disk, Env } from "../../types/vm";
   import deployPeertube from "../../utils/deployPeertube";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -19,11 +19,33 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
   // Values
+
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+
+  const baseFields: IFormField[] = [
+    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number" },
+    {
+      label: "Memory (MB)",
+      symbol: "memory",
+      placeholder: "Your Memory in MB",
+      type: "number",
+    },
+  ];
+
+  const diskField: IFormField = {
+    label: "Disk (GB)",
+    symbol: "disk",
+    placeholder: "Your Disk size in GB",
+    type: "number",
+  };
 
   const deploymentStore = window.configs?.deploymentStore;
-  let data = new VM();
+  let data = new VM(); // set the default specs for peertube
+  data.cpu = 2;
+  data.memory = 2048;
+  data.disks = [new Disk(undefined, undefined, 20, undefined)];
+
   let active: string = "base";
   let loading = false;
   let success = false;
@@ -106,6 +128,12 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
+
+        {#each baseFields as field (field.symbol)}
+          <Input bind:data={data[field.symbol]} {field} />
+        {/each}
+        <Input bind:data={data.disks[0].size} field={diskField} />
+
         <SelectNodeId
           publicIp={false}
           cpu={data.cpu}
