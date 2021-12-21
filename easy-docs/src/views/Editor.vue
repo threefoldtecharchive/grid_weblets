@@ -91,7 +91,7 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
-  public sections = ["deployment", "calculator", "coming soon"];
+  public sections = ["deployment", "calculator"];
   public weblets: Weblet[] = [
     new Weblet("CapRover", "caprover", "caprover", "deployment"),
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
