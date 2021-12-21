@@ -129,6 +129,8 @@
     visibility: visible;
     transform: translateX(-50%) translateY(0) scale(1);
   }
+
+  [disabled] { cursor: inherit !important; }
 </style>
 `;
 </script>
