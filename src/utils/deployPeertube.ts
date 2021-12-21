@@ -85,7 +85,7 @@ async function deployPeertubeVM(
   vm.memory = 1024 * 4;
   vm.rootfs_size = 1;
   vm.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.flist";
+    "https://hub.grid.tf/tf-official-apps/threefoldtech-peertube-v3.0.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
     PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
