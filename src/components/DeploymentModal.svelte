@@ -15,7 +15,7 @@
     { label: "JSON", value: "json" },
   ];
   let active: string = "details";
-  export let data: Object;
+  export let data: any;
   $: json = data ? JSON.stringify(data, undefined, 4) : "";
 
   const style = `
@@ -51,6 +51,14 @@
   }
 </style>
 `;
+
+  let vms: Array<any> = [];
+  $: if (data) vms = data.masters ? [data.masters[0], ...data.workers] : [data];
+
+  let vmTabs: ITab[] = [];
+  $: if (data && vms.length) vmTabs = vms.map(({ name }, i) => ({ label: name, value: i.toString() } as ITab)); // prettier-ignore
+
+  let vmActiveTab: string = "0";
 </script>
 
 <div>
@@ -68,7 +76,8 @@
 
       <section class="content">
         {#if active === "details"}
-          <FormatData {data} />
+          <Tabs bind:active={vmActiveTab} tabs={vmTabs} />
+          <FormatData vm={vms[vmActiveTab]} />
         {:else if active === "json"}
           <div class="json">
             {json}

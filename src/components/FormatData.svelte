@@ -4,10 +4,7 @@
   import type { IFormField } from "../types";
   import Input from "./Input.svelte";
 
-  export let data: { [key: string]: any };
-  let vms: Array<any> = [];
-
-  $: if (data) vms = data.masters ? [data.masters[0], ...data.workers] : [data];
+  export let vm: any;
 
   // fields
   const nameField: IFormField = { label: "Name", symbol: "name", type: "text", disabled: true }; // prettier-ignore
@@ -24,7 +21,7 @@
   const publicIpValueField: IFormField = { label: "Public IP", symbol: "publicIP", type: "text", disabled: true }; // prettier-ignore
 </script>
 
-{#each vms as vm, index}
+{#if vm}
   {#if vm.contractId}
     <Input data={vm.contractId} field={contractIdField} />
   {/if}
@@ -91,7 +88,4 @@
       }}
     />
   {/if}
-  {#if index + 1 !== vms.length}
-    <hr />
-  {/if}
-{/each}
+{/if}
