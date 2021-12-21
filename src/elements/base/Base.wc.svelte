@@ -15,7 +15,6 @@
   window.configs.deploymentStore = deploymentStore;
   window.configs.notificationStore = notificationStore;
   window.configs.currentDeploymentStore = currentDeploymentStore;
-  window.configs.version = "1.0.0-alpha1";
 
   let _index = 0;
   onMount(() => {

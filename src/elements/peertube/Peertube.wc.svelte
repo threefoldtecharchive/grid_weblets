@@ -18,7 +18,7 @@
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
-  import Version from "../../components/Version.svelte";
+
   // Values
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
@@ -141,7 +141,6 @@
         }
       }}
     />
-    <Version />
   </form>
 </div>
 {#if modalData}

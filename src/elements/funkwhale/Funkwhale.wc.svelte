@@ -19,7 +19,6 @@
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
-  import Version from "../../components/Version.svelte";
 
   const data = new VM();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -139,7 +138,6 @@
         }
       }}
     />
-    <Version />
   </form>
 </div>
 

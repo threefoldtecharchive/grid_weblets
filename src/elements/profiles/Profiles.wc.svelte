@@ -10,7 +10,6 @@
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
   import { onDestroy, onMount } from "svelte";
-  import Version from "../../components/Version.svelte";
 
   const configs = window.configs?.baseConfig;
   let password: string = "";
@@ -279,7 +278,6 @@
           </div>
         </form>
       {/if}
-      <Version />
     </div>
   </section>
 </div>

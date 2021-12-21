@@ -1,6 +1,6 @@
 <template>
   <section class="editor">
-    <aside class="editor__side menu">
+    <aside class="editor__side menu" style="padding-bottom: 100px">
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
@@ -37,6 +37,19 @@
           </template>
         </ul>
       </template>
+      <span
+        style="
+          position: fixed;
+          bottom: 15px;
+          left: 245px;
+          z-index: 99;
+          transform: translateX(-100%);
+          font-size: 0.9rem;
+        "
+        class="tag is-info is-light"
+      >
+        v1.0.0-alpha
+      </span>
     </aside>
 
     <div class="editor__content" v-if="active >= 0">

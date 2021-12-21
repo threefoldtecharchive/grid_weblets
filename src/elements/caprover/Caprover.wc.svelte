@@ -17,7 +17,6 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
-  import Version from "../../components/Version.svelte";
 
   const data = new Caprover();
   let loading = false;
@@ -178,7 +177,6 @@
         }
       }}
     />
-    <Version />
   </form>
 </div>
 {#if modalData}
