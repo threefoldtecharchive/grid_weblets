@@ -51,9 +51,9 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Ubuntu", value: "0", selected: true },
-      { label: "Alpine", value: "1" },
-      { label: "CentOS", value: "2" },
+      { label: "Ubuntu-20.04", value: "0", selected: true },
+      { label: "Alpine-3", value: "1" },
+      { label: "CentOS-8", value: "2" },
       { label: "Other", value: "other" }
     ]
   };
