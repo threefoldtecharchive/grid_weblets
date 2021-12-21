@@ -71,7 +71,7 @@ async function deployPeertubeVM(
   // disk
   const disk = new DiskModel();
   disk.name = name + "Data";
-  disk.size = 10;
+  disk.size = 200;
   disk.mountpoint = "/data";
 
   // vm specs
@@ -81,9 +81,9 @@ async function deployPeertubeVM(
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 3;
-  vm.memory = 1024 * 4;
-  vm.rootfs_size = 1;
+  vm.cpu = 2;
+  vm.memory = 1024 * 2;
+  vm.rootfs_size = 4;
   vm.flist =
     "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
