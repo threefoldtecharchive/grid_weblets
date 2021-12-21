@@ -80,16 +80,30 @@
     };
 
     findNodes(_filters, profile)
-      .then((_nodes) => dispatch("fetch", _nodes))
-      .catch((err) => console.log("Error", err))
+      .then((_nodes) => {
+        dispatch("fetch", _nodes);
+        if (_nodes.length <= 0){
+          data = null;
+          nodeIdSelectField.options[0].label = "No nodes available";
+        }else{
+          nodeIdSelectField.options[0].label = label;
+        }
+        })
+      .catch((err) => {
+        console.log("Error", err)
+        data = null;
+        nodeIdSelectField.options[0].label = "No nodes available";
+      })
       .finally(() => {
         loadingNodes = false;
-        nodeIdSelectField.options[0].label = label;
       });
   }
 
   $: {
     const [option] = nodeIdSelectField.options;
+    if (nodes.length > 0 ){
+      data = +nodes[0].value;
+    }
     nodeIdSelectField.options = [option, ...nodes];
   }
 
