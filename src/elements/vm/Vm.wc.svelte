@@ -18,7 +18,6 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
-  import Version from "../../components/Version.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -250,7 +249,6 @@
         }
       }}
     />
-    <Version />
   </form>
 </div>
 {#if modalData}

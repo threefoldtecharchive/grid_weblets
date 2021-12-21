@@ -17,7 +17,6 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
-  import Version from "../../components/Version.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -412,7 +411,6 @@
         {/await}
       {/if}
     {/if}
-    <Version />
   </section>
 </div>
 
