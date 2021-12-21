@@ -19,6 +19,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
+  import Version from "../../components/Version.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -205,6 +206,7 @@
       {profile}
       on:click={onResetHandler}
     />
+    <Version />
   </form>
 </div>
 {#if modalData}

@@ -16,6 +16,7 @@ interface AppConfigs {
   deploymentStore: typeof deploymentStore;
   notificationStore: typeof notificationStore;
   currentDeploymentStore: typeof currentDeploymentStore;
+  version: string;
 }
 
 declare global {

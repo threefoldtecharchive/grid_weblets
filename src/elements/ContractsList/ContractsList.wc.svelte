@@ -12,6 +12,7 @@
 
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
+  import Version from "../../components/Version.svelte";
 
   let profile: IProfile;
   let contracts: IContract[] = [];
@@ -176,6 +177,7 @@
         message={!profile ? noActiveProfile : "No contracts were found"}
       />
     {/if}
+    <Version />
   </div>
 </div>
 

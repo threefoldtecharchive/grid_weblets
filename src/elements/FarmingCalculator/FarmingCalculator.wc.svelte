@@ -12,6 +12,7 @@
   // Components
   import Input from "../../components/Input.svelte";
   import type { IFormField } from "../../types";
+  import Version from "../../components/Version.svelte";
 
   const profiles = [
     new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
@@ -426,6 +427,7 @@
         </div>
       {/if}
     {/if}
+    <Version />
   </div>
 </section>
 
