@@ -41,7 +41,7 @@
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
-    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "text" },
+    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || fields[0].invalid || fields[4].invalid; // prettier-ignore
