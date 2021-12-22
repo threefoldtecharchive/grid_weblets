@@ -87,6 +87,7 @@
           nodeIdSelectField.options[0].label = "No nodes available";
         }else{
           nodeIdSelectField.options[0].label = label;
+          data = +_nodes[0].value;
         }
         })
       .catch((err) => {
@@ -101,9 +102,6 @@
 
   $: {
     const [option] = nodeIdSelectField.options;
-    if (nodes.length > 0 ){
-      data = +nodes[0].value;
-    }
     nodeIdSelectField.options = [option, ...nodes];
   }
 
