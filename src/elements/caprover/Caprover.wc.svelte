@@ -17,6 +17,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
+  import { noActiveProfile } from "../../utils/message";
 
   const data = new Caprover();
   let loading = false;
@@ -79,6 +80,15 @@
   $: logs = $currentDeployment;
 </script>
 
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.publicKey = detail.sshKey;
+    }
+  }}
+/>
+
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
     <h4 class="is-size-4 mb-4">Caprover Deployer</h4>
@@ -94,6 +104,8 @@
 
     {#if loading || (logs !== null && logs.type === "CapRover")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
@@ -103,14 +115,6 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.publicKey = detail.sshKey;
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -160,23 +164,22 @@
           nodes={data.selection.nodes}
         />
       {/if}
-    {/if}
 
-    <DeployBtn
-      {disabled}
-      {loading}
-      {success}
-      {failed}
-      {profile}
-      on:click={(e) => {
-        if (success || failed) {
-          e.preventDefault();
-          success = false;
-          failed = false;
-          loading = false;
-        }
-      }}
-    />
+      <DeployBtn
+        {disabled}
+        {loading}
+        {success}
+        {failed}
+        on:click={(e) => {
+          if (success || failed) {
+            e.preventDefault();
+            success = false;
+            failed = false;
+            loading = false;
+          }
+        }}
+      />
+    {/if}
   </form>
 </div>
 {#if modalData}

@@ -19,6 +19,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
+  import { noActiveProfile } from "../../utils/message";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -105,6 +106,15 @@
   $: logs = $currentDeployment;
 </script>
 
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.sshKey = detail.sshKey;
+    }
+  }}
+/>
+
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
@@ -112,6 +122,8 @@
 
     {#if loading || (logs !== null && logs.type === "Kubernetes")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
@@ -121,14 +133,6 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.sshKey = detail.sshKey;
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -195,16 +199,15 @@
           {/each}
         </div>
       {/if}
-    {/if}
 
-    <DeployBtn
-      {disabled}
-      {loading}
-      {failed}
-      {success}
-      {profile}
-      on:click={onResetHandler}
-    />
+      <DeployBtn
+        {disabled}
+        {loading}
+        {failed}
+        {success}
+        on:click={onResetHandler}
+      />
+    {/if}
   </form>
 </div>
 {#if modalData}

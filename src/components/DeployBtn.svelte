@@ -1,17 +1,12 @@
 <svelte:options tag="tf-deploy-btn" />
 
 <script lang="ts">
-  import type { IProfile } from "../types/Profile";
-  import { noActiveProfile } from "../utils/message";
-  import Alert from "./Alert.svelte";
-
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   export let loading: boolean;
   export let success: boolean;
   export let failed: boolean;
   export let disabled: boolean;
-  export let profile: IProfile;
 
   $: deployment = $currentDeployment;
 </script>
@@ -29,8 +24,6 @@
         <strong>{deployment.type}</strong>
         with name <strong>{deployment.name}</strong> is in-progress.
       </div>
-    {:else if !profile}
-      <Alert type="info" message={noActiveProfile} />
     {/if}
   </div>
   <button
