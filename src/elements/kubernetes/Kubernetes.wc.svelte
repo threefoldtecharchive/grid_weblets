@@ -19,6 +19,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
+  import { noActiveProfile } from "../../utils/message";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -112,6 +113,8 @@
 
     {#if loading || (logs !== null && logs.type === "Kubernetes")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"

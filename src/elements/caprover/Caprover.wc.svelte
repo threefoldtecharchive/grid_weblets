@@ -17,6 +17,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
+  import { noActiveProfile } from "../../utils/message";
 
   const data = new Caprover();
   let loading = false;
@@ -94,6 +95,8 @@
 
     {#if loading || (logs !== null && logs.type === "CapRover")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"

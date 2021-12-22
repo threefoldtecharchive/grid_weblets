@@ -2,8 +2,6 @@
 
 <script lang="ts">
   import type { IProfile } from "../types/Profile";
-  import { noActiveProfile } from "../utils/message";
-  import Alert from "./Alert.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -29,8 +27,6 @@
         <strong>{deployment.type}</strong>
         with name <strong>{deployment.name}</strong> is in-progress.
       </div>
-    {:else if !profile}
-      <Alert type="info" message={noActiveProfile} />
     {/if}
   </div>
   <button
