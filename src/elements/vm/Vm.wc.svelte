@@ -135,6 +135,15 @@
   $: logs = $currentDeployment;
 </script>
 
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
+    }
+  }}
+/>
+
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
@@ -153,14 +162,6 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -235,23 +236,22 @@
           {/each}
         </div>
       {/if}
-    {/if}
 
-    <DeployBtn
-      {disabled}
-      {loading}
-      {failed}
-      {success}
-      {profile}
-      on:click={(e) => {
-        if (success || failed) {
-          e.preventDefault();
-          success = false;
-          failed = false;
-          loading = false;
-        }
-      }}
-    />
+      <DeployBtn
+        {disabled}
+        {loading}
+        {failed}
+        {success}
+        on:click={(e) => {
+          if (success || failed) {
+            e.preventDefault();
+            success = false;
+            failed = false;
+            loading = false;
+          }
+        }}
+      />
+    {/if}
   </form>
 </div>
 {#if modalData}

@@ -106,6 +106,15 @@
   $: logs = $currentDeployment;
 </script>
 
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.sshKey = detail.sshKey;
+    }
+  }}
+/>
+
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
@@ -124,14 +133,6 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.sshKey = detail.sshKey;
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -198,16 +199,15 @@
           {/each}
         </div>
       {/if}
-    {/if}
 
-    <DeployBtn
-      {disabled}
-      {loading}
-      {failed}
-      {success}
-      {profile}
-      on:click={onResetHandler}
-    />
+      <DeployBtn
+        {disabled}
+        {loading}
+        {failed}
+        {success}
+        on:click={onResetHandler}
+      />
+    {/if}
   </form>
 </div>
 {#if modalData}

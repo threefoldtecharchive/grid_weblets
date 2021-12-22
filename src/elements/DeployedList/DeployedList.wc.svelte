@@ -146,7 +146,7 @@
 
     {#if loading}
       <Alert type="info" message="Loading..." />
-    {:else if !configed}
+    {:else if !configed || !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if !list}
       <Alert type="info" message="Initializing..." />
