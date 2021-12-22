@@ -87,6 +87,8 @@
           nodeIdSelectField.options[0].label = "No nodes available";
         } else {
           nodeIdSelectField.options[0].label = label;
+          nodes = _nodes;
+          data = +_nodes[0].value;
         }
       })
       .catch((err) => {
@@ -101,9 +103,6 @@
 
   $: {
     const [option] = nodeIdSelectField.options;
-    if (nodes.length > 0) {
-      data = +nodes[0].value;
-    }
     nodeIdSelectField.options = [option, ...nodes];
   }
 
@@ -186,68 +185,69 @@
   let _nodeId: number;
   let validating: boolean = false;
   $: {
-    if (profile && _nodeId !== data) {
-      if (!data || !!_nodeValidator(data)) {
-        if (_ctrl) {
-          _ctrl.abort();
-          _ctrl = null;
-        }
-        validating = false;
-        status = null;
-      } else {
-        _nodeId = data;
-        if (_ctrl) _ctrl.abort();
-        _ctrl = new AbortController();
+    if (nodeSelection === "manual")
+      if (profile && _nodeId !== data) {
+        if (!data || !!_nodeValidator(data)) {
+          if (_ctrl) {
+            _ctrl.abort();
+            _ctrl = null;
+          }
+          validating = false;
+          status = null;
+        } else {
+          _nodeId = data;
+          if (_ctrl) _ctrl.abort();
+          _ctrl = new AbortController();
 
-        const { networkEnv } = profile;
-        const grid = new GridClient("" as any, "", "", null);
-        const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
+          const { networkEnv } = profile;
+          const grid = new GridClient("" as any, "", "", null);
+          const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
 
-        validating = true;
-        status = null;
-        fetch(`${rmbProxy}/nodes/${data}`, {
-          method: "GET",
-          signal: _ctrl.signal,
-        })
-          .then<{ capacity: ICapacity }>((res) => res.json())
-          .then(({ capacity }) => {
-            const { total, used } = capacity;
-            // prettier-ignore
-            let valid = (total.cru - used.cru) >= filters.cru &&
+          validating = true;
+          status = null;
+          fetch(`${rmbProxy}/nodes/${data}`, {
+            method: "GET",
+            signal: _ctrl.signal,
+          })
+            .then<{ capacity: ICapacity }>((res) => res.json())
+            .then(({ capacity }) => {
+              const { total, used } = capacity;
+              // prettier-ignore
+              let valid = (total.cru - used.cru) >= filters.cru &&
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
 
-            if (!valid) {
-              status = "invalid";
-              return;
-            }
+              if (!valid) {
+                status = "invalid";
+                return;
+              }
 
-            if (filters.publicIPs) {
-              return gqlApi<{ nodes: { id: number }[] }>(
-                profile,
-                "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
-                { id: data }
-              )
-                .then(({ nodes: [{ id }] }) => {
-                  return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
-                })
-                .then(({ publicIps: ips }) => {
-                  status = ips.length > 0 ? "valid" : "invalid";
-                });
-            } else {
-              status = "valid";
-            }
-          })
-          .catch((err: Error) => {
-            console.log("Error", err);
-            if (err.message.includes("aborted a request")) return;
-            status = "invalid";
-          })
-          .finally(() => {
-            validating = false;
-          });
+              if (filters.publicIPs) {
+                return gqlApi<{ nodes: { id: number }[] }>(
+                  profile,
+                  "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
+                  { id: data }
+                )
+                  .then(({ nodes: [{ id }] }) => {
+                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
+                  })
+                  .then(({ publicIps: ips }) => {
+                    status = ips.length > 0 ? "valid" : "invalid";
+                  });
+              } else {
+                status = "valid";
+              }
+            })
+            .catch((err: Error) => {
+              console.log("Error", err);
+              if (err.message.includes("aborted a request")) return;
+              status = "invalid";
+            })
+            .finally(() => {
+              validating = false;
+            });
+        }
       }
-    }
   }
 
   /* Update when data change */
@@ -255,20 +255,25 @@
   let _memory = memory;
   let _ssd = ssd;
   let _publicIp = publicIp;
-  $: {
-    if (_cpu !== cpu) {
-      _cpu = cpu;
-      _nodeId = null;
-    } else if (_memory !== memory) {
-      _memory = memory;
-      _nodeId = null;
-    } else if (_ssd !== ssd) {
-      _ssd = ssd;
-      _nodeId = null;
-    } else if (_publicIp !== publicIp) {
-      _publicIp = publicIp;
-      _nodeId = null;
+
+  const _reset = () => {
+    _nodeId = null;
+    if (nodeSelection === "automatic") {
+      data = null;
+      onLoadNodesHandler();
     }
+  };
+
+  $: {
+    let _update = true;
+
+    if (_cpu !== cpu) _cpu = cpu;
+    else if (_memory !== memory) _memory = memory;
+    else if (_ssd !== ssd) _ssd = ssd;
+    else if (_publicIp !== publicIp) _publicIp = publicIp;
+    else _update = false;
+
+    if (_update) _reset();
   }
 </script>
 
