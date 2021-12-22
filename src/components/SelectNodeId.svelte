@@ -1,11 +1,10 @@
 <svelte:options tag="tf-select-node-id" />
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
-  import fetchFarmAndCountries from "../utils/fetchFarmAndCountries";
 
   // components
   import Input from "./Input.svelte";
@@ -66,11 +65,18 @@
     }
   }
 
-  function onLoadNodesHandler() {
+  function _setValues(symbol: string, values: ISelectOption[]) {
+    const idx = filtersFields.findIndex((f) => f.symbol === symbol);
+    const [option] = filtersFields[idx].options;
+    values.unshift(option);
+    filtersFields[idx].options = values;
+  }
+
+  function onLoadNodesHandler(filters?: any) {
     loadingNodes = true;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
-    const _filters = {
+    const _filters = filters || {
       publicIPs: filters.publicIPs,
       country: filters.country,
       farmName: filters.farmName,
@@ -80,17 +86,20 @@
     };
 
     findNodes(_filters, profile)
-      .then((_nodes) => {
-        dispatch("fetch", _nodes);
-        if (_nodes.length <= 0){
+      .then(({ nodes, farms, countries }) => {
+        dispatch("fetch", nodes);
+        _setValues("farmName", farms);
+        _setValues("country", countries);
+
+        if (nodes.length <= 0) {
           data = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-        }else{
+        } else {
           nodeIdSelectField.options[0].label = label;
         }
-        })
+      })
       .catch((err) => {
-        console.log("Error", err)
+        console.log("Error", err);
         data = null;
         nodeIdSelectField.options[0].label = "No nodes available";
       })
@@ -101,62 +110,62 @@
 
   $: {
     const [option] = nodeIdSelectField.options;
-    if (nodes.length > 0 ){
+    if (nodes.length > 0) {
       data = +nodes[0].value;
     }
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, label: string = "Loading...") {
-    const oldLabel = filtersFields[index].options[0].label;
-    filtersFields[index].options[0].label = label;
-    return oldLabel;
-  }
+  // function _setLabel(index: number, label: string = "Loading...") {
+  //   const oldLabel = filtersFields[index].options[0].label;
+  //   filtersFields[index].options[0].label = label;
+  //   return oldLabel;
+  // }
 
-  function _setOptions(
-    index: number,
-    items: Array<{ name: string; code?: string }>
-  ) {
-    const [option] = filtersFields[index].options;
-    filtersFields[index].options = items.reduce(
-      (res, { name, code }) => {
-        const op = { label: name, value: code || name } as ISelectOption;
-        res.push(op);
-        return res;
-      },
-      [option]
-    );
-  }
+  // function _setOptions(
+  //   index: number,
+  //   items: Array<{ name: string; code?: string }>
+  // ) {
+  //   const [option] = filtersFields[index].options;
+  //   filtersFields[index].options = items.reduce(
+  //     (res, { name, code }) => {
+  //       const op = { label: name, value: code || name } as ISelectOption;
+  //       res.push(op);
+  //       return res;
+  //     },
+  //     [option]
+  //   );
+  // }
 
-  let _network: string;
-  $: {
-    if (
-      nodeSelection === "automatic" &&
-      profile &&
-      profile.networkEnv !== _network
-    ) {
-      /* Cache last used network */
-      _network = profile.networkEnv;
+  // let _network: string;
+  // $: {
+  //   if (
+  //     nodeSelection === "automatic" &&
+  //     profile &&
+  //     profile.networkEnv !== _network
+  //   ) {
+  //     /* Cache last used network */
+  //     _network = profile.networkEnv;
 
-      /* Loading farms & countries */
-      const farmsLabel = _setLabel(0);
-      const countriesLabel = _setLabel(1);
+  //     /* Loading farms & countries */
+  //     const farmsLabel = _setLabel(0);
+  //     const countriesLabel = _setLabel(1);
 
-      fetchFarmAndCountries(profile)
-        .then(({ farms, countries }) => {
-          farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
-          _setOptions(0, farms);
-          _setOptions(1, countries);
-        })
-        .catch((err) => {
-          console.log("Error", err);
-        })
-        .finally(() => {
-          _setLabel(0, farmsLabel);
-          _setLabel(1, countriesLabel);
-        });
-    }
-  }
+  //     fetchFarmAndCountries(profile)
+  //       .then(({ farms, countries }) => {
+  //         farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
+  //         _setOptions(0, farms);
+  //         _setOptions(1, countries);
+  //       })
+  //       .catch((err) => {
+  //         console.log("Error", err);
+  //       })
+  //       .finally(() => {
+  //         _setLabel(0, farmsLabel);
+  //         _setLabel(1, countriesLabel);
+  //       });
+  //   }
+  // }
 
   function _update(key: string) {
     return (e: { detail: Event }) => {
@@ -249,6 +258,9 @@
       }
     }
   }
+
+  // temp solution :/
+  $: if (profile) onLoadNodesHandler({});
 </script>
 
 <Input bind:data={nodeSelection} field={nodeSelectionField} />

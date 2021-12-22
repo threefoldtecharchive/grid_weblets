@@ -1895,6 +1895,11 @@ corser@^2.0.1:
   resolved "https://registry.npmjs.org/corser/-/corser-2.0.1.tgz"
   integrity sha1-jtolLsqrWEDc2XXOuQ2TcMgZ/4c=
 
+country-code-lookup@^0.0.20:
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/country-code-lookup/-/country-code-lookup-0.0.20.tgz#d04c71cd94de4bd44dab6822f637638ed3e55359"
+  integrity sha512-mcNlekdiVyiKO0lrjj3FrZ36vxlwjUwXTHpdRtVu9917SAYsHrlORmpHdPXeEXwTmw/yiKiTX4t6LC5uP5KVFg==
+
 crc@^3.5.0:
   version "3.8.0"
   resolved "https://registry.npmjs.org/crc/-/crc-3.8.0.tgz"
