@@ -98,7 +98,7 @@ export default class Editor extends Vue {
     new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
     new Weblet("Contracts", "contractslist", "", "deployment"),
     new Weblet("Deployments", "deployedlist", "", "deployment"),
-
+    new Weblet("INCA Chart", "inca", "", "deployment"),
     new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
 
     new Weblet("Peertube", "peertube", "peertube", "deployment"),
