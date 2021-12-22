@@ -82,15 +82,15 @@
     findNodes(_filters, profile)
       .then((_nodes) => {
         dispatch("fetch", _nodes);
-        if (_nodes.length <= 0){
+        if (_nodes.length <= 0) {
           data = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-        }else{
+        } else {
           nodeIdSelectField.options[0].label = label;
         }
-        })
+      })
       .catch((err) => {
-        console.log("Error", err)
+        console.log("Error", err);
         data = null;
         nodeIdSelectField.options[0].label = "No nodes available";
       })
@@ -101,7 +101,7 @@
 
   $: {
     const [option] = nodeIdSelectField.options;
-    if (nodes.length > 0 ){
+    if (nodes.length > 0) {
       data = +nodes[0].value;
     }
     nodeIdSelectField.options = [option, ...nodes];
@@ -247,6 +247,27 @@
             validating = false;
           });
       }
+    }
+  }
+
+  /* Update when data change */
+  let _cpu = cpu;
+  let _memory = memory;
+  let _ssd = ssd;
+  let _publicIp = publicIp;
+  $: {
+    if (_cpu !== cpu) {
+      _cpu = cpu;
+      _nodeId = null;
+    } else if (_memory !== memory) {
+      _memory = memory;
+      _nodeId = null;
+    } else if (_ssd !== ssd) {
+      _ssd = ssd;
+      _nodeId = null;
+    } else if (_publicIp !== publicIp) {
+      _publicIp = publicIp;
+      _nodeId = null;
     }
   }
 </script>
