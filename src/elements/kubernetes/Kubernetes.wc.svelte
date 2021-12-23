@@ -20,6 +20,8 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
+    validateCpu,
+    validateDisk,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -47,9 +49,9 @@
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number' },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },

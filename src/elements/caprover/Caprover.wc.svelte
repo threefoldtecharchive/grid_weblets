@@ -17,6 +17,8 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
+    validateCpu,
+    validateDisk,
     validateMemory,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
@@ -40,9 +42,9 @@
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number", validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number" },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
   ];
