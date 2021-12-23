@@ -302,7 +302,7 @@
   {/each}
 
   <button
-    class={"button is-primary mt-2 " + (loadingNodes ? "is-loading" : "")}
+    class={"button is-primary mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
     disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}

@@ -84,13 +84,6 @@
     { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
   ];
 
-  // prettier-ignore
-  const diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
-    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
-    { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text" },
-  ];
-
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";
   let loading = false;
@@ -240,7 +233,7 @@
                 on:click={() =>
                   (data.disks = data.disks.filter((_, i) => index !== i))}
               />
-              {#each diskFields as field (field.symbol)}
+              {#each disk.diskFields as field (field.symbol)}
                 <Input bind:data={disk[field.symbol]} {field} />
               {/each}
             </div>
