@@ -17,21 +17,22 @@ export function validateMemory(value: number): string | void {
   value = +value;
   if (isNaN(value)) return "Memory must be a valid number";
   if (+value.toFixed(0) !== value) return "Memory must be a valid integer";
-  if (value < 250) return "Memory must be greater than 249 MB";
-  if (value > 10 * 1024) return "Memory must be less than 10 GB";
+  if (value < 250) return "Minimum allowed memory is 250 MB";
+  if (value > 256 * 1024) return "Maximum allowed memory is 256 GB";
 }
 
 export function validateDisk(value: number): string | void {
   value = +value;
-  if (isNaN(value)) return "Disk must be a valid number";
-  if (value <= 0) return "Disk must be greater than 0";
-  if (value > 100) return "Disk must be less than 100 GB";
+  if (isNaN(value)) return "Disk size must be a valid number";
+  if (+value.toFixed(0) !== value) return "Disk size must be a valid integer";
+  if (value < 1) return "Minimum allowed disk size is 1 GB";
+  if (value > 10000) return "Maximum allowed disk size is 10000 GB";
 }
 
 export function validateCpu(value: number): string | void {
   value = +value;
   if (isNaN(value)) return "CPU must be a valid number";
-  if (+value.toFixed(0) !== value) return "CPU must be a valid integer";
-  if (value <= 0) return "CPU must be greater than 0";
-  if (value > 32) return "CPU must be less than 33 Cores";
+  if (+value.toFixed(0) !== value) return "CPU cores must be a valid integer";
+  if (value < 1) return "Minimum allowed CPU cores is 1";
+  if (value > 32) return "Maximum allowed CPU cores is 32";
 }
