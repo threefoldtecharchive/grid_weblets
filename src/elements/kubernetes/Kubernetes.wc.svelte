@@ -218,15 +218,15 @@
           {/each}
         </div>
       {/if}
-
-      <DeployBtn
-        {disabled}
-        {loading}
-        {failed}
-        {success}
-        on:click={onResetHandler}
-      />
     {/if}
+
+    <DeployBtn
+      {disabled}
+      {loading}
+      {failed}
+      {success}
+      on:click={onResetHandler}
+    />
   </form>
 </div>
 {#if modalData}

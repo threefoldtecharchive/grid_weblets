@@ -161,22 +161,22 @@
           nodes={data.selection.nodes}
         />
       {/if}
-
-      <DeployBtn
-        {disabled}
-        {loading}
-        {failed}
-        {success}
-        on:click={(e) => {
-          if (success || failed) {
-            e.preventDefault();
-            success = false;
-            failed = false;
-            loading = false;
-          }
-        }}
-      />
     {/if}
+
+    <DeployBtn
+      {disabled}
+      {loading}
+      {failed}
+      {success}
+      on:click={(e) => {
+        if (success || failed) {
+          e.preventDefault();
+          success = false;
+          failed = false;
+          loading = false;
+        }
+      }}
+    />
   </form>
 </div>
 {#if modalData}
