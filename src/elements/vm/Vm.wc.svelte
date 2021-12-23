@@ -17,7 +17,13 @@
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, {
+    isInvalid,
+    validateCpu,
+    validateDisk,
+    validateMemory,
+  } from "../../utils/validateName";
+  import { noActiveProfile } from "../../utils/message";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -29,8 +35,8 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number' },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number' },
+    { label: "CPU", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
@@ -39,8 +45,10 @@
 
   // prettier-ignore
   const flists: IFlist[] = [
-    { name: "Ubuntu", url: "https://hub.grid.tf/omar0.3bot/omarelawady-ubuntu-20.04.flist", entryPoint: "/init.sh" },
-    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/base:latest.flist", entryPoint: "/sbin/zinit init" },
+    { name: "Ubuntu", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-20.04.flist", entryPoint: "/init.sh" },
+    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist", entryPoint: "/entrypoint.sh" },
+    { name: "CentOS", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist", entryPoint: "/entrypoint.sh" },
+
   ];
 
   // prettier-ignore
@@ -49,8 +57,9 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Ubuntu", value: "0", selected: true },
-      { label: "Alpine (Coming Soon)", value: "1", disabled: true },
+      { label: "Ubuntu-20.04", value: "0", selected: true },
+      { label: "Alpine-3", value: "1" },
+      { label: "CentOS-8", value: "2" },
       { label: "Other", value: "other" }
     ]
   };
@@ -77,35 +86,21 @@
     { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
   ];
 
-  // prettier-ignore
-  const diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
-    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
-    { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text" },
-  ];
-
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";
   let loading = false;
   let success = false;
   let failed = false;
   let profile: IProfile;
-  const configs = window.configs?.baseConfig;
 
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
     loading = true;
-
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
 
     if (!hasEnoughBalance(profile)) {
       failed = true;
@@ -119,7 +114,6 @@
     failed = false;
     message = undefined;
 
-    events.addListener("logs", onLogInfo);
     deployVM(data, profile)
       .then((data) => {
         deploymentStore.set(0);
@@ -132,18 +126,30 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
+
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
+    }
+  }}
+/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "VM")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
@@ -153,14 +159,6 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -183,7 +181,15 @@
         {/if}
 
         {#each baseFields as field (field.symbol)}
-          <Input bind:data={data[field.symbol]} {field} />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
         {/each}
 
         <SelectNodeId
@@ -228,7 +234,7 @@
                 on:click={() =>
                   (data.disks = data.disks.filter((_, i) => index !== i))}
               />
-              {#each diskFields as field (field.symbol)}
+              {#each disk.diskFields as field (field.symbol)}
                 <Input bind:data={disk[field.symbol]} {field} />
               {/each}
             </div>
@@ -242,7 +248,6 @@
       {loading}
       {failed}
       {success}
-      {profile}
       on:click={(e) => {
         if (success || failed) {
           e.preventDefault();

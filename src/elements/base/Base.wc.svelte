@@ -8,6 +8,7 @@
   import deploymentStore from "../../stores/deploymentStore";
   import notificationStore from "../../stores/notifications";
   import currentDeploymentStore from "../../stores/currentDeployment";
+  import LogsInfo from "../../components/LogsInfo.svelte";
 
   window.configs = window.configs || ({} as any);
   window.configs.baseConfig = baseConfigStore;
@@ -28,3 +29,9 @@
     };
   });
 </script>
+
+<LogsInfo />
+
+<style lang="scss" scoped>
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+</style>

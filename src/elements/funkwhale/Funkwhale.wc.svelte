@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
 
   import VM, { Env } from "../../types/vm";
@@ -20,6 +19,7 @@
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName from "../../utils/validateName";
+  import { noActiveProfile } from "../../utils/message";
 
   const data = new VM();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -33,6 +33,7 @@
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
 
@@ -44,21 +45,14 @@
     failed = false;
     message = undefined;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
-    events.addListener("logs", onLogInfo);
     deployFunkwhale(data, profile)
       .then(({ domain: d, planetaryIP: ip }) => {
         deploymentStore.set(0);
@@ -72,37 +66,41 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
+
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+    }
+  }}
+/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Funkwhale")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <AlertDetailed
         type="success"
-        message="Successfully Deployed A Funkwhale Instance"
+        message="Successfully deployed a Funkwhale instance"
         {planetaryIP}
         {domain}
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || "Failed to deploy Funkwhale"} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
       {#if active === "base"}
         <Input
@@ -129,12 +127,12 @@
         />
       {/if}
     {/if}
+
     <DeployBtn
       {disabled}
       {loading}
       {failed}
       {success}
-      {profile}
       on:click={(e) => {
         if (success || failed) {
           e.preventDefault();

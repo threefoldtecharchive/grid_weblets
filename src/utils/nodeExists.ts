@@ -1,7 +1,6 @@
 import type { IProfile } from "../types/Profile";
 
 export default async function nodeExists(profile: IProfile, nodeId:number) : Promise<boolean> {
-  console.log("profile", profile);
   const { networkEnv } = profile;
   
   return fetch(`https://gridproxy.${networkEnv}.grid.tf/nodes/${nodeId}`, {

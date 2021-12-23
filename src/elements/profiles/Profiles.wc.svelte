@@ -21,6 +21,7 @@
   let opened: boolean = false;
   let currentProfile: IProfile;
   let loadingBalance: boolean = false;
+  let selectedIdx: string = "0";
 
   let tabs: ITab[] = [];
   $: {
@@ -28,7 +29,7 @@
     if (s) {
       profiles = s.profiles;
       loadingBalance = s.loadingBalance;
-      activeProfile = profiles[s.selectedIdx];
+      activeProfile = profiles[selectedIdx];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
@@ -39,18 +40,18 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile name", type: "text" },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
     { label: "Network Environment", symbol: "networkEnv", type: "select", options: [
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter your mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key, will be added as default to all deployments.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
-  const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address", disabled: true }; // prettier-ignore
+  const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address...", disabled: true }; // prettier-ignore
 
   let message: string;
   function onEventHandler(event: "create" | "load" | "save") {
@@ -58,6 +59,11 @@
     if (!message) {
       configured = true;
     }
+  }
+
+  function _updateError(symbol: string, valid: boolean, msg: string) {
+    const idx = fields.findIndex((f) => f.symbol === symbol);
+    fields[idx].error = valid ? null : msg;
   }
 
   let activating: boolean = false;
@@ -68,24 +74,22 @@
     try {
       const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
       invalid = !mnIsValid;
-      fields.find((f) => f.symbol === "mnemonics").error = invalid
-        ? "Invalid Mnemonics. Could it be that your account is not activated? or using the wrong network?"
-        : null;
+      _updateError(
+        "mnemonics",
+        mnIsValid,
+        "Invalid Mnemonics! Could it be that your account is not activated? Are you using the correct network?"
+      );
     } catch (err) {
       console.log("Error", err);
     }
 
     const sshIsValid = activeProfile.sshKey !== "";
     invalid = invalid || !sshIsValid;
-    fields.find((f) => f.symbol === "sshKey").error = sshIsValid
-      ? null
-      : "Invalid SSH Key";
+    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
 
     const nameIsValid = activeProfile.name !== "";
     invalid = invalid || !nameIsValid;
-    fields.find((f) => f.symbol === "name").error = nameIsValid
-      ? null
-      : "Please provide a profile name";
+    _updateError("name", nameIsValid, "Please provide a profile name");
 
     activating = false;
     if (invalid) return;
@@ -125,7 +129,7 @@
       <p>{currentProfile.name}</p>
       {#if loadingBalance}
         <p>Loading Account Balance</p>
-      {:else if currentProfile.balance}
+      {:else if currentProfile.balance !== null}
         <p>Balance: <span>{currentProfile.balance}</span> TFT</p>
       {/if}
     </div>
@@ -148,7 +152,10 @@
             <button
               class="button is-primary is-outlined mr-2"
               type="button"
-              on:click={configs.addProfile}
+              on:click={() => {
+                selectedIdx = configs.addProfile();
+                fields.forEach((_, i) => (fields[i].error = null));
+              }}
             >
               + Add Profile
             </button>
@@ -187,15 +194,17 @@
 
       {#if configured}
         <Tabs
-          active={$configs.selectedIdx}
+          active={selectedIdx}
           {tabs}
           centered={false}
-          on:removed={({ detail }) => configs.deleteProfile(detail)}
-          on:select={(p) => {
-            [2, 3].forEach((i) => (fields[i].error = null));
-            configs.setSelectedIdx(p.detail);
+          on:removed={({ detail }) => {
+            selectedIdx = configs.deleteProfile(detail, selectedIdx);
           }}
-          on:init={() => configs.setSelectedIdx("0")}
+          on:select={(p) => {
+            fields.forEach((_, i) => (fields[i].error = null));
+            selectedIdx = p.detail;
+          }}
+          on:init={() => (selectedIdx = "0")}
         />
 
         <div class="is-flex is-justify-content-flex-end">
@@ -243,7 +252,7 @@
             field={{
               label: "Password",
               type: "password",
-              placeholder: "Profile Manager password",
+              placeholder: "Profile Manager Password",
               symbol: "secret",
               tooltip:
                 activePassword === "load"
@@ -263,8 +272,8 @@
               disabled={password === ""}
             >
               {activePassword === "load"
-                ? "Load profiles"
-                : "Create new profile manager"}
+                ? "Load Profiles"
+                : "Create New Profile Manager"}
             </button>
           </div>
         </form>
@@ -278,12 +287,8 @@
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
   .profile-menu {
-    position: fixed;
-    top: 15px;
-    right: 15px;
     display: flex;
     align-items: center;
-    z-index: 999;
     padding: 15px;
     background-color: white;
     border-radius: 50px;

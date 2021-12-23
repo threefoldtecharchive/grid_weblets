@@ -1,6 +1,6 @@
 <template>
   <section class="editor">
-    <aside class="editor__side menu">
+    <aside class="editor__side menu" style="padding-bottom: 100px">
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
@@ -37,11 +37,24 @@
           </template>
         </ul>
       </template>
+      <span
+        style="
+          position: fixed;
+          bottom: 15px;
+          left: 245px;
+          z-index: 99;
+          transform: translateX(-100%);
+          font-size: 0.9rem;
+        "
+        class="tag is-info is-light"
+      >
+        v1.0.0-alpha
+      </span>
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
       <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-end mt-2 mb-2 mr-2">
+        <div class="navbar-end mt-2 mb-2 mr-2" style="height: 112px">
           <tf-profiles></tf-profiles>
         </div>
       </nav>
@@ -91,7 +104,7 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
-  public sections = ["deployment", "calculator", "coming soon"];
+  public sections = ["deployment", "calculator"];
   public weblets: Weblet[] = [
     new Weblet("CapRover", "caprover", "caprover", "deployment"),
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
@@ -101,15 +114,15 @@ export default class Editor extends Vue {
 
     new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
 
-    new Weblet("Peertube", "peertube", "peertube", "coming soon"),
-    new Weblet("Funkwhale", "funkwhale", "funkwhale", "coming soon"),
+    new Weblet("Peertube", "peertube", "peertube", "deployment"),
+    new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
   ];
   public active = 0;
 
   @Watch("$route.params", { deep: true, immediate: true })
   public onRouterChange(to: { component?: string }) {
     const idx = this.weblets.findIndex((w) => w.symbol === to.component);
-    this.active = idx > -1 && idx < 6 ? idx : 0;
+    this.active = idx > -1 ? idx : 0;
   }
 
   route(symbol: string): void {

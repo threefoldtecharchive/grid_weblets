@@ -1,5 +1,6 @@
 import type { GridClient } from "grid3_client";
 import type { IProfile } from "../types/Profile";
+import formatConsumption from "./formatConsumption";
 import getGrid from "./getGrid";
 
 export interface IContract {
@@ -10,8 +11,8 @@ export interface IContract {
 function _getConsumption(id: number, grid: GridClient) {
   return grid.contracts
     .getConsumption({ id })
-    .then((res) => (res === 0 ? "No Data Available" : res + " TFT/Hour"))
-    .catch(() => "No Data Available");
+    .then(formatConsumption)
+    .catch(() => formatConsumption(0));
 }
 
 export default function getContractsConsumption(

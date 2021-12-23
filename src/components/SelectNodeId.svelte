@@ -27,10 +27,10 @@
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
-    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter farm name", options: [
+    { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
       { label: "Please select a farm", value: null, selected: true }
     ] },
-    { label: "Country", symbol: "country", type: "select", placeholder: "Enter a country name", options: [
+    { label: "Country", symbol: "country", type: "select", placeholder: "Enter Country Name", options: [
       { label: "Please select a country", value: null, selected: true }
     ] },
   ];
@@ -49,7 +49,7 @@
     symbol: "value",
     options: [
       { label: "Choose a way to select node", value: null, selected: true, disabled: true },
-      { label: "Capacity filter", value: "automatic" },
+      { label: "Capacity Filter", value: "automatic" },
       { label: "Manual", value: "manual" }
     ]
   };
@@ -68,6 +68,7 @@
 
   function onLoadNodesHandler() {
     loadingNodes = true;
+    status = null;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
@@ -80,11 +81,27 @@
     };
 
     findNodes(_filters, profile)
-      .then((_nodes) => dispatch("fetch", _nodes))
-      .catch((err) => console.log("Error", err))
+      .then((_nodes) => {
+        dispatch("fetch", _nodes);
+        if (_nodes.length <= 0) {
+          data = null;
+          status = null;
+          nodeIdSelectField.options[0].label = "No nodes available";
+        } else {
+          nodeIdSelectField.options[0].label = label;
+          nodes = _nodes;
+          data = +_nodes[0].value;
+          status = "valid";
+        }
+      })
+      .catch((err) => {
+        console.log("Error", err);
+        data = null;
+        status = null;
+        nodeIdSelectField.options[0].label = "No nodes available";
+      })
       .finally(() => {
         loadingNodes = false;
-        nodeIdSelectField.options[0].label = label;
       });
   }
 
@@ -172,72 +189,108 @@
   let _nodeId: number;
   let validating: boolean = false;
   $: {
-    if (profile && _nodeId !== data) {
-      if (!data || !!_nodeValidator(data)) {
-        if (_ctrl) {
-          _ctrl.abort();
-          _ctrl = null;
-        }
-        validating = false;
-        status = null;
-      } else {
-        _nodeId = data;
-        if (_ctrl) _ctrl.abort();
-        _ctrl = new AbortController();
+    if (nodeSelection === "manual")
+      if (profile && _nodeId !== data) {
+        if (!data || !!_nodeValidator(data)) {
+          if (_ctrl) {
+            _ctrl.abort();
+            _ctrl = null;
+          }
+          validating = false;
+          status = null;
+        } else {
+          _nodeId = data;
+          if (_ctrl) _ctrl.abort();
+          _ctrl = new AbortController();
 
-        const { networkEnv } = profile;
-        const grid = new GridClient("" as any, "", "", null);
-        const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
+          const { networkEnv } = profile;
+          const grid = new GridClient("" as any, "", "", null);
+          const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
 
-        validating = true;
-        status = null;
-        fetch(`${rmbProxy}/nodes/${data}`, {
-          method: "GET",
-          signal: _ctrl.signal,
-        })
-          .then<{ capacity: ICapacity }>((res) => res.json())
-          .then(({ capacity }) => {
-            const { total, used } = capacity;
-            // prettier-ignore
-            let valid = (total.cru - used.cru) >= filters.cru &&
+          validating = true;
+          status = null;
+          fetch(`${rmbProxy}/nodes/${data}`, {
+            method: "GET",
+            signal: _ctrl.signal,
+          })
+            .then<{ capacity: ICapacity }>((res) => res.json())
+            .then(({ capacity }) => {
+              const { total, used } = capacity;
+              // prettier-ignore
+              let valid = (total.cru - used.cru) >= filters.cru &&
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
 
-            if (!valid) {
-              status = "invalid";
-              return;
-            }
+              if (!valid) {
+                status = "invalid";
+                return;
+              }
 
-            if (filters.publicIPs) {
-              return gqlApi<{ nodes: { id: number }[] }>(
-                profile,
-                "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
-                { id: data }
-              )
-                .then(({ nodes: [{ id }] }) => {
-                  return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
-                })
-                .then(({ publicIps: ips }) => {
-                  status = ips.length > 0 ? "valid" : "invalid";
-                });
-            } else {
-              status = "valid";
-            }
-          })
-          .catch((err: Error) => {
-            console.log("Error", err);
-            if (err.message.includes("aborted a request")) return;
-            status = "invalid";
-          })
-          .finally(() => {
-            validating = false;
-          });
+              if (filters.publicIPs) {
+                return gqlApi<{ nodes: { id: number }[] }>(
+                  profile,
+                  "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
+                  { id: data }
+                )
+                  .then(({ nodes: [{ id }] }) => {
+                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
+                  })
+                  .then(({ publicIps: ips }) => {
+                    status = ips.length > 0 ? "valid" : "invalid";
+                  });
+              } else {
+                status = "valid";
+              }
+            })
+            .catch((err: Error) => {
+              console.log("Error", err);
+              if (err.message.includes("aborted a request")) return;
+              status = "invalid";
+            })
+            .finally(() => {
+              validating = false;
+            });
+        }
       }
+  }
+
+  /* Update when data change */
+  let _cpu = cpu;
+  let _memory = memory;
+  let _ssd = ssd;
+  let _publicIp = publicIp;
+
+  const _reset = () => {
+    _nodeId = null;
+    if (nodeSelection === "automatic") {
+      data = null;
+      onLoadNodesHandler();
     }
+  };
+
+  $: {
+    let _update = true;
+
+    if (_cpu !== cpu) _cpu = cpu;
+    else if (_memory !== memory) _memory = memory;
+    else if (_ssd !== ssd) _ssd = ssd;
+    else if (_publicIp !== publicIp) _publicIp = publicIp;
+    else _update = false;
+
+    if (_update) _reset();
   }
 </script>
 
-<Input bind:data={nodeSelection} field={nodeSelectionField} />
+<Input
+  bind:data={nodeSelection}
+  field={nodeSelectionField}
+  on:input={() => {
+    if (nodeSelection === "manual") return (status = null);
+    if (data !== null && nodes.length > 0) {
+      status = "valid";
+    }
+  }}
+/>
 {#if nodeSelection === "automatic"}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
@@ -249,12 +302,12 @@
   {/each}
 
   <button
-    class={"button is-primary mt-2 " + (loadingNodes ? "is-loading" : "")}
+    class={"button is-primary mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
     disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}
   >
-    Apply filters and suggest nodes
+    Apply Filters and Suggest Nodes
   </button>
 
   <Input
@@ -265,6 +318,7 @@
       symbol: "nodeId",
       options: nodeIdSelectField.options,
     }}
+    on:input={() => (status = "valid")}
   />
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
@@ -274,12 +328,12 @@
   {#if !validating && data}
     {#if status == "valid"}
       <p class="help is-success">
-        Node(<strong>{data}</strong>) is up and has enough resources
+        Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
     {:else if status === "invalid"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
-        resources
+        resources.
       </p>
     {/if}
   {/if}

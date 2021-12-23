@@ -4,7 +4,6 @@
   import type { IFormField, ITab } from "../../types";
   import { default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
-  const { events } = window.configs?.grid3_client ?? {};
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -16,8 +15,14 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
-import validateDomainName from "../../utils/validateDomainName";
+  import validateName, {
+    isInvalid,
+    validateCpu,
+    validateDisk,
+    validateMemory,
+  } from "../../utils/validateName";
+  import validateDomainName from "../../utils/validateDomainName";
+  import { noActiveProfile } from "../../utils/message";
 
   const data = new Caprover();
   let loading = false;
@@ -25,8 +30,8 @@ import validateDomainName from "../../utils/validateDomainName";
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  const configs = window.configs?.baseConfig;
   let status: "valid" | "invalid";
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -36,39 +41,31 @@ import validateDomainName from "../../utils/validateDomainName";
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: "number" },
-    { label: "Domain", symbol: "domain", placeholder: "domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
-    { label: "Password", symbol: "password", placeholder: "Caprover new password", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number", validator: validateCpu, invalid: false },
+    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
+    { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
+    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || fields[0].invalid || fields[4].invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
     loading = true;
 
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
-    }
-
     if (!hasEnoughBalance(profile)) {
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
     success = false;
     failed = false;
     message = undefined;
-
-    events.addListener("logs", onLogInfo);
 
     deployCaprover(data, profile)
       .then((data) => {
@@ -82,10 +79,20 @@ import validateDomainName from "../../utils/validateDomainName";
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
+
+  $: logs = $currentDeployment;
 </script>
+
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.publicKey = detail.sshKey;
+    }
+  }}
+/>
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
@@ -100,25 +107,19 @@ import validateDomainName from "../../utils/validateDomainName";
     </p>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "CapRover")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully deployed Caprover."
+        message="Successfully Deployed Caprover."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Caprover."} />
+      <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.publicKey = detail.sshKey;
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -131,6 +132,27 @@ import validateDomainName from "../../utils/validateDomainName";
             />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+          {#if field.symbol === "domain"}
+            <div class="notification is-warning is-light">
+              <p>
+                You will need to point a wildcard DNS entry for the domain you
+                entered above to this CapRover instance IP Address after
+                deployment,<br />
+                otherwise, you won't be able to access the CapRover dashboard using
+                this domain.
+              </p>
+              <br />
+              <strong>
+                If you don't know what Captain root domain is, make sure to
+                visit <a
+                  target="_blank"
+                  href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
+                >
+                  the Quick start documentation
+                </a>.
+              </strong>
+            </div>
           {/if}
         {/each}
         <SelectNodeId
@@ -154,7 +176,6 @@ import validateDomainName from "../../utils/validateDomainName";
       {loading}
       {success}
       {failed}
-      {profile}
       on:click={(e) => {
         if (success || failed) {
           e.preventDefault();

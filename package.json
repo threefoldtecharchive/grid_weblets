@@ -55,7 +55,7 @@
     "chart.js": "^3.6.0",
     "crypto-js": "^4.1.1",
     "front-matter": "^4.0.2",
-    "grid3_client": "0.0.35",
+    "grid3_client": "0.0.36",
     "js-yaml": "^4.1.0",
     "marked": "^3.0.8",
     "page": "^1.11.6",

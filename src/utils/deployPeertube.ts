@@ -15,10 +15,14 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployPeertube(data: VM, profile: IProfile) {
-  const { envs, disks, ...base } = data;
+  const {
+    envs,
+    disks: [{ size }],
+    ...base
+  } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
-  const { mnemonics, storeSecret, networkEnv } = profile;
+  const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
   const client = new GridClient(
@@ -45,7 +49,18 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   network.ip_range = "10.1.0.0/16";
 
   // deploy the peertube
-  await deployPeertubeVM(profile, client, network, nodeId, name, domain);
+  await deployPeertubeVM(
+    profile,
+    client,
+    network,
+    nodeId,
+    name,
+    domain,
+    cpu,
+    memory,
+    size,
+    sshKey
+  );
 
   // get the info of peertube deployment
   const peertubeInfo = await getPeertubeInfo(client, name + "VMs");
@@ -66,12 +81,16 @@ async function deployPeertubeVM(
   net: any,
   nodeId: any,
   name: string,
-  domain: string
+  domain: string,
+  cpu: number,
+  memory: number,
+  diskSize: number,
+  sshKey: string
 ) {
   // disk
   const disk = new DiskModel();
   disk.name = name + "Data";
-  disk.size = 10;
+  disk.size = diskSize;
   disk.mountpoint = "/data";
 
   // vm specs
@@ -81,13 +100,14 @@ async function deployPeertubeVM(
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 3;
-  vm.memory = 1024 * 4;
-  vm.rootfs_size = 1;
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.rootfs_size = 4;
   vm.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.0.flist";
+    "https://hub.grid.tf/tf-official-apps/threefoldtech-peertube-v3.0.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
+    SSH_KEY: sshKey,
     PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
     PEERTUBE_WEBSERVER_PORT: "443",

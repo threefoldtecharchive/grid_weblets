@@ -15,12 +15,24 @@ function createBaseConfig() {
     profiles: [createProfile("Profile 1")],
     activeProfile: null,
     balance: null,
-    selectedIdx: "0",
+    // selectedIdx: "0",
     loadingBalance: false,
     twinId: null,
     address: null,
     storeSecret: null,
   });
+  let _updateBalanceInterval: any = null;
+  const clearBalanceInterval = () => {
+    if (_updateBalanceInterval) {
+      clearInterval(_updateBalanceInterval);
+      _updateBalanceInterval = null;
+    }
+  };
+  const setBalanceInterval = (fn: () => void) => {
+    clearBalanceInterval();
+    fn();
+    _updateBalanceInterval = setInterval(fn, 1000 * 60);
+  };
 
   function hashPassword(password: string) {
     return PREFIX + md5(password).toString();
@@ -68,24 +80,26 @@ function createBaseConfig() {
       });
     },
     addProfile() {
+      let _idx: string;
       update((value) => {
-        value.selectedIdx = (
-          value.profiles.push(createProfile()) - 1
-        ).toString();
+        _idx = (value.profiles.push(createProfile()) - 1).toString();
         return value;
       });
+      return _idx;
     },
-    deleteProfile(idx: number) {
+    deleteProfile(idx: number, current: string) {
+      let _idx: string;
       update((value) => {
         if (value.profiles[idx].id === value.activeProfile) {
           value.activeProfile = null;
         }
         value.profiles.splice(idx, 1);
-        if (value.selectedIdx === idx.toString()) {
-          value.selectedIdx = (idx - 1).toString();
+        if (current === idx.toString()) {
+          _idx = (idx - 1).toString();
         }
         return value;
       });
+      return _idx ? _idx : current;
     },
 
     create(password: string) {
@@ -116,7 +130,7 @@ function createBaseConfig() {
         });
 
         if (get(store).activeProfile) {
-          fullStore.updateBalance();
+          setBalanceInterval(fullStore.updateBalance);
           fullStore._loadActiveProfileInfo();
         }
       } catch {
@@ -163,7 +177,6 @@ function createBaseConfig() {
 
       fullStore._setLoadingBalance(true);
 
-      console.log("Balance Profile", fullStore.getActiveProfile());
       getBalance(fullStore.getActiveProfile())
         .then((balance) => {
           fullStore._setBalance(balance);
@@ -198,10 +211,14 @@ function createBaseConfig() {
       });
       requestAnimationFrame(() => {
         fullStore.save(password);
-        fullStore.updateBalance();
-        setTimeout(() => {
-          fullStore._loadActiveProfileInfo();
-        }, 1000);
+        if (id !== null) {
+          setBalanceInterval(fullStore.updateBalance);
+          setTimeout(() => {
+            fullStore._loadActiveProfileInfo();
+          }, 1000);
+        } else {
+          clearBalanceInterval();
+        }
       });
     },
 
@@ -213,13 +230,6 @@ function createBaseConfig() {
       profile.balance = data.balance;
       profile.storeSecret = data.storeSecret;
       return profile;
-    },
-
-    setSelectedIdx(val: string) {
-      return update((value) => {
-        value.selectedIdx = val;
-        return value;
-      });
     },
   };
 

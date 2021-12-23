@@ -1,6 +1,7 @@
 import getGrid from "../utils/getGrid";
 import type { IProfile } from "./Profile";
 import type { GridClient } from "grid3_client";
+import formatConsumption from "../utils/formatConsumption";
 
 export default class DeployedList {
   constructor(public readonly grid: GridClient) {}
@@ -28,8 +29,7 @@ export default class DeployedList {
             master: data.masters[0],
             workers: data.workers.length,
             details: data,
-            consumption:
-              value === 0 ? "No Data Available" : value + " TFT/Hour",
+            consumption: formatConsumption(value),
           });
         })
         .catch(() => res(null));
@@ -60,10 +60,8 @@ export default class DeployedList {
               .getConsumption({
                 id: data.contractId as number,
               })
-              .then((res) =>
-                res === 0 ? "No Data Available" : res + " TFT/Hour"
-              )
-              .catch(() => "No Data Available"),
+              .then(formatConsumption)
+              .catch(() => formatConsumption(0)),
             details: data,
           });
         })

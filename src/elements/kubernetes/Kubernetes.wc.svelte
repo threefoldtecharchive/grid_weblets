@@ -1,7 +1,6 @@
 <svelte:options tag="tf-kubernetes" />
 
 <script lang="ts">
-  const { events } = window.configs?.grid3_client ?? {};
   const deploymentStore = window.configs?.deploymentStore;
   import Kubernetes, { Worker } from "../../types/kubernetes";
   import deployKubernetes from "../../utils/deployKubernetes";
@@ -19,7 +18,13 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, {
+    isInvalid,
+    validateCpu,
+    validateDisk,
+    validateMemory,
+  } from "../../utils/validateName";
+  import { noActiveProfile } from "../../utils/message";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -31,7 +36,7 @@
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text", validator: validateName, invalid: false },
-    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "text" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
   ];
 
@@ -44,15 +49,16 @@
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number' },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
   ];
 
   let data = new Kubernetes();
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   let active: string = "config";
   let loading = false;
@@ -60,9 +66,8 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || baseFields[0].invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid(baseFields) || isInvalid(kubernetesFields); // prettier-ignore
   let modalData: Object;
-  const configs = window.configs?.baseConfig;
 
   async function onDeployKubernetes() {
     loading = true;
@@ -71,21 +76,13 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
-    }
-
-    function onLogInfo(msg: string) {
-      if (typeof msg === "string") {
-        message = msg;
-      }
     }
 
     success = false;
     failed = false;
     message = undefined;
-
-    events.addListener("logs", onLogInfo);
 
     deployKubernetes(data, profile)
       .then((data) => {
@@ -99,7 +96,6 @@
       })
       .finally(() => {
         loading = false;
-        events.removeListener("logs", onLogInfo);
       });
   }
 
@@ -111,15 +107,28 @@
       loading = false;
     }
   }
+
+  $: logs = $currentDeployment;
 </script>
+
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.sshKey = detail.sshKey;
+    }
+  }}
+/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message={message || "Loading..."} />
+    {#if loading || (logs !== null && logs.type === "Kubernetes")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {:else if !profile}
+      <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
@@ -129,14 +138,6 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
-      <SelectProfile
-        on:profile={({ detail }) => {
-          profile = detail;
-          if (detail) {
-            data.sshKey = detail.sshKey;
-          }
-        }}
-      />
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
@@ -156,7 +157,15 @@
         {/each}
       {:else if active === "master"}
         {#each baseFields as field (field.symbol)}
-          <Input bind:data={data.master[field.symbol]} {field} />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data.master[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data.master[field.symbol]} {field} />
+          {/if}
         {/each}
         <SelectNodeId
           cpu={data.master.cpu}
@@ -184,7 +193,15 @@
                   (data.workers = data.workers.filter((_, i) => index !== i))}
               />
               {#each baseFields as field (field.symbol)}
-                <Input bind:data={worker[field.symbol]} {field} />
+                {#if field.invalid !== undefined}
+                  <Input
+                    bind:data={worker[field.symbol]}
+                    bind:invalid={field.invalid}
+                    {field}
+                  />
+                {:else}
+                  <Input bind:data={worker[field.symbol]} {field} />
+                {/if}
               {/each}
               <SelectNodeId
                 cpu={worker.cpu}
@@ -210,7 +227,6 @@
       {loading}
       {failed}
       {success}
-      {profile}
       on:click={onResetHandler}
     />
   </form>

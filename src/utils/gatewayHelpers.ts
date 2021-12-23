@@ -22,6 +22,6 @@ export async function getUniqueName(client: any, name: string) {
     name += suffix;
     return getUniqueName(client, name);
   } else {
-    return name;
+    return name.toLowerCase();
   }
 }
