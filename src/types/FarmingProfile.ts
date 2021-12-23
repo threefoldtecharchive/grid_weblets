@@ -12,7 +12,7 @@ export default class FarmingProfile {
     public powerCost: number = 0.15,
     public certified: boolean = false,
     public publicIp: boolean = false,
-    public investmentCostHW: number = 1040,
+    public investmentCostHW: number = 1000,
     public nuRequiredPerCu: number = 30
   ) {}
 
@@ -32,7 +32,8 @@ export default class FarmingProfile {
     const { hdd, ssd, cu } = this;
 
     const x = hdd / 1200;
-    const y = ((ssd - cu * 20) / 300) * 0.8;
+    // const y = ((ssd - cu * 20) / 300) * 0.8;
+    const y = (ssd * 0.8 - cu * 25) / 200;
     return x + y;
   }
 
@@ -46,7 +47,7 @@ export default class FarmingProfile {
   }
 
   public get rewardPerSu(): number {
-    return 1.5;
+    return 1;
   }
 
   public get rewardPerNu(): number {
@@ -68,8 +69,8 @@ export default class FarmingProfile {
   }
 
   public get tftRewardPerNu(): number {
-    const { rewardPerNu, price } = this;
-    return rewardPerNu / price;
+    const { rewardPerNu, averageTokenPrice } = this;
+    return rewardPerNu / averageTokenPrice;
   }
 
   public get cuFarmingRewardInTft(): number {
