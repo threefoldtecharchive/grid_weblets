@@ -20,10 +20,8 @@
   export let data: number;
   export let status: "valid" | "invalid";
   export let nodes: ISelectOption[] = [];
-  // export let error: string = null;
 
   export let profile: IProfile;
-  let loadingNodes: boolean = false;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
@@ -67,7 +65,6 @@
   }
 
   function onLoadNodesHandler() {
-    loadingNodes = true;
     status = null;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
@@ -81,8 +78,11 @@
     };
 
     findNodes(_filters, profile)
-      .then((_nodes) => {
+      .then(({ nodes: _nodes, countries, farms }) => {
         dispatch("fetch", _nodes);
+        filtersFields[0].options = [filtersFields[0].options[0], ...farms];
+        filtersFields[1].options = [filtersFields[1].options[0], ...countries];
+
         if (_nodes.length <= 0) {
           data = null;
           status = null;
@@ -99,66 +99,12 @@
         data = null;
         status = null;
         nodeIdSelectField.options[0].label = "No nodes available";
-      })
-      .finally(() => {
-        loadingNodes = false;
       });
   }
 
   $: {
     const [option] = nodeIdSelectField.options;
     nodeIdSelectField.options = [option, ...nodes];
-  }
-
-  function _setLabel(index: number, label: string = "Loading...") {
-    const oldLabel = filtersFields[index].options[0].label;
-    filtersFields[index].options[0].label = label;
-    return oldLabel;
-  }
-
-  function _setOptions(
-    index: number,
-    items: Array<{ name: string; code?: string }>
-  ) {
-    const [option] = filtersFields[index].options;
-    filtersFields[index].options = items.reduce(
-      (res, { name, code }) => {
-        const op = { label: name, value: code || name } as ISelectOption;
-        res.push(op);
-        return res;
-      },
-      [option]
-    );
-  }
-
-  let _network: string;
-  $: {
-    if (
-      nodeSelection === "automatic" &&
-      profile &&
-      profile.networkEnv !== _network
-    ) {
-      /* Cache last used network */
-      _network = profile.networkEnv;
-
-      /* Loading farms & countries */
-      const farmsLabel = _setLabel(0);
-      const countriesLabel = _setLabel(1);
-
-      fetchFarmAndCountries(profile)
-        .then(({ farms, countries }) => {
-          farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
-          _setOptions(0, farms);
-          _setOptions(1, countries);
-        })
-        .catch((err) => {
-          console.log("Error", err);
-        })
-        .finally(() => {
-          _setLabel(0, farmsLabel);
-          _setLabel(1, countriesLabel);
-        });
-    }
   }
 
   function _update(key: string) {
