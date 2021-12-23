@@ -19,6 +19,8 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
+    validateCpu,
+    validateDisk,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -30,7 +32,7 @@
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number" },
+    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false }
   ];
 
@@ -39,6 +41,8 @@
     symbol: "disk",
     placeholder: "Your Disk size in GB",
     type: "number",
+    validator: validateDisk,
+    invalid: false,
   };
 
   const deploymentStore = window.configs?.deploymentStore;
@@ -55,7 +59,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
   let domain: string, planetaryIP: string;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
