@@ -18,7 +18,10 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, {
+    isInvalid,
+    validateMemory,
+  } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
   // prettier-ignore
@@ -45,7 +48,7 @@
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number' },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number' },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number' },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
@@ -61,7 +64,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || baseFields[0].invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid(baseFields) || isInvalid(kubernetesFields); // prettier-ignore
   let modalData: Object;
 
   async function onDeployKubernetes() {
@@ -152,7 +155,15 @@
         {/each}
       {:else if active === "master"}
         {#each baseFields as field (field.symbol)}
-          <Input bind:data={data.master[field.symbol]} {field} />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data.master[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data.master[field.symbol]} {field} />
+          {/if}
         {/each}
         <SelectNodeId
           cpu={data.master.cpu}
@@ -180,7 +191,15 @@
                   (data.workers = data.workers.filter((_, i) => index !== i))}
               />
               {#each baseFields as field (field.symbol)}
-                <Input bind:data={worker[field.symbol]} {field} />
+                {#if field.invalid !== undefined}
+                  <Input
+                    bind:data={worker[field.symbol]}
+                    bind:invalid={field.invalid}
+                    {field}
+                  />
+                {:else}
+                  <Input bind:data={worker[field.symbol]} {field} />
+                {/if}
               {/each}
               <SelectNodeId
                 cpu={worker.cpu}

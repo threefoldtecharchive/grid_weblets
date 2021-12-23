@@ -15,7 +15,10 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, {
+    isInvalid,
+    validateMemory,
+  } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
 
@@ -38,13 +41,13 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number" },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number" },
+    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number" },
     { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || fields[0].invalid || fields[4].invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
