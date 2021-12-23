@@ -12,7 +12,7 @@
     { label: "Investment", symbol: 'investment', placeholder: 'Initial Investment (in million USD)', type: 'number' },
     { label: "TFS Price", symbol: 'notfs', placeholder: 'TFS in USD', type: 'number' },
     { label: "Tech Marketcap", symbol: "techmarket", placeholder: "(in million USD)", type: 'number' },
-    { label: "TFT Price 5Y", symbol: "tftprice", placeholder: "", type: 'checkbox' },
+    { label: "TFT Price 5Y", symbol: "tftprice", placeholder: "", type: 'number' },
   ];
   let canvas3D;
   let inputData = {
@@ -22,15 +22,15 @@
     tftprice: 4
   }
   const layout = {
-      title: "INCA",
+      // title: "INCA",
       autosize: false,
       width: 825,
-      height: 750,
+      height: 825,
       margin: {
         l: 160,
-        r: 50,
+        r: 40,
         b: 65,
-        t: 50,
+        t: 0,
       },
       scene: {
         xaxis: {
@@ -75,19 +75,38 @@
         },
       ];
     }
+
+  let _init = false;
   onMount(() => {
+    _init = true;
     Plotly.newPlot(canvas3D, calcData(), layout, options);
   });
   $: {
-    Plotly.update(canvas3D, calcData(), layout, options);
+    if (_init && canvas3D){
+      console.log(inputData);
+      Plotly.newPlot(canvas3D, calcData(), layout, options);
+    
+    }
   }
 </script>
-
-<div style="padding: 15px;">
-  <h4 class="is-size-4">Calculate your ROI</h4>
-  <hr />
-  {#each baseFields as field (field.symbol)}
-    <Input bind:data={inputData[field.symbol]} {field}/>  
-  {/each}
-  <div bind:this={canvas3D} />
+<div class="box">
+  <div style="padding: 15px;">
+    <h4 class="is-size-4">Calculate your ROI</h4>
+    <hr />
+    <div style="display: flex">
+      <div style="width: 50%;">
+        {#each baseFields as field (field.symbol)}
+          <Input bind:data={inputData[field.symbol]} {field}/>  
+        {/each}
+      </div>
+      <div style="width: 50%;">
+        <div bind:this={canvas3D} />
+      </div>
+    </div>      
+  </div> 
 </div>
+
+
+<style lang="scss" scoped>
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+</style>
