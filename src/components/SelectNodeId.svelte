@@ -279,6 +279,12 @@
 
     if (_update) _reset();
   }
+
+  $: {
+    if (profile && nodeSelection === "automatic") {
+      onLoadNodesHandler();
+    }
+  }
 </script>
 
 <Input
@@ -301,14 +307,14 @@
     />
   {/each}
 
-  <button
+  <!-- <button
     class={"button is-primary mt-2 " + (loadingNodes ? "is-loading" : "")}
     disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}
   >
     Apply Filters and Suggest Nodes
-  </button>
+  </button> -->
 
   <Input
     bind:data
