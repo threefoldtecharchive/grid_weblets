@@ -1,14 +1,11 @@
 import { v4 } from "uuid";
+import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 
 export class Env {
-  constructor(
-    public id = v4(),
-    public key = "",
-    public value = ""
-  ) {}
+  constructor(public id = v4(), public key = "", public value = "") {}
 
   public get valid(): boolean {
     const { key, value } = this;
@@ -17,6 +14,16 @@ export class Env {
 }
 
 export class Disk {
+  // prettier-ignore
+  public diskFields: IFormField[] = [
+    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
+    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number" },
+    { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator(point: string): string | void {
+      point = point.trim();
+      if (point === "" || point === "/" || !point.startsWith("/")) return "Mount Point must start '/' and can't be positioned at root('/')"
+    }, invalid: false },
+  ]
+
   constructor(
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
@@ -26,7 +33,15 @@ export class Disk {
 
   public get valid(): boolean {
     const { name, size, mountpoint } = this;
-    return name !== "" && isValidInteger(size) && mountpoint !== "";
+    let point = mountpoint.trim();
+
+    return (
+      name !== "" &&
+      isValidInteger(size) &&
+      point !== "" &&
+      point !== "/" &&
+      point.startsWith("/")
+    );
   }
 }
 
