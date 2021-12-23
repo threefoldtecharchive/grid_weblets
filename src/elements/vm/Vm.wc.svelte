@@ -17,7 +17,10 @@
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, {
+    isInvalid,
+    validateMemory,
+  } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
   const tabs: ITab[] = [
@@ -31,7 +34,7 @@
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number' },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number' },
+    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
@@ -99,7 +102,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -184,7 +187,15 @@
         {/if}
 
         {#each baseFields as field (field.symbol)}
-          <Input bind:data={data[field.symbol]} {field} />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
         {/each}
 
         <SelectNodeId
