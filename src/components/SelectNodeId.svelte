@@ -68,6 +68,7 @@
 
   function onLoadNodesHandler() {
     loadingNodes = true;
+    status = null;
     const label = nodeIdSelectField.options[0].label;
     nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
@@ -84,16 +85,19 @@
         dispatch("fetch", _nodes);
         if (_nodes.length <= 0) {
           data = null;
+          status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
         } else {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
+          status = "valid";
         }
       })
       .catch((err) => {
         console.log("Error", err);
         data = null;
+        status = null;
         nodeIdSelectField.options[0].label = "No nodes available";
       })
       .finally(() => {
@@ -277,7 +281,16 @@
   }
 </script>
 
-<Input bind:data={nodeSelection} field={nodeSelectionField} />
+<Input
+  bind:data={nodeSelection}
+  field={nodeSelectionField}
+  on:input={() => {
+    if (nodeSelection === "manual") return (status = null);
+    if (data !== null && nodes.length > 0) {
+      status = "valid";
+    }
+  }}
+/>
 {#if nodeSelection === "automatic"}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
@@ -305,6 +318,7 @@
       symbol: "nodeId",
       options: nodeIdSelectField.options,
     }}
+    on:input={() => (status = "valid")}
   />
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
