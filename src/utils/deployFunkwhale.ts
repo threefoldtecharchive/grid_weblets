@@ -49,7 +49,14 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const info = await getFunkwhaleInfo(client, name + "VMs");
   const planetaryIP = info[0]["planetary"];
 
-  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
+  } catch (error) {
+    // rollback the FunkwhaleVM if the gateway fails to deploy
+    await client.machines.delete({ name: name + "VMs" });
+    throw error;
+  }
 
   const gatewayInfo = await getGatewayInfo(client, name);
   return { domain, planetaryIP };
@@ -77,7 +84,8 @@ async function deployFunkwhaleVM(
   vm.cpu = 2;
   vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
-  vm.flist = "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
+  vm.flist =
+    "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,
