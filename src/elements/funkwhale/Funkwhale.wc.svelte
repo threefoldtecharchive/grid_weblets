@@ -18,7 +18,7 @@
   import Alert from "../../components/Alert.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, { validateWorkloadName } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
   const data = new VM();
@@ -31,7 +31,7 @@
   let failed = false;
   let status: "valid" | "invalid";
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateWorkloadName, invalid: false }; // prettier-ignore
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 

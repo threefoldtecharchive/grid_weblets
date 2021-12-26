@@ -94,7 +94,7 @@ async function deployPeertubeVM(
 ) {
   // disk
   const disk = new DiskModel();
-  disk.name = "PTDT" + workloadSuffix;
+  disk.name = "PTD" + workloadSuffix;
   disk.size = diskSize;
   disk.mountpoint = "/data";
 

@@ -29,6 +29,7 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
     undefined,
     "tfkvstore" as any
   );
+  let workloadSuffix = Math.floor(Math.random() * 10000000);
 
   await client.connect();
 
@@ -41,12 +42,12 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
 
   // define network
   const network = new NetworkModel();
-  network.name = name + "Net";
+  network.name = "FWNT" + workloadSuffix;
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain);
+  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain, workloadSuffix);
 
-  const info = await getFunkwhaleInfo(client, name + "VMs");
+  const info = await getFunkwhaleInfo(client, "FWVMs" + workloadSuffix);
   const planetaryIP = info[0]["planetary"];
 
   await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
@@ -61,15 +62,18 @@ async function deployFunkwhaleVM(
   name: string,
   network: any,
   nodeId: number,
-  domain: string
+  domain: string,
+  workloadSuffix: number
 ) {
+
+
   const disk = new DiskModel();
-  disk.name = name + "Disk";
+  disk.name = "FWD" + workloadSuffix;
   disk.size = 10;
   disk.mountpoint = "/data";
 
   const vm = new MachineModel();
-  vm.name = name + "VM";
+  vm.name = "FWVM" + workloadSuffix;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
@@ -84,7 +88,7 @@ async function deployFunkwhaleVM(
   };
 
   const vms = new MachinesModel();
-  vms.name = name + "VMs";
+  vms.name = "FWVMs" + workloadSuffix;
   vms.network = network;
   vms.machines = [vm];
 
