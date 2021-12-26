@@ -38,19 +38,16 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   await client.connect();
 
   // Make sure the name is valid
-  name = await getUniqueName(client, name);
-  let gwName = (name.slice(0, 10) + generateString(3)).toLowerCase();
-  console.log(gwName);
-  let workloadSuffix = Math.floor(Math.random() * 10000000);
+  name = await getUniqueName(client, name); // no machines model with the same name
+  // name = (name.slice(0, 10) + generateString(2)).toLowerCase();
 
   // Dynamically select node to deploy the gateway
   let [gwNodeId, gwDomain] = await selectGatewayNode();
-  const domain = `${gwName}.${gwDomain}`;
-  console.log(domain);
+  const domain = `${name}gw.${gwDomain}`;
 
   // define a network
   const network = new NetworkModel();
-  network.name = "PTNT" + workloadSuffix;
+  network.name = name + "NT";
   network.ip_range = "10.1.0.0/16";
 
   // deploy the peertube
@@ -64,8 +61,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     cpu,
     memory,
     size,
-    sshKey,
-    workloadSuffix
+    sshKey
   );
 
   // get the info of peertube deployment
@@ -73,10 +69,10 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const planetaryIP = peertubeInfo[0]["planetary"];
 
   // deploy the gateway
-  await deployPrefixGateway(profile, client, gwName, planetaryIP, gwNodeId);
+  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
 
   // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, gwName);
+  const gatewayInfo = await getGatewayInfo(client, name + "gw");
   const gatewayDomain = gatewayInfo[0]["domain"];
   return { domain, planetaryIP };
 }
@@ -91,18 +87,17 @@ async function deployPeertubeVM(
   cpu: number,
   memory: number,
   diskSize: number,
-  sshKey: string,
-  workloadSuffix: number
+  sshKey: string
 ) {
   // disk
   const disk = new DiskModel();
-  disk.name = "PTD" + workloadSuffix;
+  disk.name = name + "DT";
   disk.size = diskSize;
   disk.mountpoint = "/data";
 
   // vm specs
   const vm = new MachineModel();
-  vm.name = "PTVM" + workloadSuffix;
+  vm.name = name + "VM";
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
@@ -141,21 +136,21 @@ async function deployPeertubeVM(
 async function deployPrefixGateway(
   profile: IProfile,
   client: any,
-  gwName: string,
+  name: string,
   backend: string,
   gwNodeId: number
 ) {
   // define specs
   const gw = new GatewayNameModel();
-  gw.name = gwName;
+  gw.name = name + "gw";
   gw.node_id = gwNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  return deploy(profile, "GatewayName", gwName, (grid) => {
+  return deploy(profile, "GatewayName", name, (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.gateway.getObj(gwName))
+      .then(() => grid.gateway.getObj(name))
       .then(([gw]) => gw);
   });
 }
