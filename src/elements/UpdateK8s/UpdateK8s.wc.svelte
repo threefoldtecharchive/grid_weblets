@@ -10,7 +10,7 @@
   import Alert from "../../components/Alert.svelte";
   import type { IFormField } from "../../types";
   import Input from "../../components/Input.svelte";
-  import { validateCpu, validateDisk, validateMemory } from "../../utils/validateName"; // prettier-ignore
+  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../../utils/validateName"; // prettier-ignore
   import DeployedList from "../../types/deployedList";
 
   let profile: IProfile;
@@ -31,6 +31,8 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
   ];
+
+  $: disabled = loading || isInvalid(workerFields);
 </script>
 
 <SelectProfile on:profile={({ detail }) => (profile = detail)} />
@@ -84,14 +86,13 @@
                   k8s = k8sList[selectedIdx];
                 }}
               >
-                Select K8S - {selectedIdx}
+                Select K8S
               </button>
             </div>
           {/if}
         {/await}
       {/await}
     {:else}
-      here
       {JSON.stringify(k8s)}
     {/if}
   </div>
