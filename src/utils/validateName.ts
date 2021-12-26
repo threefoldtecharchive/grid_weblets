@@ -9,6 +9,13 @@ export default function validateName(name: string): string | void {
     if (name.length > 15) return "Name must be at most 15 characters";
 }
 
+export function validateWorkloadName(name: string): string | void {
+  if (name.length === 0) return "Name must be at least 1 character";
+  if (!NAME_REGEX.test(name))
+    return "Name can only include alphanumeric characters";
+  if (name.length > 13) return "Name must be at most 13 characters";
+}
+
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
 }

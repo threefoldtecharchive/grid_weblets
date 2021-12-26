@@ -22,13 +22,14 @@
     validateCpu,
     validateDisk,
     validateMemory,
+    validateWorkloadName,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateWorkloadName, invalid: false }; // prettier-ignore
 
   // prettier-ignore
   const baseFields: IFormField[] = [
