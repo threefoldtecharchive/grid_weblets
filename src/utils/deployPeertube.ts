@@ -40,11 +40,13 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   // Make sure the name is valid
   name = await getUniqueName(client, name);
   let gwName = (name.slice(0, 10) + generateString(3)).toLowerCase();
+  console.log(gwName);
   let workloadSuffix = Math.floor(Math.random() * 10000000);
 
   // Dynamically select node to deploy the gateway
   let [gwNodeId, gwDomain] = await selectGatewayNode();
   const domain = `${gwName}.${gwDomain}`;
+  console.log(domain);
 
   // define a network
   const network = new NetworkModel();
