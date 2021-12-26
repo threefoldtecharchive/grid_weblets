@@ -15,7 +15,7 @@ export async function selectGatewayNode() {
 }
 
 export async function getUniqueName(client: any, name: string) {
-  let info = await client.gateway.getObj(name);
+  let info = await client.machines.getObj(name);
 
   if (info.length != 0) {
     const suffix = Math.floor(Math.random() * 10);

@@ -12,6 +12,7 @@ const {
   MachineModel,
   MachinesModel,
   GatewayNameModel,
+  generateString,
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployPeertube(data: VM, profile: IProfile) {
@@ -38,11 +39,12 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getUniqueName(client, name);
+  let gwName = (name.slice(0, 10) + generateString(3)).toLowerCase();
   let workloadSuffix = Math.floor(Math.random() * 10000000);
 
   // Dynamically select node to deploy the gateway
   let [gwNodeId, gwDomain] = await selectGatewayNode();
-  const domain = `${name}.${gwDomain}`;
+  const domain = `${gwName}.${gwDomain}`;
 
   // define a network
   const network = new NetworkModel();
@@ -65,14 +67,14 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   );
 
   // get the info of peertube deployment
-  const peertubeInfo = await getPeertubeInfo(client, "PTVMs" + workloadSuffix);
+  const peertubeInfo = await getPeertubeInfo(client, name);
   const planetaryIP = peertubeInfo[0]["planetary"];
 
   // deploy the gateway
-  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
+  await deployPrefixGateway(profile, client, gwName, planetaryIP, gwNodeId);
 
   // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, name);
+  const gatewayInfo = await getGatewayInfo(client, gwName);
   const gatewayDomain = gatewayInfo[0]["domain"];
   return { domain, planetaryIP };
 }
@@ -121,7 +123,7 @@ async function deployPeertubeVM(
 
   // vms specs
   const vms = new MachinesModel();
-  vms.name = "PTVMs" + workloadSuffix;
+  vms.name = name;
   vms.network = net;
   vms.machines = [vm];
 
@@ -137,21 +139,21 @@ async function deployPeertubeVM(
 async function deployPrefixGateway(
   profile: IProfile,
   client: any,
-  name: string,
+  gwName: string,
   backend: string,
   gwNodeId: number
 ) {
   // define specs
   const gw = new GatewayNameModel();
-  gw.name = name;
+  gw.name = gwName;
   gw.node_id = gwNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", gwName, (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.gateway.getObj(name))
+      .then(() => grid.gateway.getObj(gwName))
       .then(([gw]) => gw);
   });
 }
