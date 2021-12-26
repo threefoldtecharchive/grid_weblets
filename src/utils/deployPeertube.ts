@@ -39,7 +39,6 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   // Make sure the name is valid
   name = await getUniqueName(client, name); // no machines model with the same name
-  // name = (name.slice(0, 10) + generateString(2)).toLowerCase();
 
   // Dynamically select node to deploy the gateway
   let [gwNodeId, gwDomain] = await selectGatewayNode();
@@ -147,10 +146,10 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", name + "gw", (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.gateway.getObj(name))
+      .then(() => grid.gateway.getObj(name + "gw"))
       .then(([gw]) => gw);
   });
 }

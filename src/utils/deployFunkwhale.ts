@@ -38,21 +38,21 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
 
   // Gateway node Id and domain
   let [gwNodeId, gwDomain] = await selectGatewayNode();
-  const domain = `${name}.${gwDomain}`;
+  const domain = `${name}gw.${gwDomain}`;
 
   // define network
   const network = new NetworkModel();
-  network.name = "FWNT" + workloadSuffix;
+  network.name = name + "NT";
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain, workloadSuffix);
+  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain);
 
-  const info = await getFunkwhaleInfo(client, "FWVMs" + workloadSuffix);
+  const info = await getFunkwhaleInfo(client, name);
   const planetaryIP = info[0]["planetary"];
 
   await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
 
-  const gatewayInfo = await getGatewayInfo(client, name);
+  const gatewayInfo = await getGatewayInfo(client, name + "gw");
   return { domain, planetaryIP };
 }
 
@@ -63,17 +63,16 @@ async function deployFunkwhaleVM(
   network: any,
   nodeId: number,
   domain: string,
-  workloadSuffix: number
 ) {
 
 
   const disk = new DiskModel();
-  disk.name = "FWD" + workloadSuffix;
+  disk.name = name + "DT";
   disk.size = 10;
   disk.mountpoint = "/data";
 
   const vm = new MachineModel();
-  vm.name = "FWVM" + workloadSuffix;
+  vm.name = name + "VM";
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
@@ -88,7 +87,7 @@ async function deployFunkwhaleVM(
   };
 
   const vms = new MachinesModel();
-  vms.name = "FWVMs" + workloadSuffix;
+  vms.name = name;
   vms.network = network;
   vms.machines = [vm];
 
@@ -108,15 +107,15 @@ async function deployPrefixGateway(
   nodeId: number
 ) {
   const gw = new GatewayNameModel();
-  gw.name = name;
+  gw.name = name + "gw";
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", name + "gw", (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.gateway.getObj(name))
+      .then(() => grid.gateway.getObj(name + "gw"))
       .then(([gw]) => gw);
   });
 }
