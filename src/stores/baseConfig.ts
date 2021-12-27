@@ -4,7 +4,6 @@ import md5 from "crypto-js/md5";
 import { encrypt, decrypt } from "crypto-js/aes";
 import { v4 } from "uuid";
 import type { IProfile } from "../types/Profile";
-import getBalance from "../utils/getBalance";
 import getGrid from "../utils/getGrid";
 
 const PREFIX = "v2.";
@@ -14,24 +13,10 @@ function createBaseConfig() {
   const store = writable({
     profiles: [createProfile("Profile 1")],
     activeProfile: null,
-    // selectedIdx: "0",
-    loadingBalance: false,
     twinId: null,
     address: null,
     storeSecret: null,
   });
-  // let _updateBalanceInterval: any = null;
-  // const clearBalanceInterval = () => {
-  //   if (_updateBalanceInterval) {
-  //     clearInterval(_updateBalanceInterval);
-  //     _updateBalanceInterval = null;
-  //   }
-  // };
-  // const setBalanceInterval = (fn: () => void) => {
-  //   clearBalanceInterval();
-  //   fn();
-  //   _updateBalanceInterval = setInterval(fn, 1000 * 60);
-  // };
 
   function hashPassword(password: string) {
     return PREFIX + md5(password).toString();
@@ -54,12 +39,6 @@ function createBaseConfig() {
         return value;
       });
     },
-    // updateStoreSecret(idx: number, e: InputEvent) {
-    //   return update((value) => {
-    //     value.profiles[idx].storeSecret = (e.target as any).value;
-    //     return value;
-    //   });
-    // },
     updateNetworkEnv(idx: number, e: Event) {
       return update((value) => {
         value.profiles[idx].networkEnv = (e.target as any).selectedIndex === 0 ? "test" : "dev"; // prettier-ignore
@@ -129,25 +108,11 @@ function createBaseConfig() {
         });
 
         if (get(store).activeProfile) {
-          // setBalanceInterval(fullStore.updateBalance);
           fullStore._loadActiveProfileInfo();
         }
       } catch {
         return "Incorrect data.";
       }
-    },
-
-    // _setBalance(balance: number) {
-    //   return update((value) => {
-    //     value.balance = balance;
-    //     return value;
-    //   });
-    // },
-    _setLoadingBalance(loading: boolean) {
-      return update((value) => {
-        value.loadingBalance = loading;
-        return value;
-      });
     },
 
     _loadActiveProfileInfo() {
@@ -166,28 +131,6 @@ function createBaseConfig() {
           });
       });
     },
-
-    // updateBalance(times: number = 0) {
-    //   const { activeProfile } = get(store);
-    //   if (!activeProfile) {
-    //     fullStore._setLoadingBalance(false);
-    //     return fullStore._setBalance(null);
-    //   }
-
-    //   fullStore._setLoadingBalance(true);
-
-    //   getBalance(fullStore.getActiveProfile())
-    //     .then((balance) => {
-    //       fullStore._setBalance(balance);
-    //     })
-    //     .catch((err) => {
-    //       console.log("Balance Error", err);
-    //       if (times < 3) fullStore.updateBalance(times + 1);
-    //     })
-    //     .finally(() => {
-    //       fullStore._setLoadingBalance(false);
-    //     });
-    // },
 
     save(password: string) {
       const hash = hashPassword(password);
@@ -211,12 +154,9 @@ function createBaseConfig() {
       requestAnimationFrame(() => {
         fullStore.save(password);
         if (id !== null) {
-          // setBalanceInterval(fullStore.updateBalance);
           setTimeout(() => {
             fullStore._loadActiveProfileInfo();
           }, 1000);
-        } else {
-          // clearBalanceInterval();
         }
       });
     },

@@ -102,7 +102,7 @@
   async function onDeployVM() {
     loading = true;
 
-    if (!hasEnoughBalance(profile)) {
+    if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
       message =
