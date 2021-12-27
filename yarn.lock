@@ -2964,10 +2964,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.2.3, graceful-fs@^4.2.4, 
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.8.tgz"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@0.0.36:
-  version "0.0.36"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.36.tgz#aa2118f51be65d0dcb5fb2ae6e9e2457f20e9069"
-  integrity sha512-zplQODDi1JGhtQ7VOVebq/VhAoiQ1/Ih3CEA3fr+OKMUtaHYRMCcHGu897UwKqGj72WJZCOBCtG6QQpGKRNX1g==
+grid3_client@0.0.38:
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-0.0.38.tgz#3f596d0702aba76d8a6cd701c1d2adc18e5cc4b7"
+  integrity sha512-TOV7goEMfu6y7QY/YQJ4MFGmMV7gUW8wEHIpbNxJS8nC5n13drBl8RqEJbTPtT0MjU8A61Vs+akU6fM7WNsyAg==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -2982,7 +2982,7 @@ grid3_client@0.0.36:
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
-    tfgrid-api-client "^1.0.2"
+    tfgrid-api-client "^1.0.3"
     ts-rmb-client-base "^0.0.1"
     ts-rmb-http-client "^0.1.9"
     ts-rmb-redis-client "^0.0.3"
@@ -6081,10 +6081,10 @@ terser@^5.0.0, terser@^5.7.2:
     source-map "~0.7.2"
     source-map-support "~0.5.20"
 
-tfgrid-api-client@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.0.2.tgz#40dc87b1cb3f61ca6c6479ab11473ac7e547fae2"
-  integrity sha512-nw2Zo/ioUOW8z2qERav+yorRkPhhPoi6YCGCD9x0kUnt2WnLTc3A5DHotwMeSaWpH8DogetpRQ4H56GW6/nt8g==
+tfgrid-api-client@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.0.3.tgz#c67f25bde24502180d9581e71da6bc9af4248b09"
+  integrity sha512-mqFDApi9MQaCzsOBgKzou5Bra1x4Ycxfd4xzeWQPf7px8KO/ZTDoAiy2IZiYFQqWo/F5JRTympn5sLsf7akoqA==
   dependencies:
     "@polkadot/api" "^4.0.3"
     bip39 "^3.0.3"
