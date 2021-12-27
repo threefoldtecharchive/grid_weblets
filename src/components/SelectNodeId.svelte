@@ -261,11 +261,13 @@
   let _publicIp = publicIp;
 
   const _reset = () => {
-    _nodeId = null;
-    if (nodeSelection === "automatic") {
-      data = null;
-      onLoadNodesHandler();
-    }
+    requestAnimationFrame(() => {
+      _nodeId = null;
+      if (nodeSelection === "automatic") {
+        data = null;
+        onLoadNodesHandler();
+      }
+    });
   };
 
   $: {
