@@ -39,7 +39,7 @@
   <Input data={vm.capacity.memory} field={memoryField} />
   {#each vm.mounts as disk}
     <Input
-      data={(disk.size * 10 ** -9).toFixed(2)}
+      data={Math.ceil(disk.size / (1024 * 1024 * 1024))}
       field={{
         label: `Disk(${disk.mountPoint}) GB`,
         symbol: "size",
