@@ -1,6 +1,7 @@
 import type { IProfile } from "../types/Profile";
 
-export default function hasEnoughBalance(profile: IProfile, amount = 2) {
-  const { balance } = profile;
+export default function hasEnoughBalance(amount = 2) {
+  // const { balance } = profile;
+  const balance = window.configs.balanceStore.getBalance();
   return balance && balance >= amount;
 }

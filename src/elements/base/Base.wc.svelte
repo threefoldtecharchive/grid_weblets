@@ -9,12 +9,14 @@
   import notificationStore from "../../stores/notifications";
   import currentDeploymentStore from "../../stores/currentDeployment";
   import LogsInfo from "../../components/LogsInfo.svelte";
+  import balanceStore from "../../stores/balance";
 
   window.configs = window.configs || ({} as any);
   window.configs.baseConfig = baseConfigStore;
   window.configs.deploymentStore = deploymentStore;
   window.configs.notificationStore = notificationStore;
   window.configs.currentDeploymentStore = currentDeploymentStore;
+  window.configs.balanceStore = balanceStore;
 
   let _index = 0;
   onMount(() => {
