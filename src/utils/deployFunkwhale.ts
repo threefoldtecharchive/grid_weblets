@@ -12,7 +12,7 @@ const {
   GridClient,
   GatewayNameModel,
   NetworkModel,
-  generateString
+  generateString,
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployFunkwhale(data: VM, profile: IProfile) {
@@ -43,18 +43,38 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
   const domain = `${domainName}.${nodeDomain}`;
 
-
   // define network
   const network = new NetworkModel();
   network.name = `net${randomSuffix}`;
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain, randomSuffix);
+  await deployFunkwhaleVM(
+    profile,
+    client,
+    name,
+    network,
+    nodeId,
+    domain,
+    randomSuffix
+  );
 
   const info = await getFunkwhaleInfo(client, name);
   const planetaryIP = info[0]["planetary"];
 
-  await deployPrefixGateway(profile, client, domainName, planetaryIP, publicNodeId);
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(
+      profile,
+      client,
+      domainName,
+      planetaryIP,
+      publicNodeId
+    );
+  } catch (error) {
+    // rollback the FunkwhaleVM if the gateway fails to deploy
+    await client.machines.delete({ name: name });
+    throw error;
+  }
 
   const gatewayInfo = await getGatewayInfo(client, domainName);
   return { domain, planetaryIP };
@@ -83,7 +103,8 @@ async function deployFunkwhaleVM(
   vm.cpu = 2;
   vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
-  vm.flist = "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
+  vm.flist =
+    "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,

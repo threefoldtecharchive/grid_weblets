@@ -71,14 +71,20 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const peertubeInfo = await getPeertubeInfo(client, name);
   const planetaryIP = peertubeInfo[0]["planetary"];
 
-  // deploy the gateway
-  await deployPrefixGateway(
-    profile,
-    client,
-    domainName,
-    planetaryIP,
-    publicNodeId
-  );
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(
+      profile,
+      client,
+      domainName,
+      planetaryIP,
+      publicNodeId
+    );
+  } catch (error) {
+    // rollback peertube deployment if gateway deployment failed
+    await client.machines.delete({ name: name });
+    throw error;
+  }
 
   // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, domainName);
