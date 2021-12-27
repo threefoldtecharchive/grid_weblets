@@ -55,7 +55,7 @@
   async function deployCaproverHandler() {
     loading = true;
 
-    if (!hasEnoughBalance(profile)) {
+    if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
       message =
