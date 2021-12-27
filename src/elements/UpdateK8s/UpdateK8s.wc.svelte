@@ -7,7 +7,7 @@
   import { Worker } from "../../types/kubernetes";
   import type { IFormField, ITab } from "../../types";
   import { isInvalid, validateCpu, validateDisk, validateMemory } from "../../utils/validateName"; // prettier-ignore
-  const { AddWorkerModel, events } = window.configs?.grid3_client ?? {};
+  const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // components
@@ -29,6 +29,7 @@
 
   let selectedIdx: string = null;
   let k8s: any;
+  let workerName: string = null;
 
   let worker = new Worker();
   // prettier-ignore
@@ -91,6 +92,37 @@
         });
     });
   }
+
+  function onDeleteWorker() {
+    loading = true;
+    getGrid(profile, (grid) => {
+      const workerModel = new DeleteWorkerModel();
+      workerModel.deployment_name = k8s.name;
+      workerModel.name = workerName;
+      grid.k8s
+        .delete_worker(workerModel)
+        .then(({ deleted }) => {
+          if (deleted.length > 0) {
+            success = true;
+            requestAnimationFrame(() => {
+              k8s.details.workers = k8s.details.workers.filter(({ name }) => name !== workerName); // prettier-ignore
+              workerName = null;
+            });
+          } else {
+            failed = true;
+          }
+        })
+        .catch((err) => {
+          console.log("Error", err);
+          message = err.message || err;
+        })
+        .finally(() => {
+          loading = false;
+          message = null;
+          // currentDeployment.clear();
+        });
+    });
+  }
 </script>
 
 <SelectProfile on:profile={({ detail }) => (profile = detail)} />
@@ -128,8 +160,6 @@
                     selected: true,
                   },
                   ...k8sList.map((k8s, i) => {
-                    console.log({ k8s });
-                    // prettier-ignore
                     return { label: k8s.name, value: i.toString() };
                   }),
                 ],
@@ -151,7 +181,18 @@
         {/await}
       {/await}
     {:else}
-      <Tabs bind:active {tabs} disabled={loading} />
+      <Tabs
+        bind:active
+        {tabs}
+        disabled={loading}
+        on:select={() => {
+          success = false;
+          failed = false;
+          loading = false;
+          message = null;
+        }}
+      />
+
       {#if active === "add"}
         <form on:submit|preventDefault={onAddWorker}>
           {#if loading || (logs !== null && logs.type === "Add Worker")}
@@ -204,7 +245,50 @@
           />
         </form>
       {:else if active === "remove"}
-        remove
+        {#if success}
+          <Alert type="success" message="Successfully Removed Worker." />
+        {:else if failed}
+          <Alert
+            type="danger"
+            message={message || "Failed to Remove Worker."}
+          />
+        {/if}
+
+        <Input
+          bind:data={workerName}
+          field={{
+            label: "Select a worker",
+            symbol: "worker",
+            type: "select",
+            options: [
+              {
+                label: "Please! Select a worker",
+                value: null,
+                disabled: true,
+                selected: true,
+              },
+              ...k8s.details.workers.map(({ name }) => {
+                return { label: name, value: name };
+              }),
+            ],
+            disabled: loading,
+          }}
+          on:input={() => {
+            success = false;
+            failed = false;
+            loading = false;
+            message = null;
+          }}
+        />
+        <div class="is-flex is-justify-content-center">
+          <button
+            class={"button is-danger " + (loading ? "is-loading" : "")}
+            disabled={workerName === null || loading}
+            on:click={onDeleteWorker}
+          >
+            Delete Worker
+          </button>
+        </div>
       {/if}
     {/if}
   </div>
