@@ -4,25 +4,35 @@
   // libs
   import type { IProfile } from "../../types/Profile";
   import { noActiveProfile } from "../../utils/message";
+  import { Worker } from "../../types/kubernetes";
+  import type { IFormField, ITab } from "../../types";
+  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../../utils/validateName"; // prettier-ignore
+  const { AddWorkerModel, events } = window.configs?.grid3_client ?? {};
+  const currentDeployment = window.configs?.currentDeploymentStore;
 
   // components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
-  import type { IFormField } from "../../types";
   import Input from "../../components/Input.svelte";
-  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../../utils/validateName"; // prettier-ignore
   import DeployedList from "../../types/deployedList";
+  import Tabs from "../../components/Tabs.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import getGrid from "../../utils/getGrid";
+  import DeployBtn from "../../components/DeployBtn.svelte";
 
   let profile: IProfile;
   let loading: boolean = false;
   let message: string;
   let selecting: boolean = true;
+  let success: boolean = false;
+  let failed: boolean = false;
 
   let selectedIdx: string = null;
   let k8s: any;
 
+  let worker = new Worker();
   // prettier-ignore
-  const workerFields: IFormField[] = [
+  const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
@@ -32,14 +42,62 @@
     { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
   ];
 
-  $: disabled = loading || isInvalid(workerFields);
+  // prettier-ignore
+  let active = "add";
+  const tabs: ITab[] = [
+    { label: "Add", value: "add" },
+    { label: "Remove", value: "remove" },
+  ];
+
+  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid"; // prettier-ignore
+  $: logs = $currentDeployment;
+
+  function onAddWorker() {
+    currentDeployment.deploy("Add Worker", worker.name);
+    getGrid(profile, (grid) => {
+      const { name, cpu, memory, diskSize, publicIp, planetary, rootFsSize, node } = worker; // prettier-ignore
+      const workerModel = new AddWorkerModel();
+      workerModel.deployment_name = k8s.name;
+      workerModel.name = name;
+      workerModel.cpu = cpu;
+      workerModel.memory = memory;
+      workerModel.disk_size = diskSize;
+      workerModel.public_ip = publicIp;
+      workerModel.planetary = planetary;
+      workerModel.rootfs_size = rootFsSize;
+      workerModel.node_id = node;
+
+      loading = true;
+      grid.k8s
+        .add_worker(workerModel)
+        .then(({ contracts }) => {
+          const { updated } = contracts;
+          if (updated.length > 0) {
+            success = true;
+            worker = new Worker();
+          } else {
+            failed = true;
+          }
+        })
+        .catch((err) => {
+          failed = true;
+          console.log("Error", err);
+          message = err.message || err;
+        })
+        .finally(() => {
+          loading = false;
+          message = null;
+          currentDeployment.clear();
+        });
+    });
+  }
 </script>
 
 <SelectProfile on:profile={({ detail }) => (profile = detail)} />
 
 <div style="padding: 15px;">
   <div class="box">
-    <h4 class="is-size-4">Update a Kubernetes</h4>
+    <h4 class="is-size-4">Update a Kubernetes {k8s ? `(${k8s.name})` : ""}</h4>
     <hr />
 
     {#if !profile}
@@ -93,7 +151,61 @@
         {/await}
       {/await}
     {:else}
-      {JSON.stringify(k8s)}
+      <Tabs bind:active {tabs} disabled={loading} />
+      {#if active === "add"}
+        <form on:submit|preventDefault={onAddWorker}>
+          {#if loading || (logs !== null && logs.type === "Add Worker")}
+            <Alert type="info" message={logs?.message ?? "Loading..."} />
+          {:else if success}
+            <Alert type="success" message="Successfully Added Worker." />
+          {:else if failed}
+            <Alert type="danger" message={message || "Failed to Add Worker."} />
+          {:else}
+            {#each workerFields as field (field.symbol)}
+              {#if field.invalid !== undefined}
+                <Input
+                  bind:data={worker[field.symbol]}
+                  bind:invalid={field.invalid}
+                  {field}
+                />
+              {:else}
+                <Input bind:data={worker[field.symbol]} {field} />
+              {/if}
+            {/each}
+            <SelectNodeId
+              cpu={worker.cpu}
+              memory={worker.memory}
+              publicIp={worker.publicIp}
+              ssd={worker.diskSize}
+              filters={worker.selection.filters}
+              bind:data={worker.node}
+              bind:nodeSelection={worker.selection.type}
+              bind:status={worker.status}
+              {profile}
+              on:fetch={({ detail }) => (worker.selection.nodes = detail)}
+              nodes={worker.selection.nodes}
+            />
+          {/if}
+          <DeployBtn
+            label="Add Worker"
+            {loading}
+            {success}
+            {failed}
+            disabled={disabled && !failed && !success}
+            on:click={(e) => {
+              if (success || failed) {
+                e.preventDefault();
+                success = false;
+                failed = false;
+                loading = false;
+                message = null;
+              }
+            }}
+          />
+        </form>
+      {:else if active === "remove"}
+        remove
+      {/if}
     {/if}
   </div>
 </div>
