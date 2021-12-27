@@ -14,25 +14,24 @@ function createBaseConfig() {
   const store = writable({
     profiles: [createProfile("Profile 1")],
     activeProfile: null,
-    balance: null,
     // selectedIdx: "0",
     loadingBalance: false,
     twinId: null,
     address: null,
     storeSecret: null,
   });
-  let _updateBalanceInterval: any = null;
-  const clearBalanceInterval = () => {
-    if (_updateBalanceInterval) {
-      clearInterval(_updateBalanceInterval);
-      _updateBalanceInterval = null;
-    }
-  };
-  const setBalanceInterval = (fn: () => void) => {
-    clearBalanceInterval();
-    fn();
-    _updateBalanceInterval = setInterval(fn, 1000 * 60);
-  };
+  // let _updateBalanceInterval: any = null;
+  // const clearBalanceInterval = () => {
+  //   if (_updateBalanceInterval) {
+  //     clearInterval(_updateBalanceInterval);
+  //     _updateBalanceInterval = null;
+  //   }
+  // };
+  // const setBalanceInterval = (fn: () => void) => {
+  //   clearBalanceInterval();
+  //   fn();
+  //   _updateBalanceInterval = setInterval(fn, 1000 * 60);
+  // };
 
   function hashPassword(password: string) {
     return PREFIX + md5(password).toString();
@@ -130,7 +129,7 @@ function createBaseConfig() {
         });
 
         if (get(store).activeProfile) {
-          setBalanceInterval(fullStore.updateBalance);
+          // setBalanceInterval(fullStore.updateBalance);
           fullStore._loadActiveProfileInfo();
         }
       } catch {
@@ -138,12 +137,12 @@ function createBaseConfig() {
       }
     },
 
-    _setBalance(balance: number) {
-      return update((value) => {
-        value.balance = balance;
-        return value;
-      });
-    },
+    // _setBalance(balance: number) {
+    //   return update((value) => {
+    //     value.balance = balance;
+    //     return value;
+    //   });
+    // },
     _setLoadingBalance(loading: boolean) {
       return update((value) => {
         value.loadingBalance = loading;
@@ -168,27 +167,27 @@ function createBaseConfig() {
       });
     },
 
-    updateBalance(times: number = 0) {
-      const { activeProfile } = get(store);
-      if (!activeProfile) {
-        fullStore._setLoadingBalance(false);
-        return fullStore._setBalance(null);
-      }
+    // updateBalance(times: number = 0) {
+    //   const { activeProfile } = get(store);
+    //   if (!activeProfile) {
+    //     fullStore._setLoadingBalance(false);
+    //     return fullStore._setBalance(null);
+    //   }
 
-      fullStore._setLoadingBalance(true);
+    //   fullStore._setLoadingBalance(true);
 
-      getBalance(fullStore.getActiveProfile())
-        .then((balance) => {
-          fullStore._setBalance(balance);
-        })
-        .catch((err) => {
-          console.log("Balance Error", err);
-          if (times < 3) fullStore.updateBalance(times + 1);
-        })
-        .finally(() => {
-          fullStore._setLoadingBalance(false);
-        });
-    },
+    //   getBalance(fullStore.getActiveProfile())
+    //     .then((balance) => {
+    //       fullStore._setBalance(balance);
+    //     })
+    //     .catch((err) => {
+    //       console.log("Balance Error", err);
+    //       if (times < 3) fullStore.updateBalance(times + 1);
+    //     })
+    //     .finally(() => {
+    //       fullStore._setLoadingBalance(false);
+    //     });
+    // },
 
     save(password: string) {
       const hash = hashPassword(password);
@@ -212,12 +211,12 @@ function createBaseConfig() {
       requestAnimationFrame(() => {
         fullStore.save(password);
         if (id !== null) {
-          setBalanceInterval(fullStore.updateBalance);
+          // setBalanceInterval(fullStore.updateBalance);
           setTimeout(() => {
             fullStore._loadActiveProfileInfo();
           }, 1000);
         } else {
-          clearBalanceInterval();
+          // clearBalanceInterval();
         }
       });
     },
@@ -227,7 +226,6 @@ function createBaseConfig() {
       if (data.activeProfile === null) return null;
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
       const profile = data.profiles[idx] as IProfile;
-      profile.balance = data.balance;
       profile.storeSecret = data.storeSecret;
       return profile;
     },
