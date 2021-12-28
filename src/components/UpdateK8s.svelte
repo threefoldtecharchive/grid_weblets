@@ -3,7 +3,6 @@
 <script lang="ts">
   // libs
   import type { IProfile } from "../types/Profile";
-  import { noActiveProfile } from "../utils/message";
   import { Worker } from "../types/kubernetes";
   import type { IFormField, ITab } from "../types";
   import { isInvalid, validateCpu, validateDisk, validateMemory } from "../utils/validateName"; // prettier-ignore
@@ -11,24 +10,21 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Input from "../../components/Input.svelte";
-  import DeployedList from "../types/deployedList";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import Alert from "./Alert.svelte";
+  import Input from "./Input.svelte";
+  import Tabs from "./Tabs.svelte";
+  import SelectNodeId from "./SelectNodeId.svelte";
   import getGrid from "../utils/getGrid";
-  import DeployBtn from "../../components/DeployBtn.svelte";
+  import DeployBtn from "./DeployBtn.svelte";
+  import { createEventDispatcher } from "svelte";
 
-  let profile: IProfile;
+  export let profile: IProfile;
+  export let k8s: any;
+
   let loading: boolean = false;
   let message: string;
-  let selecting: boolean = true;
   let success: boolean = false;
   let failed: boolean = false;
-
-  let selectedIdx: string = null;
-  let k8s: any;
   let workerName: string = null;
 
   let worker = new Worker();
@@ -54,6 +50,7 @@
   $: logs = $currentDeployment;
 
   function onAddWorker() {
+    loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
     getGrid(profile, (grid) => {
       const { name, cpu, memory, diskSize, publicIp, planetary, rootFsSize, node } = worker; // prettier-ignore
@@ -67,8 +64,6 @@
       workerModel.planetary = planetary;
       workerModel.rootfs_size = rootFsSize;
       workerModel.node_id = node;
-
-      loading = true;
       grid.k8s
         .add_worker(workerModel)
         .then(({ contracts }) => {
@@ -95,6 +90,7 @@
 
   function onDeleteWorker() {
     loading = true;
+    currentDeployment.deploy("Remove Worker", worker.name);
     getGrid(profile, (grid) => {
       const workerModel = new DeleteWorkerModel();
       workerModel.deployment_name = k8s.name;
@@ -119,68 +115,64 @@
         .finally(() => {
           loading = false;
           message = null;
-          // currentDeployment.clear();
+          currentDeployment.clear();
         });
     });
   }
+
+  const style = `
+<style>
+  .modal-content {
+    width: calc(100% - 30px);
+    max-height: 70vh;
+    transform: translateY(30px);
+    background-color: white;
+  }
+
+  .modal-content::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+  }
+  
+  .modal-content::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .content {
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #fff;
+  }
+
+  .modal-content > div,
+  .content {
+    width: 100%;
+  }
+
+</style>
+`;
+  const dispatch = createEventDispatcher<{ closed: void }>();
 </script>
 
-<SelectProfile on:profile={({ detail }) => (profile = detail)} />
+<div>
+  {@html style}
+</div>
 
-<div style="padding: 15px;">
-  <div class="box">
-    <h4 class="is-size-4">Update a Kubernetes {k8s ? `(${k8s.name})` : ""}</h4>
-    <hr />
+<div class="modal is-active">
+  <div
+    class="modal-background"
+    on:click|preventDefault={() => {
+      if (!loading) {
+        dispatch("closed");
+      }
+    }}
+  />
+  <div class="modal-content" on:click|stopPropagation>
+    <div class="box">
+      <h4 class="is-size-4">
+        Update a Kubernetes {k8s ? `(${k8s.name})` : ""}
+      </h4>
+      <hr />
 
-    {#if !profile}
-      <Alert type="info" message={noActiveProfile} />
-    {:else if message}
-      <Alert type="danger" {message} />
-    {:else if selecting}
-      {#await DeployedList.init(profile)}
-        <Alert type="info" message="Loading..." />
-      {:then list}
-        {#await list.loadK8s()}
-          <Alert type="info" message="Loading..." />
-        {:then k8sList}
-          {#if k8sList.length === 0}
-            <Alert type="info" message="No k8s were found." />
-          {:else}
-            <Input
-              bind:data={selectedIdx}
-              field={{
-                label: "Select K8S",
-                type: "select",
-                symbol: "k8s",
-                options: [
-                  {
-                    label: "Select K8S",
-                    value: null,
-                    disabled: true,
-                    selected: true,
-                  },
-                  ...k8sList.map((k8s, i) => {
-                    return { label: k8s.name, value: i.toString() };
-                  }),
-                ],
-              }}
-            />
-            <div class="is-flex is-justify-content-center mt-2">
-              <button
-                class="button is-info"
-                disabled={selectedIdx === null}
-                on:click={() => {
-                  selecting = false;
-                  k8s = k8sList[selectedIdx];
-                }}
-              >
-                Select K8S
-              </button>
-            </div>
-          {/if}
-        {/await}
-      {/await}
-    {:else}
       <Tabs
         bind:active
         {tabs}
@@ -290,7 +282,7 @@
           </button>
         </div>
       {/if}
-    {/if}
+    </div>
   </div>
 </div>
 

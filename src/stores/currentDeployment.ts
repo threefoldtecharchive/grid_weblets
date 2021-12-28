@@ -8,7 +8,8 @@ export interface IStore {
     | "Peertube"
     | "Funkwhale"
     | "GatewayName"
-    | "Add Worker";
+    | "Add Worker"
+    | "Remove Worker";
   name: string;
   message: string;
 }
