@@ -206,7 +206,7 @@
                 },
                 {
                   type: "warning",
-                  label: "Add/Remove Worker",
+                  label: "Manage Workers",
                   click: (_, i) => (k8sToUpdate = rows[i]),
                   disabled: () => removing !== null,
                 },
@@ -430,9 +430,9 @@
   <UpdateK8s
     {profile}
     k8s={k8sToUpdate}
-    on:closed={() => {
+    on:closed={({ detail }) => {
       k8sToUpdate = null;
-      _reloadTab();
+      if (detail) _reloadTab();
     }}
   />
 {/if}

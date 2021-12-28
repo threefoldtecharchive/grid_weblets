@@ -17,15 +17,19 @@
   import getGrid from "../utils/getGrid";
   import DeployBtn from "./DeployBtn.svelte";
   import { createEventDispatcher } from "svelte";
+  import Table from "./Table.svelte";
+
+  const dispatch = createEventDispatcher<{ closed: boolean }>();
 
   export let profile: IProfile;
   export let k8s: any;
 
+  let shouldBeUpdated: boolean = false;
   let loading: boolean = false;
   let message: string;
   let success: boolean = false;
   let failed: boolean = false;
-  let workerName: string = null;
+  let removing: string = null;
 
   let worker = new Worker();
   // prettier-ignore
@@ -37,13 +41,6 @@
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
-  ];
-
-  // prettier-ignore
-  let active = "add";
-  const tabs: ITab[] = [
-    { label: "Add", value: "add" },
-    { label: "Remove", value: "remove" },
   ];
 
   $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid"; // prettier-ignore
@@ -70,6 +67,7 @@
           const { updated } = contracts;
           if (updated.length > 0) {
             success = true;
+            shouldBeUpdated = true;
             worker = new Worker();
           } else {
             failed = true;
@@ -82,30 +80,32 @@
         })
         .finally(() => {
           loading = false;
-          message = null;
           currentDeployment.clear();
         });
     });
   }
 
-  function onDeleteWorker() {
+  function onDeleteWorker(idx: number) {
+    const worker = k8s.details.workers[idx];
+    removing = worker.name;
     loading = true;
     currentDeployment.deploy("Remove Worker", worker.name);
     getGrid(profile, (grid) => {
       const workerModel = new DeleteWorkerModel();
       workerModel.deployment_name = k8s.name;
-      workerModel.name = workerName;
+      workerModel.name = removing;
       grid.k8s
         .delete_worker(workerModel)
         .then(({ deleted }) => {
           if (deleted.length > 0) {
-            success = true;
+            shouldBeUpdated = true;
+            let r = removing;
             requestAnimationFrame(() => {
-              k8s.details.workers = k8s.details.workers.filter(({ name }) => name !== workerName); // prettier-ignore
-              workerName = null;
+              k8s.details.workers = k8s.details.workers.filter(({ name }) => name !== r); // prettier-ignore
             });
           } else {
             failed = true;
+            message = "Failed to remove worker";
           }
         })
         .catch((err) => {
@@ -114,7 +114,7 @@
         })
         .finally(() => {
           loading = false;
-          message = null;
+          removing = null;
           currentDeployment.clear();
         });
     });
@@ -150,7 +150,13 @@
 
 </style>
 `;
-  const dispatch = createEventDispatcher<{ closed: void }>();
+  function _createWorkerRows(workers: any[]) {
+    // prettier-ignore
+    return workers.map((worker, i) => {
+      const { contractId, name, planetary, capacity: { cpu, memory }, mounts: [ { size } ] } = worker;
+      return [i + 1, contractId, name, planetary, cpu, memory, size / (1024 * 1024 * 1024)];
+    });
+  }
 </script>
 
 <div>
@@ -162,30 +168,46 @@
     class="modal-background"
     on:click|preventDefault={() => {
       if (!loading) {
-        dispatch("closed");
+        dispatch("closed", shouldBeUpdated);
       }
     }}
   />
-  <div class="modal-content" on:click|stopPropagation>
-    <div class="box">
-      <h4 class="is-size-4">
-        Update a Kubernetes {k8s ? `(${k8s.name})` : ""}
-      </h4>
-      <hr />
 
-      <Tabs
-        bind:active
-        {tabs}
-        disabled={loading}
-        on:select={() => {
-          success = false;
-          failed = false;
-          loading = false;
-          message = null;
-        }}
-      />
+  {#if k8s}
+    <div class="modal-content" on:click|stopPropagation>
+      <div class="box">
+        <h4 class="is-size-4">
+          Manage K8S({k8s.name}) Workers
+        </h4>
+        <hr />
 
-      {#if active === "add"}
+        <Table
+          rowsData={k8s.details.workers}
+          headers={[
+            "#",
+            "Contract ID",
+            "Name",
+            "Planetary Network IP",
+            "CPU",
+            "Memory",
+            "Disk(GB)",
+          ]}
+          rows={_createWorkerRows(k8s.details.workers)}
+          selectable={false}
+          actions={[
+            {
+              label: "Delete",
+              type: "danger",
+              loading: (i) =>
+                loading && removing === k8s.details.workers[i].name,
+              click: (_, i) => onDeleteWorker(i),
+              disabled: () => loading || removing !== null,
+            },
+          ]}
+        />
+
+        <hr />
+
         <form on:submit|preventDefault={onAddWorker}>
           {#if loading || (logs !== null && logs.type === "Add Worker")}
             <Alert type="info" message={logs?.message ?? "Loading..."} />
@@ -221,7 +243,7 @@
           {/if}
           <DeployBtn
             label="Add Worker"
-            {loading}
+            loading={loading && removing === null}
             {success}
             {failed}
             disabled={disabled && !failed && !success}
@@ -236,54 +258,9 @@
             }}
           />
         </form>
-      {:else if active === "remove"}
-        {#if success}
-          <Alert type="success" message="Successfully Removed Worker." />
-        {:else if failed}
-          <Alert
-            type="danger"
-            message={message || "Failed to Remove Worker."}
-          />
-        {/if}
-
-        <Input
-          bind:data={workerName}
-          field={{
-            label: "Select a worker",
-            symbol: "worker",
-            type: "select",
-            options: [
-              {
-                label: "Please! Select a worker",
-                value: null,
-                disabled: true,
-                selected: true,
-              },
-              ...k8s.details.workers.map(({ name }) => {
-                return { label: name, value: name };
-              }),
-            ],
-            disabled: loading,
-          }}
-          on:input={() => {
-            success = false;
-            failed = false;
-            loading = false;
-            message = null;
-          }}
-        />
-        <div class="is-flex is-justify-content-center">
-          <button
-            class={"button is-danger " + (loading ? "is-loading" : "")}
-            disabled={workerName === null || loading}
-            on:click={onDeleteWorker}
-          >
-            Delete Worker
-          </button>
-        </div>
-      {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style lang="scss" scoped>
