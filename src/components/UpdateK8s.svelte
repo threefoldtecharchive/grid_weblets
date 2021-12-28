@@ -2,11 +2,11 @@
 
 <script lang="ts">
   // libs
-  import type { IProfile } from "../../types/Profile";
-  import { noActiveProfile } from "../../utils/message";
-  import { Worker } from "../../types/kubernetes";
-  import type { IFormField, ITab } from "../../types";
-  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../../utils/validateName"; // prettier-ignore
+  import type { IProfile } from "../types/Profile";
+  import { noActiveProfile } from "../utils/message";
+  import { Worker } from "../types/kubernetes";
+  import type { IFormField, ITab } from "../types";
+  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -14,10 +14,10 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
   import Input from "../../components/Input.svelte";
-  import DeployedList from "../../types/deployedList";
+  import DeployedList from "../types/deployedList";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import getGrid from "../../utils/getGrid";
+  import getGrid from "../utils/getGrid";
   import DeployBtn from "../../components/DeployBtn.svelte";
 
   let profile: IProfile;
