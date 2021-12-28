@@ -2,7 +2,7 @@ import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import { getUniqueName, selectGatewayNode } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -12,6 +12,7 @@ const {
   MachineModel,
   MachinesModel,
   GatewayNameModel,
+  generateString,
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployPeertube(data: VM, profile: IProfile) {
@@ -36,16 +37,19 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
 
   await client.connect();
 
-  // Make sure the name is valid
-  name = await getUniqueName(client, name);
+  // sub deployments model (vm, disk, net): <type><random_suffix>
+  let randomSuffix = generateString(10).toLowerCase();
+
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(client, "pt", name);
 
   // Dynamically select node to deploy the gateway
-  let [gwNodeId, gwDomain] = await selectGatewayNode();
-  const domain = `${name}.${gwDomain}`;
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  const domain = `${domainName}.${nodeDomain}`;
 
   // define a network
   const network = new NetworkModel();
-  network.name = name + "Net";
+  network.name = `net${randomSuffix}`;
   network.ip_range = "10.1.0.0/16";
 
   // deploy the peertube
@@ -59,18 +63,31 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     cpu,
     memory,
     size,
-    sshKey
+    sshKey,
+    randomSuffix
   );
 
   // get the info of peertube deployment
-  const peertubeInfo = await getPeertubeInfo(client, name + "VMs");
+  const peertubeInfo = await getPeertubeInfo(client, name);
   const planetaryIP = peertubeInfo[0]["planetary"];
 
-  // deploy the gateway
-  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(
+      profile,
+      client,
+      domainName,
+      planetaryIP,
+      publicNodeId
+    );
+  } catch (error) {
+    // rollback peertube deployment if gateway deployment failed
+    await client.machines.delete({ name: name });
+    throw error;
+  }
 
   // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, name);
+  const gatewayInfo = await getGatewayInfo(client, domainName);
   const gatewayDomain = gatewayInfo[0]["domain"];
   return { domain, planetaryIP };
 }
@@ -85,17 +102,18 @@ async function deployPeertubeVM(
   cpu: number,
   memory: number,
   diskSize: number,
-  sshKey: string
+  sshKey: string,
+  randomSuffix: string
 ) {
   // disk
   const disk = new DiskModel();
-  disk.name = name + "Data";
+  disk.name = `disk${randomSuffix}`;
   disk.size = diskSize;
   disk.mountpoint = "/data";
 
   // vm specs
   const vm = new MachineModel();
-  vm.name = name + "VM";
+  vm.name = `vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
@@ -118,7 +136,7 @@ async function deployPeertubeVM(
 
   // vms specs
   const vms = new MachinesModel();
-  vms.name = name + "VMs";
+  vms.name = name;
   vms.network = net;
   vms.machines = [vm];
 
@@ -134,21 +152,21 @@ async function deployPeertubeVM(
 async function deployPrefixGateway(
   profile: IProfile,
   client: any,
-  name: string,
+  domainName: string,
   backend: string,
-  gwNodeId: number
+  publicNodeId: number
 ) {
   // define specs
   const gw = new GatewayNameModel();
-  gw.name = name;
-  gw.node_id = gwNodeId;
+  gw.name = domainName;
+  gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.gateway.getObj(name))
+      .then(() => grid.gateway.getObj(domainName))
       .then(([gw]) => gw);
   });
 }

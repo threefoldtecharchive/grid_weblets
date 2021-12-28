@@ -8,6 +8,7 @@ import baseConfigStore from "./stores/baseConfig";
 import deploymentStore from "./stores/deploymentStore";
 import notificationStore from "./stores/notifications";
 import currentDeploymentStore from "./stores/currentDeployment";
+import balanceStore from "./stores/balance";
 
 interface AppConfigs {
   client: typeof client;
@@ -16,6 +17,7 @@ interface AppConfigs {
   deploymentStore: typeof deploymentStore;
   notificationStore: typeof notificationStore;
   currentDeploymentStore: typeof currentDeploymentStore;
+  balanceStore: typeof balanceStore;
 }
 
 declare global {

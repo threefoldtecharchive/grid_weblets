@@ -2,7 +2,7 @@ import type { default as VM } from "../types/vm";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import { getUniqueName, selectGatewayNode } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -12,6 +12,7 @@ const {
   GridClient,
   GatewayNameModel,
   NetworkModel,
+  generateString,
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployFunkwhale(data: VM, profile: IProfile) {
@@ -32,26 +33,50 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
 
   await client.connect();
 
-  // Make sure the name is valid
-  name = await getUniqueName(client, name);
+  // sub deployments model (vm, disk, net): <type><random_suffix>
+  let randomSuffix = generateString(10).toLowerCase();
 
-  // Gateway node Id and domain
-  let [gwNodeId, gwDomain] = await selectGatewayNode();
-  const domain = `${name}.${gwDomain}`;
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(client, "fw", name);
+
+  // Dynamically select node to deploy the gateway
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  const domain = `${domainName}.${nodeDomain}`;
 
   // define network
   const network = new NetworkModel();
-  network.name = name + "Net";
+  network.name = `net${randomSuffix}`;
   network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(profile, client, name, network, nodeId, domain);
+  await deployFunkwhaleVM(
+    profile,
+    client,
+    name,
+    network,
+    nodeId,
+    domain,
+    randomSuffix
+  );
 
-  const info = await getFunkwhaleInfo(client, name + "VMs");
+  const info = await getFunkwhaleInfo(client, name);
   const planetaryIP = info[0]["planetary"];
 
-  await deployPrefixGateway(profile, client, name, planetaryIP, gwNodeId);
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(
+      profile,
+      client,
+      domainName,
+      planetaryIP,
+      publicNodeId
+    );
+  } catch (error) {
+    // rollback the FunkwhaleVM if the gateway fails to deploy
+    await client.machines.delete({ name: name });
+    throw error;
+  }
 
-  const gatewayInfo = await getGatewayInfo(client, name);
+  const gatewayInfo = await getGatewayInfo(client, domainName);
   return { domain, planetaryIP };
 }
 
@@ -61,15 +86,16 @@ async function deployFunkwhaleVM(
   name: string,
   network: any,
   nodeId: number,
-  domain: string
+  domain: string,
+  randomSuffix: string
 ) {
   const disk = new DiskModel();
-  disk.name = name + "Disk";
+  disk.name = `disk${randomSuffix}`;
   disk.size = 10;
   disk.mountpoint = "/data";
 
   const vm = new MachineModel();
-  vm.name = name + "VM";
+  vm.name = `vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
@@ -77,14 +103,15 @@ async function deployFunkwhaleVM(
   vm.cpu = 2;
   vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
-  vm.flist = "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
+  vm.flist =
+    "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,
   };
 
   const vms = new MachinesModel();
-  vms.name = name + "VMs";
+  vms.name = name;
   vms.network = network;
   vms.machines = [vm];
 
@@ -99,20 +126,20 @@ async function deployFunkwhaleVM(
 async function deployPrefixGateway(
   profile: IProfile,
   client: any,
-  name: string,
+  domainName: string,
   backend: string,
-  nodeId: number
+  publicNodeId: number
 ) {
   const gw = new GatewayNameModel();
-  gw.name = name;
-  gw.node_id = nodeId;
+  gw.name = domainName;
+  gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway
       .deploy_name(gw)
-      .then(() => grid.gateway.getObj(name))
+      .then(() => grid.gateway.getObj(domainName))
       .then(([gw]) => gw);
   });
 }
