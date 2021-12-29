@@ -17,6 +17,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
+  import UpdateK8s from "../../components/UpdateK8s.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -74,6 +75,7 @@
   }
 
   let infoToShow: Object;
+  let k8sToUpdate: any;
 
   let _sub: any;
   onMount(() => {
@@ -201,6 +203,12 @@
                   click: (_, i) => (infoToShow = rows[i].details),
                   disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Manage Workers",
+                  click: (_, i) => (k8sToUpdate = rows[i]),
+                  disabled: () => removing !== null,
                 },
               ]}
               on:selected={_onSelectRowHandler}
@@ -416,6 +424,17 @@
 
 {#if infoToShow}
   <Modal data={infoToShow} on:closed={() => (infoToShow = null)} />
+{/if}
+
+{#if k8sToUpdate}
+  <UpdateK8s
+    {profile}
+    k8s={k8sToUpdate}
+    on:closed={({ detail }) => {
+      k8sToUpdate = null;
+      if (detail) _reloadTab();
+    }}
+  />
 {/if}
 
 <style lang="scss" scoped>

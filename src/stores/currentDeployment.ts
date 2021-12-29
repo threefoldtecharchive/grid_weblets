@@ -7,7 +7,9 @@ export interface IStore {
     | "CapRover"
     | "Peertube"
     | "Funkwhale"
-    | "GatewayName";
+    | "GatewayName"
+    | "Add Worker"
+    | "Remove Worker";
   name: string;
   message: string;
 }
