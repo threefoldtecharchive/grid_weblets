@@ -16,7 +16,7 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployFunkwhale(data: VM, profile: IProfile) {
-  const { envs, disks, ...base } = data;
+  const { envs, disks, username, email, password, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, rootFsSize } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
@@ -55,7 +55,10 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
     network,
     nodeId,
     domain,
-    randomSuffix
+    randomSuffix,
+    username,
+    email,
+    password
   );
 
   const info = await getFunkwhaleInfo(client, name);
@@ -87,7 +90,10 @@ async function deployFunkwhaleVM(
   network: any,
   nodeId: number,
   domain: string,
-  randomSuffix: string
+  randomSuffix: string,
+  username: string,
+  email: string,
+  password: string
 ) {
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
@@ -104,12 +110,13 @@ async function deployFunkwhaleVM(
   vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
   vm.flist =
-    "https://hub.grid.tf/asamirr.3bot/asamirr-threefold-funkwhale-dec21.flist";
+    "https://hub.grid.tf/asamirr.3bot/asamirr-tf-funkwhale-dec21.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,
-    DJANGO_SUPERUSER_USERNAME: "admin@funkwhale.com",
-    DJANGO_SUPERUSER_PASSWORD: "myfunkwhalepass"
+    DJANGO_SUPERUSER_EMAIL: email,
+    DJANGO_SUPERUSER_USERNAME: username,
+    DJANGO_SUPERUSER_PASSWORD: password,
   };
 
   const vms = new MachinesModel();
