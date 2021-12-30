@@ -9,7 +9,8 @@ export interface IStore {
     | "Funkwhale"
     | "GatewayName"
     | "Add Worker"
-    | "Remove Worker";
+    | "Remove Worker"
+    | "Deleting Deployment";
   name: string;
   message: string;
 }

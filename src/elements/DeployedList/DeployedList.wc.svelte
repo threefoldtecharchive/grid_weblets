@@ -63,15 +63,16 @@
   let removing: string = null;
   function onRemoveHandler(key: "k8s" | "machines", name: string) {
     removing = name;
+    window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
     return deleteContracts(profile, key, name)
-      .then((data) => {
-        // console.log("Removed", data);
-      })
       .catch((err) => {
         console.log("Error while removing", err);
         message = err.message || err;
       })
-      .finally(() => (removing = null));
+      .finally(() => {
+        removing = null;
+        window.configs.currentDeploymentStore.clear();
+      });
   }
 
   let infoToShow: Object;
