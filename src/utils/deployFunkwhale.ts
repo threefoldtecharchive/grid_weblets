@@ -104,10 +104,12 @@ async function deployFunkwhaleVM(
   vm.memory = 1024 * 2;
   vm.rootfs_size = 2;
   vm.flist =
-    "https://hub.grid.tf/tf-official-apps/threefoldtech-funk-latest.flist";
+    "https://hub.grid.tf/asamirr.3bot/asamirr-threefold-funkwhale-dec21.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,
+    DJANGO_SUPERUSER_USERNAME: "admin@funkwhale.com",
+    DJANGO_SUPERUSER_PASSWORD: "myfunkwhalepass"
   };
 
   const vms = new MachinesModel();
