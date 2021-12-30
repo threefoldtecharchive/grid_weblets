@@ -7,6 +7,7 @@
   export let success: boolean;
   export let failed: boolean;
   export let disabled: boolean;
+  export let label: string = "Deploy";
 
   $: deployment = $currentDeployment;
 </script>
@@ -35,7 +36,7 @@
     {#if success || failed}
       Back
     {:else}
-      Deploy
+      {label}
     {/if}
   </button>
 </div>

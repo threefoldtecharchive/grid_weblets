@@ -69,7 +69,7 @@
     failed = false;
     message = undefined;
 
-    if (!hasEnoughBalance(profile)) {
+    if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
       message =

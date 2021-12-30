@@ -68,6 +68,10 @@ export default class VM {
     public disks: Disk[] = [],
     public publicIp = false,
 
+    public email = "",
+    public username = "admin",
+    public password = "",
+
     public selection = new NodeID()
   ) { }
 

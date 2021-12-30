@@ -13,7 +13,7 @@ export default function deploy<T>(
   return getGrid(profile, (grid) => {
     return deployer(grid)
       .then((res) => {
-        window.configs.baseConfig.updateBalance();
+        window.configs.balanceStore.updateBalance();
         return res;
       })
       .finally(() => {

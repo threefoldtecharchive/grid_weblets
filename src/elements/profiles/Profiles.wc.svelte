@@ -12,6 +12,7 @@
   import { onDestroy, onMount } from "svelte";
 
   const configs = window.configs?.baseConfig;
+  const _balanceStore = window.configs?.balanceStore;
   let password: string = "";
   let configured: boolean = false;
 
@@ -20,7 +21,6 @@
   let activeProfileId: string;
   let opened: boolean = false;
   let currentProfile: IProfile;
-  let loadingBalance: boolean = false;
   let selectedIdx: string = "0";
 
   let tabs: ITab[] = [];
@@ -28,7 +28,6 @@
     let s = $configs;
     if (s) {
       profiles = s.profiles;
-      loadingBalance = s.loadingBalance;
       activeProfile = profiles[selectedIdx];
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
@@ -116,6 +115,8 @@
     { label: "Create Profile Manager", value: "create" },
   ];
   let activePassword: string = "load";
+
+  $: balanceStore = $_balanceStore;
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
@@ -127,10 +128,10 @@
   {#if currentProfile}
     <div class="profile-active">
       <p>{currentProfile.name}</p>
-      {#if loadingBalance}
+      {#if balanceStore.loading}
         <p>Loading Account Balance</p>
-      {:else if currentProfile.balance !== null}
-        <p>Balance: <span>{currentProfile.balance}</span> TFT</p>
+      {:else if balanceStore.balance !== null}
+        <p>Balance: <span>{balanceStore.balance}</span> TFT</p>
       {/if}
     </div>
   {/if}

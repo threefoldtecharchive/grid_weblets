@@ -5,5 +5,4 @@ export interface IProfile {
   storeSecret: string;
   networkEnv: string;
   sshKey: string;
-  balance?: number;
 }

@@ -96,13 +96,20 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
+
+  function _isInvalidDisks() {
+    const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
+    const mountSet = new Set(mounts);
+    return mounts.length !== mountSet.size;
+  }
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
     loading = true;
 
-    if (!hasEnoughBalance(profile)) {
+    if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
       message =
@@ -127,6 +134,15 @@
       .finally(() => {
         loading = false;
       });
+  }
+
+  function validateMountPoint({ id, mountpoint }: Disk) {
+    const disks = data.disks;
+    const valid = disks.reduce((v, disk) => {
+      if (disk.id === id) return v;
+      return v && disk.mountpoint.replaceAll("/", "") !== mountpoint.replaceAll("/", ""); // prettier-ignore
+    }, true);
+    return valid ? null : "Disks can't have duplicated mountpoint.";
   }
 
   $: logs = $currentDeployment;
@@ -235,7 +251,20 @@
                   (data.disks = data.disks.filter((_, i) => index !== i))}
               />
               {#each disk.diskFields as field (field.symbol)}
-                <Input bind:data={disk[field.symbol]} {field} />
+                {#if field.symbol === "mountpoint"}
+                  <Input
+                    bind:data={disk[field.symbol]}
+                    field={{
+                      ...field,
+                      error:
+                        !field.invalid && !field.error
+                          ? validateMountPoint(disk)
+                          : null,
+                    }}
+                  />
+                {:else}
+                  <Input bind:data={disk[field.symbol]} {field} />
+                {/if}
               {/each}
             </div>
           {/each}
