@@ -18,7 +18,7 @@
   import Alert from "../../components/Alert.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName from "../../utils/validateName";
+  import validateName, { validateEmail } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
   const data = new VM();
@@ -32,6 +32,12 @@
   let status: "valid" | "invalid";
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
+
+  const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
+  
+  
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -108,7 +114,21 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-
+        <Input
+          bind:data={data.username}
+          bind:invalid={userNameField.invalid}
+          field={userNameField}
+        />
+        <Input
+          bind:data={data.email}
+          bind:invalid={emailField.invalid}
+          field={emailField}
+        />
+        <Input
+          bind:data={data.password}
+          bind:invalid={passwordField.invalid}
+          field={passwordField}
+        />
         <SelectNodeId
           publicIp={false}
           cpu={data.cpu}
