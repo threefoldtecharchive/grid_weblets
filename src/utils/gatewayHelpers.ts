@@ -16,5 +16,5 @@ export async function selectGatewayNode() {
 
 export async function getUniqueDomainName(client, solution_type, name) {
   let twin_id = await client.twins.get_my_twin_id();
-  return `${solution_type}${twin_id}${name}`;
+  return `${solution_type}${twin_id}${name.toLowerCase()}`;
 }
