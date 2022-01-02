@@ -78,7 +78,9 @@
 <Input
   bind:data={nodeId}
   field={{
-    label: `Node ID (Found ${nodes.length})`,
+    label: `Node ID (${
+      loading ? "Loading..." : "Found " + nodes.length + " Nodes"
+    })`,
     symbol: "nodeId",
     type: "select",
     options: [
