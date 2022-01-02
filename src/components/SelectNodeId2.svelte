@@ -19,25 +19,49 @@
 
   let loading: boolean = false;
 
+  // Limit updates
+  let _update = true;
+  let _info: IData = {
+    cpu: null,
+    memory: null,
+    ssd: null,
+    publicIp: null,
+  };
+
   $: {
-    if (data && nodeSelection) {
-      loading = true;
+    // Check if should update
+    if (data && nodeSelection)
+      _update =
+        _info.cpu !== data.cpu ||
+        _info.memory !== data.memory ||
+        _info.ssd !== data.ssd ||
+        _info.publicIp !== data.publicIp;
+
+    if (data && nodeSelection && _update && !loading) {
+      // return to initial values
+      _info = {
+        cpu: data.cpu,
+        memory: data.memory,
+        ssd: data.ssd,
+        publicIp: data.publicIp,
+      };
+      _update = false;
+
+      // Code to exec
       const _nodeId = nodeId;
+      loading = true;
       nodeId = null;
 
       const { cpu, memory, ssd, publicIp } = data;
-      const { country, farmName } = nodeSelection.filters;
-      const filters = { sru: ssd, cru: cpu, mru: memory / 1024, publicIPs: publicIp, farmName, country }; // prettier-ignore
-      console.log({ filters });
+      const filters = { sru: ssd, cru: cpu, mru: memory / 1024, publicIPs: publicIp }; // prettier-ignore
 
       loadNodes(filters)
-        .then((info) => {
-          const { countries, nodes, farmNames } = info;
-          nodeSelection.update("countries", countries);
+        .then((nodes) => {
           nodeSelection.update("nodes", nodes);
-          nodeSelection.update("farmNames", farmNames);
 
-          if (nodes.some((n) => n.value === _nodeId)) {
+          if (_nodeId === null && nodes.length > 0) {
+            nodeId = +nodes[0].value;
+          } else if (nodes.some((n) => n.value === _nodeId)) {
             nodeId = _nodeId;
           }
         })
@@ -52,73 +76,25 @@
 </script>
 
 {#if nodeSelection}
-  <div>
-    <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
-
-    <Input
-      data={nodeSelection.filters.farmName}
-      field={{
-        label: "Farm Name",
-        symbol: "farmName",
-        type: "select",
-        options: [
-          {
-            label: loading ? "Loading..." : "Select farm name",
-            value: null,
-            disabled: true,
-          },
-          ...nodeSelection.farmNames,
-        ],
-      }}
-      on:input={({ detail }) => {
-        const { selectedIndex } = detail.target;
-        const farmName = nodeSelection.farmNames[selectedIndex - 1];
-        nodeSelection.updateFilter("farmName", farmName.value.toString());
-      }}
-    />
-
-    <Input
-      data={nodeSelection.filters.country}
-      field={{
-        label: "Country",
-        symbol: "country",
-        type: "select",
-        options: [
-          {
-            label: loading ? "Loading..." : "Select country",
-            value: null,
-            disabled: true,
-          },
-          ...nodeSelection.countries,
-        ],
-      }}
-      on:input={({ detail }) => {
-        const { selectedIndex } = detail.target;
-        const country = nodeSelection.countries[selectedIndex - 1];
-        nodeSelection.updateFilter("country", country.value.toString());
-      }}
-    />
-
-    <Input
-      bind:data={nodeId}
-      field={{
-        label: `Node ID (Found ${nodeSelection.nodes.length})`,
-        symbol: "nodeId",
-        type: "select",
-        options: [
-          {
-            label: loading ? "Loading..." : "Select NodeId",
-            value: null,
-            disabled: true,
-          },
-          ...nodeSelection.nodes,
-        ],
-      }}
-      on:input={({ detail }) => {
-        const { selectedIndex } = detail.target;
-        const _nodeId = nodeSelection.nodes[selectedIndex - 1];
-        nodeId = +_nodeId.value;
-      }}
-    />
-  </div>
+  <Input
+    bind:data={nodeId}
+    field={{
+      label: `Node ID (Found ${nodeSelection.nodes.length})`,
+      symbol: "nodeId",
+      type: "select",
+      options: [
+        {
+          label: loading ? "Loading..." : "Select NodeId",
+          value: null,
+          disabled: true,
+        },
+        ...nodeSelection.nodes,
+      ],
+    }}
+    on:input={({ detail }) => {
+      const { selectedIndex } = detail.target;
+      const _nodeId = nodeSelection.nodes[selectedIndex - 1];
+      nodeId = +_nodeId.value;
+    }}
+  />
 {/if}

@@ -4,12 +4,6 @@ const { GridClient, Nodes } = window.configs?.grid3_client ?? {};
 import { byIso } from "country-code-lookup";
 import gqlApi from "./gqlApi";
 
-interface ILoadNodes {
-  nodes: ISelectOption[];
-  countries: ISelectOption[];
-  farmNames: ISelectOption[];
-}
-
 export default function loadNodes(filters: FilterOptions) {
   const profile = window.configs.baseConfig.getActiveProfile();
   const { networkEnv } = profile;
@@ -17,26 +11,31 @@ export default function loadNodes(filters: FilterOptions) {
   const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
   const nodeSelection = new Nodes(graphql, rmbProxy);
 
-  return new Promise<ILoadNodes>(async (res) => {
+  return new Promise<ISelectOption[]>(async (res) => {
     try {
       const nodesInfo = await nodeSelection.filterNodes(filters);
-      const countriesInfo = nodesInfo.map(({ country }) => country.length === 2 ? byIso(country).country : country); // prettier-ignore
-      const farmInfo = nodesInfo.map(({ farmId }) => farmId);
-
-      const _farmNames = await gqlApi<{ farms: ISelectOption[] }>(
+      const names = await gqlApi<{ farms: { id: number; name: string }[] }>(
         profile,
-        "query _($in: [Int!]!){farms(where: { farmId_in: $in }) {label: name value: farmId}}",
-        { in: farmInfo }
+        "query _($in: [Int!]!){farms(where: { farmId_in: $in }) {id: farmId name}}",
+        { in: nodesInfo.map(({ farmId }) => farmId) }
       );
-      const farmNames = _farmNames.farms;
-      const _countries = Array.from(new Set(countriesInfo));
-      const countries = _countries.map(c => ({ label: c, value: c } as ISelectOption)); // prettier-ignore
-      const nodes = nodesInfo.map(({ nodeId }) => ({ label: `NodeID(${nodeId})`, value: nodeId } as ISelectOption)); // prettier-ignore
 
-      res({ nodes, countries, farmNames });
+      const nodes = nodesInfo.map(({ nodeId, country, farmId }) => {
+        const c = country.length === 2 ? byIso(country).country : country;
+        const name = names.farms.find(({ id }) => id === farmId).name;
+
+        return {
+          label: `NodeID(${nodeId}) | FarmName(${name}) | Country(${c})`,
+          value: nodeId,
+        };
+      });
+
+      nodes.sort((a, b) => a.value - b.value);
+
+      res(nodes);
     } catch (err) {
       console.log("Error loadNodes", err);
-      res({ nodes: [], countries: [], farmNames: [] });
+      res([]);
     }
   });
 }
