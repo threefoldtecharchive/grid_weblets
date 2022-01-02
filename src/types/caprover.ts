@@ -1,7 +1,6 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import generatePassword from "../utils/generatePassword";
-import SelectNodeID from "./selectNodeId";
 
 export default class Caprover {
   constructor(
@@ -16,7 +15,6 @@ export default class Caprover {
     public publicKey = "",
     public diskSize = 100,
     public password = generatePassword(length=Math.floor(Math.random() * 5) + 10), // password length between 10 and 14
-    public nodeSelection = new SelectNodeID()
   ) {}
 
   public get valid(): boolean {

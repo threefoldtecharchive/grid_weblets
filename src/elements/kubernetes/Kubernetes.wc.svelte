@@ -15,7 +15,6 @@
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
-  // import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
@@ -177,7 +176,6 @@
             publicIp: data.master.publicIp,
             ssd: data.master.diskSize,
           }}
-          nodeSelection={data.master.nodeSelection}
         />
       {:else if active === "workers"}
         <AddBtn
@@ -211,7 +209,6 @@
                   publicIp: worker.publicIp,
                   ssd: worker.diskSize,
                 }}
-                nodeSelection={worker.nodeSelection}
               />
             </div>
           {/each}

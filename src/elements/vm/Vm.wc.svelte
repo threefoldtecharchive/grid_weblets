@@ -217,7 +217,6 @@
             ),
             publicIp: data.publicIp,
           }}
-          nodeSelection={data.nodeSelection}
         />
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />

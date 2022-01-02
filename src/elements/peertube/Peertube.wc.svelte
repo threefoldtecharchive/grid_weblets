@@ -150,7 +150,6 @@
 
         <SelectNodeId2
           bind:nodeId={data.nodeId}
-          nodeSelection={data.nodeSelection}
           data={{
             cpu: data.cpu,
             memory: data.memory,

@@ -156,7 +156,6 @@
         {/each}
         <SelectNodeId2
           bind:nodeId={data.nodeId}
-          nodeSelection={data.nodeSelection}
           data={{
             cpu: data.cpu,
             ssd: data.diskSize,

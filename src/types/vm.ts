@@ -3,7 +3,6 @@ import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import { validateDisk } from "../utils/validateName";
 import { Network } from "./kubernetes";
-import SelectNodeID from "./selectNodeId";
 
 export class Env {
   constructor(public id = v4(), public key = "", public value = "") {}
@@ -70,9 +69,7 @@ export default class VM {
 
     public email = "",
     public username = "admin",
-    public password = "",
-    // public selection = new NodeID()
-    public nodeSelection = new SelectNodeID()
+    public password = ""
   ) {}
 
   public get valid(): boolean {
