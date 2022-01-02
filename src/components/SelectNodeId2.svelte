@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import type SelectNodeID from "../types/selectNodeId";
+  import loadNodes from "../utils/loadNodes";
 
   import Input from "./Input.svelte";
 
@@ -15,16 +16,38 @@
   export let nodeSelection: SelectNodeID;
   export let nodeId: number;
   export let data: IData;
+
   let loading: boolean = false;
 
-  function onSelectNodeId(e: Event) {
-    const { selectedIndex } = e.target as HTMLSelectElement;
-    const _nodeId = nodeSelection.nodes[selectedIndex - 1];
-    console.log({ nodeId: _nodeId });
-    nodeId = +_nodeId.value;
-  }
-
   $: {
+    if (data && nodeSelection) {
+      loading = true;
+      const _nodeId = nodeId;
+      nodeId = null;
+
+      const { cpu, memory, ssd, publicIp } = data;
+      const { country, farmName } = nodeSelection.filters;
+      const filters = { sru: ssd, cru: cpu, mru: memory / 1024, publicIPs: publicIp, farmName, country }; // prettier-ignore
+      console.log({ filters });
+
+      loadNodes(filters)
+        .then((info) => {
+          const { countries, nodes, farmNames } = info;
+          nodeSelection.update("countries", countries);
+          nodeSelection.update("nodes", nodes);
+          nodeSelection.update("farmNames", farmNames);
+
+          if (nodes.some((n) => n.value === _nodeId)) {
+            nodeId = _nodeId;
+          }
+        })
+        .catch((err) => {
+          console.log("Error", err);
+        })
+        .finally(() => {
+          loading = false;
+        });
+    }
   }
 </script>
 
@@ -47,6 +70,11 @@
           ...nodeSelection.farmNames,
         ],
       }}
+      on:input={({ detail }) => {
+        const { selectedIndex } = detail.target;
+        const farmName = nodeSelection.farmNames[selectedIndex - 1];
+        nodeSelection.updateFilter("farmName", farmName.value.toString());
+      }}
     />
 
     <Input
@@ -63,6 +91,11 @@
           },
           ...nodeSelection.countries,
         ],
+      }}
+      on:input={({ detail }) => {
+        const { selectedIndex } = detail.target;
+        const country = nodeSelection.countries[selectedIndex - 1];
+        nodeSelection.updateFilter("country", country.value.toString());
       }}
     />
 
@@ -81,7 +114,11 @@
           ...nodeSelection.nodes,
         ],
       }}
-      on:input={({ detail }) => onSelectNodeId(detail)}
+      on:input={({ detail }) => {
+        const { selectedIndex } = detail.target;
+        const _nodeId = nodeSelection.nodes[selectedIndex - 1];
+        nodeId = +_nodeId.value;
+      }}
     />
   </div>
 {/if}
