@@ -11,7 +11,6 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
@@ -24,6 +23,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import SelectNodeId2 from "../../components/SelectNodeId2.svelte";
 
   // Values
 
@@ -58,8 +58,8 @@
   let profile: IProfile;
   let message: string;
   let modalData: Object;
-  let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
   let domain: string, planetaryIP: string;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -148,21 +148,18 @@
         {/each}
         <Input bind:data={data.disks[0].size} field={diskField} />
 
-        <SelectNodeId
-          publicIp={false}
-          cpu={data.cpu}
-          memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
+        <SelectNodeId2
+          bind:nodeId={data.nodeId}
+          nodeSelection={data.nodeSelection}
+          data={{
+            cpu: data.cpu,
+            memory: data.memory,
+            publicIp: data.publicIp,
+            ssd: data.disks.reduce(
+              (total, disk) => total + disk.size,
+              data.rootFsSize
+            ),
+          }}
         />
       {/if}
     {/if}

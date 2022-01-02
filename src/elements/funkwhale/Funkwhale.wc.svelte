@@ -13,13 +13,13 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { validateEmail } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import SelectNodeId2 from "../../components/SelectNodeId2.svelte";
 
   const data = new VM();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -29,16 +29,14 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let status: "valid" | "invalid";
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
 
   const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
-  
-  
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
@@ -129,21 +127,19 @@
           bind:invalid={passwordField.invalid}
           field={passwordField}
         />
-        <SelectNodeId
-          publicIp={false}
-          cpu={data.cpu}
-          memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
+
+        <SelectNodeId2
+          bind:nodeId={data.nodeId}
+          nodeSelection={data.nodeSelection}
+          data={{
+            cpu: data.cpu,
+            memory: data.memory,
+            publicIp: data.publicIp,
+            ssd: data.disks.reduce(
+              (total, disk) => total + disk.size,
+              data.rootFsSize
+            ),
+          }}
         />
       {/if}
     {/if}

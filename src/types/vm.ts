@@ -3,10 +3,10 @@ import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import { validateDisk } from "../utils/validateName";
 import { Network } from "./kubernetes";
-import NodeID from "./nodeId";
+import SelectNodeID from "./selectNodeId";
 
 export class Env {
-  constructor(public id = v4(), public key = "", public value = "") { }
+  constructor(public id = v4(), public key = "", public value = "") {}
 
   public get valid(): boolean {
     const { key, value } = this;
@@ -32,7 +32,7 @@ export class Disk {
     public name = "DISK" + id.split("-")[0],
     public size = 50,
     public mountpoint = "/opt/"
-  ) { }
+  ) {}
 
   public get valid(): boolean {
     const { name, size, mountpoint } = this;
@@ -71,9 +71,9 @@ export default class VM {
     public email = "",
     public username = "admin",
     public password = "",
-
-    public selection = new NodeID()
-  ) { }
+    // public selection = new NodeID()
+    public nodeSelection = new SelectNodeID()
+  ) {}
 
   public get valid(): boolean {
     const { name, flist, cpu, memory, entrypoint, nodeId } = this;

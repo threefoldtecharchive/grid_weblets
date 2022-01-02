@@ -15,7 +15,7 @@
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  // import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
@@ -25,6 +25,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import SelectNodeId2 from "../../components/SelectNodeId2.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -66,7 +67,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid(baseFields) || isInvalid(kubernetesFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || isInvalid(baseFields) || isInvalid(kubernetesFields); // prettier-ignore
   let modalData: Object;
 
   async function onDeployKubernetes() {
@@ -167,18 +168,16 @@
             <Input bind:data={data.master[field.symbol]} {field} />
           {/if}
         {/each}
-        <SelectNodeId
-          cpu={data.master.cpu}
-          memory={data.master.memory}
-          publicIp={data.master.publicIp}
-          ssd={data.master.diskSize}
-          bind:data={data.master.node}
-          bind:nodeSelection={data.master.selection.type}
-          filters={data.master.selection.filters}
-          bind:status={data.master.status}
-          {profile}
-          on:fetch={({ detail }) => (data.master.selection.nodes = detail)}
-          nodes={data.master.selection.nodes}
+
+        <SelectNodeId2
+          bind:nodeId={data.master.node}
+          data={{
+            cpu: data.master.cpu,
+            memory: data.master.memory,
+            publicIp: data.master.publicIp,
+            ssd: data.master.diskSize,
+          }}
+          nodeSelection={data.master.nodeSelection}
         />
       {:else if active === "workers"}
         <AddBtn
@@ -203,18 +202,16 @@
                   <Input bind:data={worker[field.symbol]} {field} />
                 {/if}
               {/each}
-              <SelectNodeId
-                cpu={worker.cpu}
-                memory={worker.memory}
-                publicIp={worker.publicIp}
-                ssd={worker.diskSize}
-                filters={worker.selection.filters}
-                bind:data={worker.node}
-                bind:nodeSelection={worker.selection.type}
-                bind:status={worker.status}
-                {profile}
-                on:fetch={({ detail }) => (worker.selection.nodes = detail)}
-                nodes={worker.selection.nodes}
+
+              <SelectNodeId2
+                bind:nodeId={worker.node}
+                data={{
+                  cpu: worker.cpu,
+                  memory: worker.memory,
+                  publicIp: worker.publicIp,
+                  ssd: worker.diskSize,
+                }}
+                nodeSelection={worker.nodeSelection}
               />
             </div>
           {/each}

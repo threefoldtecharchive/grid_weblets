@@ -10,7 +10,6 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -20,10 +19,10 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import SelectNodeId2 from "../../components/SelectNodeId2.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -95,7 +94,6 @@
 
   let message: string;
   let modalData: Object;
-  let status: "valid" | "invalid";
 
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
@@ -103,7 +101,7 @@
     return mounts.length !== mountSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -208,21 +206,18 @@
           {/if}
         {/each}
 
-        <SelectNodeId
-          publicIp={data.publicIp}
-          cpu={data.cpu}
-          memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
-          bind:nodeSelection={data.selection.type}
-          bind:data={data.nodeId}
-          filters={data.selection.filters}
-          bind:status
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
+        <SelectNodeId2
+          bind:nodeId={data.nodeId}
+          data={{
+            cpu: data.cpu,
+            memory: data.memory,
+            ssd: data.disks.reduce(
+              (total, disk) => total + disk.size,
+              data.rootFsSize
+            ),
+            publicIp: data.publicIp,
+          }}
+          nodeSelection={data.nodeSelection}
         />
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />

@@ -90,6 +90,7 @@
         },
         ...nodeSelection.nodes,
       ],
+      disabled: loading,
     }}
     on:input={({ detail }) => {
       const { selectedIndex } = detail.target;

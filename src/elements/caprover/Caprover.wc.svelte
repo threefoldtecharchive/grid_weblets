@@ -12,7 +12,6 @@
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  // import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
@@ -31,7 +30,6 @@
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  // let status: "valid" | "invalid";
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // prettier-ignore
@@ -50,7 +48,7 @@
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile /* || status !== "valid" */ || isInvalid(fields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || isInvalid(fields); // prettier-ignore
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
