@@ -12,7 +12,7 @@
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  // import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
@@ -23,6 +23,7 @@
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
+  import SelectNodeId2 from "../../components/SelectNodeId2.svelte";
 
   const data = new Caprover();
   let loading = false;
@@ -30,7 +31,7 @@
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
   let profile: IProfile;
-  let status: "valid" | "invalid";
+  // let status: "valid" | "invalid";
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // prettier-ignore
@@ -49,7 +50,7 @@
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile /* || status !== "valid" */ || isInvalid(fields); // prettier-ignore
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
@@ -155,18 +156,15 @@
             </div>
           {/if}
         {/each}
-        <SelectNodeId
-          cpu={data.cpu}
-          memory={data.memory}
-          publicIp={true}
-          ssd={data.diskSize}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
+        <SelectNodeId2
+          bind:nodeId={data.nodeId}
+          nodeSelection={data.nodeSelection}
+          data={{
+            cpu: data.cpu,
+            ssd: data.diskSize,
+            memory: data.memory,
+            publicIp: true,
+          }}
         />
       {/if}
     {/if}
