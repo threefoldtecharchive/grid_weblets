@@ -23,13 +23,16 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
-  const tabs: ITab[] = [
-    { label: "Base", value: "base" },
-  ]
-
   let data = new VM();
 
-  // prettier-ignore
+  const tabs: ITab[] = [{ label: "Base", value: "base" }]
+
+  let profile: IProfile;
+  let active: string = "base";
+  let loading = false;
+  let success = false;
+  let failed = false;
+
   let baseFields: IFormField[] = [
     { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -37,18 +40,11 @@
 
   const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-
-
-  const deploymentStore = window.configs?.deploymentStore;
-  let active: string = "config";
-  let loading = false;
-  let success = false;
-  let failed = false;
-  let profile: IProfile;
-
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
+
+  const deploymentStore = window.configs?.deploymentStore;
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -114,7 +110,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "config"}
+      {#if active === "base"}
         <Input
           bind:data={data.name}
           bind:invalid={nameField.invalid}
