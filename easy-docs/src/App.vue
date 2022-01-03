@@ -42,6 +42,7 @@ export default class App extends Vue {
     "funkwhale",
     "peertube",
     "contractslist",
+    "mattermost",
   ];
   sidenav: ISidenav | null = null;
 
