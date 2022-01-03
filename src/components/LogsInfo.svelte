@@ -1,8 +1,35 @@
 <svelte:options tag="tf-logs-info" />
 
 <script lang="ts">
+  import type { IStore } from "../stores/currentDeployment";
+
   const currentDeployment = window.configs.currentDeploymentStore;
   $: logs = $currentDeployment;
+
+  function getMessage({ type, name }: IStore): string {
+    const s = (m: string) => `<strong>${m}</strong>`;
+
+    switch (type) {
+      case "Add Worker":
+        return `Logs of ${s("Adding Worker")} with name ${s(name)}`;
+      case "Remove Worker":
+        return `Logs of ${s("Removing Worker")} with name ${s(name)}`;
+
+      case "VM":
+      case "CapRover":
+      case "Funkwhale":
+      case "Kubernetes":
+      case "Peertube":
+      case "GatewayName":
+        return `Logs of Deployment of type ${s(type)} with name ${s(name)}`;
+
+      case "Deleting Deployment":
+        return `Logs of ${s(type)} with name ${s(name)}`;
+
+      default:
+        return "Logs";
+    }
+  }
 </script>
 
 {#if logs && logs.message}
@@ -16,8 +43,7 @@ z-index: 9999;
 "
   >
     <p>
-      Logs of deployment with name <strong>{logs.name}</strong> of type
-      <strong>{logs.type}</strong>
+      {@html getMessage(logs)}
     </p>
     {logs.message}
   </div>
