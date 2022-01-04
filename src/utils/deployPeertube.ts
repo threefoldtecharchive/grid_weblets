@@ -4,11 +4,12 @@ import deploy from "./deploy";
 
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
+import createNetwork from "./createNetwork";
+import { Network } from "../types/kubernetes";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
   GridClient,
-  NetworkModel,
   DiskModel,
   MachineModel,
   MachinesModel,
@@ -51,9 +52,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const domain = `${domainName}.${nodeDomain}`;
 
   // define a network
-  const network = new NetworkModel();
-  network.name = `net${randomSuffix}`;
-  network.ip_range = "10.1.0.0/16";
+  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
   // deploy the peertube
   await deployPeertubeVM(
