@@ -100,7 +100,10 @@
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
     const mountSet = new Set(mounts);
-    return mounts.length !== mountSet.size;
+
+    const names = data.disks.map(({ name }) => name.trim());
+    const nameSet = new Set(names);
+    return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
@@ -143,6 +146,15 @@
       return v && disk.mountpoint.replaceAll("/", "") !== mountpoint.replaceAll("/", ""); // prettier-ignore
     }, true);
     return valid ? null : "Disks can't have duplicated mountpoint.";
+  }
+
+  function validateDiskName({ id, name }: Disk) {
+    if (!name) return "Disk name is required";
+    const valid = data.disks.reduce((v, disk) => {
+      if (disk.id === id) return v;
+      return v && disk.name.trim() !== name.trim();
+    }, true);
+    return valid ? null : "Disks can't have duplicated name.";
   }
 
   $: logs = $currentDeployment;
@@ -212,10 +224,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
@@ -260,6 +269,14 @@
                         !field.invalid && !field.error
                           ? validateMountPoint(disk)
                           : null,
+                    }}
+                  />
+                {:else if field.symbol === "name"}
+                  <Input
+                    bind:data={disk[field.symbol]}
+                    field={{
+                      ...field,
+                      error: validateDiskName(disk),
                     }}
                   />
                 {:else}

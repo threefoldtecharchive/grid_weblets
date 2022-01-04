@@ -3,6 +3,9 @@ import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import rootFs from "./rootFs";
+import createNetwork from "./createNetwork";
+import { Network } from "../types/kubernetes";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -11,14 +14,13 @@ const {
   MachinesModel,
   GridClient,
   GatewayNameModel,
-  NetworkModel,
   generateString,
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const { envs, disks, username, email, password, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId, rootFsSize } = base;
+  const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
@@ -44,9 +46,7 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
   const domain = `${domainName}.${nodeDomain}`;
 
   // define network
-  const network = new NetworkModel();
-  network.name = `net${randomSuffix}`;
-  network.ip_range = "10.1.0.0/16";
+  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
   await deployFunkwhaleVM(
     profile,
@@ -108,7 +108,7 @@ async function deployFunkwhaleVM(
   vm.planetary = true;
   vm.cpu = 2;
   vm.memory = 1024 * 2;
-  vm.rootfs_size = 2;
+  vm.rootfs_size = rootFs(2, 2 * 1024);
   vm.flist =
     "https://hub.grid.tf/asamirr.3bot/asamirr-tf-funkwhale-dec21.flist";
   vm.entrypoint = "/init.sh";
