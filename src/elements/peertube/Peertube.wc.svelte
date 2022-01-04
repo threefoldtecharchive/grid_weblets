@@ -22,6 +22,7 @@
     validateCpu,
     validateDisk,
     validateMemory,
+    validateEmail,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
@@ -29,6 +30,8 @@
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const emailField: IFormField = { label: "Email", placeholder: "Instance Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
+  const passField: IFormField = { label: "Password", placeholder: "Instance Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
   // prettier-ignore
   const baseFields: IFormField[] = [
@@ -136,7 +139,16 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-
+        <Input
+          bind:data={data.email}
+          bind:invalid={emailField.invalid}
+          field={emailField}
+        />
+        <Input
+          bind:data={data.password}
+          bind:invalid={passField.invalid}
+          field={passField}
+        />
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input

@@ -20,6 +20,8 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const {
     envs,
     disks: [{ size }],
+    email,
+    password,
     ...base
   } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
@@ -66,7 +68,9 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     size,
     sshKey,
     randomSuffix,
-    publicIp
+    publicIp,
+    email,
+    password
   );
 
   // get the info of peertube deployment
@@ -106,7 +110,9 @@ async function deployPeertubeVM(
   diskSize: number,
   sshKey: string,
   randomSuffix: string,
-  publicIp: boolean
+  publicIp: boolean,
+  email: string,
+  password: string
 ) {
   // disk
   const disk = new DiskModel();
@@ -125,11 +131,12 @@ async function deployPeertubeVM(
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/omarabdul3ziz-peertube-pt3.0_u20.04.flist";
+    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.1.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
     SSH_KEY: sshKey,
-    PEERTUBE_ADMIN_EMAIL: "support@incubid.com",
+    PEERTUBE_ADMIN_EMAIL: email,
+    PT_INITIAL_ROOT_PASSWORD: password,
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
     PEERTUBE_WEBSERVER_PORT: "443",
     PEERTUBE_DB_SUFFIX: "_prod",
