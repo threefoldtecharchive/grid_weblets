@@ -3,7 +3,7 @@
 <script lang="ts">
   import VM, { Env } from "../../types/vm";
   import type { IFormField, ITab } from "../../types";
-  import deployVM from "../../utils/deployVM";
+  import deployTaiga from "../../utils/deployTaiga";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -64,7 +64,7 @@
     failed = false;
     message = undefined;
 
-    deployVM(data, profile)
+    deployTaiga(data, profile)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -133,10 +133,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
