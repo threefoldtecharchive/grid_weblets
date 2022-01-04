@@ -1,6 +1,8 @@
 <svelte:options tag="tf-peertube" />
 
 <script lang="ts">
+  import { v4 } from "uuid";
+
   // Types
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
@@ -51,10 +53,13 @@
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new VM(); // set the default specs for peertube
+  data.name = `pt${v4().split("-")[0]}`;
+  data.email = "admin@peertube.com";
+  data.password = "password";
+  data.disks = [new Disk(undefined, undefined, 20, undefined)];
   data.cpu = 2;
   data.memory = 2048;
   data.publicIp = false;
-  data.disks = [new Disk(undefined, undefined, 20, undefined)];
 
   let active: string = "base";
   let loading = false;
@@ -149,6 +154,8 @@
           bind:invalid={passField.invalid}
           field={passField}
         />
+        <Input bind:data={data.disks[0].size} field={diskField} />
+
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -160,7 +167,6 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-        <Input bind:data={data.disks[0].size} field={diskField} />
 
         <SelectNodeId
           publicIp={data.publicIp}
