@@ -6,7 +6,7 @@ import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 
 export class Env {
-  constructor(public id = v4(), public key = "", public value = "") { }
+  constructor(public id = v4(), public key = "", public value = "") {}
 
   public get valid(): boolean {
     const { key, value } = this;
@@ -32,7 +32,7 @@ export class Disk {
     public name = "DISK" + id.split("-")[0],
     public size = 50,
     public mountpoint = "/opt/"
-  ) { }
+  ) {}
 
   public get valid(): boolean {
     const { name, size, mountpoint } = this;
@@ -59,7 +59,6 @@ export default class VM {
     public entrypoint = "/sbin/zinit init",
     public planetary = true,
     public nodeId: number = null,
-    public rootFsSize = 25,
 
     /* Network */
     public network = new Network(),
@@ -73,11 +72,11 @@ export default class VM {
     public password = "",
 
     public selection = new NodeID()
-  ) { }
+  ) {}
 
   public get valid(): boolean {
     const { name, flist, cpu, memory, entrypoint, nodeId } = this;
-    const { rootFsSize, network, envs, disks } = this;
+    const { network, envs, disks } = this;
     return (
       name !== "" &&
       flist !== "" &&
@@ -85,7 +84,6 @@ export default class VM {
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
       isValidInteger(nodeId) &&
-      isValidInteger(rootFsSize) &&
       network.valid &&
       envs.reduce((res, env) => res && env.valid, true) &&
       disks.reduce((res, disk) => res && disk.valid, true)
