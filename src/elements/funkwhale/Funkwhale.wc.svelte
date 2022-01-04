@@ -36,8 +36,7 @@
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
 
   const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
-  
-  
+
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -133,10 +132,7 @@
           publicIp={false}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status

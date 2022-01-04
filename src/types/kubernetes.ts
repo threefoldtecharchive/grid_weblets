@@ -11,7 +11,6 @@ export abstract class Base {
     public diskSize: number = 100,
     public publicIp: boolean = false,
     public memory: number = 4096,
-    public rootFsSize: number = 50,
     public planetary: boolean = true,
 
     public selection = new NodeID(),
@@ -19,14 +18,13 @@ export abstract class Base {
   ) {}
 
   public get valid(): boolean {
-    const { name, node, cpu, diskSize, memory, rootFsSize } = this;
+    const { name, node, cpu, diskSize, memory } = this;
     return (
       name !== "" &&
       isValidInteger(node) &&
       isValidInteger(cpu) &&
       isValidInteger(diskSize) &&
-      isValidInteger(memory) &&
-      isValidInteger(rootFsSize)
+      isValidInteger(memory)
     );
   }
 }

@@ -3,6 +3,7 @@ import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import rootFs from "./rootFs";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -22,7 +23,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     ...base
   } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId, rootFsSize } = base;
+  const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
 
   const http = new HTTPMessageBusClient(0, "");
@@ -120,7 +121,7 @@ async function deployPeertubeVM(
   vm.planetary = true;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = 4;
+  vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
     "https://hub.grid.tf/tf-official-apps/threefoldtech-peertube-v3.0.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
