@@ -38,7 +38,7 @@ function createNode(data: Base) {
   node.disk_size = data.diskSize;
   node.memory = data.memory;
   node.public_ip = data.publicIp;
-  node.rootfs_size = data.rootFsSize;
+  node.rootfs_size = 0;
   node.planetary = data.planetary;
   return node;
 }

@@ -9,7 +9,7 @@ import deploy from "./deploy";
 export default async function deployVM(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId, rootFsSize } = base;
+  const { publicIp, planetary, nodeId } = base;
 
   const vm = new MachineModel();
   vm.name = name;
@@ -19,7 +19,7 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vm.planetary = planetary;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = rootFsSize;
+  vm.rootfs_size = 0;
   vm.flist = flist;
   vm.entrypoint = entrypoint;
   vm.env = createEnvs(envs);

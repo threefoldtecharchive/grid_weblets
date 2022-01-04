@@ -40,7 +40,6 @@
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
-    { label: "Root FS Size (GB)", symbol: "rootFsSize", placeholder: "Root File System Size in GB", type: 'number' },
   ];
 
   $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid"; // prettier-ignore
@@ -50,7 +49,7 @@
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
     getGrid(profile, (grid) => {
-      const { name, cpu, memory, diskSize, publicIp, planetary, rootFsSize, node } = worker; // prettier-ignore
+      const { name, cpu, memory, diskSize, publicIp, planetary, node } = worker; // prettier-ignore
       const workerModel = new AddWorkerModel();
       workerModel.deployment_name = k8s.name;
       workerModel.name = name;
@@ -59,7 +58,7 @@
       workerModel.disk_size = diskSize;
       workerModel.public_ip = publicIp;
       workerModel.planetary = planetary;
-      workerModel.rootfs_size = rootFsSize;
+      workerModel.rootfs_size = 0;
       workerModel.node_id = node;
       grid.k8s
         .add_worker(workerModel)

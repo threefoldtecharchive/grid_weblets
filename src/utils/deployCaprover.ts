@@ -36,7 +36,7 @@ export default async function deployCaprover(
   machine.planetary = false;
   machine.flist = CAPROVER_FLIST;
   machine.qsfs_disks = [];
-  machine.rootfs_size = 10;
+  machine.rootfs_size = 0;
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SWM_NODE_MODE: "leader",
