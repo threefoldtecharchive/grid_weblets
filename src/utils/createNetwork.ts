@@ -5,5 +5,6 @@ export default function createNetwork(nw: Network) {
   const network = new NetworkModel();
   network.name = nw.name;
   network.ip_range = nw.ipRange;
+  network.addAccess = true;
   return network;
 }
