@@ -154,10 +154,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFsSize
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status
