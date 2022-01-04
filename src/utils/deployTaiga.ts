@@ -103,7 +103,7 @@ async function deployTaigaVM(
   vm.planetary = true;
   vm.cpu = 4;
   vm.memory = 1024 * 8;
-  vm.rootfs_size = rootFs(2, 2 * 1024);
+  vm.rootfs_size = rootFs(4, 8 * 1024);
   vm.flist =
     "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-taiga-test.flist";
   vm.entrypoint = "/sbin/zinit init";
