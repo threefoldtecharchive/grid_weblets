@@ -33,7 +33,8 @@
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false }
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false },
+    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
   ];
 
   const diskField: IFormField = {
@@ -49,6 +50,7 @@
   let data = new VM(); // set the default specs for peertube
   data.cpu = 2;
   data.memory = 2048;
+  data.publicIp = false;
   data.disks = [new Disk(undefined, undefined, 20, undefined)];
 
   let active: string = "base";
@@ -149,7 +151,7 @@
         <Input bind:data={data.disks[0].size} field={diskField} />
 
         <SelectNodeId
-          publicIp={false}
+          publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(

@@ -64,7 +64,8 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     memory,
     size,
     sshKey,
-    randomSuffix
+    randomSuffix,
+    publicIp
   );
 
   // get the info of peertube deployment
@@ -103,7 +104,8 @@ async function deployPeertubeVM(
   memory: number,
   diskSize: number,
   sshKey: string,
-  randomSuffix: string
+  randomSuffix: string,
+  publicIp: boolean
 ) {
   // disk
   const disk = new DiskModel();
@@ -116,11 +118,11 @@ async function deployPeertubeVM(
   vm.name = `vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
-  vm.public_ip = false;
+  vm.public_ip = publicIp;
   vm.planetary = true;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = 4;
+  vm.rootfs_size = 0;
   vm.flist =
     "https://hub.grid.tf/omarabdul3ziz.3bot/omarabdul3ziz-peertube-pt3.0_u20.04.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
