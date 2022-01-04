@@ -3,6 +3,7 @@ import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import getGrid from "./getGrid";
+import rootFs from "./rootFs";
 const { K8SModel, KubernetesNodeModel } = window.configs?.grid3_client ?? {};
 
 export default async function deployKubernetes(
@@ -38,7 +39,7 @@ function createNode(data: Base) {
   node.disk_size = data.diskSize;
   node.memory = data.memory;
   node.public_ip = data.publicIp;
-  node.rootfs_size = 0;
+  node.rootfs_size = rootFs(data.cpu, data.memory);
   node.planetary = data.planetary;
   return node;
 }

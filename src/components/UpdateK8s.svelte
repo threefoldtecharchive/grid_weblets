@@ -18,6 +18,8 @@
   import DeployBtn from "./DeployBtn.svelte";
   import { createEventDispatcher } from "svelte";
   import Table from "./Table.svelte";
+  import rootFs from "../utils/rootFs";
+  import { dataset_dev } from "svelte/internal";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -58,7 +60,7 @@
       workerModel.disk_size = diskSize;
       workerModel.public_ip = publicIp;
       workerModel.planetary = planetary;
-      workerModel.rootfs_size = 0;
+      workerModel.rootfs_size = rootFs(cpu, memory);
       workerModel.node_id = node;
       grid.k8s
         .add_worker(workerModel)

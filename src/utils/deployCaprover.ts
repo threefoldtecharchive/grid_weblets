@@ -4,6 +4,7 @@ import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import getGrid from "./getGrid";
+import rootFs from "./rootFs";
 // const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const { MachinesModel, DiskModel /* , GridClient */, MachineModel } =
   window.configs?.grid3_client ?? {};
@@ -36,7 +37,7 @@ export default async function deployCaprover(
   machine.planetary = false;
   machine.flist = CAPROVER_FLIST;
   machine.qsfs_disks = [];
-  machine.rootfs_size = 0;
+  machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SWM_NODE_MODE: "leader",

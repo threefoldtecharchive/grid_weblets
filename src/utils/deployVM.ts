@@ -5,6 +5,7 @@ const { DiskModel, MachineModel, MachinesModel } =
 import type { IProfile } from "../types/Profile";
 import getGrid from "./getGrid";
 import deploy from "./deploy";
+import rootFs from "./rootFs";
 
 export default async function deployVM(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
@@ -19,7 +20,7 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vm.planetary = planetary;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = 0;
+  vm.rootfs_size = rootFs(cpu, memory);
   vm.flist = flist;
   vm.entrypoint = entrypoint;
   vm.env = createEnvs(envs);
