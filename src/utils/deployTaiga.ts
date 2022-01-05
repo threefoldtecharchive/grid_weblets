@@ -16,7 +16,7 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployFunkwhale(data: VM, profile: IProfile) {
+export default async function deployTaiga(data: VM, profile: IProfile) {
   const { envs, disks, username, email, password, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
@@ -136,7 +136,7 @@ async function deployPrefixGateway(
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${backend}]:9000/`];
+  gw.backends = [`http://[${backend}]:9000/`, `ws://[${backend}]:9000/`];
 
   return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway
