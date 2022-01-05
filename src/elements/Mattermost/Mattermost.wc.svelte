@@ -22,7 +22,7 @@
     { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost name", validator },
     { label: "Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator },
     { label: "Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator },
-    { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator },
+    // { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator },
     { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator },
     { label: "SMTP port", symbol: "port", type: "text", placeholder: "SMTP port", validator },
   ];
@@ -89,7 +89,7 @@
         cpu={2}
         ssd={10}
         memory={2048}
-        publicIp={true}
+        publicIp={false}
         nodes={data.selection.nodes}
         filters={data.selection.filters}
         on:fetch={({ detail }) => (data.selection.nodes = detail)}

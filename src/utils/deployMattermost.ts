@@ -3,20 +3,45 @@ import type Mattermost from "../types/mattermost";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
+import { selectGatewayNode } from "./gatewayHelpers";
+import getGrid from "./getGrid";
 import rootFs from "./rootFs";
-const { MachineModel, MachinesModel } = window.configs?.grid3_client ?? {};
+const { MachineModel, MachinesModel, GatewayNameModel } =
+  window.configs?.grid3_client ?? {};
 
-export default function deployMattermost(
+export default async function deployMattermost(
   profile: IProfile,
   mattermost: Mattermost
 ) {
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  const domain = `${mattermost.name}.${nodeDomain}`;
+
+  mattermost.domain = domain;
+
+  const matterMostVm = await _deployMatterMost(profile, mattermost);
+  const ip = matterMostVm.planetary as string;
+
+  try {
+    await _deployGateway(profile, mattermost, ip, publicNodeId);
+  } catch (err) {
+    await getGrid(profile, (grid) => {
+      return grid.machines.delete({ name: mattermost.name });
+    });
+    console.log("Error", err);
+    throw err;
+  }
+
+  return matterMostVm;
+}
+
+function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   const { name, username, password, server, domain, port, nodeId } = mattermost;
 
   const vm = new MachineModel();
   vm.name = name;
   vm.node_id = nodeId;
   vm.disks = [];
-  vm.public_ip = true;
+  vm.public_ip = false;
   vm.planetary = true;
   vm.cpu = 2;
   vm.memory = 2048;
@@ -39,9 +64,29 @@ export default function deployMattermost(
   vms.machines = [vm];
 
   return deploy(profile, "VM", name, (grid) => {
-    return grid.machines.deploy(vms).then((res) => {
-      console.log({ res });
-      return res;
-    });
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
+  });
+}
+
+function _deployGateway(
+  profile: IProfile,
+  { name }: Mattermost,
+  ip: string,
+  nodeId: number
+) {
+  const gw = new GatewayNameModel();
+  gw.name = name;
+  gw.node_id = nodeId;
+  gw.tls_passthrough = false;
+  gw.backends = [`http://[${ip}]:9000`];
+
+  return deploy(profile, "GatewayName", name, (grid) => {
+    return grid.gateway
+      .deploy_name(gw)
+      .then(() => grid.gateway.getObj(name))
+      .then(([gw]) => gw);
   });
 }

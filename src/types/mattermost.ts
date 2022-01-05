@@ -50,7 +50,7 @@ export default class Mattermost implements IMattermost {
       name.trim() === "" ||
       username.trim() === "" ||
       password.trim() === "" ||
-      domain.trim() === "" ||
+      // domain.trim() === "" ||
       server.trim() === "" ||
       port.trim() === "" ||
       !isValidInteger(port.trim()) ||
