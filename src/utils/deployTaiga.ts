@@ -49,7 +49,7 @@ export default async function deployTaiga(data: VM, profile: IProfile) {
   network.name = `net${randomSuffix}`;
   network.ip_range = "10.1.0.0/16";
 
-  await deployTaigaVM(
+  const deployment = await deployTaigaVM(
     profile,
     client,
     name,
@@ -78,7 +78,7 @@ export default async function deployTaiga(data: VM, profile: IProfile) {
   }
 
   const gatewayInfo = await getGatewayInfo(client, domainName);
-  return { domain, planetaryIP };
+  return { deployment, domain, planetaryIP };
 }
 
 async function deployTaigaVM(
@@ -109,7 +109,6 @@ async function deployTaigaVM(
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     DOMAIN_NAME: domain,
-    SSH_KEY: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsX9pdO2K6sjCbxzrBdc+o91L/AOGzI31Slcp1ZGpjpHs/lhS2O1sogVdbCgTOkxRKMkuaAkvcqrMwPBmfwhNVITFqKT7S+ZcWy26FInkjv7geWwgHaDu43eXfor6UdhEJg2sj/A61V2yQK1N+nTeqQqZOu0uZASfLbQjffO3lrCRKDWkSwmSHbqRF1+O5wEQh4ItH1VQhNoK7PfnY63/+DKZ0i4lbSbqUJ9BGjryOODSlK9+1EvemptSft58CaQRwlT247EfKFwKpuM0mbuoKA2SxEfEaoTTYg41GUGc4uH2nYUMMBIyKBe0FU+Alli433EzQA2LcJiELreLb4y5ZzBULoOVEEhFLVLEGTyUKYQ0nGMH9cAn6/5BijQJXLa7a/O1dE1ZLKL6B9PJfqyZhK7tlqDEb8NCxb2yv3OiC9B7rftLlelWXZEc/jVw8CgdmAJ9sD1ktCHuBFi7TPQTHdE6bcze22vYJJ86r4IuxgZJ3YKNCiKSWyDt0KFfq9Zs= ahmed@Ahmed-Samir"
   };
 
   const vms = new MachinesModel();
@@ -136,7 +135,7 @@ async function deployPrefixGateway(
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${backend}]:9000/`, `ws://[${backend}]:9000/`];
+  gw.backends = [`http://[${backend}]:9000/`];
 
   return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway

@@ -68,7 +68,7 @@
       .then((data) => {
         deploymentStore.set(0);
         success = true;
-        modalData = data;
+        modalData = data.deployment;
       })
       .catch((err: Error) => {
         failed = true;
