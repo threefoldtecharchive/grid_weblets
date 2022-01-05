@@ -13,6 +13,11 @@ export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format";
 }
 
+export function validateEmailTaiga(email: string): string | void {
+  if (email == "") return null;
+  if (!EMAIL_REGEX.test(email) ) return "Invalid email format";
+}
+
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
 }

@@ -1,7 +1,7 @@
 <svelte:options tag="tf-taiga" />
 
 <script lang="ts">
-  import VM, { Env } from "../../types/vm";
+  import VM, { Disk, Env } from "../../types/vm";
   import type { IFormField, ITab } from "../../types";
   import deployTaiga from "../../utils/deployTaiga";
   import type { IProfile } from "../../types/Profile";
@@ -19,26 +19,45 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-
+    validateCpu,
+    validateEmailTaiga,
+    validateDisk,
+    validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
   let data = new VM();
 
-  const tabs: ITab[] = [{ label: "Base", value: "base" }]
-
+  data.disks = [new Disk()];
   let profile: IProfile;
   let active: string = "base";
   let loading = false;
   let success = false;
   let failed = false;
 
+  const tabs: ITab[] = [{ label: "Base", value: "base" }]
+  const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+
   let baseFields: IFormField[] = [
-    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
+
+    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false }
   ];
 
-  const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const emailField: IFormField = { label: "Email", symbol: "email", type: "text", validator: validateEmailTaiga, invalid: false }; // prettier-ignore
+  const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
+
+  const emailHostField: IFormField = { label: "Email Host", placeholder: "Ex. smtp.host.example.com", symbol: "emailhost", type: "text", validator: validateEmailTaiga, invalid: false }; // prettier-ignore
+
+  const diskField: IFormField = {
+    label: "Disk (GB)",
+    symbol: "disk",
+    placeholder: "Your Disk size in GB",
+    type: "number",
+    validator: validateDisk,
+    invalid: false,
+  };
 
   let message: string;
   let modalData: Object;
@@ -116,7 +135,26 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-
+        <Input
+          bind:data={data.email}
+          bind:invalid={emailField.invalid}
+          field={emailField}
+        />
+        <Input
+          bind:data={data.username}
+          bind:invalid={userNameField.invalid}
+          field={userNameField}
+        />
+        <Input
+          bind:data={data.password}
+          bind:invalid={passwordField.invalid}
+          field={passwordField}
+        />
+        <Input
+          bind:data={data.hostemail}
+          bind:invalid={emailHostField.invalid}
+          field={emailHostField}
+        />
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -129,6 +167,8 @@
           {/if}
         {/each}
 
+        <Input bind:data={data.disks[0].size} field={diskField} />
+        
         <SelectNodeId
           publicIp={data.publicIp}
           cpu={data.cpu}
@@ -142,19 +182,6 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "env"}
-        <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
-        <div class="nodes-container">
-          {#each data.envs as env, index (env.id)}
-            <div class="box">
-              <DeleteBtn
-                name={env.key}
-                on:click={() =>
-                  (data.envs = data.envs.filter((_, i) => index !== i))}
-              />
-            </div>
-          {/each}
-        </div>
         
       {/if}
     {/if}
@@ -181,5 +208,4 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  @import "../../assets/global.scss";
 </style>

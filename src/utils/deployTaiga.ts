@@ -17,10 +17,10 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployTaiga(data: VM, profile: IProfile) {
-  const { envs, disks, username, email, password, ...base } = data;
+  const { envs, disks:[{size}], username, email, password, hostemail, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv } = profile;
+  const { mnemonics, storeSecret, networkEnv, sshKey} = profile;
 
   const http = new HTTPMessageBusClient(0, "");
   const client = new GridClient(
@@ -55,7 +55,15 @@ export default async function deployTaiga(data: VM, profile: IProfile) {
     name,
     network,
     nodeId,
+    cpu,
+    memory,
+    size,
     domain,
+    username,
+    email,
+    password,
+    sshKey,
+    hostemail,
     randomSuffix,
   );
 
@@ -87,12 +95,20 @@ async function deployTaigaVM(
   name: string,
   network: any,
   nodeId: number,
+  cpu: number,
+  memory: number,
+  diskSize: number,
   domain: string,
+  username: string,
+  email: string,
+  password: string,
+  sshKey: string,
+  hostemail: string,
   randomSuffix: string,
 ) {
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = 10;
+  disk.size = diskSize;
   disk.mountpoint = "/data";
 
   const vm = new MachineModel();
@@ -101,14 +117,22 @@ async function deployTaigaVM(
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 4;
-  vm.memory = 1024 * 8;
-  vm.rootfs_size = rootFs(4, 8 * 1024);
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
     "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-taiga-test.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
+    SSH_KEY: sshKey,
     DOMAIN_NAME: domain,
+    DEFAULT_FROM_EMAIL: email,
+    EMAIL_USE_TLS: "False",
+    EMAIL_USE_SSL: "False",
+    EMAIL_HOST: hostemail,
+    EMAIL_PORT: "587",
+    EMAIL_HOST_USER: username,
+    EMAIL_HOST_PASSWORD: password
   };
 
   const vms = new MachinesModel();

@@ -70,6 +70,7 @@ export default class VM {
     public email = "",
     public username = "admin",
     public password = "",
+    public hostemail = "",
 
     public selection = new NodeID()
   ) {}
