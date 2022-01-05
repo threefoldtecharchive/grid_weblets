@@ -1,57 +1,59 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
-import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
-import { Disk } from "./vm";
 
 interface IMattermost {
   name: string;
   username: string;
   password: string;
-  dbUsername: string;
   nodeId: number;
+  domain: string;
+  server: string;
+  port: string;
 }
 
 export default class Mattermost implements IMattermost {
+  id = v4();
+  selection = new NodeID();
+  status: "invalid" | "valid" = "invalid";
+
   name: string;
   username: string;
   password: string;
-  dbUsername: string;
   nodeId: number;
-
-  /* default info */
-  id = v4();
-  network = new Network();
-  selection = new NodeID();
-  status: "invalid" | "valid" = "invalid";
-  cpu = 2;
-  memory = 2048;
-  publicIp = true;
-  planetary = true;
-  disk = new Disk(undefined, undefined, 50);
-  rootFsSize = 10;
+  domain: string;
+  server: string;
+  port: string;
 
   constructor({
     name,
     username,
     password,
-    dbUsername,
     nodeId,
+    domain,
+    server,
+    port,
   }: Partial<IMattermost> = {}) {
     this.name = name || "MM" + this.id.split("-")[0];
     this.username = username || "";
     this.password = password || "";
-    this.dbUsername = dbUsername || "";
     this.nodeId = nodeId;
+    this.domain = domain || "";
+    this.server = server || "";
+    this.port = port || "8000";
   }
 
   get invalid(): boolean {
-    const { name, username, password, dbUsername, nodeId } = this;
+    const { name, username, password, nodeId } = this;
+    const { domain, server, port } = this;
     return (
       name.trim() === "" ||
       username.trim() === "" ||
       password.trim() === "" ||
-      dbUsername.trim() === "" ||
+      domain.trim() === "" ||
+      server.trim() === "" ||
+      port.trim() === "" ||
+      !isValidInteger(port.trim()) ||
       !isValidInteger(nodeId)
     );
   }

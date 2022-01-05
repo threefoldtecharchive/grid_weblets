@@ -22,7 +22,9 @@
     { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost name", validator },
     { label: "Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator },
     { label: "Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator },
-    { label: "Database Username", symbol: "dbUsername", type: "text", placeholder: "Database Username", validator }
+    { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator },
+    { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator },
+    { label: "SMTP port", symbol: "port", type: "text", placeholder: "SMTP port", validator },
   ];
 
   let profile: IProfile;
