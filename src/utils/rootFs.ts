@@ -1,7 +1,15 @@
+const GB = 1024;
+
 export default function rootFs(
   cpu_in_cores: number,
-  memory_in_mb: number
+  mem_in_mb: number
 ): number {
-  const sru = (cpu_in_cores * (memory_in_mb / 1024)) / 8;
-  return sru * 50;
+  const mem_in_gb = mem_in_mb / GB;
+  const x = cpu_in_cores * mem_in_gb;
+  const y = 8;
+
+  const cu = x / y;
+
+  if (cu === 0) return 500 / GB;
+  return 2;
 }
