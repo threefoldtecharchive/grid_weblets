@@ -20,6 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { validateEmail } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
 
   const data = new VM();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -132,7 +133,10 @@
           publicIp={false}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
+          ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            rootFs(data.cpu, data.memory)
+          )}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status

@@ -232,7 +232,7 @@
               cpu={worker.cpu}
               memory={worker.memory}
               publicIp={worker.publicIp}
-              ssd={worker.diskSize}
+              ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
               filters={worker.selection.filters}
               bind:data={worker.node}
               bind:nodeSelection={worker.selection.type}

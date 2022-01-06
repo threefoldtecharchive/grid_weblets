@@ -23,6 +23,7 @@
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
 
   const data = new Caprover();
   let loading = false;
@@ -159,7 +160,7 @@
           cpu={data.cpu}
           memory={data.memory}
           publicIp={true}
-          ssd={data.diskSize}
+          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status
