@@ -17,7 +17,7 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployTaiga(data: VM, profile: IProfile) {
-  const { envs, disks:[{size}], username, email, password, hostemail, ...base } = data;
+  const { envs, disks:[{size}], username, email, password, emailhost, emailport, emailhostpassword, emailhostusername, tls, ssl, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv, sshKey} = profile;
@@ -63,7 +63,10 @@ export default async function deployTaiga(data: VM, profile: IProfile) {
     email,
     password,
     sshKey,
-    hostemail,
+    emailhost,
+    emailport,
+    emailhostusername,
+    emailhostpassword,
     randomSuffix,
   );
 
@@ -103,7 +106,11 @@ async function deployTaigaVM(
   email: string,
   password: string,
   sshKey: string,
-  hostemail: string,
+  emailhost: string,
+  emailport: string, 
+  emailhostusername: string,
+  emailhostpassword: string,
+
   randomSuffix: string,
 ) {
   const disk = new DiskModel();
@@ -129,8 +136,8 @@ async function deployTaigaVM(
     DEFAULT_FROM_EMAIL: email,
     EMAIL_USE_TLS: "False",
     EMAIL_USE_SSL: "False",
-    EMAIL_HOST: hostemail,
-    EMAIL_PORT: "587",
+    EMAIL_HOST: emailhost,
+    EMAIL_PORT: emailport,
     EMAIL_HOST_USER: username,
     EMAIL_HOST_PASSWORD: password
   };

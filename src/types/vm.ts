@@ -67,10 +67,19 @@ export default class VM {
     public disks: Disk[] = [],
     public publicIp = false,
 
+    /* Superuser credentials */
     public email = "",
     public username = "admin",
     public password = "",
-    public hostemail = "",
+    
+    /* Mail server credentials */ 
+    public emailhost = "",
+    public emailport = "",
+    public emailhostusername = "",
+    public emailhostpassword = "",
+
+    public tls = "",
+    public ssl = "",
 
     public selection = new NodeID()
   ) {}

@@ -25,6 +25,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+import { validate } from "uuid";
 
   let data = new VM();
 
@@ -35,7 +36,10 @@
   let success = false;
   let failed = false;
 
-  const tabs: ITab[] = [{ label: "Base", value: "base" }]
+  const tabs: ITab[] = [
+    { label: "Base", value: "base" },
+    { label: "Mail Server", value: "mail" }
+  ]
   const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   let baseFields: IFormField[] = [
@@ -48,8 +52,6 @@
   const emailField: IFormField = { label: "Email", symbol: "email", type: "text", validator: validateEmailTaiga, invalid: false }; // prettier-ignore
   const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
-  const emailHostField: IFormField = { label: "Email Host", placeholder: "Ex. smtp.host.example.com", symbol: "emailhost", type: "text", validator: validateEmailTaiga, invalid: false }; // prettier-ignore
-
   const diskField: IFormField = {
     label: "Disk (GB)",
     symbol: "disk",
@@ -58,6 +60,16 @@
     validator: validateDisk,
     invalid: false,
   };
+
+  let mailFields: IFormField[] = [
+
+    { label: "Email Host", symbol: "host", placeholder: "Ex. smtp.host.example.com", type: "text", validator: validateEmailTaiga, invalid: false },
+    { label: "Email Port", symbol: "port", placeholder: "SMTP Port", type: "text", validator: validateEmailTaiga, invalid: false },
+    { label: "Host Username", symbol: "hostusername", placeholder: "Host Username", type: "text", validator: validateEmailTaiga, invalid: false },
+    { label: "Host Password", symbol: "hostpassword", placeholder: "Host Password", type: "text", validator: validateEmailTaiga, invalid: false },
+    { label: "TLS", symbol: "tls", placeholder: "", type: 'checkbox' },
+    { label: "SSL", symbol: "ssl", placeholder: "", type: 'checkbox' },
+  ];
 
   let message: string;
   let modalData: Object;
@@ -150,11 +162,6 @@
           bind:invalid={passwordField.invalid}
           field={passwordField}
         />
-        <Input
-          bind:data={data.hostemail}
-          bind:invalid={emailHostField.invalid}
-          field={emailHostField}
-        />
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -182,7 +189,18 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-        
+      {:else if active === "mail"}
+        {#each mailFields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
       {/if}
     {/if}
 
