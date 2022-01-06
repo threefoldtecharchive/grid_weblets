@@ -41,16 +41,16 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vm.name = name;
   vm.node_id = nodeId;
   vm.disks = [];
-  vm.public_ip = false;
+  vm.public_ip = true;
   vm.planetary = true;
-  vm.cpu = 2;
-  vm.memory = 2048;
-  vm.rootfs_size = rootFs(2, 2048);
-  vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-mattermost-latest.flist"; // prettier-ignore
-  vm.entrypoint = "/entrypoint.sh";
+  vm.cpu = 4;
+  vm.memory = 8 * 1024;
+  vm.rootfs_size = rootFs(4, 8 * 1024);
+  vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-mattermost-with-siteurl.flist"; // prettier-ignore
+  vm.entrypoint = "/entrypoint.sh mattermost";
   vm.env = {
     DB_PASSWORD: password,
-    SITE_URL: domain,
+    SITE_URL: "https://" + domain,
     SMTPUsername: username,
     SMTPPassword: password,
     SMTPServer: server,
@@ -81,7 +81,7 @@ function _deployGateway(
   gw.name = name;
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${ip}]:9000`];
+  gw.backends = [`http://[${ip}]:8000`];
 
   return deploy(profile, "GatewayName", name, (grid) => {
     return grid.gateway
