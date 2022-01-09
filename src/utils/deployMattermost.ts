@@ -46,7 +46,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vm.cpu = 4;
   vm.memory = 8 * 1024;
   vm.rootfs_size = rootFs(4, 8 * 1024);
-  vm.flist = "https://hub.grid.tf/omar0.3bot/omarelawady-mattermost-with-siteurl.flist"; // prettier-ignore
+  vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-mattermost-latest.flist"; // prettier-ignore
   vm.entrypoint = "/entrypoint.sh mattermost";
   vm.env = {
     DB_PASSWORD: password,
