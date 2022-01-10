@@ -8,17 +8,13 @@
 
   // fields
   const nameField: IFormField = { label: "Name", symbol: "name", type: "text", disabled: true }; // prettier-ignore
-  const publicIpField: IFormField = { label: "Public IP", symbol: "publicIP", type: "checkbox", disabled: true }; // prettier-ignore
   const yggIpField: IFormField = { label: "	Planetary Network IP", symbol: "planetary", type: "text", disabled: true }; // prettier-ignore
   const networkField: IFormField = { label: "Network Name", symbol: "network", type: "text", disabled: true }; // prettier-ignore
   const cpuField: IFormField = { label: "CPU", symbol: "cpu", type: "number", disabled: true }; // prettier-ignore
   const memoryField: IFormField = { label: "Memory", symbol: "memory", type: "number", disabled: true }; // prettier-ignore
-  // const diskField: IFormField = { label: "Disk", symbol: "size", type: "number", disabled: true }; // prettier-ignore
   const wireguardField: IFormField = { label: "WireGuard", symbol: "wireguard", type: "text", disabled: true }; // prettier-ignore
   const flistField: IFormField = { label: "Flist", symbol: "flist", type: "text", disabled: true }; // prettier-ignore
-  // const domainField: IFormField = { label: "Domain", symbol: "domain", type: "text", disabled: true, tooltip: "Default Password: captain42" }; // prettier-ignore
   const contractIdField: IFormField = { label: "Contract ID", symbol: "contractId", type: "number", disabled: true }; // prettier-ignore
-  const publicIpValueField: IFormField = { label: "Public IP", symbol: "publicIP", type: "text", disabled: true }; // prettier-ignore
 </script>
 
 {#if vm}
@@ -26,11 +22,55 @@
     <Input data={vm.contractId} field={contractIdField} />
   {/if}
   <Input data={vm.name} field={nameField} />
+
   {#if !!vm.publicIP}
+    {#if !!vm.publicIP.ip}
+      <Input
+        data={vm.publicIP.ip}
+        field={{
+          label: "Public IPv4",
+          symbol: "publicIP",
+          type: "text",
+          disabled: true,
+        }}
+      />
+    {/if}
+
+    {#if !!vm.publicIP.ip6}
+      <Input
+        data={vm.publicIP.ip6}
+        field={{
+          label: "Public IPv6",
+          symbol: "publicIP6",
+          type: "text",
+          disabled: true,
+        }}
+      />
+    {/if}
+  {:else}
+    <Input
+      data={false}
+      field={{
+        label: "Public IP",
+        symbol: "publicIP",
+        type: "checkbox",
+        disabled: true,
+      }}
+    />
+  {/if}
+
+  <!-- {#if vm.publicIP?.ip}
     <Input data={vm.publicIP.ip} field={publicIpValueField} />
   {:else}
     <Input data={false} field={publicIpField} />
   {/if}
+
+  {#if vm.publicIP?.ip6}
+    <Input data={vm.publicIP.ip6} field={publicIpValueField} />
+  {:else}
+    <Input data={false} field={publicIpField} />
+  {/if} -->
+
   {#if vm.planetary}
     <Input data={vm.planetary} field={yggIpField} />
   {/if}
