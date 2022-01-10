@@ -10,6 +10,7 @@ export abstract class Base {
     public cpu: number = 2,
     public diskSize: number = 100,
     public publicIp: boolean = false,
+    public publicIp6: boolean = false,
     public memory: number = 4096,
     public planetary: boolean = true,
 
