@@ -59,18 +59,6 @@
     />
   {/if}
 
-  <!-- {#if vm.publicIP?.ip}
-    <Input data={vm.publicIP.ip} field={publicIpValueField} />
-  {:else}
-    <Input data={false} field={publicIpField} />
-  {/if}
-
-  {#if vm.publicIP?.ip6}
-    <Input data={vm.publicIP.ip6} field={publicIpValueField} />
-  {:else}
-    <Input data={false} field={publicIpField} />
-  {/if} -->
-
   {#if vm.planetary}
     <Input data={vm.planetary} field={yggIpField} />
   {/if}
