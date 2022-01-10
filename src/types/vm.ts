@@ -66,6 +66,7 @@ export default class VM {
     public envs: Env[] = [],
     public disks: Disk[] = [],
     public publicIp = false,
+    public publicIp6 = false,
 
     public email = "",
     public username = "admin",
