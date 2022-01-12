@@ -41,7 +41,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vm.name = name;
   vm.node_id = nodeId;
   vm.disks = [];
-  vm.public_ip = true;
+  vm.public_ip = false;
   vm.planetary = true;
   vm.cpu = 4;
   vm.memory = 8 * 1024;
