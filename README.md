@@ -51,6 +51,13 @@ You can see the following for more information about installing other versions o
 
 
 ### Installation
+
+
+https://user-images.githubusercontent.com/31689104/149097600-be76b899-32a7-498d-96b8-b645a54a2232.mp4
+
+
+
+
 - **Clone the repo**
   ```
   git clone https://github.com/threefoldtech/grid_weblets.git
