@@ -18,7 +18,7 @@ export class Disk {
   // prettier-ignore
   public diskFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
-    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk },
+    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     {
       label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator(point: string): string | void {
         point = point.trim();
@@ -34,6 +34,13 @@ export class Disk {
     public mountpoint = "/opt/"
   ) {}
 
+  get _diskFieldsValid(): boolean {
+    return this.diskFields.reduce((res, field) => {
+      if (field.invalid === undefined) return res;
+      return res && !field.invalid;
+    }, true);
+  }
+
   public get valid(): boolean {
     const { name, size, mountpoint } = this;
     let point = mountpoint.trim();
@@ -43,7 +50,8 @@ export class Disk {
       isValidInteger(size) &&
       point !== "" &&
       point !== "/" &&
-      point.startsWith("/")
+      point.startsWith("/") &&
+      this._diskFieldsValid
     );
   }
 }

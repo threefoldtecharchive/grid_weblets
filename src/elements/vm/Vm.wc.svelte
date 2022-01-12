@@ -284,7 +284,11 @@
                     }}
                   />
                 {:else}
-                  <Input bind:data={disk[field.symbol]} {field} />
+                  <Input
+                    bind:data={disk[field.symbol]}
+                    {field}
+                    bind:invalid={field.invalid}
+                  />
                 {/if}
               {/each}
             </div>
