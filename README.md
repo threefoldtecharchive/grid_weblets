@@ -80,16 +80,16 @@ You can see the following for more information about installing other versions o
 
      ```sh
      export NODE_OPTIONS="--max-old-space-size=2048" # or even higher size 8192
-     yarn build:app
+     yarn build:app # on grid_weblets (dir)
      ```
     Increasing --max-old-space-size as needed. Note that this number can safely surpass your available physical memory. In that case, Node will start paging memory to disk as needed.
     
 ### Run The Playground
   Finally to run the playground, you need to serve the bundle created in docs directory, for that you could use `serve`
-    ```sh
-    npx serve docs
-    ```
-    you could then access open this link in your browser http://localhost:3000
+```sh
+npx serve docs
+```  
+you could then access open this link in your browser http://localhost:3000
 
 
 
