@@ -203,7 +203,6 @@ The `index.html` file should be like the following.
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VM Weblet Example</title>
 
-    <script defer src="./farmingcalculator.wc.js"></script>
     <style>
       * {
         box-sizing: border-box;
