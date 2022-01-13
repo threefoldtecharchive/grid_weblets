@@ -77,12 +77,6 @@
   }
 
   // prettier-ignore
-  // const flistFields: IFormField[] = [
-  //   { label: "FList", symbol: 'flist', placeholder: 'VM Image', type: "text" },
-  //   { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Entrypoint', type: "text"},
-  // ]
-
-  // prettier-ignore
   const envFields: IFormField[] = [
     { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text"},
     { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
@@ -116,11 +110,6 @@
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
-
-      console.log({
-        flist: data.flist,
-        valid: await isInvalidFlist(data.flist),
-      });
 
       if (await isInvalidFlist(data.flist)) {
         validateFlist.loading = false;
