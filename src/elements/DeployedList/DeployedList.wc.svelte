@@ -369,6 +369,61 @@
           />
         {/await}
 
+        <!-- Discouse -->
+      {:else if active === "discourse"}
+        {#await list.loadDiscourse()}
+          <Alert type="info" message="Listing Discourse..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+                "Billing Rate",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain =
+                      rows[i].details.env.DISCOURSE_HOSTNAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return (
+                      !env ||
+                      !env.DISCOURSE_HOSTNAME ||
+                      removing !== null
+                    );
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert type="info" message="No Discourse found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Peertube"}
+          />
+        {/await}
+
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
         {#await list.loadFunkwhale()}

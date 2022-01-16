@@ -85,6 +85,12 @@ export default class DeployedList {
       return vms.filter((vm) => vm.flist.toLowerCase().includes("caprover"));
     });
   }
+  
+  public loadDiscourse(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("discourse"));
+    });
+  }
 
   public loadFunkwhale(): Promise<any[]> {
     return this.loadVm().then((vms) => {
