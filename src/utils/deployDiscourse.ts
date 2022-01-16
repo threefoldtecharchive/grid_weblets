@@ -12,7 +12,7 @@ const { MachinesModel, DiskModel, GridClient, MachineModel, GatewayNameModel } =
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 const DISCOURSE_FLIST =
-  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v1.5.flist";
+  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v1.11.flist";
 
 export default async function deployDiscourse(
   data: Discourse,
@@ -44,7 +44,7 @@ export default async function deployDiscourse(
 
   const discourseInfo = await getDiscourseInfo(client, name);
   const planetaryIP = discourseInfo[0]["planetary"] as string;
-  const publicIP = discourseInfo[0]["publicIP"]["ip"].split("/")[0];
+  const publicIP =  discourseInfo[0]["publicIP"] ? discourseInfo[0]["publicIP"]["ip"].split("/")[0]: "";
   console.log({ discourseInfo });
   console.log({ publicIP });
 
@@ -83,13 +83,17 @@ async function depoloyDiscourseVM(
     resticRepository,
     AWSAccessKeyID,
     AWSSecretAccessKey,
-    railsEvn,
     flaskSecretKey,
     threebotURL,
     openKYCURL,
     version,
+    publicIp,
+    planetary,
+    
   } = data;
 
+  console.log({publicIp,planetary});
+  
   /* Docker disk */
   const disk = new DiskModel();
   disk.name = "data0";
@@ -102,8 +106,8 @@ async function depoloyDiscourseVM(
   machine.memory = memory;
   machine.disks = [disk];
   machine.node_id = nodeId;
-  machine.public_ip = true;
-  machine.planetary = true;
+  machine.public_ip = publicIp;
+  machine.planetary = planetary;
   machine.flist = DISCOURSE_FLIST;
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
@@ -113,7 +117,7 @@ async function depoloyDiscourseVM(
     pub_key: profile.sshKey,
     DISCOURSE_SMTP_PASSWORD: smtp.password,
     DISCOURSE_VERSION: version,
-    RAILS_ENV: railsEvn,
+    RAILS_ENV: "production",
     DISCOURSE_HOSTNAME: domain,
     DISCOURSE_SMTP_USER_NAME: smtp.userName,
     DISCOURSE_SMTP_ADDRESS: smtp.address,
@@ -122,7 +126,7 @@ async function depoloyDiscourseVM(
     THREEBOT_PRIVATE_KEY: threepotPRKey,
     FLASK_SECRET_KEY: flaskSecretKey,
     THREEBOT_URL: threebotURL,
-    OPEN_KYC_URL: openKYCURL,
+    OPEN_KYC_URL: openKYCURL,   
     RESTIC_REPOSITORY: resticRepository,
     RESTIC_PASSWORD: resticPassword,
     AWS_ACCESS_KEY_ID: AWSAccessKeyID,
@@ -159,7 +163,7 @@ async function deployPrefixGateway(
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://${publicIP}:80`];
+  gw.backends = [`http://[${backend}]:80`];
 
   return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway.deploy_name(gw);

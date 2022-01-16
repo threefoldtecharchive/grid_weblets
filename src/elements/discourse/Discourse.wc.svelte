@@ -49,7 +49,11 @@
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
+    { label: "SMTP Name", symbol: "smtp.userName", placeholder: "SMTP Name", type: "text", validator: validateEmail, invalid: false },
+    { label: "SMTP Password", symbol: "smtp.password", placeholder: "SMTP password", type: "password", invalid: false },
     { label: "Threebot private key", symbol: "threepotPRKey", placeholder: "Threebot private key", type: "text", invalid: false },
+    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
+    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
@@ -136,7 +140,7 @@
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
-          publicIp={false}
+          publicIp={data.publicIp}
           ssd={data.diskSize + rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}

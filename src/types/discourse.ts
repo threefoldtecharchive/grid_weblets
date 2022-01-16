@@ -33,10 +33,11 @@ export default class Discourse {
     public developerEmail = "",
     public threepotPRKey = "",
     public smtp = new SMTP(),
+    public publicIp = false,
+    public planetary = true,
 
     public publicKey = "",
     public version = "staging",
-    public railsEvn = "production",
     public threebotURL = "https://login.threefold.me",
     public flaskSecretKey = "flasksecret",
     public openKYCURL = "https://openkyc.live/verification/verify-sei",
