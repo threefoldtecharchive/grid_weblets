@@ -17,7 +17,7 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployTaiga(data: VM, profile: IProfile) {
-  const { envs, disks:[{size}], username, email, password, emailhost, emailport, emailhostpassword, emailhostusername, tls, ssl, ...base } = data;
+  const { envs, disks:[{size}], adminUsername, adminEmail, adminPassword, smtpFromEmail, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, smtpUseTLS, smtpUseSSL, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv, sshKey} = profile;
@@ -59,14 +59,17 @@ export default async function deployTaiga(data: VM, profile: IProfile) {
     memory,
     size,
     domain,
-    username,
-    email,
-    password,
+    adminUsername,
+    adminEmail,
+    adminPassword,
     sshKey,
-    emailhost,
-    emailport,
-    emailhostusername,
-    emailhostpassword,
+    smtpFromEmail,
+    smtpHost,
+    smtpPort,
+    smtpHostUser,
+    smtpHostPassword,
+    smtpUseTLS,
+    smtpUseSSL,
     randomSuffix,
   );
 
@@ -83,7 +86,7 @@ export default async function deployTaiga(data: VM, profile: IProfile) {
       publicNodeId
     );
   } catch (error) {
-    // rollback the FunkwhaleVM if the gateway fails to deploy
+    // rollback the TaigaVM if the gateway fails to deploy
     await client.machines.delete({ name: name });
     throw error;
   }
@@ -102,21 +105,23 @@ async function deployTaigaVM(
   memory: number,
   diskSize: number,
   domain: string,
-  username: string,
-  email: string,
-  password: string,
+  adminUsername: string,
+  adminEmail: string,
+  adminPassword: string,
   sshKey: string,
-  emailhost: string,
-  emailport: string, 
-  emailhostusername: string,
-  emailhostpassword: string,
-
+  smtpFromEmail: string,
+  smtpHost: string,
+  smtpPort: string, 
+  smtpHostUser: string,
+  smtpHostPassword: string,
+  smtpUseTLS,
+  smtpUseSSL,
   randomSuffix: string,
 ) {
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
   disk.size = diskSize;
-  disk.mountpoint = "/data";
+  disk.mountpoint = "/var/lib/docker";
 
   const vm = new MachineModel();
   vm.name = `vm${randomSuffix}`;
@@ -128,18 +133,21 @@ async function deployTaigaVM(
   vm.memory = memory;
   vm.rootfs_size = 50;
   vm.flist =
-    "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-taiga-test.flist";
+    "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-grid3_taiga_docker-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: sshKey,
     DOMAIN_NAME: domain,
-    DEFAULT_FROM_EMAIL: email,
-    EMAIL_USE_TLS: "False",
-    EMAIL_USE_SSL: "False",
-    EMAIL_HOST: emailhost,
-    EMAIL_PORT: emailport,
-    EMAIL_HOST_USER: username,
-    EMAIL_HOST_PASSWORD: password
+    ADMIN_USERNAME: adminUsername,
+    ADMIN_PASSWORD: adminPassword,
+    ADMIN_EMAIL: adminEmail,
+    DEFAULT_FROM_EMAIL: smtpFromEmail,
+    EMAIL_USE_TLS: smtpUseTLS ? "True" : "False" ,
+    EMAIL_USE_SSL: smtpUseSSL ? "True": "False",
+    EMAIL_HOST: smtpHost,
+    EMAIL_PORT: `${ smtpPort }`,
+    EMAIL_HOST_USER: smtpHostUser,
+    EMAIL_HOST_PASSWORD: smtpHostPassword
   };
 
   const vms = new MachinesModel();

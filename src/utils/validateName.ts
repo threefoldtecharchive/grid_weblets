@@ -13,7 +13,7 @@ export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format";
 }
 
-export function validateEmailTaiga(email: string): string | void {
+export function validateOptionalEmail(email: string): string | void {
   if (email == "") return null;
   if (!EMAIL_REGEX.test(email) ) return "Invalid email format";
 }
