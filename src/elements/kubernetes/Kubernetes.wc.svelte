@@ -25,6 +25,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -170,7 +171,8 @@
           cpu={data.master.cpu}
           memory={data.master.memory}
           publicIp={data.master.publicIp}
-          ssd={data.master.diskSize}
+          ssd={data.master.diskSize +
+            rootFs(data.master.cpu, data.master.memory)}
           bind:data={data.master.node}
           bind:nodeSelection={data.master.selection.type}
           filters={data.master.selection.filters}
@@ -206,7 +208,7 @@
                 cpu={worker.cpu}
                 memory={worker.memory}
                 publicIp={worker.publicIp}
-                ssd={worker.diskSize}
+                ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
                 filters={worker.selection.filters}
                 bind:data={worker.node}
                 bind:nodeSelection={worker.selection.type}

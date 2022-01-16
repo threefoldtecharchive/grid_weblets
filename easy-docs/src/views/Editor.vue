@@ -77,7 +77,7 @@ class Weblet {
     public name: string,
     public symbol: string,
     deployment = "",
-    public section: "deployment" | "calculator" | "coming soon"
+    public section: "deployment" | "calculator" | "my account"
   ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
@@ -104,13 +104,13 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
-  public sections = ["deployment", "calculator"];
+  public sections = ["deployment", "my account", "calculator"];
   public weblets: Weblet[] = [
     new Weblet("CapRover", "caprover", "caprover", "deployment"),
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
     new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
-    new Weblet("Contracts", "contractslist", "", "deployment"),
-    new Weblet("Deployments", "deployedlist", "", "deployment"),
+    new Weblet("Contracts", "contractslist", "", "my account"),
+    new Weblet("Deployments", "deployedlist", "", "my account"),
 
     new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
 

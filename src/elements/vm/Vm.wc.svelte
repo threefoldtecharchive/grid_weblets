@@ -24,6 +24,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -224,7 +225,10 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
+          ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            rootFs(data.cpu, data.memory)
+          )}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
