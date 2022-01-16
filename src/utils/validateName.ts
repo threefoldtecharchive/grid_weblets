@@ -45,3 +45,12 @@ export function validateCpu(value: number): string | void {
   if (value < 1) return "Minimum allowed CPU cores is 1";
   if (value > 32) return "Maximum allowed CPU cores is 32";
 }
+
+export function validatePortNumber(value: string): string | void {
+  if (value === "") return null;
+  let port = +value;
+  if (isNaN(port)) return "Port must be a valid number";
+  if (port.toFixed(0) !== value) return "Port must be a valid integer";
+  if (port < 1) return "Minimum allowed port is 1";
+  if (port > 65535) return "Maximum allowed port is 65535";
+}
