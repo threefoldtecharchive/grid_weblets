@@ -1,6 +1,9 @@
 import VM from "./vm";
 import generatePassword from "../utils/generatePassword";
-
+import isValidInteger from "../utils/isValidInteger";
+import { validateEmail, validateOptionalEmail } from "../utils/validateName";
+import validateName from "../utils/validateName";
+import validateDomainName from "../utils/validateDomainName";
 export default class Taiga extends VM {
   /* Superuser settings */
   public adminEmail = "";
@@ -16,4 +19,29 @@ export default class Taiga extends VM {
 
   public smtpUseTLS = false;
   public smtpUseSSL = false;
+  public get valid(): boolean {
+    const { name, flist, cpu, memory, entrypoint, nodeId } = this;
+    const { network, envs, disks } = this;
+    const { adminEmail, adminUsername, adminPassword } = this;
+    const { smtpFromEmail, smtpHost, smtpPort, smtpHostUser, smtpHostPassword } = this;
+
+    return (
+      name !== "" &&
+      flist !== "" &&
+      entrypoint !== "" &&
+      isValidInteger(cpu) &&
+      isValidInteger(memory) &&
+      isValidInteger(nodeId) &&
+      network.valid &&
+      envs.reduce((res, env) => res && env.valid, true) &&
+      disks.reduce((res, disk) => res && disk.valid, true) &&
+      !validateEmail(adminEmail) &&
+      !validateName(adminUsername) &&
+      adminPassword !== "" &&
+      !validateOptionalEmail(smtpFromEmail) &&
+      !validateOptionalEmail(smtpHostUser) &&
+      (!validateDomainName(smtpHost) || smtpHost === "") &&
+      (isValidInteger(smtpPort) || smtpPort === "")
+    );
+  }
 }

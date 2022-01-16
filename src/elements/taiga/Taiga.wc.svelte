@@ -23,6 +23,8 @@
     validateOptionalEmail,
     validateDisk,
     validateMemory,
+validatePortNumber,
+
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
@@ -116,7 +118,8 @@
       label: "Port",
       symbol: "smtpPort",
       placeholder: "587",
-      type: "number",
+      type: "text",
+      validator: validatePortNumber,
       invalid: false,
     },
     {
