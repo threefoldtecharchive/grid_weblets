@@ -1,4 +1,4 @@
-import type { default as VM } from "../types/vm";
+import type { default as Taiga } from "../types/taiga";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
@@ -16,7 +16,7 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployTaiga(data: VM, profile: IProfile) {
+export default async function deployTaiga(data: Taiga, profile: IProfile) {
   const { envs, disks:[{size}], adminUsername, adminEmail, adminPassword, smtpFromEmail, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, smtpUseTLS, smtpUseSSL, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;

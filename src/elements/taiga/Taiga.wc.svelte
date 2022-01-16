@@ -1,18 +1,17 @@
 <svelte:options tag="tf-taiga" />
 
 <script lang="ts">
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
   import type { IFormField, ITab } from "../../types";
   import deployTaiga from "../../utils/deployTaiga";
   import type { IProfile } from "../../types/Profile";
+  import Taiga from "../../types/taiga";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
@@ -26,10 +25,9 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-import { validate } from "uuid";
-import validateDomainName from "../../utils/validateDomainName";
+  import validateDomainName from "../../utils/validateDomainName";
 
-  let data = new VM();
+  let data = new Taiga();
 
   data.disks = [new Disk()];
   let profile: IProfile;
@@ -40,19 +38,52 @@ import validateDomainName from "../../utils/validateDomainName";
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
-    { label: "Mail Server", value: "mail" }
-  ]
+    { label: "Mail Server", value: "mail" },
+  ];
   const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   let baseFields: IFormField[] = [
-
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false }
+    {
+      label: "CPU",
+      symbol: "cpu",
+      placeholder: "CPU Cores",
+      type: "number",
+      validator: validateCpu,
+      invalid: false,
+    },
+    {
+      label: "Memory (MB)",
+      symbol: "memory",
+      placeholder: "Your Memory in MB",
+      type: "number",
+      validator: validateMemory,
+      invalid: false,
+    },
   ];
   let adminFields: IFormField[] = [
-    { label: "Admin User Name", symbol: "adminUsername", placeholder: "admin", type: "text", validator: validateName, invalid: false },
-    { label: "Admin Password", symbol: "adminPassword", placeholder: "password", type: "password", invalid: false },
-    { label: "Admin Email Address", symbol: "adminEmail", placeholder: "admin@example.com", type: "text", validator: validateEmail, invalid: false },
+    {
+      label: "Admin User Name",
+      symbol: "adminUsername",
+      placeholder: "admin",
+      type: "text",
+      validator: validateName,
+      invalid: false,
+    },
+    {
+      label: "Admin Password",
+      symbol: "adminPassword",
+      placeholder: "password",
+      type: "password",
+      invalid: false,
+    },
+    {
+      label: "Admin Email Address",
+      symbol: "adminEmail",
+      placeholder: "admin@example.com",
+      type: "text",
+      validator: validateEmail,
+      invalid: false,
+    },
   ];
 
   const diskField: IFormField = {
@@ -65,11 +96,44 @@ import validateDomainName from "../../utils/validateDomainName";
   };
 
   let mailFields: IFormField[] = [
-    { label: "From Email Address", symbol: "smtpFromEmail", placeholder: "support@example.com", type: "text", validator: validateOptionalEmail, invalid: false },
-    { label: "Host Name", symbol: "smtpHost", placeholder: "smtp.example.com", type: "text", validator: validateDomainName, invalid: false },
-    { label: "Port", symbol: "smtpPort", placeholder: "587", type: "number", invalid: false },
-    { label: "User Name", symbol: "smtpHostUser", placeholder: "user@example.com", type: "text", validator: validateOptionalEmail, invalid: false },
-    { label: "Password", symbol: "smtpHostPassword", placeholder: "password", type: "password", invalid: false },
+    {
+      label: "From Email Address",
+      symbol: "smtpFromEmail",
+      placeholder: "support@example.com",
+      type: "text",
+      validator: validateOptionalEmail,
+      invalid: false,
+    },
+    {
+      label: "Host Name",
+      symbol: "smtpHost",
+      placeholder: "smtp.example.com",
+      type: "text",
+      validator: validateDomainName,
+      invalid: false,
+    },
+    {
+      label: "Port",
+      symbol: "smtpPort",
+      placeholder: "587",
+      type: "number",
+      invalid: false,
+    },
+    {
+      label: "User Name",
+      symbol: "smtpHostUser",
+      placeholder: "user@example.com",
+      type: "text",
+      validator: validateOptionalEmail,
+      invalid: false,
+    },
+    {
+      label: "Password",
+      symbol: "smtpHostPassword",
+      placeholder: "password",
+      type: "password",
+      invalid: false,
+    },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
   ];
@@ -163,7 +227,7 @@ import validateDomainName from "../../utils/validateDomainName";
         {/each}
 
         <Input bind:data={data.disks[0].size} field={diskField} />
-        
+
         {#each adminFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -190,9 +254,12 @@ import validateDomainName from "../../utils/validateDomainName";
           nodes={data.selection.nodes}
         />
       {:else if active === "mail"}
-      <div class="notification is-warning is-light">
-        <p>configure those settings only If you have an smtp service and you know what you’re doing.</p>
-      </div>
+        <div class="notification is-warning is-light">
+          <p>
+            configure those settings only If you have an smtp service and you
+            know what you’re doing.
+          </p>
+        </div>
         {#each mailFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input

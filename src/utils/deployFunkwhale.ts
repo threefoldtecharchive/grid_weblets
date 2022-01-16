@@ -1,4 +1,4 @@
-import type { default as VM } from "../types/vm";
+import type { default as Funkwhale } from "../types/funkwhale";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
@@ -17,8 +17,12 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployFunkwhale(data: VM, profile: IProfile) {
-  const { envs, disks, adminUsername, adminEmail, adminPassword, ...base } = data;
+export default async function deployFunkwhale(
+  data: Funkwhale,
+  profile: IProfile
+) {
+  const { envs, disks, adminUsername, adminEmail, adminPassword, ...base } =
+    data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;

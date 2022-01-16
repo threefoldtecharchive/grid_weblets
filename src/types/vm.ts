@@ -4,7 +4,6 @@ import isValidInteger from "../utils/isValidInteger";
 import { validateDisk } from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
-import generatePassword from "../utils/generatePassword";
 
 export class Env {
   constructor(public id = v4(), public key = "", public value = "") {}
@@ -67,21 +66,6 @@ export default class VM {
     public envs: Env[] = [],
     public disks: Disk[] = [],
     public publicIp = false,
-
-    /* Superuser settings */
-    public adminEmail = "",
-    public adminUsername = "admin",
-    public adminPassword = generatePassword(length=Math.floor(Math.random() * 5) + 10), // password length between 10 and 14,
-    
-    /* Mail server settings */
-    public smtpFromEmail = "", 
-    public smtpHost = "",
-    public smtpPort = "",
-    public smtpHostUser = "",
-    public smtpHostPassword = "",
-
-    public smtpUseTLS = false,
-    public smtpUseSSL = false,
 
     public selection = new NodeID()
   ) {}
