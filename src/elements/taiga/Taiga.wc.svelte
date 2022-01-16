@@ -259,7 +259,7 @@ validatePortNumber,
       {:else if active === "mail"}
         <div class="notification is-warning is-light">
           <p>
-            configure those settings only If you have an smtp service and you
+            configure these settings only If you have an smtp service and you
             know what you’re doing.
           </p>
         </div>
