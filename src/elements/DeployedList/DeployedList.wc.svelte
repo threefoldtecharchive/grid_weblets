@@ -7,7 +7,13 @@
   import DeployedList from "../../types/deployedList";
   import deleteContracts from "../../utils/deleteContracts";
 
-  type TabsType = "k8s" | "vm" | "caprover" | "funkwhale" | "peertube";
+  type TabsType =
+    | "k8s"
+    | "vm"
+    | "caprover"
+    | "funkwhale"
+    | "peertube"
+    | "mattermost";
   export let tab: TabsType = undefined;
 
   // components
@@ -416,6 +422,42 @@
           <Alert
             type="danger"
             message={err.message || err || "Failed to list Funkwhale"}
+          />
+        {/await}
+      {:else if active === "mattermost"}
+        {#await list.loadMattermost()}
+          <Alert type="info" message="Listing Mattermost..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+                "Billing Rate",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert type="info" message="No Mattermost found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Mattermost"}
           />
         {/await}
       {/if}

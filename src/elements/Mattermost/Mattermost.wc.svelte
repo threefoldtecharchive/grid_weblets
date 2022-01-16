@@ -14,6 +14,7 @@
   import deployMattermost from "../../utils/deployMattermost";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
+  const deploymentStore = window.configs?.deploymentStore;
   const data = new Mattermost();
   const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
 
@@ -38,7 +39,7 @@
     loading = true;
     deployMattermost(profile, data)
       .then((res) => {
-        console.log(res);
+        deploymentStore.set(0);
         success = true;
       })
       .catch((err) => {

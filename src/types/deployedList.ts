@@ -98,6 +98,12 @@ export default class DeployedList {
     });
   }
 
+  public loadMattermost(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("mattermost"));
+    });
+  }
+
   public static async init(profile: IProfile): Promise<DeployedList> {
     return new DeployedList(await getGrid(profile, (grid) => grid, false));
   }
