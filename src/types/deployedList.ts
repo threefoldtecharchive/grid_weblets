@@ -98,6 +98,11 @@ export default class DeployedList {
     });
   }
 
+  public loadTaiga(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("taiga"));
+    });
+  }
   public static async init(profile: IProfile): Promise<DeployedList> {
     return new DeployedList(await getGrid(profile, (grid) => grid, false));
   }

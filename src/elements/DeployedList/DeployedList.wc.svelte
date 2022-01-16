@@ -25,7 +25,8 @@
     { label: "Virtual Machines", value: "vm" },
     { label: "Caprover", value: "caprover" },
     { label: "FunkWhale", value: "funkwhale" },
-    { label: "Peertube", value: "peertube" }
+    { label: "Peertube", value: "peertube" },
+    { label: "Taiga", value: "taiga" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -418,6 +419,70 @@
             message={err.message || err || "Failed to list Funkwhale"}
           />
         {/await}
+
+        {:else if active === "taiga"}
+        {#await list.loadTaiga()}
+          <Alert type="info" message="Listing Taiga Instances..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={[
+                "#",
+                "Name",
+                "Public IP",
+                "Planetary Network IP",
+                "Flist",
+                "Billing Rate",
+              ]}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.DOMAIN_NAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.DOMAIN_NAME || removing !== null;
+                  },
+                },
+                {
+                  type: "warning",
+                  label: "Admin Panel",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.DOMAIN_NAME;
+                    window.open("http://" + domain + "/admin/", "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return (
+                      !env || !env.DOMAIN_NAME || removing !== null
+                    );
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert type="info" message="No Taiga instances found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Taiga instances"}
+          />
+        {/await}
+
       {/if}
     {/if}
   </section>
