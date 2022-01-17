@@ -36,14 +36,18 @@ export default class DeployedList {
     });
   }
   public loadK8s(): Promise<any[]> {
-    return this.grid.k8s
-      .list()
-      .then((names) => {
-        return Promise.all(names.map((name) => this._loadK8s(name)));
-      })
-      .then((data) => {
-        return data.filter((x) => [null, undefined].includes(x) === false);
-      });
+    try {
+      return this.grid.k8s
+        .list()
+        .then((names) => {
+          return Promise.all(names.map((name) => this._loadK8s(name)));
+        })
+        .then((data) => {
+          return data.filter((x) => [null, undefined].includes(x) === false);
+        });
+    } catch {
+      return [] as unknown as Promise<any[]>;
+    }
   }
 
   private _loadVm(name: string) {
@@ -72,14 +76,18 @@ export default class DeployedList {
   }
 
   public loadVm(): Promise<any[]> {
-    return this.grid.machines
-      .list()
-      .then((names) => {
-        return Promise.all(names.map((name) => this._loadVm(name)));
-      })
-      .then((data) => {
-        return data.filter((x) => [null, undefined].includes(x) === false);
-      });
+    try {
+      return this.grid.machines
+        .list()
+        .then((names) => {
+          return Promise.all(names.map((name) => this._loadVm(name)));
+        })
+        .then((data) => {
+          return data.filter((x) => [null, undefined].includes(x) === false);
+        });
+    } catch {
+      return [] as unknown as Promise<any[]>;
+    }
   }
 
   public loadCaprover(): Promise<any[]> {
