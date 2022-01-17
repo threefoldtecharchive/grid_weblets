@@ -94,21 +94,15 @@
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
       const { name, master, workers, consumption } = row;
-      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers, consumption]; // prettier-ignore
+      const publicIp = master.publicIP ?? ({} as any);
+      return [i + 1, name, publicIp.ip || "None", publicIp.ip6 || "None", master.planetary || "None", workers, consumption]; // prettier-ignore
     });
   }
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, publicIp, planetary, flist, consumption } = row;
-      return [
-        i + 1,
-        name,
-        publicIp ?? "",
-        planetary ?? "None",
-        flist,
-        consumption,
-      ];
+      const { name, publicIp, publicIp6, planetary, flist, consumption } = row;
+      return [i + 1, name, publicIp, publicIp6, planetary, flist, consumption];
     });
   }
 
@@ -130,6 +124,16 @@
     selectedRows = [];
     _reloadTab();
   }
+
+  const _vmHeader = [
+    "#",
+    "Name",
+    "Public IPv4",
+    "Public IPv6",
+    "Planetary Network IP",
+    "Flist",
+    "Billing Rate",
+  ];
 </script>
 
 <SelectProfile
@@ -192,7 +196,8 @@
               headers={[
                 "#",
                 "Name",
-                "Public IP",
+                "Public IPv4",
+                "Public IPv6",
                 "Planetary Network IP",
                 "Workers",
                 "Billing Rate",
@@ -233,14 +238,7 @@
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -271,14 +269,7 @@
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -323,14 +314,7 @@
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -378,14 +362,7 @@
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {

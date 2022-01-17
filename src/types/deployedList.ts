@@ -51,10 +51,12 @@ export default class DeployedList {
       this.grid.machines
         .getObj(name)
         .then(async ([data]) => {
+          const publicIP = data.publicIP ?? ({} as any);
           return res({
             name,
-            publicIp: (data.publicIP as any)?.ip ?? "None",
-            planetary: data.planetary,
+            publicIp: publicIP.ip || "None",
+            publicIp6: publicIP.ip6 || "None",
+            planetary: data.planetary || "None",
             flist: data.flist,
             consumption: await this.grid.contracts
               .getConsumption({
