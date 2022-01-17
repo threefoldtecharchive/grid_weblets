@@ -24,8 +24,9 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
+import Funkwhale from "../../types/funkwhale";
 
-  const data = new VM();
+  const data = new Funkwhale();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let profile: IProfile;
 
@@ -118,17 +119,17 @@
           field={nameField}
         />
         <Input
-          bind:data={data.username}
+          bind:data={data.adminUsername}
           bind:invalid={userNameField.invalid}
           field={userNameField}
         />
         <Input
-          bind:data={data.email}
+          bind:data={data.adminEmail}
           bind:invalid={emailField.invalid}
           field={emailField}
         />
         <Input
-          bind:data={data.password}
+          bind:data={data.adminPassword}
           bind:invalid={passwordField.invalid}
           field={passwordField}
         />
