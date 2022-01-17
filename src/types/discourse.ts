@@ -1,8 +1,15 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
+import type { IFormField } from ".";
+import  {  validateEmail } from "../utils/validateName";
+
 
 class SMTP {
+  public fields: IFormField[] = [
+    { label: "SMTP Name", symbol: "userName", placeholder: "SMTP Name", type: "text", validator: validateEmail, invalid: false },
+    { label: "SMTP Password", symbol: "password", placeholder: "SMTP password", type: "password", invalid: false },
+  ]
   constructor(
     public password = "",
     public userName = "",

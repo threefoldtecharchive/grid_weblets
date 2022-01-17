@@ -23,6 +23,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  
 
   const data = new Discourse();
 
@@ -49,8 +50,6 @@
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
-    { label: "SMTP Name", symbol: "smtp.userName", placeholder: "SMTP Name", type: "text", validator: validateEmail, invalid: false },
-    { label: "SMTP Password", symbol: "smtp.password", placeholder: "SMTP password", type: "password", invalid: false },
     { label: "Threebot private key", symbol: "threepotPRKey", placeholder: "Threebot private key", type: "text", invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
@@ -134,6 +133,18 @@
             />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
+        <!-- SMTP fields -->
+        {#each data.smtp.fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data.smtp[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data.smtp[field.symbol]} {field} />
           {/if}
         {/each}
 
