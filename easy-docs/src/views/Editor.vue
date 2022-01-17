@@ -117,7 +117,6 @@ export default class Editor extends Vue {
     new Weblet("Peertube", "peertube", "peertube", "deployment"),
     new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
     new Weblet("Taiga", "taiga", "taiga", "deployment"),
-    
   ];
   public active = 0;
 
@@ -165,7 +164,7 @@ export default class Editor extends Vue {
     height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
-    will-change: transform;
+    // will-change: transform; // This 100% a bug in CSS
     padding-bottom: 250px;
     @include nice-scroll;
   }
