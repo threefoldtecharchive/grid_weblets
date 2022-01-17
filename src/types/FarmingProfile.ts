@@ -5,7 +5,7 @@ export default class FarmingProfile {
     public cpu: number = 0,
     public hdd: number = 0,
     public ssd: number = 0,
-    public price: number = 0,
+    public price: number = 0.09,
     public priceAfter5Years: number = 2,
     public maximumTokenPrice: number = 2,
     public powerUtilization: number = 40,
@@ -17,11 +17,11 @@ export default class FarmingProfile {
   ) {}
 
   public get cu(): number {
-    const { memory, cpu } = this;
-
+    const { memory, cpu, ssd } = this;
     const x = (memory - 1) / 4;
-    const y = (cpu * 4) / 2;
-    return Math.min(x, y);
+    const y = cpu * 2;
+    const z = ssd / 50;
+    return Math.min(x, y, z);
   }
 
   public get nu(): number {
@@ -32,9 +32,8 @@ export default class FarmingProfile {
     const { hdd, ssd, cu } = this;
 
     const x = hdd / 1200;
-    // const y = ((ssd - cu * 20) / 300) * 0.8;
-    const y = (ssd * 0.8 - cu * 25) / 200;
-    return x + y;
+    const y = ssd * 0.8 - cu * 25;
+    return x + y / 200;
   }
 
   public get averageTokenPrice(): number {
