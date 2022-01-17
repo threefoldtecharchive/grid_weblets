@@ -146,7 +146,8 @@
         <p class="label">{field.label}</p>
         <div
           class={"control" +
-            (field.type === "password" ? " has-icons-right" : "")}
+            (field.type === "password" ? " has-icons-right" : "") +
+            (field.loading ? " is-loading" : "")}
         >
           {#if field.type === "textarea"}
             <textarea

@@ -39,6 +39,7 @@ export interface IFormField {
   invalid?: boolean;
   min?: string | number;
   max?: string | number;
+  loading?: boolean;
 }
 
 export interface IFlist {
