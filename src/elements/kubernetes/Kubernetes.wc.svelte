@@ -53,7 +53,8 @@
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
-    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
+    { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
+    { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 

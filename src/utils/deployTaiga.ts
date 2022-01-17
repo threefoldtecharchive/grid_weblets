@@ -1,11 +1,9 @@
-import type { default as Funkwhale } from "../types/funkwhale";
+import type { default as Taiga } from "../types/taiga";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
-import createNetwork from "./createNetwork";
-import { Network } from "../types/kubernetes";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
@@ -14,18 +12,15 @@ const {
   MachinesModel,
   GridClient,
   GatewayNameModel,
+  NetworkModel,
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployFunkwhale(
-  data: Funkwhale,
-  profile: IProfile
-) {
-  const { envs, disks, adminUsername, adminEmail, adminPassword, ...base } =
-    data;
+export default async function deployTaiga(data: Taiga, profile: IProfile) {
+  const { envs, disks:[{size}], adminUsername, adminEmail, adminPassword, smtpFromEmail, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, smtpUseTLS, smtpUseSSL, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv } = profile;
+  const { mnemonics, storeSecret, networkEnv, sshKey} = profile;
 
   const http = new HTTPMessageBusClient(0, "");
   const client = new GridClient(
@@ -43,29 +38,42 @@ export default async function deployFunkwhale(
   let randomSuffix = generateString(10).toLowerCase();
 
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "fw", name);
+  let domainName = await getUniqueDomainName(client, "tg", name);
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
   const domain = `${domainName}.${nodeDomain}`;
 
   // define network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
+  const network = new NetworkModel();
+  network.name = `net${randomSuffix}`;
+  network.ip_range = "10.1.0.0/16";
 
-  await deployFunkwhaleVM(
+  const deployment = await deployTaigaVM(
     profile,
     client,
     name,
     network,
     nodeId,
+    cpu,
+    memory,
+    size,
     domain,
-    randomSuffix,
     adminUsername,
     adminEmail,
-    adminPassword
+    adminPassword,
+    sshKey,
+    smtpFromEmail,
+    smtpHost,
+    smtpPort,
+    smtpHostUser,
+    smtpHostPassword,
+    smtpUseTLS,
+    smtpUseSSL,
+    randomSuffix,
   );
 
-  const info = await getFunkwhaleInfo(client, name);
+  const info = await getTaigaInfo(client, name);
   const planetaryIP = info[0]["planetary"];
 
   try {
@@ -78,31 +86,42 @@ export default async function deployFunkwhale(
       publicNodeId
     );
   } catch (error) {
-    // rollback the FunkwhaleVM if the gateway fails to deploy
+    // rollback the TaigaVM if the gateway fails to deploy
     await client.machines.delete({ name: name });
     throw error;
   }
 
   const gatewayInfo = await getGatewayInfo(client, domainName);
-  return { domain, planetaryIP };
+  return { deployment, domain, planetaryIP };
 }
 
-async function deployFunkwhaleVM(
+async function deployTaigaVM(
   profile: IProfile,
   client: any,
   name: string,
   network: any,
   nodeId: number,
+  cpu: number,
+  memory: number,
+  diskSize: number,
   domain: string,
-  randomSuffix: string,
   adminUsername: string,
   adminEmail: string,
-  adminPassword: string
+  adminPassword: string,
+  sshKey: string,
+  smtpFromEmail: string,
+  smtpHost: string,
+  smtpPort: string, 
+  smtpHostUser: string,
+  smtpHostPassword: string,
+  smtpUseTLS,
+  smtpUseSSL,
+  randomSuffix: string,
 ) {
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = 10;
-  disk.mountpoint = "/data";
+  disk.size = diskSize;
+  disk.mountpoint = "/var/lib/docker";
 
   const vm = new MachineModel();
   vm.name = `vm${randomSuffix}`;
@@ -110,17 +129,25 @@ async function deployFunkwhaleVM(
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 2;
-  vm.memory = 1024 * 2;
-  vm.rootfs_size = rootFs(2, 2 * 1024);
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.rootfs_size = 50;
   vm.flist =
-    "https://hub.grid.tf/asamirr.3bot/asamirr-tf-funkwhale-dec21.flist";
-  vm.entrypoint = "/init.sh";
+    "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-grid3_taiga_docker-latest.flist";
+  vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    FUNKWHALE_HOSTNAME: domain,
-    DJANGO_SUPERUSER_EMAIL: adminEmail,
-    DJANGO_SUPERUSER_USERNAME: adminUsername,
-    DJANGO_SUPERUSER_PASSWORD: adminPassword,
+    SSH_KEY: sshKey,
+    DOMAIN_NAME: domain,
+    ADMIN_USERNAME: adminUsername,
+    ADMIN_PASSWORD: adminPassword,
+    ADMIN_EMAIL: adminEmail,
+    DEFAULT_FROM_EMAIL: smtpFromEmail,
+    EMAIL_USE_TLS: smtpUseTLS ? "True" : "False" ,
+    EMAIL_USE_SSL: smtpUseSSL ? "True": "False",
+    EMAIL_HOST: smtpHost,
+    EMAIL_PORT: `${ smtpPort }`,
+    EMAIL_HOST_USER: smtpHostUser,
+    EMAIL_HOST_PASSWORD: smtpHostPassword
   };
 
   const vms = new MachinesModel();
@@ -128,7 +155,7 @@ async function deployFunkwhaleVM(
   vms.network = network;
   vms.machines = [vm];
 
-  return deploy(profile, "Funkwhale", name, (grid) => {
+  return deploy(profile, "VM", name, (grid) => {
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -147,7 +174,7 @@ async function deployPrefixGateway(
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${backend}]:80/`];
+  gw.backends = [`http://[${backend}]:9000/`];
 
   return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway
@@ -157,7 +184,7 @@ async function deployPrefixGateway(
   });
 }
 
-async function getFunkwhaleInfo(client: any, name: string) {
+async function getTaigaInfo(client: any, name: string) {
   const info = await client.machines.getObj(name);
   return info;
 }
