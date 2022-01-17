@@ -25,6 +25,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
+  import isInvalidFlist from "../../utils/isInvalidFlist";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -77,12 +78,6 @@
   }
 
   // prettier-ignore
-  const flistFields: IFormField[] = [
-    { label: "FList", symbol: 'flist', placeholder: 'VM Image', type: "text" },
-    { label: "Entry Point", symbol: 'entrypoint', placeholder: 'Entrypoint', type: "text"},
-  ]
-
-  // prettier-ignore
   const envFields: IFormField[] = [
     { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text"},
     { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
@@ -110,8 +105,20 @@
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
+  const validateFlist = { loading: false, error: null };
 
   async function onDeployVM() {
+    if (flistSelectValue === "other") {
+      validateFlist.loading = true;
+      validateFlist.error = null;
+
+      if (await isInvalidFlist(data.flist)) {
+        validateFlist.loading = false;
+        validateFlist.error = "Invalid Flist URL.";
+        return;
+      }
+    }
+
     loading = true;
 
     if (!hasEnoughBalance()) {
@@ -137,6 +144,7 @@
         message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
+        validateFlist.loading = false;
         loading = false;
       });
   }
@@ -202,12 +210,32 @@
           bind:data={flistSelectValue}
           bind:selected={selectedFlist}
           field={flistField}
+          on:input={() => {
+            validateFlist.error = null;
+          }}
         />
 
         {#if flistSelectValue === "other"}
-          {#each flistFields as field (field.symbol)}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/each}
+          <Input
+            bind:data={data.flist}
+            field={{
+              label: "FList",
+              symbol: "flist",
+              placeholder: "VM Image",
+              type: "text",
+              ...validateFlist,
+            }}
+          />
+
+          <Input
+            bind:data={data.entrypoint}
+            field={{
+              label: "Entry Point",
+              symbol: "entrypoint",
+              placeholder: "Entrypoint",
+              type: "text",
+            }}
+          />
         {/if}
 
         {#each baseFields as field (field.symbol)}
@@ -299,8 +327,8 @@
     {/if}
 
     <DeployBtn
-      {disabled}
-      {loading}
+      disabled={disabled || validateFlist.loading}
+      loading={loading || validateFlist.loading}
       {failed}
       {success}
       on:click={(e) => {
