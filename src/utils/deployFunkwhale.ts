@@ -123,7 +123,6 @@ async function deployFunkwhaleVM(
     DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
 
-    
   const vms = new MachinesModel();
   vms.name = name;
   vms.network = network;
