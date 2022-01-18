@@ -52,6 +52,7 @@ export default async function deployFunkwhale(
   // define network
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
+  
   await deployFunkwhaleVM(
     profile,
     client,
@@ -123,6 +124,7 @@ async function deployFunkwhaleVM(
     DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
 
+    
   const vms = new MachinesModel();
   vms.name = name;
   vms.network = network;
@@ -131,6 +133,17 @@ async function deployFunkwhaleVM(
   return deploy(profile, "Funkwhale", name, (grid) => {
     return grid.machines
       .deploy(vms)
+      .then(async () => {
+        for(const gw of await grid.gateway._list()){
+          console.log(gw);
+          try {
+            await grid.gateway.getObj(gw);
+          }
+          catch (e ){
+            console.log(e);
+          }
+        }
+      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });
