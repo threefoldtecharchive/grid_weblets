@@ -10,7 +10,8 @@ export interface IStore {
     | "GatewayName"
     | "Add Worker"
     | "Remove Worker"
-    | "Deleting Deployment";
+    | "Deleting Deployment"
+    | "Taiga";
   name: string;
   message: string;
 }

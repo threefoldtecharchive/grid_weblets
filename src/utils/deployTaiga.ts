@@ -155,7 +155,7 @@ async function deployTaigaVM(
   vms.network = network;
   vms.machines = [vm];
 
-  return deploy(profile, "VM", name, (grid) => {
+  return deploy(profile, "Taiga", name, (grid) => {
     return grid.machines
       .deploy(vms)
       .then(async () => {
