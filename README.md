@@ -19,6 +19,7 @@ It solves such problem where you had to write complex HTML (and associated style
     - [Deployed List](#deployed-list)
   - [Add New Weblet](#add-new-weblet)
   - [Playground](#playground)
+  - [Add Weblet To Plain HTML File](#add-weblet-to-plain-html-file)
   - [Test a weblet](#test-a-weblet)
     - [Create](#create)
     - [Build](#build)
@@ -51,6 +52,13 @@ You can see the following for more information about installing other versions o
 
 
 ### Installation
+
+
+https://user-images.githubusercontent.com/31689104/149097600-be76b899-32a7-498d-96b8-b645a54a2232.mp4
+
+
+
+
 - **Clone the repo**
   ```
   git clone https://github.com/threefoldtech/grid_weblets.git
@@ -80,16 +88,16 @@ You can see the following for more information about installing other versions o
 
      ```sh
      export NODE_OPTIONS="--max-old-space-size=2048" # or even higher size 8192
-     yarn build:app
+     yarn build:app # on grid_weblets (dir)
      ```
     Increasing --max-old-space-size as needed. Note that this number can safely surpass your available physical memory. In that case, Node will start paging memory to disk as needed.
     
 ### Run The Playground
   Finally to run the playground, you need to serve the bundle created in docs directory, for that you could use `serve`
-    ```sh
-    npx serve docs
-    ```
-    you could then access open this link in your browser http://localhost:3000
+```sh
+npx serve docs
+```  
+you could then access open this link in your browser http://localhost:3000
 
 
 
@@ -179,6 +187,47 @@ yarn build
 - `cd easy-docs`
 - `yarn build`  will output in the docs directory
 - serve content in docs dir for path `/grid_weblets` so `play.grid.tf/grid_weblets`
+
+## Add Weblet To Plain HTML File
+Assume we need to include `vm` weblet in its own `index.html` file.  
+The `index.html` file should be like the following.
+> Notes: Your will need to include `base.wc.js` & `profiles.wc.js` for every component to work also you will need to inject the required libraries [grid3_client](https://www.npmjs.com/package/grid3_client) and [ts-rmb-http-client](https://www.npmjs.com/package/ts-rmb-http-client) in `window.configs` Object.
+
+```html
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Weblet Example</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+    </style>
+
+    <script src="/path/to/libs/to/inject"></script>
+    <!-- window.configs should include the required libs -->
+
+    <script src="/path/to/base.wc.js"></script>
+    <script src="/path/to/profiles.wc.js"></script>
+    <script defer src="/path/to/vm.wc.js"></script>
+</head>
+<body>
+    <tf-base></tf-base>
+    <tf-profiles></tf-profiles>
+    <tf-vm></tf-vm>
+</body>
+</html>
+```
 
 
 ## Test a weblet
