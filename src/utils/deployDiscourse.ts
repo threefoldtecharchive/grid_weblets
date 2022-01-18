@@ -12,7 +12,7 @@ const { MachinesModel, DiskModel, GridClient, MachineModel, GatewayNameModel } =
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 const DISCOURSE_FLIST =
-  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v1.11.flist";
+  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v3.1.flist";
 
 export default async function deployDiscourse(
   data: Discourse,
@@ -114,24 +114,25 @@ async function depoloyDiscourseVM(
   machine.entrypoint = "/.start_discourse.sh";
   console.log("pub Key", profile.sshKey);
   machine.env = {
-    pub_key: profile.sshKey,
+    SSH_KEY: profile.sshKey,
     DISCOURSE_SMTP_PASSWORD: smtp.password,
-    DISCOURSE_VERSION: version,
-    RAILS_ENV: "production",
-    DISCOURSE_HOSTNAME: domain,
-    DISCOURSE_SMTP_USER_NAME: smtp.userName,
-    DISCOURSE_SMTP_ADDRESS: smtp.address,
-    DISCOURSE_DEVELOPER_EMAILS: developerEmail,
-    DISCOURSE_SMTP_PORT: smtp.port,
-    THREEBOT_PRIVATE_KEY: threepotPRKey,
-    FLASK_SECRET_KEY: flaskSecretKey,
-    THREEBOT_URL: threebotURL,
-    OPEN_KYC_URL: openKYCURL,   
-    RESTIC_REPOSITORY: resticRepository,
-    RESTIC_PASSWORD: resticPassword,
-    AWS_ACCESS_KEY_ID: AWSAccessKeyID,
-    AWS_SECRET_ACCESS_KEY: AWSSecretAccessKey,
-    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS,
+    // TODO add the address
+    DISCOURSE_VERSION: version, // done to be removed
+    RAILS_ENV: "production", // done  to be removed
+    DISCOURSE_HOSTNAME: domain, 
+    DISCOURSE_SMTP_USER_NAME: smtp.userName, 
+    DISCOURSE_SMTP_ADDRESS: smtp.address, 
+    DISCOURSE_DEVELOPER_EMAILS: developerEmail, 
+    DISCOURSE_SMTP_PORT: smtp.port, // needed
+    THREEBOT_PRIVATE_KEY: threepotPRKey, // auto genetrated
+    FLASK_SECRET_KEY: flaskSecretKey, // auto generated 
+    THREEBOT_URL: threebotURL, // done to be removed
+    OPEN_KYC_URL: openKYCURL,  // done to be removed
+    RESTIC_REPOSITORY: resticRepository, //
+    RESTIC_PASSWORD: resticPassword,  //
+    AWS_ACCESS_KEY_ID: AWSAccessKeyID, //
+    AWS_SECRET_ACCESS_KEY: AWSSecretAccessKey, //  
+    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS, // needed
   };
   console.log("env vars", machine.env);
   const machines = new MachinesModel();
