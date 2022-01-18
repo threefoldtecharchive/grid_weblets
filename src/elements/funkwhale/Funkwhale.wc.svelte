@@ -40,7 +40,7 @@ import Funkwhale from "../../types/funkwhale";
   const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: true }; // prettier-ignore
 
-  const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: (value: string) => value.trim().length === 0 ? "Password can't be empty." : undefined, invalid: true }; // prettier-ignore
+  const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: (value: string) => value.trim().length === 0 ? "Password can't be empty." : undefined, invalid: false}; // prettier-ignore
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
