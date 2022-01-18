@@ -19,7 +19,7 @@ It solves such problem where you had to write complex HTML (and associated style
     - [Deployed List](#deployed-list)
   - [Add New Weblet](#add-new-weblet)
   - [Playground](#playground)
-  - [Add Weblet To Dummy HTML File](#add-weblet-to-dummy-html-file)
+  - [Add Weblet To Plain HTML File](#add-weblet-to-plain-html-file)
   - [Test a weblet](#test-a-weblet)
     - [Create](#create)
     - [Build](#build)
@@ -188,7 +188,7 @@ yarn build
 - `yarn build`  will output in the docs directory
 - serve content in docs dir for path `/grid_weblets` so `play.grid.tf/grid_weblets`
 
-## Add Weblet To Dummy HTML File
+## Add Weblet To Plain HTML File
 Assume we need to include `vm` weblet in its own `index.html` file.  
 The `index.html` file should be like the following.
 > Notes: Your will need to include `base.wc.js` & `profiles.wc.js` for every component to work also you will need to inject the required libraries [grid3_client](https://www.npmjs.com/package/grid3_client) and [ts-rmb-http-client](https://www.npmjs.com/package/ts-rmb-http-client) in `window.configs` Object.
