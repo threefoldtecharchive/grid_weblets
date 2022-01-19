@@ -8,7 +8,9 @@ import TweetNACL from "tweetnacl";
 
 function generatePubKey(): String {
   const keypair = TweetNACL.box.keyPair();
-  return window.configs.buffer.Buffer.from(keypair.publicKey).toString("base64");
+  return window.configs.buffer.Buffer.from(keypair.publicKey).toString(
+    "base64"
+  );
 }
 
 class SMTP {
@@ -63,7 +65,7 @@ export default class Discourse {
     public smtp = new SMTP(),
 
     public threebotPRKey = generatePubKey(),
-    public flaskSecretKey = v4(),
+    public flaskSecretKey = v4().split("-")[0],
 
     public nodeId: number = null,
     public selection = new NodeID()
