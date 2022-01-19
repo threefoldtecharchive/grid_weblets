@@ -5,12 +5,10 @@ import type { IFormField } from ".";
 import { validateEmail } from "../utils/validateName";
 
 import TweetNACL from "tweetnacl";
-import { Buffer } from "buffer";
 
 function generatePubKey(): String {
   const keypair = TweetNACL.box.keyPair();
-  console.log(keypair);
-  return Buffer.from(keypair.publicKey).toString("base64");
+  return window.configs.buffer.Buffer.from(keypair.publicKey).toString("base64");
 }
 
 class SMTP {
