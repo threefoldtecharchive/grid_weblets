@@ -24,6 +24,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
 
+
   const data = new Discourse();
 
   let loading = false;
@@ -39,6 +40,8 @@
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
+    { label: "Mail Server", value: "mail" },
+
   ];
   let active = "config";
 
@@ -49,11 +52,10 @@
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
-    { label: "Threebot private key", symbol: "threebotPRKey", placeholder: "Threebot private key", type: "text", invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
-
+  
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
 
   let message: string;
@@ -131,18 +133,6 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-        <!-- SMTP fields -->
-        {#each data.smtp.fields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data.smtp[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data.smtp[field.symbol]} {field} />
-          {/if}
-        {/each}
 
         <SelectNodeId
           cpu={data.cpu}
@@ -157,6 +147,25 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
+
+        <!-- SMTP fields -->
+        {:else if active === "mail"}
+        <div class="notification is-warning is-light">
+          <p>
+            Discourse need SMTP serivce so please configure these settings proberly.
+          </p>
+        </div>
+        {#each data.smtp.fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data.smtp[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data.smtp[field.symbol]} {field} />
+          {/if}
+        {/each}
       {/if}
     {/if}
 

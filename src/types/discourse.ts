@@ -16,26 +16,43 @@ function generatePubKey(): String {
 class SMTP {
   public fields: IFormField[] = [
     {
-      label: "SMTP Name",
+      label: "Host Name",
+      symbol: "address",
+      placeholder: "smtp.example.com",
+      type: "text",
+      // validator: validateDomainName,
+      invalid: false,
+    },
+    {
+      label: "Port",
+      symbol: "port",
+      placeholder: "587",
+      type: "text",
+      // validator: validatePortNumber,
+      invalid: false,
+    },
+    {
+      label: "User Name",
       symbol: "userName",
-      placeholder: "SMTP Name",
+      placeholder: "user@example.com",
       type: "text",
       validator: validateEmail,
       invalid: false,
     },
     {
-      label: "SMTP Password",
+      label: "Password",
       symbol: "password",
-      placeholder: "SMTP password",
+      placeholder: "password",
       type: "password",
       invalid: false,
     },
+    { label: "Use TLS", symbol: "enableTLS", type: "checkbox" },
   ];
   constructor(
     public password = "",
     public userName = "",
     public address = "smtp.gmail.com",
-    public enableTLS = "true",
+    public enableTLS = true,
     public port = "587"
   ) {}
   public get valid(): boolean {

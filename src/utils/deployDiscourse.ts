@@ -12,7 +12,7 @@ const { MachinesModel, DiskModel, GridClient, MachineModel, GatewayNameModel } =
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 const DISCOURSE_FLIST =
-  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v3.2.flist";
+  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v4.0.flist";
 
 export default async function deployDiscourse(
   data: Discourse,
@@ -47,8 +47,6 @@ export default async function deployDiscourse(
   const publicIP = discourseInfo[0]["publicIP"]
     ? discourseInfo[0]["publicIP"]["ip"].split("/")[0]
     : "";
-  console.log({ discourseInfo });
-  console.log({ publicIP });
 
   try {
     await deployPrefixGateway(
@@ -86,8 +84,6 @@ async function depoloyDiscourseVM(
     planetary,
   } = data;
 
-  console.log({ publicIp, planetary });
-
   /* Docker disk */
   const disk = new DiskModel();
   disk.name = "data0";
@@ -106,7 +102,6 @@ async function depoloyDiscourseVM(
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/.start_discourse.sh";
-  console.log("pub Key", profile.sshKey);
   machine.env = {
     SSH_KEY: profile.sshKey,
     DISCOURSE_HOSTNAME: domain,
@@ -114,14 +109,13 @@ async function depoloyDiscourseVM(
 
     DISCOURSE_SMTP_ADDRESS: smtp.address,
     DISCOURSE_SMTP_PORT: smtp.port,
-    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS,
+    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS ? "true": "false",
     DISCOURSE_SMTP_USER_NAME: smtp.userName,
     DISCOURSE_SMTP_PASSWORD: smtp.password,
-
-    THREEBOT_PRIVATE_KEY: threebotPRKey, // auto genetrated
-    FLASK_SECRET_KEY: flaskSecretKey, // auto generated
+    // Auto generated env. vars
+    THREEBOT_PRIVATE_KEY: threebotPRKey, 
+    FLASK_SECRET_KEY: flaskSecretKey, 
   };
-  console.log("env vars", machine.env);
   const machines = new MachinesModel();
   machines.name = name;
   machines.machines = [machine];
