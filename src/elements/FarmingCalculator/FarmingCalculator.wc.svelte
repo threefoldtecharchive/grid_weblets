@@ -426,6 +426,23 @@
         </div>
       {/if}
     {/if}
+    <hr />
+    <p class="is-size-4 has-text-weight-bold">Disclaimer</p>
+    <p>
+      Simulations are NOT investment advice nor should they be looked at in this
+      way. The scenarios shown are by no means a guarantee and no one can
+      predict the future of yields exactly as they are heavily dependent on
+      factors beyond anyone’s control. The <strong>DAO</strong> could also
+      decide to change parameters or farming, which could have a different
+      result. We invite the community to review and give feedback and make
+      proposals for necessary changes
+      <a
+        href="https://forum.threefold.io/t/the-new-farming-calculator-a-much-simpler-way-to-calculate-your-potential-farming-rewards/1773/4"
+        target="_blank"
+      >
+        here
+      </a>
+    </p>
   </div>
 </section>
 
