@@ -12,7 +12,7 @@ const { MachinesModel, DiskModel, GridClient, MachineModel, GatewayNameModel } =
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 const DISCOURSE_FLIST =
-  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v3.1.flist";
+  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v3.2.flist";
 
 export default async function deployDiscourse(
   data: Discourse,
@@ -44,7 +44,9 @@ export default async function deployDiscourse(
 
   const discourseInfo = await getDiscourseInfo(client, name);
   const planetaryIP = discourseInfo[0]["planetary"] as string;
-  const publicIP =  discourseInfo[0]["publicIP"] ? discourseInfo[0]["publicIP"]["ip"].split("/")[0]: "";
+  const publicIP = discourseInfo[0]["publicIP"]
+    ? discourseInfo[0]["publicIP"]["ip"].split("/")[0]
+    : "";
   console.log({ discourseInfo });
   console.log({ publicIP });
 
@@ -78,22 +80,14 @@ async function depoloyDiscourseVM(
     diskSize,
     smtp,
     developerEmail,
-    threepotPRKey,
-    resticPassword,
-    resticRepository,
-    AWSAccessKeyID,
-    AWSSecretAccessKey,
+    threebotPRKey,
     flaskSecretKey,
-    threebotURL,
-    openKYCURL,
-    version,
     publicIp,
     planetary,
-    
   } = data;
 
-  console.log({publicIp,planetary});
-  
+  console.log({ publicIp, planetary });
+
   /* Docker disk */
   const disk = new DiskModel();
   disk.name = "data0";
@@ -115,24 +109,17 @@ async function depoloyDiscourseVM(
   console.log("pub Key", profile.sshKey);
   machine.env = {
     SSH_KEY: profile.sshKey,
+    DISCOURSE_HOSTNAME: domain,
+    DISCOURSE_DEVELOPER_EMAILS: developerEmail,
+
+    DISCOURSE_SMTP_ADDRESS: smtp.address,
+    DISCOURSE_SMTP_PORT: smtp.port,
+    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS,
+    DISCOURSE_SMTP_USER_NAME: smtp.userName,
     DISCOURSE_SMTP_PASSWORD: smtp.password,
-    // TODO add the address
-    DISCOURSE_VERSION: version, // done to be removed
-    RAILS_ENV: "production", // done  to be removed
-    DISCOURSE_HOSTNAME: domain, 
-    DISCOURSE_SMTP_USER_NAME: smtp.userName, 
-    DISCOURSE_SMTP_ADDRESS: smtp.address, 
-    DISCOURSE_DEVELOPER_EMAILS: developerEmail, 
-    DISCOURSE_SMTP_PORT: smtp.port, // needed
-    THREEBOT_PRIVATE_KEY: threepotPRKey, // auto genetrated
-    FLASK_SECRET_KEY: flaskSecretKey, // auto generated 
-    THREEBOT_URL: threebotURL, // done to be removed
-    OPEN_KYC_URL: openKYCURL,  // done to be removed
-    RESTIC_REPOSITORY: resticRepository, //
-    RESTIC_PASSWORD: resticPassword,  //
-    AWS_ACCESS_KEY_ID: AWSAccessKeyID, //
-    AWS_SECRET_ACCESS_KEY: AWSSecretAccessKey, //  
-    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS, // needed
+
+    THREEBOT_PRIVATE_KEY: threebotPRKey, // auto genetrated
+    FLASK_SECRET_KEY: flaskSecretKey, // auto generated
   };
   console.log("env vars", machine.env);
   const machines = new MachinesModel();

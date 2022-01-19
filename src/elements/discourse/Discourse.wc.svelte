@@ -23,7 +23,6 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  
 
   const data = new Discourse();
 
@@ -50,7 +49,7 @@
     { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
-    { label: "Threebot private key", symbol: "threepotPRKey", placeholder: "Threebot private key", type: "text", invalid: false },
+    { label: "Threebot private key", symbol: "threebotPRKey", placeholder: "Threebot private key", type: "text", invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
@@ -96,9 +95,6 @@
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.publicKey = detail.sshKey; // not working for now
-    }
   }}
 />
 
