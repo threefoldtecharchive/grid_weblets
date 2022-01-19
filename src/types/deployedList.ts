@@ -36,14 +36,18 @@ export default class DeployedList {
     });
   }
   public loadK8s(): Promise<any[]> {
-    return this.grid.k8s
-      .list()
-      .then((names) => {
-        return Promise.all(names.map((name) => this._loadK8s(name)));
-      })
-      .then((data) => {
-        return data.filter((x) => [null, undefined].includes(x) === false);
-      });
+    try {
+      return this.grid.k8s
+        .list()
+        .then((names) => {
+          return Promise.all(names.map((name) => this._loadK8s(name)));
+        })
+        .then((data) => {
+          return data.filter((x) => [null, undefined].includes(x) === false);
+        });
+    } catch {
+      return [] as unknown as Promise<any[]>;
+    }
   }
 
   private _loadVm(name: string) {
@@ -51,10 +55,12 @@ export default class DeployedList {
       this.grid.machines
         .getObj(name)
         .then(async ([data]) => {
+          const publicIP = data.publicIP ?? ({} as any);
           return res({
             name,
-            publicIp: (data.publicIP as any)?.ip ?? "None",
-            planetary: data.planetary,
+            publicIp: publicIP.ip || "None",
+            publicIp6: publicIP.ip6 || "None",
+            planetary: data.planetary || "None",
             flist: data.flist,
             consumption: await this.grid.contracts
               .getConsumption({
@@ -70,14 +76,18 @@ export default class DeployedList {
   }
 
   public loadVm(): Promise<any[]> {
-    return this.grid.machines
-      .list()
-      .then((names) => {
-        return Promise.all(names.map((name) => this._loadVm(name)));
-      })
-      .then((data) => {
-        return data.filter((x) => [null, undefined].includes(x) === false);
-      });
+    try {
+      return this.grid.machines
+        .list()
+        .then((names) => {
+          return Promise.all(names.map((name) => this._loadVm(name)));
+        })
+        .then((data) => {
+          return data.filter((x) => [null, undefined].includes(x) === false);
+        });
+    } catch {
+      return [] as unknown as Promise<any[]>;
+    }
   }
 
   public loadCaprover(): Promise<any[]> {
@@ -104,6 +114,11 @@ export default class DeployedList {
     });
   }
 
+  public loadTaiga(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("taiga"));
+    });
+  }
   public static async init(profile: IProfile): Promise<DeployedList> {
     return new DeployedList(await getGrid(profile, (grid) => grid, false));
   }

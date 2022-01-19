@@ -42,7 +42,8 @@
     { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
     { label: "Network Environment", symbol: "networkEnv", type: "select", options: [
       { label: "Testnet", value: "test" },
-      { label: "Devnet", value: "dev" }
+      { label: "Devnet", value: "dev" },
+      { label: "Mainnet", value: "main" }
     ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "Secret key used to encrypt your data on TFChain", type: "password" },
