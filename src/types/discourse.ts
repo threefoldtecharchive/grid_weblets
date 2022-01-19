@@ -2,7 +2,8 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
 import type { IFormField } from ".";
-import { validateEmail } from "../utils/validateName";
+import { validateEmail, validatePortNumber } from "../utils/validateName";
+import  validateDomainName from "../utils/validateDomainName";
 
 import TweetNACL from "tweetnacl";
 
@@ -20,7 +21,7 @@ class SMTP {
       symbol: "address",
       placeholder: "smtp.example.com",
       type: "text",
-      // validator: validateDomainName,
+      validator: validateDomainName,
       invalid: false,
     },
     {
@@ -28,7 +29,7 @@ class SMTP {
       symbol: "port",
       placeholder: "587",
       type: "text",
-      // validator: validatePortNumber,
+      validator: validatePortNumber,
       invalid: false,
     },
     {
