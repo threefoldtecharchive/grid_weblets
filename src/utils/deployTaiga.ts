@@ -131,7 +131,7 @@ async function deployTaigaVM(
   vm.planetary = true;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = 50;
+  vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
     "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-grid3_taiga_docker-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
@@ -155,9 +155,17 @@ async function deployTaigaVM(
   vms.network = network;
   vms.machines = [vm];
 
-  return deploy(profile, "VM", name, (grid) => {
+  return deploy(profile, "Taiga", name, (grid) => {
     return grid.machines
       .deploy(vms)
+      .then(async () => {
+        for(const gw of await grid.gateway._list()){
+          try {
+            await grid.gateway.getObj(gw);
+          }
+          catch {}
+        }
+      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });
