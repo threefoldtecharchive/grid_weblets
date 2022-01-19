@@ -404,14 +404,7 @@
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
