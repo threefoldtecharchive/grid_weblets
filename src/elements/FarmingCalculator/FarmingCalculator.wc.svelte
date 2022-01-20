@@ -370,7 +370,7 @@
                     <Input
                       bind:data={activeProfile.priceAfter5Years}
                       field={createNumberField({
-                        label: "Token price after 5 years (USD)</span>",
+                        label: "Token price after 5 years (USD)",
                         symbol: "priceAfter5Years",
                       })}
                     />
