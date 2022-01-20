@@ -11,7 +11,8 @@ export interface IStore {
     | "Add Worker"
     | "Remove Worker"
     | "Deleting Deployment"
-    | "Taiga";
+    | "Taiga"
+    | "Owncloud";
   name: string;
   message: string;
 }
