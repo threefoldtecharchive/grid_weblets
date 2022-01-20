@@ -34,7 +34,7 @@ export default class Mattermost implements IMattermost {
     server,
     port,
   }: Partial<IMattermost> = {}) {
-    this.name = name || "MM" + this.id.split("-")[0];
+    this.name = name || "mm" + this.id.split("-")[0];
     this.username = username || "";
     this.password = password || "";
     this.nodeId = nodeId;

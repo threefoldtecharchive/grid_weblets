@@ -12,6 +12,7 @@
   import { noActiveProfile } from "../../utils/message";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployMattermost from "../../utils/deployMattermost";
+  import validateName from "../../utils/validateName";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -20,12 +21,12 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost name", validator },
-    { label: "Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator },
-    { label: "Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator },
-    // { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator },
-    { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator },
-    { label: "SMTP port", symbol: "port", type: "text", placeholder: "SMTP port", validator },
+    { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost name", validator: validateName, invalid: false },
+    { label: "Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator, invalid: false },
+    { label: "Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator, invalid: false },
+    // { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator, invalid: false },
+    { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator, invalid: false },
+    { label: "SMTP port", symbol: "port", type: "text", placeholder: "SMTP port", validator, invalid: false },
   ];
 
   let profile: IProfile;
@@ -79,7 +80,11 @@
       />
     {:else}
       {#each fields as field (field.symbol)}
-        <Input bind:data={data[field.symbol]} {field} />
+        <Input
+          bind:data={data[field.symbol]}
+          bind:invalid={field.invalid}
+          {field}
+        />
       {/each}
 
       <SelectNodeId
