@@ -16,16 +16,21 @@ export default class FarmingProfile {
     public nuRequiredPerCu: number = 30
   ) {}
 
+  private _max(val: number, max = 0) {
+    val = val ?? 0;
+    return Math.max(val, max);
+  }
+
   public get cu(): number {
     const { memory, cpu, ssd } = this;
     const x = (memory - 1) / 4;
     const y = cpu * 2;
     const z = ssd / 50;
-    return Math.min(x, y, z);
+    return this._max(Math.min(x, y, z));
   }
 
   public get nu(): number {
-    return this.cu * this.nuRequiredPerCu;
+    return this._max(this.cu * this.nuRequiredPerCu);
   }
 
   public get su(): number {
@@ -33,7 +38,7 @@ export default class FarmingProfile {
 
     const x = hdd / 1200;
     const y = ssd * 0.8 - cu * 25;
-    return x + y / 200;
+    return this._max(x + y / 200);
   }
 
   public get averageTokenPrice(): number {
