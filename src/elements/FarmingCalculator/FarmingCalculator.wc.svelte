@@ -31,15 +31,15 @@
   // prettier-ignore
   const inputFields = [
     { label: "Memory (GB)", symbol: "memory" },
-    { label: "CPU (Cores)", symbol: "cpu" },
+    { label: "<span class=has-text-danger>vCPU (Threads)</span>", symbol: "cpu" },
     { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     // { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
-    { label: "Power Utilization", symbol: "powerUtilization" },
-    { label: "Power Cost", symbol: "powerCost" },
+    { label: "Power Utilization <span class=has-text-danger>(Watt)</span>", symbol: "powerUtilization" },
+    { label: "Power Cost <span class=has-text-danger>(USD)</span>", symbol: "powerCost" },
     { label: "Public IP", symbol: "publicIp", type: "checkbox" },
     { label: "Certified", symbol: "certified", type: "checkbox" },
   ];
@@ -47,15 +47,15 @@
   // prettier-ignore
   const basicInputFields = [
     { label: "Memory (GB)", symbol: "memory" },
-    { label: "CPU (Cores)", symbol: "cpu" },
+    { label: "<span class=has-text-danger>vCPU (Threads)</span>", symbol: "cpu" },
     { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     { label: "Maximum Token Price", symbol: "maximumTokenPrice" },
-    { label: "Power Utilization", symbol: "powerUtilization" },
-    { label: "Power Cost", symbol: "powerCost" },
+    { label: "Power Utilization <span class=has-text-danger>(Watt)</span>", symbol: "powerUtilization" },
+    { label: "Power Cost <span class=has-text-danger>(USD)</span>", symbol: "powerCost" },
     { label: "Public IP", symbol: "publicIp", type: "checkbox" },
     { label: "Certified", symbol: "certified", type: "checkbox" },
   ];
@@ -67,15 +67,15 @@
     { label: "SU", symbol: "su" },
     { label: "NU", symbol: "nu" },
     // { label: "Average Token Price", symbol: "averageTokenPrice" },
-    { label: "USD reward per CU", symbol: "rewardPerCu" },
-    { label: "USD reward per SU", symbol: "rewardPerSu" },
-    { label: "USD reward per NU", symbol: "rewardPerNu" },
-    { label: "TFT Reward Per CU", symbol: "tftRewardPerCu" },
-    { label: "TFT Reward Per SU", symbol: "tftRewardPerSu" },
-    { label: "TFT Reward Per NU", symbol: "tftRewardPerNu" },
-    { label: "CU Farming Reward In TFT", symbol: "cuFarmingRewardInTft" },
-    { label: "SU Farming Reward In TFT", symbol: "suFarmingRewardInTft" },
-    { label: "NU Farming Reward In TFT", symbol: "nuFarmingRewardInTft" },
+    { label: "USD reward <span class=has-text-danger>per</span> CU", symbol: "rewardPerCu" },
+    { label: "USD reward <span class=has-text-danger>per</span> SU", symbol: "rewardPerSu" },
+    { label: "USD reward <span class=has-text-danger>per</span> NU", symbol: "rewardPerNu" },
+    { label: "TFT Reward <span class=has-text-danger>Per</span> CU", symbol: "tftRewardPerCu" },
+    { label: "TFT Reward <span class=has-text-danger>Per</span> SU", symbol: "tftRewardPerSu" },
+    { label: "TFT Reward <span class=has-text-danger>Per</span> NU", symbol: "tftRewardPerNu" },
+    { label: "CU Farming Reward <span class=has-text-danger>In</span> TFT", symbol: "cuFarmingRewardInTft" },
+    { label: "SU Farming Reward <span class=has-text-danger>In</span> TFT", symbol: "suFarmingRewardInTft" },
+    { label: "NU Farming Reward <span class=has-text-danger>In</span> TFT", symbol: "nuFarmingRewardInTft" },
   ];
 
   // prettier-ignore
@@ -83,9 +83,9 @@
     { label: "CU", symbol: "cu" },
     { label: "SU", symbol: "su" },
     { label: "NU", symbol: "nu" },
-    { label: "USD reward per CU", symbol: "rewardPerCu" },
-    { label: "USD reward per SU", symbol: "rewardPerSu" },
-    { label: "USD reward per NU", symbol: "rewardPerNu" },
+    { label: "USD reward <span class=has-text-danger>per</span> CU", symbol: "rewardPerCu" },
+    { label: "USD reward <span class=has-text-danger>per</span> SU", symbol: "rewardPerSu" },
+    { label: "USD reward <span class=has-text-danger>per</span> NU", symbol: "rewardPerNu" },
   ];
 
   // prettier-ignore
@@ -316,7 +316,7 @@
                 <div class="field">
                   <div class="control">
                     <label class="label">
-                      <p>{field.label}</p>
+                      <p>{@html field.label}</p>
                       <input
                         disabled
                         class="input"
@@ -370,7 +370,8 @@
                     <Input
                       bind:data={activeProfile.priceAfter5Years}
                       field={createNumberField({
-                        label: "Token price after 5 years (USD)",
+                        label:
+                          "<span class=has-text-danger>Token price after 5 years (USD)</span>",
                         symbol: "priceAfter5Years",
                       })}
                     />
@@ -410,7 +411,7 @@
                 <div class="field" style={field.fullWidth ? "width: 100%" : ""}>
                   <div class="control">
                     <label class="label">
-                      <p>{field.label}</p>
+                      <p>{@html field.label}</p>
                       <input
                         disabled
                         class="input"
