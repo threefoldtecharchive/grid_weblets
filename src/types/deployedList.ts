@@ -46,7 +46,7 @@ export default class DeployedList {
           return data.filter((x) => [null, undefined].includes(x) === false);
         });
     } catch {
-      return [] as unknown as Promise<any[]>;
+      return Promise.resolve([]);
     }
   }
 
@@ -86,7 +86,7 @@ export default class DeployedList {
           return data.filter((x) => [null, undefined].includes(x) === false);
         });
     } catch {
-      return [] as unknown as Promise<any[]>;
+      return Promise.resolve([]);
     }
   }
 
