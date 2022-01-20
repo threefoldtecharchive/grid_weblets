@@ -195,7 +195,7 @@
               }}
             >
               <i
-                class={"fas " + (showPassword ? "far fa-eye-slash" : "fa-eye")}
+                class={"fas " + (!showPassword ? "far fa-eye-slash" : "fa-eye")}
               />
             </span>
           {/if}
