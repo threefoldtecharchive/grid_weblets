@@ -20,6 +20,7 @@
       case "Funkwhale":
       case "Kubernetes":
       case "Peertube":
+      case "Owncloud":
       case "GatewayName":
         return `Logs of Deployment of type ${s(type)} with name ${s(name)}`;
 
