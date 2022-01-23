@@ -16,9 +16,12 @@ export default class Owncloud extends VM {
     public smtpPort = "";
     public smtpHostUser = "";
     public smtpHostPassword = "";
+    public cpu = 8;
+    public memory = 8192;
+    public diskSize = 100;
 
     public get valid(): boolean {
-        const { name, flist, cpu, memory, entrypoint, nodeId } = this;
+        const { name, flist, cpu, memory, diskSize, entrypoint, nodeId } = this;
         const { network, envs, disks } = this;
         const { adminEmail, adminUsername, adminPassword } = this;
         const { smtpFromEmail, smtpHost, smtpPort, smtpHostUser, smtpHostPassword } = this;
