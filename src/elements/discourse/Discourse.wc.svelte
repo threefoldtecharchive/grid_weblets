@@ -102,7 +102,7 @@
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployDiscourseHandler}>
-    <h4 class="is-size-4 mb-4">Discourse Deployer</h4>
+    <h4 class="is-size-4 mb-4">Deploy a Discourse Instance</h4>
 
     <hr />
 
@@ -152,7 +152,7 @@
         {:else if active === "mail"}
         <div class="notification is-warning is-light">
           <p>
-            Discourse need SMTP serivce so please configure these settings proberly.
+            Discourse needs SMTP service so please configure these settings properly.
           </p>
         </div>
         {#each data.smtp.fields as field (field.symbol)}

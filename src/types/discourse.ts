@@ -33,7 +33,7 @@ class SMTP {
       invalid: false,
     },
     {
-      label: "User Name",
+      label: "Username",
       symbol: "userName",
       placeholder: "user@example.com",
       type: "text",
@@ -43,7 +43,7 @@ class SMTP {
     {
       label: "Password",
       symbol: "password",
-      placeholder: "password",
+      placeholder: "Password",
       type: "password",
       invalid: false,
     },
