@@ -49,24 +49,6 @@
 
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-  let baseFields: IFormField[] = [
-    {
-      label: "CPU",
-      symbol: "cpu",
-      placeholder: "CPU Cores",
-      type: "number",
-      validator: validateCpu,
-      invalid: false,
-    },
-    {
-      label: "Memory (MB)",
-      symbol: "memory",
-      placeholder: "Your Memory in MB",
-      type: "number",
-      validator: validateMemory,
-      invalid: false,
-    },
-  ];
   let adminFields: IFormField[] = [
     {
       label: "Admin User Name",
@@ -93,15 +75,6 @@
       invalid: false,
     },
   ];
-
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
 
   let mailFields: IFormField[] = [
     {
@@ -143,7 +116,7 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -216,19 +189,6 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-        {#each baseFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-
-        <Input bind:data={data.disks[0].size} field={diskField} />
 
         {#each adminFields as field (field.symbol)}
           {#if field.invalid !== undefined}
