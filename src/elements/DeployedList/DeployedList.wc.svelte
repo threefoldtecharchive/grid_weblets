@@ -13,7 +13,9 @@
     | "caprover"
     | "funkwhale"
     | "peertube"
-    | "owncloud";
+    | "owncloud"
+    | "discourse"
+    | "presearch";
   export let tab: TabsType = undefined;
 
   // components
@@ -33,7 +35,10 @@
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
     { label: "Taiga", value: "taiga" },
-    { label: "Owncloud", value: "owncloud" }
+    { label: "Owncloud", value: "owncloud" },
+    { label: "Discourse", value: "discourse" },
+    { label: "Presearch", value: "presearch" }
+
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -504,6 +509,73 @@
           <Alert
             type="danger"
             message={err.message || err || "Failed to list owncloud instances"}
+          />
+        {/await}
+
+        <!-- Presearch -->
+      {:else if active === "presearch"}
+        {#await list.loadPresearch()}
+          <Alert type="info" message="Listing presearch Instances..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert
+              type="info"
+              message="No presearch instances found on this profile."
+            />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list presearch instances"}
+          />
+        {/await}
+        <!-- Discourse -->
+      {:else if active === "discourse"}
+        {#await list.loadDiscourse()}
+          <Alert type="info" message="Listing discourse Instances..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert
+              type="info"
+              message="No discourse instances found on this profile."
+            />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list discourse instances"}
           />
         {/await}
       {/if}
