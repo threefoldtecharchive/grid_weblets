@@ -11,7 +11,7 @@ export default async function getGrid<T>(
     networkEnv as any,
     mnemonics,
     storeSecret,
-    new window.configs.client.HTTPMessageBusClient(0, ""),
+    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     undefined,
     window.configs.grid3_client.BackendStorageType.tfkvstore
   );

@@ -13,7 +13,7 @@ export default function deleteContracts(
   name: string
 ) {
   const { mnemonics, networkEnv, storeSecret } = configs;
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const grid = new GridClient(
     networkEnv as any,
     mnemonics,
