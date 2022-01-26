@@ -27,7 +27,7 @@ export default async function deployFunkwhale(
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
     networkEnv as any,
     mnemonics,
@@ -52,7 +52,6 @@ export default async function deployFunkwhale(
   // define network
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
-  
   await deployFunkwhaleVM(
     profile,
     client,
@@ -124,7 +123,6 @@ async function deployFunkwhaleVM(
     DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
 
-    
   const vms = new MachinesModel();
   vms.name = name;
   vms.network = network;
@@ -134,12 +132,11 @@ async function deployFunkwhaleVM(
     return grid.machines
       .deploy(vms)
       .then(async () => {
-        for(const gw of await grid.gateway._list()){
+        for (const gw of await grid.gateway._list()) {
           console.log(gw);
           try {
             await grid.gateway.getObj(gw);
-          }
-          catch (e ){
+          } catch (e) {
             console.log(e);
           }
         }
