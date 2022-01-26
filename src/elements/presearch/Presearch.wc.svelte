@@ -48,6 +48,23 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
+  const restoreFields: IFormField[] = [
+    {
+      label: "Private Presearch Restore Key",
+      symbol: "privateRestoreKey",
+      placeholder: "Restore Previous Presearch Node",
+      type: "textarea",
+      invalid: false,
+    },
+    {
+      label: "Public Presearch Restore Key",
+      symbol: "publicRestoreKey",
+      placeholder: "Restore Previous Presearch Node",
+      type: "textarea",
+      invalid: false,
+    },
+  ];
+
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
 
   let message: string;
@@ -115,6 +132,28 @@
 
       {#if active === "base"}
         {#each fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
+
+        <div class="notification is-warning is-light">
+          <p>
+            Only configure these Presearch Restore Keys fields if you want to
+            restore previous node. see backup steps <a
+              href="https://docs.presearch.org/nodes/backing-up-and-migrating-nodes"
+              target="_blank">here</a
+            >.
+          </p>
+        </div>
+
+        {#each restoreFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
               bind:data={data[field.symbol]}
