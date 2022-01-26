@@ -6,7 +6,7 @@ export default class Presearch extends VM {
   public name = `ps${this.id}`;
   public cpu = 1;
   public memory = 1024 * 1;
-  public diskSize = 20;
+  public diskSize = 10;
   public preCode = "";
   public privateRestoreKey = "";
   public publicRestoreKey = "";
