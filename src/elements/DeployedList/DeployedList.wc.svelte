@@ -7,7 +7,13 @@
   import DeployedList from "../../types/deployedList";
   import deleteContracts from "../../utils/deleteContracts";
 
-  type TabsType = "k8s" | "vm" | "caprover" | "funkwhale" | "peertube";
+  type TabsType =
+    | "k8s"
+    | "vm"
+    | "caprover"
+    | "funkwhale"
+    | "peertube"
+    | "owncloud";
   export let tab: TabsType = undefined;
 
   // components
@@ -26,7 +32,8 @@
     { label: "Caprover", value: "caprover" },
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
-    { label: "Taiga", value: "taiga" }
+    { label: "Taiga", value: "taiga" },
+    { label: "Owncloud", value: "owncloud" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -353,7 +360,6 @@
             message={err.message || err || "Failed to list Peertube"}
           />
         {/await}
-
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
         {#await list?.loadFunkwhale()}
@@ -396,8 +402,7 @@
             message={err.message || err || "Failed to list Funkwhale"}
           />
         {/await}
-
-        {:else if active === "taiga"}
+      {:else if active === "taiga"}
         {#await list.loadTaiga()}
           <Alert type="info" message="Listing Taiga Instances..." />
         {:then rows}
@@ -431,20 +436,23 @@
                   label: "Admin Panel",
                   click: (_, i) => {
                     const domain = rows[i].details.env.DOMAIN_NAME;
-                    window.open("http://" + domain + "/admin/", "_blank").focus();
+                    window
+                      .open("http://" + domain + "/admin/", "_blank")
+                      .focus();
                   },
                   disabled: (i) => {
                     const env = rows[i].details.env;
-                    return (
-                      !env || !env.DOMAIN_NAME || removing !== null
-                    );
+                    return !env || !env.DOMAIN_NAME || removing !== null;
                   },
                 },
               ]}
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Taiga instances found on this profile." />
+            <Alert
+              type="info"
+              message="No Taiga instances found on this profile."
+            />
           {/if}
         {:catch err}
           <Alert
@@ -453,6 +461,51 @@
           />
         {/await}
 
+        <!-- Owncloud -->
+      {:else if active === "owncloud"}
+        {#await list.loadOwncloud()}
+          <Alert type="info" message="Listing owncloud Instances..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.OWNCLOUD_HOST;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.OWNCLOUD_HOST || removing !== null;
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert
+              type="info"
+              message="No owncloud instances found on this profile."
+            />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list owncloud instances"}
+          />
+        {/await}
       {/if}
     {/if}
   </section>
