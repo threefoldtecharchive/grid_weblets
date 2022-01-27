@@ -12,7 +12,7 @@ export default class FarmingProfile {
     public powerCost: number = 0.15,
     public certified: boolean = false,
     public publicIp: boolean = false,
-    public investmentCostHW: number = 1000,
+    public investmentCostHW: number = 2200,
     public nuRequiredPerCu: number = 30
   ) {}
 
@@ -32,7 +32,7 @@ export default class FarmingProfile {
     const { hdd, ssd, cu } = this;
 
     const x = hdd / 1200;
-    const y = ssd * 0.8 - cu * 25;
+    const y = ssd * 0.8;
     return x + y / 200;
   }
 
@@ -101,9 +101,9 @@ export default class FarmingProfile {
   }
 
   public getRoi(price: number = this.priceAfter5Years): number {
-    const { totalFarmingRewardInTft, investmentCostHW /* D32 */, powerUtilization, powerCost } = this; // prettier-ignore
+    const { totalFarmingRewardInTft, investmentCostHW /* D38 */, powerUtilization, powerCost } = this; // prettier-ignore
     const tft = totalFarmingRewardInTft * 60;
-    const usd /* D31 */ = tft * price;
+    const usd /* D37 */ = tft * price;
     const powerCostOver5Years /* D33 */ = powerUtilization * 24 * .365 * 5 * powerCost; // prettier-ignore
     const roiX = usd - (investmentCostHW + powerCostOver5Years);
     const roiY = investmentCostHW + powerCostOver5Years;
