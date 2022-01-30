@@ -3,20 +3,20 @@ import createNetwork from "./createNetwork";
 const { DiskModel, MachineModel, MachinesModel } =
   window.configs?.grid3_client ?? {};
 import type { IProfile } from "../types/Profile";
-import getGrid from "./getGrid";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 
 export default async function deployVM(data: VM, profile: IProfile) {
   const { envs, disks, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId } = base;
+  const { publicIp, planetary, nodeId, publicIp6 } = base;
 
   const vm = new MachineModel();
   vm.name = name;
   vm.node_id = nodeId;
   vm.disks = disks.map(createDisk);
   vm.public_ip = publicIp;
+  vm.public_ip6 = publicIp6;
   vm.planetary = planetary;
   vm.cpu = cpu;
   vm.memory = memory;

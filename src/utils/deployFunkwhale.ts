@@ -1,4 +1,4 @@
-import type { default as VM } from "../types/vm";
+import type { default as Funkwhale } from "../types/funkwhale";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
@@ -17,13 +17,17 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployFunkwhale(data: VM, profile: IProfile) {
-  const { envs, disks, username, email, password, ...base } = data;
+export default async function deployFunkwhale(
+  data: Funkwhale,
+  profile: IProfile
+) {
+  const { envs, disks, adminUsername, adminEmail, adminPassword, ...base } =
+    data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
     networkEnv as any,
     mnemonics,
@@ -56,9 +60,9 @@ export default async function deployFunkwhale(data: VM, profile: IProfile) {
     nodeId,
     domain,
     randomSuffix,
-    username,
-    email,
-    password
+    adminUsername,
+    adminEmail,
+    adminPassword
   );
 
   const info = await getFunkwhaleInfo(client, name);
@@ -91,9 +95,9 @@ async function deployFunkwhaleVM(
   nodeId: number,
   domain: string,
   randomSuffix: string,
-  username: string,
-  email: string,
-  password: string
+  adminUsername: string,
+  adminEmail: string,
+  adminPassword: string
 ) {
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
@@ -114,9 +118,9 @@ async function deployFunkwhaleVM(
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,
-    DJANGO_SUPERUSER_EMAIL: email,
-    DJANGO_SUPERUSER_USERNAME: username,
-    DJANGO_SUPERUSER_PASSWORD: password,
+    DJANGO_SUPERUSER_EMAIL: adminEmail,
+    DJANGO_SUPERUSER_USERNAME: adminUsername,
+    DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
 
   const vms = new MachinesModel();
@@ -127,6 +131,16 @@ async function deployFunkwhaleVM(
   return deploy(profile, "Funkwhale", name, (grid) => {
     return grid.machines
       .deploy(vms)
+      .then(async () => {
+        for (const gw of await grid.gateway._list()) {
+          console.log(gw);
+          try {
+            await grid.gateway.getObj(gw);
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });

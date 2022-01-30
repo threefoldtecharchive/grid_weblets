@@ -183,7 +183,7 @@
   };
 
   interface IResources { cru: number; sru: number; hru: number; mru: number; ipv4u: number; } // prettier-ignore
-  interface ICapacity { total: IResources; used: IResources; } // prettier-ignore
+  interface ICapacity { total_resources: IResources; used_resources: IResources; } // prettier-ignore
 
   let _ctrl: AbortController;
   let _nodeId: number;
@@ -215,7 +215,7 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then(({ capacity }) => {
-              const { total, used } = capacity;
+              const { total_resources: total, used_resources: used } = capacity;
               // prettier-ignore
               let valid = (total.cru - used.cru) >= filters.cru &&
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
