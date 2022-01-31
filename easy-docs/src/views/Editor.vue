@@ -48,7 +48,7 @@
         "
         class="tag is-info is-light"
       >
-        v1.0.0-alpha
+        <tf-version></tf-version>
       </span>
     </aside>
 

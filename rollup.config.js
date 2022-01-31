@@ -9,7 +9,7 @@ import path from 'path';
 import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
-const network = process.env.NETWORK || "devnet";
+const network = process.env.NETWORK || "dev";
 
 /**
  * 
@@ -57,6 +57,7 @@ function build(options) {
 				preventAssignment: true,
 				values: {
 					'process.env.NETWORK': `"${network}"`,
+					'process.env.VERSION': `"${process.env.VERSION || "No version to show"}"`
 				}
 			})
 		],
