@@ -21,7 +21,7 @@ export default async function deployDiscourse(
   const name = data.name;
   const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
     networkEnv as any,
     mnemonics,
@@ -109,12 +109,12 @@ async function depoloyDiscourseVM(
 
     DISCOURSE_SMTP_ADDRESS: smtp.address,
     DISCOURSE_SMTP_PORT: smtp.port,
-    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS ? "true": "false",
+    DISCOURSE_SMTP_ENABLE_START_TLS: smtp.enableTLS ? "true" : "false",
     DISCOURSE_SMTP_USER_NAME: smtp.userName,
     DISCOURSE_SMTP_PASSWORD: smtp.password,
     // Auto generated env. vars
-    THREEBOT_PRIVATE_KEY: threebotPRKey, 
-    FLASK_SECRET_KEY: flaskSecretKey, 
+    THREEBOT_PRIVATE_KEY: threebotPRKey,
+    FLASK_SECRET_KEY: flaskSecretKey,
   };
   const machines = new MachinesModel();
   machines.name = name;
