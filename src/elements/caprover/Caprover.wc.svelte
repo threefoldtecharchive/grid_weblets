@@ -1,7 +1,7 @@
 <svelte:options tag="tf-caprover" />
 
 <script lang="ts">
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import { default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
   import type { IProfile } from "../../types/Profile";
@@ -24,6 +24,7 @@
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const data = new Caprover();
   let loading = false;
@@ -43,11 +44,14 @@
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
+  ];
+
+  const packages: IPackage[] = [
+    { name: "Small", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Medium", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Large", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
@@ -156,6 +160,13 @@
             </div>
           {/if}
         {/each}
+
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.diskSize}
+          {packages}
+        />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
