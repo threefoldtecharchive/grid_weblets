@@ -13,6 +13,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployMattermost from "../../utils/deployMattermost";
   import validateName from "../../utils/validateName";
+import validateDomainName from "../../utils/validateDomainName";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -22,10 +23,10 @@
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost name", validator: validateName, invalid: false },
-    { label: "Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator, invalid: false },
-    { label: "Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator, invalid: false },
+    { label: "SMTP Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator, invalid: false },
+    { label: "SMTP Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator, invalid: false },
     // { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator, invalid: false },
-    { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator, invalid: false },
+    { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator: validateDomainName, invalid: false },
     { label: "SMTP port", symbol: "port", type: "text", placeholder: "SMTP port", validator, invalid: false },
   ];
 

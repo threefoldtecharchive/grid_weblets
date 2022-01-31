@@ -1,4 +1,5 @@
 import { v4 } from "uuid";
+import generatePassword from "../utils/generatePassword";
 import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
 
@@ -36,11 +37,11 @@ export default class Mattermost implements IMattermost {
   }: Partial<IMattermost> = {}) {
     this.name = name || "mm" + this.id.split("-")[0];
     this.username = username || "";
-    this.password = password || "";
+    this.password = password || generatePassword(10);
     this.nodeId = nodeId;
     this.domain = domain || "";
     this.server = server || "";
-    this.port = port || "8000";
+    this.port = port || "587";
   }
 
   get invalid(): boolean {
