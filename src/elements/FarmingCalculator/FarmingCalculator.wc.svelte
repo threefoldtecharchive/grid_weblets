@@ -14,8 +14,8 @@
   import type { IFormField } from "../../types";
 
   const profiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.06, 2), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 0, 1000, 0.06, 2), // prettier-ignore
+    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.08, 1), // prettier-ignore
+    new FarmingProfile("Titan v2.1", 32, 8, 0, 1000, 0.08, 1), // prettier-ignore
   ];
 
   let profileChoosing: boolean = true;
@@ -31,15 +31,15 @@
   // prettier-ignore
   const inputFields = [
     { label: "Memory (GB)", symbol: "memory" },
-    { label: "CPU (Cores)", symbol: "cpu" },
+    { label: "vCPU (Threads)", symbol: "cpu" },
     { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     // { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
-    { label: "Power Utilization", symbol: "powerUtilization" },
-    { label: "Power Cost", symbol: "powerCost" },
+    { label: "Power Utilization (Watt)", symbol: "powerUtilization" },
+    { label: "Power Cost (USD)", symbol: "powerCost" },
     { label: "Public IP", symbol: "publicIp", type: "checkbox" },
     { label: "Certified", symbol: "certified", type: "checkbox" },
   ];
@@ -47,15 +47,15 @@
   // prettier-ignore
   const basicInputFields = [
     { label: "Memory (GB)", symbol: "memory" },
-    { label: "CPU (Cores)", symbol: "cpu" },
+    { label: "vCPU (Threads)", symbol: "cpu" },
     { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
     { label: "SSD (GB)", symbol: "ssd" },
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
     { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
     { label: "Maximum Token Price", symbol: "maximumTokenPrice" },
-    { label: "Power Utilization", symbol: "powerUtilization" },
-    { label: "Power Cost", symbol: "powerCost" },
+    { label: "Power Utilization (Watt)", symbol: "powerUtilization" },
+    { label: "Power Cost (USD)", symbol: "powerCost" },
     { label: "Public IP", symbol: "publicIp", type: "checkbox" },
     { label: "Certified", symbol: "certified", type: "checkbox" },
   ];

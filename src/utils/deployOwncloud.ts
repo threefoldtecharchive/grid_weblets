@@ -18,12 +18,12 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployOwncloud(data: Owncloud, profile: IProfile) {
-    const { envs, disks: [{ size }], adminUsername, adminEmail, adminPassword, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, ...base } = data;
-    let { name, flist, cpu, memory, entrypoint, network: nw } = base;
+    const { envs, adminUsername, adminEmail, adminPassword, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, cpu, memory, diskSize, ...base } = data;
+    let { name, flist, entrypoint, network: nw } = base;
     const { publicIp, planetary, nodeId } = base;
     const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
 
-    const http = new HTTPMessageBusClient(0, "");
+    const http = new HTTPMessageBusClient(0, "", "", "");
     const client = new GridClient(
         networkEnv as any,
         mnemonics,
@@ -60,7 +60,7 @@ export default async function deployOwncloud(data: Owncloud, profile: IProfile) 
         domain,
         cpu,
         memory,
-        size,
+        diskSize,
         adminUsername,
         adminEmail,
         adminPassword,
