@@ -1,13 +1,12 @@
 <svelte:options tag="tf-peertube" />
 
 <script lang="ts">
-  import { v4 } from "uuid";
-
   // Types
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
+  import Peertube from "../../types/peertube";
   import deployPeertube from "../../utils/deployPeertube";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -53,14 +52,7 @@
   };
 
   const deploymentStore = window.configs?.deploymentStore;
-  let data = new VM(); // set the default specs for peertube
-  data.name = `pt${v4().split("-")[0]}`;
-  data.email = "admin@peertube.com";
-  data.password = "password";
-  data.disks = [new Disk(undefined, undefined, 20, undefined)];
-  data.cpu = 2;
-  data.memory = 2048;
-  data.publicIp = false;
+  let data = new Peertube();
 
   let active: string = "base";
   let loading = false;
@@ -146,12 +138,12 @@
           field={nameField}
         />
         <Input
-          bind:data={data.email}
+          bind:data={data.adminEmail}
           bind:invalid={emailField.invalid}
           field={emailField}
         />
         <Input
-          bind:data={data.password}
+          bind:data={data.adminPassword}
           bind:invalid={passField.invalid}
           field={passField}
         />

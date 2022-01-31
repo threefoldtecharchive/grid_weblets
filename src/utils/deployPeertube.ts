@@ -1,4 +1,4 @@
-import type { default as VM } from "../types/vm";
+import type { default as Peertube } from "../types/peertube";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
@@ -17,12 +17,15 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployPeertube(data: VM, profile: IProfile) {
+export default async function deployPeertube(
+  data: Peertube,
+  profile: IProfile
+) {
   const {
     envs,
     disks: [{ size }],
-    email,
-    password,
+    adminEmail,
+    adminPassword,
     ...base
   } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
@@ -68,8 +71,8 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     sshKey,
     randomSuffix,
     publicIp,
-    email,
-    password
+    adminEmail,
+    adminPassword
   );
 
   // get the info of peertube deployment
@@ -154,11 +157,10 @@ async function deployPeertubeVM(
     return grid.machines
       .deploy(vms)
       .then(async () => {
-        for(const gw of await grid.gateway._list()){
+        for (const gw of await grid.gateway._list()) {
           try {
             await grid.gateway.getObj(gw);
-          }
-          catch {}
+          } catch {}
         }
       })
       .then(() => grid.machines.getObj(name))
