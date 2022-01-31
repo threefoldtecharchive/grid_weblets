@@ -53,3 +53,10 @@ export interface ITab {
   value: string;
   removable?: boolean;
 }
+
+export interface IPackage {
+  name: string;
+  cpu: number;
+  memory: number;
+  diskSize: number;
+}
