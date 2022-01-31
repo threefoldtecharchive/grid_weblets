@@ -13,11 +13,8 @@
     | "caprover"
     | "funkwhale"
     | "peertube"
-<<<<<<< HEAD
-    | "mattermost";
-=======
+    | "mattermost"
     | "owncloud";
->>>>>>> development
   export let tab: TabsType = undefined;
 
   // components
