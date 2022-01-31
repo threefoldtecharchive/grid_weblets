@@ -50,9 +50,9 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Small", cpu: 2, memory: 1024 * 16, diskSize: 250 },
-    { name: "Medium", cpu: 2, memory: 1024 * 16, diskSize: 500 },
-    { name: "Large", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
+    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
+    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore

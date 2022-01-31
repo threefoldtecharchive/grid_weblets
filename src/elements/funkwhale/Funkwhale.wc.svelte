@@ -46,9 +46,9 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Small", cpu: 2, memory: 1024, diskSize: 50 },
-    { name: "Medium", cpu: 2, memory: 1024 * 2, diskSize: 100 },
-    { name: "Large", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+    { name: "Minimum", cpu: 2, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField]); // prettier-ignore

@@ -32,9 +32,9 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Small", cpu: 1, memory: 1024, diskSize: 100 },
-    { name: "Medium", cpu: 2, memory: 1024 * 2, diskSize: 250 },
-    { name: "Large", cpu: 4, memory: 1024 * 4, diskSize: 500 },
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
   ];
 
   const deploymentStore = window.configs?.deploymentStore;

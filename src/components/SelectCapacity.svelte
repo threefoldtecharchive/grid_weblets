@@ -44,15 +44,15 @@
     symbol: "pkg",
     type: "select",
     options: [
-      { label: "Small", value: "sm", selected: true },
-      { label: "Meduim", value: "md" },
-      { label: "Large", value: "lg" },
-      { label: "Other", value: "other" },
+      { label: "Minimum", value: "min", selected: true },
+      { label: "Standard", value: "std" },
+      { label: "Recommended", value: "rec" },
+      { label: "Custom", value: "cust" },
     ],
   };
 
   let selectedPackageIndex: number = 0;
-  let selectedPackage: string = "sm";
+  let selectedPackage: string = "min";
 
   function _applyPackage(idx: number) {
     const pkg = packages[idx];
@@ -82,7 +82,7 @@
   on:input={onSelectPackage}
 />
 
-{#if selectedPackage === "other"}
+{#if selectedPackage === "cust"}
   <Input bind:data={cpu} bind:invalid={cpuField.invalid} field={cpuField} />
 
   <Input
