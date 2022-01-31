@@ -13,6 +13,11 @@ export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format";
 }
 
+export function validateOptionalEmail(email: string): string | void {
+  if (email == "") return null;
+  if (!EMAIL_REGEX.test(email) ) return "Invalid email format";
+}
+
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
 }
@@ -39,4 +44,13 @@ export function validateCpu(value: number): string | void {
   if (+value.toFixed(0) !== value) return "CPU cores must be a valid integer";
   if (value < 1) return "Minimum allowed CPU cores is 1";
   if (value > 32) return "Maximum allowed CPU cores is 32";
+}
+
+export function validatePortNumber(value: string): string | void {
+  if (value === "") return null;
+  let port = +value;
+  if (isNaN(port)) return "Port must be a valid number";
+  if (port.toFixed(0) !== value) return "Port must be a valid integer";
+  if (port < 1) return "Minimum allowed port is 1";
+  if (port > 65535) return "Maximum allowed port is 65535";
 }

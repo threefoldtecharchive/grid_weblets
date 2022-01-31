@@ -1,33 +1,26 @@
-import type { default as VM } from "../types/vm";
+import type { default as Taiga } from "../types/taiga";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
-import createNetwork from "./createNetwork";
-import { Network } from "../types/kubernetes";
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
-  GridClient,
   DiskModel,
   MachineModel,
   MachinesModel,
+  GridClient,
   GatewayNameModel,
+  NetworkModel,
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployPeertube(data: VM, profile: IProfile) {
-  const {
-    envs,
-    disks: [{ size }],
-    email,
-    password,
-    ...base
-  } = data;
+export default async function deployTaiga(data: Taiga, profile: IProfile) {
+  const { envs, disks:[{size}], adminUsername, adminEmail, adminPassword, smtpFromEmail, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, smtpUseTLS, smtpUseSSL, ...base } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
+  const { mnemonics, storeSecret, networkEnv, sshKey} = profile;
 
   const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
@@ -45,36 +38,43 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   let randomSuffix = generateString(10).toLowerCase();
 
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "pt", name);
+  let domainName = await getUniqueDomainName(client, "tg", name);
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
   const domain = `${domainName}.${nodeDomain}`;
 
-  // define a network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
+  // define network
+  const network = new NetworkModel();
+  network.name = `net${randomSuffix}`;
+  network.ip_range = "10.1.0.0/16";
 
-  // deploy the peertube
-  await deployPeertubeVM(
+  const deployment = await deployTaigaVM(
     profile,
     client,
+    name,
     network,
     nodeId,
-    name,
-    domain,
     cpu,
     memory,
     size,
+    domain,
+    adminUsername,
+    adminEmail,
+    adminPassword,
     sshKey,
+    smtpFromEmail,
+    smtpHost,
+    smtpPort,
+    smtpHostUser,
+    smtpHostPassword,
+    smtpUseTLS,
+    smtpUseSSL,
     randomSuffix,
-    publicIp,
-    email,
-    password
   );
 
-  // get the info of peertube deployment
-  const peertubeInfo = await getPeertubeInfo(client, name);
-  const planetaryIP = peertubeInfo[0]["planetary"];
+  const info = await getTaigaInfo(client, name);
+  const planetaryIP = info[0]["planetary"];
 
   try {
     // deploy the gateway
@@ -86,71 +86,76 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
       publicNodeId
     );
   } catch (error) {
-    // rollback peertube deployment if gateway deployment failed
+    // rollback the TaigaVM if the gateway fails to deploy
     await client.machines.delete({ name: name });
     throw error;
   }
 
-  // get the info of the deployed gateway
   const gatewayInfo = await getGatewayInfo(client, domainName);
-  const gatewayDomain = gatewayInfo[0]["domain"];
-  return { domain, planetaryIP };
+  return { deployment, domain, planetaryIP };
 }
 
-async function deployPeertubeVM(
+async function deployTaigaVM(
   profile: IProfile,
   client: any,
-  net: any,
-  nodeId: any,
   name: string,
-  domain: string,
+  network: any,
+  nodeId: number,
   cpu: number,
   memory: number,
   diskSize: number,
+  domain: string,
+  adminUsername: string,
+  adminEmail: string,
+  adminPassword: string,
   sshKey: string,
+  smtpFromEmail: string,
+  smtpHost: string,
+  smtpPort: string, 
+  smtpHostUser: string,
+  smtpHostPassword: string,
+  smtpUseTLS,
+  smtpUseSSL,
   randomSuffix: string,
-  publicIp: boolean,
-  email: string,
-  password: string
 ) {
-  // disk
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
   disk.size = diskSize;
-  disk.mountpoint = "/data";
+  disk.mountpoint = "/var/lib/docker";
 
-  // vm specs
   const vm = new MachineModel();
   vm.name = `vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
-  vm.public_ip = publicIp;
+  vm.public_ip = false;
   vm.planetary = true;
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.1.flist";
-  vm.entrypoint = "/usr/local/bin/entrypoint.sh";
+    "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-grid3_taiga_docker-latest.flist";
+  vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: sshKey,
-    PEERTUBE_ADMIN_EMAIL: email,
-    PT_INITIAL_ROOT_PASSWORD: password,
-    PEERTUBE_WEBSERVER_HOSTNAME: domain,
-    PEERTUBE_WEBSERVER_PORT: "443",
-    PEERTUBE_DB_SUFFIX: "_prod",
-    PEERTUBE_DB_USERNAME: "peertube",
-    PEERTUBE_DB_PASSWORD: "peertube",
+    DOMAIN_NAME: domain,
+    ADMIN_USERNAME: adminUsername,
+    ADMIN_PASSWORD: adminPassword,
+    ADMIN_EMAIL: adminEmail,
+    DEFAULT_FROM_EMAIL: smtpFromEmail,
+    EMAIL_USE_TLS: smtpUseTLS ? "True" : "False" ,
+    EMAIL_USE_SSL: smtpUseSSL ? "True": "False",
+    EMAIL_HOST: smtpHost,
+    EMAIL_PORT: `${ smtpPort }`,
+    EMAIL_HOST_USER: smtpHostUser,
+    EMAIL_HOST_PASSWORD: smtpHostPassword
   };
 
-  // vms specs
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = net;
+  vms.network = network;
   vms.machines = [vm];
 
-  // deploy
-  return deploy(profile, "Peertube", name, (grid) => {
+  return deploy(profile, "Taiga", name, (grid) => {
     return grid.machines
       .deploy(vms)
       .then(async () => {
@@ -173,12 +178,11 @@ async function deployPrefixGateway(
   backend: string,
   publicNodeId: number
 ) {
-  // define specs
   const gw = new GatewayNameModel();
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${backend}]:9000`];
+  gw.backends = [`http://[${backend}]:9000/`];
 
   return deploy(profile, "GatewayName", domainName, (grid) => {
     return grid.gateway
@@ -188,7 +192,7 @@ async function deployPrefixGateway(
   });
 }
 
-async function getPeertubeInfo(client: any, name: string) {
+async function getTaigaInfo(client: any, name: string) {
   const info = await client.machines.getObj(name);
   return info;
 }

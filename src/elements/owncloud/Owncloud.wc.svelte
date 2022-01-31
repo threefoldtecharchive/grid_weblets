@@ -1,14 +1,13 @@
-<svelte:options tag="tf-peertube" />
+<svelte:options tag="tf-owncloud" />
 
 <script lang="ts">
-  import { v4 } from "uuid";
-
   // Types
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from "../../types/vm";
+  import Owncloud from "../../types/owncloud";
   // Modules
-  import VM, { Disk, Env } from "../../types/vm";
-  import deployPeertube from "../../utils/deployPeertube";
+  import deployOwncloud from "../../utils/deployOwncloud";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
@@ -22,56 +21,102 @@
   import validateName, {
     isInvalid,
     validateCpu,
+    validateEmail,
+    validateOptionalEmail,
     validateDisk,
     validateMemory,
-    validateEmail,
+    validatePortNumber,
   } from "../../utils/validateName";
+  import validateDomainName from "../../utils/validateDomainName";
+
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
 
-  // Values
+  let data = new Owncloud();
+  let domain: string, planetaryIP: string;
 
-  const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-  const emailField: IFormField = { label: "Email", placeholder: "Instance Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
-  const passField: IFormField = { label: "Password", placeholder: "Instance Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
-
-  // prettier-ignore
-  const baseFields: IFormField[] = [
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
-  ];
-
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
-
-  const deploymentStore = window.configs?.deploymentStore;
-  let data = new VM(); // set the default specs for peertube
-  data.name = `pt${v4().split("-")[0]}`;
-  data.email = "admin@peertube.com";
-  data.password = "password";
-  data.disks = [new Disk(undefined, undefined, 20, undefined)];
-  data.cpu = 2;
-  data.memory = 2048;
-  data.publicIp = false;
-
+  data.disks = [new Disk()];
+  let profile: IProfile;
   let active: string = "base";
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
+
+  const tabs: ITab[] = [
+    { label: "Base", value: "base" },
+    { label: "Mail Server", value: "mail" },
+  ];
+
+  const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+
+  let adminFields: IFormField[] = [
+    {
+      label: "Admin User Name",
+      symbol: "adminUsername",
+      placeholder: "admin",
+      type: "text",
+      validator: validateName,
+      invalid: false,
+    },
+    {
+      label:
+        "Admin Password (It's important to save the admin username and password for login)",
+      symbol: "adminPassword",
+      placeholder: "password",
+      type: "password",
+      invalid: false,
+    },
+    {
+      label: "Admin Email Address",
+      symbol: "adminEmail",
+      placeholder: "admin@example.com",
+      type: "text",
+      validator: validateEmail,
+      invalid: false,
+    },
+  ];
+
+  let mailFields: IFormField[] = [
+    {
+      label: "Host Name",
+      symbol: "smtpHost",
+      placeholder: "smtp.example.com",
+      type: "text",
+      validator: validateDomainName,
+      invalid: false,
+    },
+    {
+      label: "Port",
+      symbol: "smtpPort",
+      placeholder: "587",
+      type: "text",
+      validator: validatePortNumber,
+      invalid: false,
+    },
+    {
+      label: "User Name",
+      symbol: "smtpHostUser",
+      placeholder: "user@example.com",
+      type: "text",
+      validator: validateOptionalEmail,
+      invalid: false,
+    },
+    {
+      label: "Password",
+      symbol: "smtpHostPassword",
+      placeholder: "password",
+      type: "password",
+      invalid: false,
+    },
+  ];
+
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
-  let domain: string, planetaryIP: string;
+
+  const deploymentStore = window.configs?.deploymentStore;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -87,12 +132,13 @@
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployPeertube(data, profile)
-      .then(({ domain: d, planetaryIP: ip }) => {
+    deployOwncloud(data, profile)
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
-        domain = d;
-        planetaryIP = ip;
+        modalData = data.deployment;
+        domain = data.domain;
+        planetaryIP = data.planetaryIP;
       })
       .catch((err: Error) => {
         failed = true;
@@ -110,32 +156,30 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
     }
   }}
 />
 
 <div style="padding: 15px;">
-  <!-- Container -->
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Peertube Instance</h4>
+    <h4 class="is-size-4">Deploy an owncloud Instance</h4>
     <hr />
 
-    <!-- Status -->
-    {#if loading || (logs !== null && logs.type === "Peertube")}
+    {#if loading || (logs !== null && logs.type === "VM")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <AlertDetailed
         type="success"
-        message="Successfully deployed a Peertube instance"
+        message="Successfully deployed owncloud."
         {planetaryIP}
         {domain}
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || "Failed to deploy owncloud."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -145,19 +189,8 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-        <Input
-          bind:data={data.email}
-          bind:invalid={emailField.invalid}
-          field={emailField}
-        />
-        <Input
-          bind:data={data.password}
-          bind:invalid={passField.invalid}
-          field={passField}
-        />
-        <Input bind:data={data.disks[0].size} field={diskField} />
 
-        {#each baseFields as field (field.symbol)}
+        {#each adminFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
               bind:data={data[field.symbol]}
@@ -173,18 +206,33 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
-          )}
-          bind:data={data.nodeId}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:nodeSelection={data.selection.type}
-          bind:status
+          bind:data={data.nodeId}
           filters={data.selection.filters}
+          bind:status
           {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
+      {:else if active === "mail"}
+        <div class="notification is-warning is-light">
+          <p>
+            configure these settings only If you have an smtp service and you
+            know what you’re doing.
+          </p>
+        </div>
+        {#each mailFields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
       {/if}
     {/if}
 
