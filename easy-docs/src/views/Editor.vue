@@ -118,6 +118,7 @@ export default class Editor extends Vue {
     new Weblet("Peertube", "peertube", "peertube", "deployment"),
     new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
     new Weblet("Taiga", "taiga", "taiga", "deployment"),
+    new Weblet("Owncloud", "owncloud", "owncloud", "deployment"),
   ];
   public active = 0;
 

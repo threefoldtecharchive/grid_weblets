@@ -12,27 +12,32 @@ export default class FarmingProfile {
     public powerCost: number = 0.15,
     public certified: boolean = false,
     public publicIp: boolean = false,
-    public investmentCostHW: number = 1000,
+    public investmentCostHW: number = 2200,
     public nuRequiredPerCu: number = 30
   ) {}
+
+  private _max(val: number, max = 0) {
+    val = val ?? 0;
+    return Math.max(val, max);
+  }
 
   public get cu(): number {
     const { memory, cpu, ssd } = this;
     const x = (memory - 1) / 4;
     const y = cpu * 2;
     const z = ssd / 50;
-    return Math.min(x, y, z);
+    return this._max(Math.min(x, y, z));
   }
 
   public get nu(): number {
-    return this.cu * this.nuRequiredPerCu;
+    return this._max(this.cu * this.nuRequiredPerCu);
   }
 
   public get su(): number {
     const { hdd, ssd, cu } = this;
 
     const x = hdd / 1200;
-    const y = ssd * 0.8 - cu * 25;
+    const y = ssd * 0.8;
     return x + y / 200;
   }
 
@@ -101,9 +106,9 @@ export default class FarmingProfile {
   }
 
   public getRoi(price: number = this.priceAfter5Years): number {
-    const { totalFarmingRewardInTft, investmentCostHW /* D32 */, powerUtilization, powerCost } = this; // prettier-ignore
+    const { totalFarmingRewardInTft, investmentCostHW /* D38 */, powerUtilization, powerCost } = this; // prettier-ignore
     const tft = totalFarmingRewardInTft * 60;
-    const usd /* D31 */ = tft * price;
+    const usd /* D37 */ = tft * price;
     const powerCostOver5Years /* D33 */ = powerUtilization * 24 * .365 * 5 * powerCost; // prettier-ignore
     const roiX = usd - (investmentCostHW + powerCostOver5Years);
     const roiY = investmentCostHW + powerCostOver5Years;

@@ -27,7 +27,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
     networkEnv as any,
     mnemonics,
@@ -144,6 +144,14 @@ async function deployPeertubeVM(
   return deploy(profile, "Peertube", name, (grid) => {
     return grid.machines
       .deploy(vms)
+      .then(async () => {
+        for(const gw of await grid.gateway._list()){
+          try {
+            await grid.gateway.getObj(gw);
+          }
+          catch {}
+        }
+      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });

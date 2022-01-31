@@ -27,7 +27,7 @@ export default async function deployFunkwhale(
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
     networkEnv as any,
     mnemonics,
@@ -131,6 +131,16 @@ async function deployFunkwhaleVM(
   return deploy(profile, "Funkwhale", name, (grid) => {
     return grid.machines
       .deploy(vms)
+      .then(async () => {
+        for (const gw of await grid.gateway._list()) {
+          console.log(gw);
+          try {
+            await grid.gateway.getObj(gw);
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });
