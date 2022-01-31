@@ -25,6 +25,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -52,7 +53,8 @@
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
-    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
+    { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
+    { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
@@ -170,7 +172,8 @@
           cpu={data.master.cpu}
           memory={data.master.memory}
           publicIp={data.master.publicIp}
-          ssd={data.master.diskSize}
+          ssd={data.master.diskSize +
+            rootFs(data.master.cpu, data.master.memory)}
           bind:data={data.master.node}
           bind:nodeSelection={data.master.selection.type}
           filters={data.master.selection.filters}
@@ -206,7 +209,7 @@
                 cpu={worker.cpu}
                 memory={worker.memory}
                 publicIp={worker.publicIp}
-                ssd={worker.diskSize}
+                ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
                 filters={worker.selection.filters}
                 bind:data={worker.node}
                 bind:nodeSelection={worker.selection.type}

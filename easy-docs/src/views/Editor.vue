@@ -77,7 +77,7 @@ class Weblet {
     public name: string,
     public symbol: string,
     deployment = "",
-    public section: "deployment" | "calculator" | "coming soon"
+    public section: "deployment" | "calculator" | "my account"
   ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
@@ -104,19 +104,21 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
-  public sections = ["deployment", "calculator"];
+  public sections = ["deployment", "my account", "calculator"];
   public weblets: Weblet[] = [
     new Weblet("CapRover", "caprover", "caprover", "deployment"),
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
     new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
-    new Weblet("Contracts", "contractslist", "", "deployment"),
-    new Weblet("Deployments", "deployedlist", "", "deployment"),
+    new Weblet("Contracts", "contractslist", "", "my account"),
+    new Weblet("Deployments", "deployedlist", "", "my account"),
 
     new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
 
     new Weblet("Peertube", "peertube", "peertube", "deployment"),
     new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
     new Weblet("Mattermost", "mattermost", "mattermost", "deployment"),
+    new Weblet("Taiga", "taiga", "taiga", "deployment"),
+    new Weblet("Owncloud", "owncloud", "owncloud", "deployment"),
   ];
   public active = 0;
 
@@ -164,7 +166,7 @@ export default class Editor extends Vue {
     height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
-    will-change: transform;
+    // will-change: transform; // This 100% a bug in CSS
     padding-bottom: 250px;
     @include nice-scroll;
   }

@@ -13,7 +13,11 @@
     | "caprover"
     | "funkwhale"
     | "peertube"
+<<<<<<< HEAD
     | "mattermost";
+=======
+    | "owncloud";
+>>>>>>> development
   export let tab: TabsType = undefined;
 
   // components
@@ -31,7 +35,9 @@
     { label: "Virtual Machines", value: "vm" },
     { label: "Caprover", value: "caprover" },
     { label: "FunkWhale", value: "funkwhale" },
-    { label: "Peertube", value: "peertube" }
+    { label: "Peertube", value: "peertube" },
+    { label: "Taiga", value: "taiga" },
+    { label: "Owncloud", value: "owncloud" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -99,21 +105,15 @@
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
       const { name, master, workers, consumption } = row;
-      return [i + 1, name, master.publicIP?.ip ?? "None", master.planetary ?? "None", workers, consumption]; // prettier-ignore
+      const publicIp = master.publicIP ?? ({} as any);
+      return [i + 1, name, publicIp.ip || "None", publicIp.ip6 || "None", master.planetary || "None", workers, consumption]; // prettier-ignore
     });
   }
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, publicIp, planetary, flist, consumption } = row;
-      return [
-        i + 1,
-        name,
-        publicIp ?? "",
-        planetary ?? "None",
-        flist,
-        consumption,
-      ];
+      const { name, publicIp, publicIp6, planetary, flist, consumption } = row;
+      return [i + 1, name, publicIp, publicIp6, planetary, flist, consumption];
     });
   }
 
@@ -135,6 +135,16 @@
     selectedRows = [];
     _reloadTab();
   }
+
+  const _vmHeader = [
+    "#",
+    "Name",
+    "Public IPv4",
+    "Public IPv6",
+    "Planetary Network IP",
+    "Flist",
+    "Billing Rate",
+  ];
 </script>
 
 <SelectProfile
@@ -188,7 +198,7 @@
 
       <!-- K8S -->
       {#if active === "k8s"}
-        {#await list.loadK8s()}
+        {#await list?.loadK8s()}
           <Alert type="info" message="Listing Kubernetes..." />
         {:then rows}
           {#if rows.length}
@@ -197,7 +207,8 @@
               headers={[
                 "#",
                 "Name",
-                "Public IP",
+                "Public IPv4",
+                "Public IPv6",
                 "Planetary Network IP",
                 "Workers",
                 "Billing Rate",
@@ -232,20 +243,13 @@
 
         <!-- VM -->
       {:else if active === "vm"}
-        {#await list.loadVm()}
+        {#await list?.loadVm()}
           <Alert type="info" message="Listing Virtual Machines..." />
         {:then rows}
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -270,20 +274,13 @@
 
         <!-- Caprover -->
       {:else if active === "caprover"}
-        {#await list.loadCaprover()}
+        {#await list?.loadCaprover()}
           <Alert type="info" message="Listing CapRover..." />
         {:then rows}
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -322,20 +319,13 @@
 
         <!-- Peertube -->
       {:else if active === "peertube"}
-        {#await list.loadPeertube()}
+        {#await list?.loadPeertube()}
           <Alert type="info" message="Listing Peertube..." />
         {:then rows}
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -374,23 +364,15 @@
             message={err.message || err || "Failed to list Peertube"}
           />
         {/await}
-
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
-        {#await list.loadFunkwhale()}
+        {#await list?.loadFunkwhale()}
           <Alert type="info" message="Listing Funkwhale..." />
         {:then rows}
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -424,21 +406,14 @@
             message={err.message || err || "Failed to list Funkwhale"}
           />
         {/await}
-      {:else if active === "mattermost"}
-        {#await list.loadMattermost()}
-          <Alert type="info" message="Listing Mattermost..." />
+      {:else if active === "taiga"}
+        {#await list.loadTaiga()}
+          <Alert type="info" message="Listing Taiga Instances..." />
         {:then rows}
           {#if rows.length}
             <Table
               rowsData={rows}
-              headers={[
-                "#",
-                "Name",
-                "Public IP",
-                "Planetary Network IP",
-                "Flist",
-                "Billing Rate",
-              ]}
+              headers={_vmHeader}
               rows={_createVMRow(rows)}
               actions={[
                 {
@@ -448,16 +423,91 @@
                   disabled: () => removing !== null,
                   loading: (i) => removing === rows[i].name,
                 },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.DOMAIN_NAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.DOMAIN_NAME || removing !== null;
+                  },
+                },
+                {
+                  type: "warning",
+                  label: "Admin Panel",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.DOMAIN_NAME;
+                    window
+                      .open("http://" + domain + "/admin/", "_blank")
+                      .focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.DOMAIN_NAME || removing !== null;
+                  },
+                },
               ]}
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Mattermost found on this profile." />
+            <Alert
+              type="info"
+              message="No Taiga instances found on this profile."
+            />
           {/if}
         {:catch err}
           <Alert
             type="danger"
-            message={err.message || err || "Failed to list Mattermost"}
+            message={err.message || err || "Failed to list Taiga instances"}
+          />
+        {/await}
+
+        <!-- Owncloud -->
+      {:else if active === "owncloud"}
+        {#await list.loadOwncloud()}
+          <Alert type="info" message="Listing owncloud Instances..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.OWNCLOUD_HOST;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.OWNCLOUD_HOST || removing !== null;
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert
+              type="info"
+              message="No owncloud instances found on this profile."
+            />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list owncloud instances"}
           />
         {/await}
       {/if}
