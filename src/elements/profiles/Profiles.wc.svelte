@@ -40,7 +40,7 @@
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
-    { label: "Network Environment", symbol: "networkEnv", type: "select", options: [
+    { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
       { label: "Testnet", value: "test" },
       { label: "Devnet", value: "dev" }
     ] },

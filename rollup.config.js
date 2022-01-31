@@ -6,8 +6,10 @@ import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import fs from 'fs';
 import path from 'path';
+import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
+const network = process.env.NETWORK || "devnet";
 
 /**
  * 
@@ -50,7 +52,13 @@ function build(options) {
 				sourceMap: !production,
 				inlineSources: !production
 			}),
-			production && terser()
+			production && terser(),
+			replace({
+				preventAssignment: true,
+				values: {
+					'process.env.NETWORK': `"${network}"`,
+				}
+			})
 		],
 		watch: {
 			clearScreen: false
