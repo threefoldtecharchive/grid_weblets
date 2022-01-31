@@ -53,6 +53,7 @@
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
+        <tf-disclaimer></tf-disclaimer>
       <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-end mt-2 mb-2 mr-2" style="height: 112px">
           <tf-profiles></tf-profiles>
