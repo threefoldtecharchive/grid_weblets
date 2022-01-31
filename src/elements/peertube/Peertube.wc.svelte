@@ -30,12 +30,6 @@
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-  // prettier-ignore
-  const baseFields: IFormField[] = [
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false }
-  ];
-
   // define this solution packages
   const packages: IPackage[] = [
     { name: "Small", cpu: 1, memory: 1024, diskSize: 50 },
@@ -43,9 +37,11 @@
     { name: "Large", cpu: 2, memory: 1024 * 4, diskSize: 200 },
   ];
 
-
   const deploymentStore = window.configs?.deploymentStore;
-  let data = new VM(); // set the default specs for peertube
+  let data = new VM();
+  data.cpu = 2;
+  data.memory = 2048;
+  data.disks = [new Disk(undefined, undefined, 20, undefined)];
 
   let active: string = "base";
   let loading = false;
@@ -55,7 +51,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   let domain: string, planetaryIP: string;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -134,7 +130,7 @@
         <SelectCapacity
           bind:cpu={data.cpu}
           bind:memory={data.memory}
-          bind:diskSize={data.diskSize}
+          bind:diskSize={data.disks[0].size}
           {packages}
         />
 

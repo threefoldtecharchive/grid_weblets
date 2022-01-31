@@ -65,7 +65,6 @@ export default class VM {
     public pkg = "",
     public cpu = 4,
     public memory = 1024 * 8,
-    public diskSize = 50,
     public entrypoint = "/sbin/zinit init",
     public planetary = true,
     public nodeId: number = null,

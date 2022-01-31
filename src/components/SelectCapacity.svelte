@@ -15,10 +15,30 @@
   export let diskSize: number;
   export let packages: IPackage[];
 
-  let cpuField: IFormField = { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false };
-  let memoryField: IFormField = { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false };
-  let diskField: IFormField = { label: "Disk (GB)", symbol: "diskSize", placeholder: "Your Disk size in GB", type: "number", validator: validateDisk, invalid: false };
-
+  let cpuField: IFormField = {
+    label: "CPU (Cores)",
+    symbol: "cpu",
+    placeholder: "CPU Cores",
+    type: "number",
+    validator: validateCpu,
+    invalid: false,
+  };
+  let memoryField: IFormField = {
+    label: "Memory (MB)",
+    symbol: "memory",
+    placeholder: "Your Memory in MB",
+    type: "number",
+    validator: validateMemory,
+    invalid: false,
+  };
+  let diskField: IFormField = {
+    label: "Disk (GB)",
+    symbol: "diskSize",
+    placeholder: "Your Disk size in GB",
+    type: "number",
+    validator: validateDisk,
+    invalid: false,
+  };
   let packageField: IFormField = {
     label: "Select Capacity Package",
     symbol: "pkg",
@@ -51,8 +71,8 @@
   onMount(() => {
     requestAnimationFrame(() => {
       _applyPackage(0);
-    })
-  })
+    });
+  });
 </script>
 
 <Input
@@ -63,21 +83,17 @@
 />
 
 {#if selectedPackage === "other"}
-  <Input
-    bind:data={cpu}
-    bind:invalid={cpuField.invalid}
-    field={cpuField}
-    />
+  <Input bind:data={cpu} bind:invalid={cpuField.invalid} field={cpuField} />
 
   <Input
     bind:data={memory}
     bind:invalid={memoryField.invalid}
     field={memoryField}
-    />
+  />
 
   <Input
     bind:data={diskSize}
     bind:invalid={diskField.invalid}
     field={diskField}
-    />
+  />
 {/if}

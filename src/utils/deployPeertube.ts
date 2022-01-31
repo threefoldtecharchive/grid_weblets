@@ -145,11 +145,10 @@ async function deployPeertubeVM(
     return grid.machines
       .deploy(vms)
       .then(async () => {
-        for(const gw of await grid.gateway._list()){
+        for (const gw of await grid.gateway._list()) {
           try {
             await grid.gateway.getObj(gw);
-          }
-          catch {}
+          } catch {}
         }
       })
       .then(() => grid.machines.getObj(name))
