@@ -20,7 +20,6 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -44,47 +43,9 @@
     { name: "Large", cpu: 2, memory: 1024 * 4, diskSize: 200 },
   ];
 
-  // let packageField: IFormField = {
-  //   label: "Select Capacity Package",
-  //   symbol: "pkg",
-  //   type: "select",
-  //   options: [
-  //     { label: "Small", value: "sm", selected: true },
-  //     { label: "Meduim", value: "md" },
-  //     { label: "Large", value: "lg" },
-  //     { label: "Other", value: "other" },
-  //   ],
-  // };
-
-  // let selectedPackageIndex: number = 0;
-  // let selectedPackage: string = "sm";
-
-  // $: {
-  //   const option = packageField.options[selectedPackageIndex];
-  //   if (option.value !== "other") {
-  //     const pkg = packages[selectedPackageIndex];
-  //     data.cpu = pkg.cpu;
-  //     data.memory = pkg.memory;
-  //     data.disks[0].size = pkg.diskSize;
-  //   }
-  // }
-
-  // const diskField: IFormField = {
-  //   label: "Disk (GB)",
-  //   symbol: "disk",
-  //   placeholder: "Your Disk size in GB",
-  //   type: "number",
-  //   validator: validateDisk,
-  //   invalid: false,
-  // };
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new VM(); // set the default specs for peertube
-  let cpu, memory, diskSize;
-
-  data.cpu = cpu;
-  data.memory = memory;
-  data.disks = [new Disk(undefined, undefined, diskSize, undefined)];
 
   let active: string = "base";
   let loading = false;
@@ -169,34 +130,11 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-        <!-- 
-        <Input
-          bind:data={selectedPackage}
-          bind:selected={selectedPackageIndex}
-          field={packageField}
-        />
-
-        {#if selectedPackage === "other"}
-          {#each baseFields as field (field.symbol)}
-            {#if field.invalid !== undefined}
-              <Input
-                bind:data={data[field.symbol]}
-                bind:invalid={field.invalid}
-                {field}
-              />
-            {:else}
-              <Input bind:data={data[field.symbol]} {field} />
-            {/if}
-          {/each}
-          <Input bind:data={data.disks[0].size} field={diskField} />
-        {/if} 
-      -->
 
         <SelectCapacity
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.diskSize}
-          {data}
           {packages}
         />
 

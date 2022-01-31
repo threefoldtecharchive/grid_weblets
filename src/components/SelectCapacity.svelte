@@ -1,46 +1,23 @@
 <svelte:options tag="tf-select-capacity" />
 
 <script lang="ts">
-  import type { IFormField } from "../types";
+  import type { IFormField, IPackage } from "../types";
   import Input from "./Input.svelte";
   import {
     validateCpu,
     validateDisk,
     validateMemory,
   } from "../utils/validateName";
+  import { onMount } from "svelte";
 
-  export let data;
-  export let cpu;
-  export let memory;
-  export let diskSize;
-  export let packages; // dependes on each solution
+  export let cpu: number;
+  export let memory: number;
+  export let diskSize: number;
+  export let packages: IPackage[];
 
-  let capacityFields: IFormField[] = [
-    {
-      label: "CPU (Cores)",
-      symbol: "cpu",
-      placeholder: "CPU Cores",
-      type: "number",
-      validator: validateCpu,
-      invalid: false,
-    },
-    {
-      label: "Memory (MB)",
-      symbol: "memory",
-      placeholder: "Your Memory in MB",
-      type: "number",
-      validator: validateMemory,
-      invalid: false,
-    },
-    {
-      label: "Disk (GB)",
-      symbol: "diskSize",
-      placeholder: "Your Disk size in GB",
-      type: "number",
-      validator: validateDisk,
-      invalid: false,
-    },
-  ];
+  let cpuField: IFormField = { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false };
+  let memoryField: IFormField = { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false };
+  let diskField: IFormField = { label: "Disk (GB)", symbol: "diskSize", placeholder: "Your Disk size in GB", type: "number", validator: validateDisk, invalid: false };
 
   let packageField: IFormField = {
     label: "Select Capacity Package",
@@ -57,31 +34,25 @@
   let selectedPackageIndex: number = 0;
   let selectedPackage: string = "sm";
 
-  // $: {
-  //   if (packages) {
-  //     const option = packageField.options[selectedPackageIndex];
-  //     console.log("here");
-  //     if (option.value !== "other") {
-  //       const pkg = packages[selectedPackageIndex];
-  //       console.log("here2");
-
-  //       cpu = pkg.cpu;
-  //       memory = pkg.memory;
-  //       diskSize = pkg.diskSize;
-  //     }
-  //   }
-  // }
-
-  function onSelectPackage({ detail }: { detail: Event }) {
-    console.log(detail);
-    const inp = detail.target as HTMLSelectElement;
-    const pkg = packages[inp.selectedIndex];
+  function _applyPackage(idx: number) {
+    const pkg = packages[idx];
     if (pkg) {
       cpu = pkg.cpu;
       memory = pkg.memory;
       diskSize = pkg.diskSize;
     }
   }
+
+  function onSelectPackage({ detail }: { detail: Event }) {
+    const inp = detail.target as HTMLSelectElement;
+    _applyPackage(inp.selectedIndex);
+  }
+
+  onMount(() => {
+    requestAnimationFrame(() => {
+      _applyPackage(0);
+    })
+  })
 </script>
 
 <Input
@@ -91,23 +62,22 @@
   on:input={onSelectPackage}
 />
 
-{#each capacityFields as field (field.symbol)}
-  {#if field.invalid !== undefined}
-    <Input
-      bind:data={data[field.symbol]}
-      bind:invalid={field.invalid}
-      field={{
-        ...field,
-        disabled: selectedPackage !== "other",
-      }}
+{#if selectedPackage === "other"}
+  <Input
+    bind:data={cpu}
+    bind:invalid={cpuField.invalid}
+    field={cpuField}
     />
-  {:else}
-    <Input
-      bind:data={data[field.symbol]}
-      field={{
-        ...field,
-        disabled: selectedPackage !== "other",
-      }}
+
+  <Input
+    bind:data={memory}
+    bind:invalid={memoryField.invalid}
+    field={memoryField}
     />
-  {/if}
-{/each}
+
+  <Input
+    bind:data={diskSize}
+    bind:invalid={diskField.invalid}
+    field={diskField}
+    />
+{/if}
