@@ -21,8 +21,14 @@ export default async function deployFunkwhale(
   data: Funkwhale,
   profile: IProfile
 ) {
-  const { envs, disks, adminUsername, adminEmail, adminPassword, ...base } =
-    data;
+  const {
+    envs,
+    disks: [{ size }],
+    adminUsername,
+    adminEmail,
+    adminPassword,
+    ...base
+  } = data;
   let { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
   const { mnemonics, storeSecret, networkEnv } = profile;
@@ -62,7 +68,10 @@ export default async function deployFunkwhale(
     randomSuffix,
     adminUsername,
     adminEmail,
-    adminPassword
+    adminPassword,
+    size,
+    cpu,
+    memory
   );
 
   const info = await getFunkwhaleInfo(client, name);
@@ -97,11 +106,14 @@ async function deployFunkwhaleVM(
   randomSuffix: string,
   adminUsername: string,
   adminEmail: string,
-  adminPassword: string
+  adminPassword: string,
+  size: number,
+  cpu: number,
+  memory: number
 ) {
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = 10;
+  disk.size = size;
   disk.mountpoint = "/data";
 
   const vm = new MachineModel();
@@ -110,9 +122,9 @@ async function deployFunkwhaleVM(
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
-  vm.cpu = 2;
-  vm.memory = 1024 * 2;
-  vm.rootfs_size = rootFs(2, 2 * 1024);
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
     "https://hub.grid.tf/asamirr.3bot/asamirr-tf-funkwhale-dec21.flist";
   vm.entrypoint = "/init.sh";
