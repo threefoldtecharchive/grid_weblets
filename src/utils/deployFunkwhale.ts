@@ -83,8 +83,7 @@ export default async function deployFunkwhale(
     throw error;
   }
 
-  const gatewayInfo = await getGatewayInfo(client, domainName);
-  return { domain, planetaryIP };
+  return info;
 }
 
 async function deployFunkwhaleVM(

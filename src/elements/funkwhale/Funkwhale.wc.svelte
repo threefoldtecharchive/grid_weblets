@@ -24,13 +24,14 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
-import Funkwhale from "../../types/funkwhale";
+  import Funkwhale from "../../types/funkwhale";
 
   const data = new Funkwhale();
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let profile: IProfile;
 
   let active: string = "base";
+  let modalData: Object;
   let loading = false;
   let success = false;
   let failed = false;
@@ -47,8 +48,6 @@ import Funkwhale from "../../types/funkwhale";
 
   let message: string;
 
-  let domain: string, planetaryIP: string;
-
   async function onDeployVM() {
     loading = true;
     success = false;
@@ -64,11 +63,10 @@ import Funkwhale from "../../types/funkwhale";
     }
 
     deployFunkwhale(data, profile)
-      .then(({ domain: d, planetaryIP: ip }) => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
-        domain = d;
-        planetaryIP = ip;
+        modalData = data;
       })
       .catch((err) => {
         failed = true;
@@ -101,11 +99,9 @@ import Funkwhale from "../../types/funkwhale";
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed a Funkwhale instance"
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}

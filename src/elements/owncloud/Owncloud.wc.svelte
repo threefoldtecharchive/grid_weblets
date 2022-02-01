@@ -171,11 +171,9 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed owncloud."
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}

@@ -86,10 +86,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     throw error;
   }
 
-  // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, domainName);
-  const gatewayDomain = gatewayInfo[0]["domain"];
-  return { domain, planetaryIP };
+  return peertubeInfo;
 }
 
 async function deployPeertubeVM(
@@ -145,11 +142,10 @@ async function deployPeertubeVM(
     return grid.machines
       .deploy(vms)
       .then(async () => {
-        for(const gw of await grid.gateway._list()){
+        for (const gw of await grid.gateway._list()) {
           try {
             await grid.gateway.getObj(gw);
-          }
-          catch {}
+          } catch {}
         }
       })
       .then(() => grid.machines.getObj(name))
