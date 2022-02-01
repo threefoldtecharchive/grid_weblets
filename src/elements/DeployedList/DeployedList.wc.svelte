@@ -15,6 +15,7 @@
     | "peertube"
     | "owncloud"
     | "discourse"
+    | "mattermost"
     | "presearch";
   export let tab: TabsType = undefined;
 

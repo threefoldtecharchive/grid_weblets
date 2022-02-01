@@ -107,6 +107,7 @@ export default class Editor extends Vue {
   public sections = ["deployment", "my account", "calculator"];
   public weblets: Weblet[] = [
     new Weblet("CapRover", "caprover", "caprover", "deployment"),
+    new Weblet("Discourse", "discourse", "discourse", "deployment"),
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
     new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
     new Weblet("Contracts", "contractslist", "", "my account"),
@@ -116,6 +117,7 @@ export default class Editor extends Vue {
 
     new Weblet("Peertube", "peertube", "peertube", "deployment"),
     new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
+    new Weblet("Mattermost", "mattermost", "mattermost", "deployment"),
     new Weblet("Taiga", "taiga", "taiga", "deployment"),
     new Weblet("Owncloud", "owncloud", "owncloud", "deployment"),
     new Weblet("Presearch", "presearch", "presearch", "deployment"),

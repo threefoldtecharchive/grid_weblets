@@ -666,6 +666,11 @@
   resolved "https://registry.npmjs.org/@types/crypto-js/-/crypto-js-4.0.2.tgz"
   integrity sha512-sCVniU+h3GcGqxOmng11BRvf9TfN9yIs8KKjB8C8d75W69cpTfZG80gau9yTx5SxF3gvHGbJhdESzzvnjtf3Og==
 
+"@types/crypto-js@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-4.1.0.tgz#09ba1b49bcce62c9a8e6d5e50a3364aa98975578"
+  integrity sha512-DCFfy/vh2lG6qHSGezQ+Sn2Ulf/1Mx51dqOdmOKyW5nMK3maLlxeS3onC7r212OnBM2pBR95HkAmAjjF08YkxQ==
+
 "@types/cssnano@^4.0.1":
   version "4.0.1"
   resolved "https://registry.npmjs.org/@types/cssnano/-/cssnano-4.0.1.tgz"
@@ -1262,19 +1267,19 @@ axios@0.21.4:
   dependencies:
     follow-redirects "^1.14.0"
 
-axios@^0.22.0:
-  version "0.22.0"
-  resolved "https://registry.npmjs.org/axios/-/axios-0.22.0.tgz"
-  integrity sha512-Z0U3uhqQeg1oNcihswf4ZD57O3NrR1+ZXhxaROaWpDmsDTx7T2HNBV2ulBtie2hwJptu8UvgnJoK+BIqdzh/1w==
-  dependencies:
-    follow-redirects "^1.14.4"
-
 axios@^0.24.0:
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
   integrity sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==
   dependencies:
     follow-redirects "^1.14.4"
+
+axios@^0.25.0:
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.25.0.tgz#349cfbb31331a9b4453190791760a8d35b093e0a"
+  integrity sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==
+  dependencies:
+    follow-redirects "^1.14.7"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -1533,7 +1538,7 @@ buffer@^5.1.0:
 
 buffer@^6.0.3:
   version "6.0.3"
-  resolved "https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
   integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
   dependencies:
     base64-js "^1.3.1"
@@ -2742,6 +2747,11 @@ follow-redirects@^1.14.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.6.tgz#8cfb281bbc035b3c067d6cd975b0f6ade6e855cd"
   integrity sha512-fhUl5EwSJbbl8AR+uYL2KQDxLkdSjZGR36xy46AO7cOMTrCMON6Sa28FmAnC2tRTDbd/Uuzz3aJBv7EBN7JH8A==
 
+follow-redirects@^1.14.7:
+  version "1.14.7"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"
+  integrity sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==
+
 foreach@^2.0.5, foreach@~2.0.1:
   version "2.0.5"
   resolved "https://registry.npmjs.org/foreach/-/foreach-2.0.5.tgz"
@@ -2964,10 +2974,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.2.3, graceful-fs@^4.2.4, 
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.8.tgz"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.0.8.tgz#293db1cdf13ca9fe066f8d4d22b66c83b0c16da2"
-  integrity sha512-P9itq5tC9fAj5H+mDRTPFuSlCnz4ZYqRCqFhW9cYpLgaFvIgK1oAKOXzHoKdEm745QK9HLTEK7EgYqja868H6A==
+grid3_client@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.1.0.tgz#cb637a3baa2c111dd2dc8422c92b2e95464968aa"
+  integrity sha512-zk9uLKFz+1RwkHq96TWvwTv7zhhQP+f8Dlc2+tau2o/OKCQYtfAZ18FT8HlVc1PnU/pitu47xbXeAEK9MxfoBA==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -2984,7 +2994,7 @@ grid3_client@1.0.8:
     stellar-sdk "^9.1.0"
     tfgrid-api-client "^1.0.4"
     ts-rmb-client-base "^0.0.1"
-    ts-rmb-http-client "^0.1.9"
+    ts-rmb-http-client "^1.0.3"
     ts-rmb-redis-client "^0.0.3"
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
@@ -6193,15 +6203,18 @@ ts-rmb-client-base@0.0.1, ts-rmb-client-base@^0.0.1:
   resolved "https://registry.npmjs.org/ts-rmb-client-base/-/ts-rmb-client-base-0.0.1.tgz"
   integrity sha512-xe7NxHgDyQnHTOFNfuHnhRXSY1xAEyRC/dRmCLI8H3THXLfLr3UcTqNg4Cxli0JEa2oW7s9DQvfZXek91FYo+w==
 
-ts-rmb-http-client@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.npmjs.org/ts-rmb-http-client/-/ts-rmb-http-client-0.1.9.tgz"
-  integrity sha512-kimnHvf1t94p9P/JjqElwHb69aptrjf41yUCslBmCM+xgBYNVhIwWhS9aJPcs1rBf7ne2cwtOK0xut5GI/ZsrA==
+ts-rmb-http-client@1.0.3, ts-rmb-http-client@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.3.tgz#33a491fd2feb67d2d219bedbc9b951cedcba59a7"
+  integrity sha512-XO9DwFcmvDB5LB3hp78VAbI2rHaNpPg0FiKYjo9LctqtwAtjdyuA43RovmGrN4XZswFdRhDAW8hhL5j+OFMhiQ==
   dependencies:
-    axios "^0.22.0"
+    "@polkadot/keyring" "^6.11.1"
+    "@types/crypto-js" "^4.1.0"
+    axios "^0.25.0"
+    buffer "^6.0.3"
+    crypto-js "^4.1.1"
     js-base64 "^3.7.2"
     ts-rmb-client-base "^0.0.1"
-    typescript "^4.3.5"
 
 ts-rmb-redis-client@^0.0.3:
   version "0.0.3"
