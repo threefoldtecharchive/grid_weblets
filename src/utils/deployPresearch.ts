@@ -18,7 +18,7 @@ export default async function deployDiscourse(
   const name = data.name;
   const { mnemonics, storeSecret, networkEnv } = profile;
 
-  const http = new HTTPMessageBusClient(0, "");
+  const http = new HTTPMessageBusClient(0, "", "", "");
   const client = new GridClient(
     networkEnv as any,
     mnemonics,
