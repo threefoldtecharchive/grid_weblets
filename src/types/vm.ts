@@ -20,7 +20,7 @@ export class Disk {
     { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
     { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     {
-      label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", disabled: true, validator(point: string): string | void {
+      label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator(point: string): string | void {
         point = point.trim();
         if (point === "" || point === "/" || !point.startsWith("/")) return "Mount Point must start '/' and can't be positioned at root('/')"
       }, invalid: false
