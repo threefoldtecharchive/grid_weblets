@@ -108,6 +108,12 @@ export default class DeployedList {
     });
   }
 
+  public loadMattermost(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("mattermost"));
+    });
+  }
+
   public loadOwncloud(): Promise<any[]> {
     return this.loadVm().then((vms) => {
       return vms.filter((vm) => vm.flist.toLowerCase().includes("owncloud"));

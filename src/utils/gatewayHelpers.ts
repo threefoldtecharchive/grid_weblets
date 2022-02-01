@@ -1,6 +1,6 @@
 const { GridClient, Nodes, randomChoice } = window.configs?.grid3_client ?? {};
 
-export async function selectGatewayNode() {
+export async function selectGatewayNode(): Promise<[number, string]> {
   const nodes = new Nodes(
     GridClient.config.graphqlURL,
     GridClient.config.rmbClient["proxyURL"]
