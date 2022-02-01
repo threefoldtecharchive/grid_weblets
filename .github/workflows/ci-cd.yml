@@ -5,7 +5,6 @@ name: CI/CD pipeline
 on:
   push:
     branches:
-      - master
       - development
 concurrency:
   # one instance of runing pipeline allowed per branch.
@@ -40,8 +39,25 @@ jobs:
         yarn install
         cd ..
 
-    - name: Build
-      run: yarn build:app
+    - name: Build in case development
+      if: ${{ github.ref == 'refs/heads/development' }}
+      run: |
+        VERSION=$GITHUB_REF
+        VERSION=${VERSION:11:12} NETWORK=dev yarn build:app
+
+    - name: Build in case test
+      if: github.event.release.prerelease == true
+      run: | 
+        VERSION=$GITHUB_REF 
+        VERSION=${VERSION:10:12} NETWORK=test yarn build:app
+
+    - name: Build in case main
+      if: | 
+        github.event_name == 'release' &&
+        github.event.release.prerelease == false   
+      run: |
+        VERSION=$GITHUB_REF 
+        VERSION=${VERSION:10:12}NETWORK=main yarn build:app
 
     - name: Copying files to staging server
       if: ${{ github.ref == 'refs/heads/development' }}
@@ -55,8 +71,20 @@ jobs:
         source: "docs/"
         target: "${{ secrets.DEV_REMOTE_DIR }}"
 
-    - name: Copying files to production server
-      if: ${{ github.ref == 'refs/heads/master' }}
+    - name: Copying files to testing server - Pre-release
+      if: github.event.release.prerelease == true
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.TEST_REMOTE_HOST }}
+        username: ${{ secrets.TEST_REMOTE_USER }}
+        key: ${{ secrets.TEST_SSH_KEY }}
+        passphrase: ${{ secrets.TEST_SSH_KEY_PASSPHRASE }}
+        rm: true
+        source: "docs/"
+        target: "${{ secrets.TEST_REMOTE_DIR }}"
+
+    - name: Copying files to production server - Release
+      if: github.event.release.prerelease != true
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.PROD_REMOTE_HOST }}
