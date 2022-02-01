@@ -5,6 +5,7 @@ export interface IStore {
     | "Kubernetes"
     | "VM"
     | "CapRover"
+    | "Discourse"
     | "Peertube"
     | "Funkwhale"
     | "GatewayName"
