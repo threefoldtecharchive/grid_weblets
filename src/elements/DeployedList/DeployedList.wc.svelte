@@ -484,12 +484,12 @@
                   type: "warning",
                   label: "Visit",
                   click: (_, i) => {
-                    const domain = rows[i].details.env.OWNCLOUD_HOST;
+                    const domain = rows[i].details.env.OWNCLOUD_DOMAIN;
                     window.open("https://" + domain, "_blank").focus();
                   },
                   disabled: (i) => {
                     const env = rows[i].details.env;
-                    return !env || !env.OWNCLOUD_HOST || removing !== null;
+                    return !env || !env.OWNCLOUD_DOMAIN || removing !== null;
                   },
                 },
               ]}

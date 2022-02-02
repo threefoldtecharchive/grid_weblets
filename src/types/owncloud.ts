@@ -16,6 +16,9 @@ export default class Owncloud extends VM {
     public smtpPort = "";
     public smtpHostUser = "";
     public smtpHostPassword = "";
+    public smtpUseTLS = false;
+    public smtpUseSSL = false;
+    
     public cpu = 8;
     public memory = 8192;
     public diskSize = 100;
@@ -23,7 +26,7 @@ export default class Owncloud extends VM {
     public get valid(): boolean {
         const { name, flist, cpu, memory, diskSize, entrypoint, nodeId } = this;
         const { network, envs, disks } = this;
-        const { adminEmail, adminUsername, adminPassword } = this;
+        const { adminUsername, adminPassword } = this;
         const { smtpFromEmail, smtpHost, smtpPort, smtpHostUser, smtpHostPassword } = this;
 
         return (
@@ -36,7 +39,6 @@ export default class Owncloud extends VM {
             network.valid &&
             envs.reduce((res, env) => res && env.valid, true) &&
             disks.reduce((res, disk) => res && disk.valid, true) &&
-            !validateEmail(adminEmail) &&
             !validateName(adminUsername) &&
             adminPassword !== "" &&
             !validateOptionalEmail(smtpFromEmail) &&
