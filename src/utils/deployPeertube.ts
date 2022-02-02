@@ -53,7 +53,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
   // deploy the peertube
-  await deployPeertubeVM(
+  const deploymentInfo = await deployPeertubeVM(
     profile,
     client,
     network,
@@ -86,7 +86,7 @@ export default async function deployPeertube(data: VM, profile: IProfile) {
     throw error;
   }
 
-  return peertubeInfo;
+  return { deploymentInfo };
 }
 
 async function deployPeertubeVM(

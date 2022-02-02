@@ -16,6 +16,8 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
@@ -66,7 +68,7 @@
       .then((data) => {
         deploymentStore.set(0);
         success = true;
-        modalData = data;
+        modalData = data.deploymentInfo;
       })
       .catch((err) => {
         failed = true;
@@ -164,6 +166,10 @@
     />
   </form>
 </div>
+
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

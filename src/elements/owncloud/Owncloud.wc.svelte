@@ -136,9 +136,7 @@
       .then((data) => {
         deploymentStore.set(0);
         success = true;
-        modalData = data.deployment;
-        domain = data.domain;
-        planetaryIP = data.planetaryIP;
+        modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
