@@ -121,7 +121,7 @@ async function deployCasperlabsVM(
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/ranatarek.3bot/ranatrk-casperlabs-dev.flist"; // FIXME
+    "https://hub.grid.tf/ranatarek.3bot/ranatrk-casperlabs-latest.flist"; // FIXME
   vm.entrypoint = "/start_casper";
   vm.env = {
     SSH_KEY: sshKey,
