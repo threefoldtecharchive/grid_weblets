@@ -4,7 +4,7 @@ import type { GridClient } from "grid3_client";
 import formatConsumption from "../utils/formatConsumption";
 
 export default class DeployedList {
-  constructor(public readonly grid: GridClient) {}
+  constructor(public readonly grid: GridClient) { }
 
   private _loadK8s(name: string) {
     return new Promise((res) => {
@@ -134,6 +134,12 @@ export default class DeployedList {
   public loadPresearch(): Promise<any[]> {
     return this.loadVm().then((vms) => {
       return vms.filter((vm) => vm.flist.toLowerCase().includes("presearch"));
+    });
+  }
+
+  public loadCasperlabs(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("casperlabs"));
     });
   }
 
