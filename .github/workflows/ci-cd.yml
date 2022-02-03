@@ -84,7 +84,9 @@ jobs:
         target: "${{ secrets.TEST_REMOTE_DIR }}"
 
     - name: Copying files to production server - Release
-      if: github.event.release.prerelease != true
+      if: |
+        github.event_name == 'release' && 
+        github.event.release.prerelease != true
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.PROD_REMOTE_HOST }}
