@@ -14,7 +14,7 @@ concurrency:
   # On master, we want all builds to complete even if merging happens faster for better reliability and to make it easier to discover at which point something broke.
   # on developmetn, new workflow trigger will cancel the in progress job, and start a new one..
   group: ${{ format('ci-{0}', github.ref) }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+  cancel-in-progress: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
 jobs:
   build-and-deploy:
 
@@ -57,7 +57,7 @@ jobs:
     - name: Build in case main
       if: | 
         github.event_name == 'release' &&
-        github.event.release.prerelease == false   
+        github.event.release.prerelease != true   
       run: |
         VERSION=$GITHUB_REF 
         VERSION=${VERSION:10:12}NETWORK=main yarn build:app
