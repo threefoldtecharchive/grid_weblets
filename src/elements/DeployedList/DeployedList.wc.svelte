@@ -357,12 +357,12 @@
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Discourse found on this profile." />
+            <Alert type="info" message="No Peertubes found on this profile." />
           {/if}
         {:catch err}
           <Alert
             type="danger"
-            message={err.message || err || "Failed to list Discourse"}
+            message={err.message || err || "Failed to list Peertube"}
           />
         {/await}
 
@@ -546,12 +546,12 @@
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Peertubes found on this profile." />
+            <Alert type="info" message="No Discourses found on this profile." />
           {/if}
         {:catch err}
           <Alert
             type="danger"
-            message={err.message || err || "Failed to list Peertube"}
+            message={err.message || err || "Failed to list Discourse"}
           />
         {/await}
 
