@@ -45,7 +45,10 @@ export default class App extends Vue {
     "taiga",
     "owncloud",
     "contractslist",
+    "disclaimer",
+    "version",
     "mattermost",
+
   ];
   sidenav: ISidenav | null = null;
 
