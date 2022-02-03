@@ -14,7 +14,6 @@ export interface IStore {
     | "Deleting Deployment"
     | "Taiga"
     | "Owncloud"
-    | "Discourse"
     | "Presearch";
   name: string;
   message: string;
