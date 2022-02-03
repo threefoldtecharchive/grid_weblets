@@ -1,0 +1,1 @@
+import "./Discourse.wc.svelte";
