@@ -18,7 +18,7 @@ const {
 } = window.configs?.grid3_client ?? {};
 
 export default async function deployOwncloud(data: Owncloud, profile: IProfile) {
-    const { envs, adminUsername, adminEmail, adminPassword, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, cpu, memory, diskSize, ...base } = data;
+    const { envs, adminUsername, adminPassword, smtpFromEmail, smtpHost, smtpPort, smtpHostPassword, smtpHostUser, smtpUseTLS, smtpUseSSL, cpu, memory, diskSize, ...base } = data;
     let { name, flist, entrypoint, network: nw } = base;
     const { publicIp, planetary, nodeId } = base;
     const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
@@ -62,13 +62,15 @@ export default async function deployOwncloud(data: Owncloud, profile: IProfile) 
         memory,
         diskSize,
         adminUsername,
-        adminEmail,
         adminPassword,
         sshKey,
-        smtpHost,
-        smtpPort,
-        smtpHostUser,
+        smtpFromEmail, 
+        smtpHost, 
+        smtpPort, 
         smtpHostPassword,
+        smtpHostUser,
+        smtpUseTLS,
+        smtpUseSSL,
         randomSuffix
     );
 
@@ -108,13 +110,15 @@ async function deployOwncloudVM(
     memory: number,
     diskSize: number,
     adminUsername: string,
-    adminEmail: string,
     adminPassword: string,
     sshKey: string,
+    smtpFromEmail: string,
     smtpHost: string,
     smtpPort: string,
-    smtpHostUser: string,
     smtpHostPassword: string,
+    smtpHostUser: string,
+    smtpUseTLS: boolean,
+    smtpUseSSL: boolean,
     randomSuffix: string,
 ) {
     // disk
@@ -134,18 +138,36 @@ async function deployOwncloudVM(
     vm.memory = memory;
     vm.rootfs_size = rootFs(cpu, memory);
     vm.flist =
-        "https://hub.grid.tf/waleedhammam.3bot/waleedhammam-owncloud-latest.flist";
+        "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-owncloud-10.9.1.flist";
     vm.entrypoint = "/sbin/zinit init";
+    let smtp_secure: string;
+    let emailName: string;
+    let emailDomain: string;
+    if (smtpUseTLS) {
+        smtp_secure = "tls";
+    } else if (smtpUseSSL) {
+        smtp_secure = "ssl";
+    } else {
+        smtp_secure = "none";
+    }
+    // check if smtpFromEmail parameter is not empty then extract the name and domain
+    if (smtpFromEmail) {
+        let email = smtpFromEmail.split("@");
+        emailName = email[0];
+        emailDomain = email[1];
+    }
     vm.env = {
         SSH_KEY: sshKey,
-        OWNCLOUD_HOST: domain,
-        OWNCLOUD_USERNAME: adminUsername,
-        OWNCLOUD_PASSWORD: adminPassword,
-        OWNCLOUD_EMAIL: adminEmail,
-        OWNCLOUD_SMTP_HOST: smtpHost,
-        OWNCLOUD_SMTP_PORT_NUMBER: `${smtpPort}`,
-        OWNCLOUD_SMTP_USER: smtpHostUser,
-        OWNCLOUD_SMTP_PASSWORD: smtpHostPassword,
+        OWNCLOUD_DOMAIN: domain,
+        OWNCLOUD_ADMIN_USERNAME: adminUsername,
+        OWNCLOUD_ADMIN_PASSWORD: adminPassword,
+        OWNCLOUD_MAIL_SMTP_SECURE: smtp_secure,
+        OWNCLOUD_MAIL_DOMAIN: emailDomain,
+        OWNCLOUD_MAIL_FROM_ADDRESS: emailName,
+        OWNCLOUD_MAIL_SMTP_HOST: smtpHost,
+        OWNCLOUD_MAIL_SMTP_PORT: `${smtpPort}`,
+        OWNCLOUD_MAIL_SMTP_NAME: smtpHostUser,
+        OWNCLOUD_MAIL_SMTP_PASSWORD: smtpHostPassword,
     };
 
     // vms specs
