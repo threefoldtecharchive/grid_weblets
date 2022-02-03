@@ -2859,6 +2859,11 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
+"binaryheap@>= 0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/binaryheap/-/binaryheap-0.0.3.tgz#0d6136c84e9f1a5a90c0b97178c3e00df59820d6"
+  integrity sha1-DWE2yE6fGlqQwLlxeMPgDfWYINY=
+
 bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
@@ -3107,6 +3112,13 @@ buffer@^6.0.3:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
+
+"buffercursor@>= 0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/buffercursor/-/buffercursor-0.0.12.tgz#78a9a7f4343ae7d820a8999acc80de591e25a779"
+  integrity sha1-eKmn9DQ659ggqJmazIDeWR4lp3k=
+  dependencies:
+    verror "^1.4.0"
 
 bufferutil@^4.0.1:
   version "4.0.5"
@@ -5572,10 +5584,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.1.0.tgz#cb637a3baa2c111dd2dc8422c92b2e95464968aa"
-  integrity sha512-zk9uLKFz+1RwkHq96TWvwTv7zhhQP+f8Dlc2+tau2o/OKCQYtfAZ18FT8HlVc1PnU/pitu47xbXeAEK9MxfoBA==
+grid3_client@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.1.1.tgz#03a1724b5eb871c9ef6909ae3463ffaeaf01d3de"
+  integrity sha512-YBJzLj4db3ibgD6X7w/ZIhwaG7FjRJRwH0Ppn01kkvfw8yCsP2W/QvF+S6A44sbt3Vn+XjW6PIqQqShpai8+Kg==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -5587,6 +5599,7 @@ grid3_client@1.1.0:
     decimal.js "^10.3.1"
     http-server "^14.0.0"
     netaddr "^1.1.0"
+    nslookup "^1.1.1"
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
@@ -6155,10 +6168,15 @@ ipaddr.js@1.9.1, ipaddr.js@^1.9.0:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
   integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
 
-ipaddr.js@^2.0.1:
+"ipaddr.js@>= 0.1.1", ipaddr.js@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-2.0.1.tgz#eca256a7a877e917aeb368b0a7497ddf42ef81c0"
   integrity sha512-1qTgH9NG+IIJ4yfKs2e6Pp1bZg8wbDbKHT21HrLIeYBTRLgMYKnMTPAuI3Lcs61nfx5h1xlXnbJtH1kX5/d/ng==
+
+ipaddr.js@~0.1.3:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-0.1.9.tgz#a9c78ccc12dc9010f296ab9aef2f61f432d69efa"
+  integrity sha1-qceMzBLckBDylqua7y9h9DLWnvo=
 
 is-absolute-url@^2.0.0:
   version "2.1.0"
@@ -7782,6 +7800,31 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
+native-dns-cache@~0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/native-dns-cache/-/native-dns-cache-0.0.2.tgz#ce0998f7fdf6c7990970a33190624b0e98ee959b"
+  integrity sha1-zgmY9/32x5kJcKMxkGJLDpjulZs=
+  dependencies:
+    binaryheap ">= 0.0.3"
+    native-dns-packet ">= 0.0.1"
+
+"native-dns-packet@>= 0.0.1", native-dns-packet@~0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/native-dns-packet/-/native-dns-packet-0.1.1.tgz#97da90570b8438a00194701ce24d011fd3cc109a"
+  integrity sha1-l9qQVwuEOKABlHAc4k0BH9PMEJo=
+  dependencies:
+    buffercursor ">= 0.0.12"
+    ipaddr.js ">= 0.1.1"
+
+native-dns@~0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/native-dns/-/native-dns-0.7.0.tgz#df418636f08fb29e8fcb7ef142c822a1588ba5b7"
+  integrity sha1-30GGNvCPsp6Py37xQsgioViLpbc=
+  dependencies:
+    ipaddr.js "~0.1.3"
+    native-dns-cache "~0.0.2"
+    native-dns-packet "~0.1.1"
+
 natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
@@ -7985,6 +8028,13 @@ npm-run-path@^4.0.0:
   integrity sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==
   dependencies:
     path-key "^3.0.0"
+
+nslookup@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/nslookup/-/nslookup-1.1.1.tgz#59937f914e8eefd10141e5653f62a0cc951a373b"
+  integrity sha1-WZN/kU6O79EBQeVlP2KgzJUaNzs=
+  dependencies:
+    native-dns "~0.7.0"
 
 nth-check@^1.0.2:
   version "1.0.2"
@@ -11046,6 +11096,15 @@ verror@1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/verror/-/verror-1.10.0.tgz#3a105ca17053af55d6e270c1f8288682e18da400"
   integrity sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=
+  dependencies:
+    assert-plus "^1.0.0"
+    core-util-is "1.0.2"
+    extsprintf "^1.2.0"
+
+verror@^1.4.0:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/verror/-/verror-1.10.1.tgz#4bf09eeccf4563b109ed4b3d458380c972b0cdeb"
+  integrity sha512-veufcmxri4e3XSrT0xwfUR7kguIkaxBeosDg00yDWhk49wdwkSUrvvsm7nc75e1PUyvIeZj6nS8VQRYz2/S4Xg==
   dependencies:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
