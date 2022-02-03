@@ -11,11 +11,13 @@ export default class Casperlabs extends VM {
     public diskSize = 100;
     public publicIp = true;
     public publicIp6 = true;
+    public knownValidator = "";
 
 
 
     public get valid(): boolean {
         const { name, flist, cpu, memory, diskSize, entrypoint, nodeId } = this;
+        const { knownValidator } = this;
         const { network, envs, disks } = this;
 
         return (

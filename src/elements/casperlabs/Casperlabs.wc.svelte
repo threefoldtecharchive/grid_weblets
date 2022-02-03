@@ -36,6 +36,7 @@
     const tabs: ITab[] = [{ label: "Base", value: "base" }];
 
     const nameField: IFormField = { label: "Name", placeholder: "Casperlabs Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+    const knownValidator: IFormField = { label: "Known Validator", placeholder: "Validator Node IP (optional)", symbol: "validatorIP", type: "text", validator: undefined, invalid: false }; // prettier-ignore
 
     let message: string;
     let modalData: Object;
@@ -92,7 +93,7 @@
 
 <div style="padding: 15px;">
     <form on:submit|preventDefault={onDeployVM} class="box">
-        <h4 class="is-size-4">Deploy an casperlabs Instance</h4>
+        <h4 class="is-size-4">Deploy a casperlabs Instance</h4>
         <hr />
 
         {#if loading || (logs !== null && logs.type === "VM")}
@@ -121,6 +122,8 @@
                     bind:invalid={nameField.invalid}
                     field={nameField}
                 />
+
+                <Input bind:data={data.knownValidator} field={knownValidator} />
 
                 <SelectNodeId
                     publicIp={data.publicIp}
