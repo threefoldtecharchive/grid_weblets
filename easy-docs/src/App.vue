@@ -46,6 +46,8 @@ export default class App extends Vue {
     "owncloud",
     "contractslist",
     "presearch",
+    "disclaimer",
+    "version",
     "mattermost",
   ];
   sidenav: ISidenav | null = null;
