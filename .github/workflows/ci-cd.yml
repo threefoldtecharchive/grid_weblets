@@ -60,7 +60,7 @@ jobs:
         github.event.release.prerelease != true   
       run: |
         VERSION=$GITHUB_REF 
-        VERSION=${VERSION:10:12}NETWORK=main yarn build:app
+        VERSION=${VERSION:10:12} NETWORK=main yarn build:app
 
     - name: Copying files to staging server
       if: ${{ github.ref == 'refs/heads/development' }}
