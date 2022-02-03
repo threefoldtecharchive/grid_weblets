@@ -1,0 +1,1 @@
+import "./Mattermost.wc.svelte";

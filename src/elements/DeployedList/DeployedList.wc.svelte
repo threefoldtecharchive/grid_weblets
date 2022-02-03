@@ -13,6 +13,7 @@
     | "caprover"
     | "funkwhale"
     | "peertube"
+    | "mattermost"
     | "owncloud";
   export let tab: TabsType = undefined;
 
