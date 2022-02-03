@@ -13,8 +13,6 @@
     | "caprover"
     | "funkwhale"
     | "peertube"
-    | "owncloud"
-    | "discourse"
     | "mattermost"
     | "discourse"
     | "taiga"
