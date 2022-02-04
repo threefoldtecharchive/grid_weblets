@@ -140,15 +140,13 @@ async function deployOwncloudVM(
     vm.flist =
         "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-owncloud-10.9.1.flist";
     vm.entrypoint = "/sbin/zinit init";
-    let smtp_secure: string;
-    let emailName: string;
-    let emailDomain: string;
+    let smtp_secure = "none";
+    let emailName = "";
+    let emailDomain = "";
     if (smtpUseTLS) {
         smtp_secure = "tls";
     } else if (smtpUseSSL) {
         smtp_secure = "ssl";
-    } else {
-        smtp_secure = "none";
     }
     // check if smtpFromEmail parameter is not empty then extract the name and domain
     if (smtpFromEmail) {
