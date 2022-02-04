@@ -1,0 +1,1 @@
+import "./Version.wc.svelte"

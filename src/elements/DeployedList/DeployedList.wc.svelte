@@ -14,6 +14,8 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
+    | "discourse"
+    | "taiga"
     | "owncloud";
   export let tab: TabsType = undefined;
 
@@ -33,6 +35,8 @@
     { label: "Caprover", value: "caprover" },
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
+    { label: "Mattermost", value: "mattermost" },
+    { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" }
   ];
@@ -361,6 +365,7 @@
             message={err.message || err || "Failed to list Peertube"}
           />
         {/await}
+
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
         {#await list?.loadFunkwhale()}
@@ -403,6 +408,8 @@
             message={err.message || err || "Failed to list Funkwhale"}
           />
         {/await}
+
+        <!-- Taiga -->
       {:else if active === "taiga"}
         {#await list.loadTaiga()}
           <Alert type="info" message="Listing Taiga Instances..." />
@@ -459,6 +466,92 @@
           <Alert
             type="danger"
             message={err.message || err || "Failed to list Taiga instances"}
+          />
+        {/await}
+
+        <!-- Mattermost -->
+      {:else if active === "mattermost"}
+        {#await list?.loadMattermost()}
+          <Alert type="info" message="Listing Mattermost..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.SITE_URL;
+                    window.open(domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.SITE_URL || removing !== null;
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert type="info" message="No Mattermost found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Mattermost"}
+          />
+        {/await}
+
+        <!-- Discourse -->
+      {:else if active === "discourse"}
+        {#await list?.loadDiscourse()}
+          <Alert type="info" message="Listing Discourse..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.DISCOURSE_HOSTNAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return !env || !env.DISCOURSE_HOSTNAME || removing !== null;
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert type="info" message="No Discourses found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Discourse"}
           />
         {/await}
 
