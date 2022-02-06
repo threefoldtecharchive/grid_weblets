@@ -174,6 +174,7 @@
                 configured = false;
                 sessionStorage.removeItem("session_password");
                 configs.setActiveProfile(null, password);
+                password = "";
               }}
             >
               Deactivate
