@@ -47,7 +47,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vm.memory = 8 * 1024;
   vm.rootfs_size = rootFs(4, 8 * 1024);
   vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-mattermost-latest.flist"; // prettier-ignore
-  vm.entrypoint = "/entrypoint.sh mattermost";
+  vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     DB_PASSWORD: password,
     SITE_URL: "https://" + domain,
