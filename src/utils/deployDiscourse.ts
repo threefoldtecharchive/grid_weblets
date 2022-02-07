@@ -33,7 +33,7 @@ export default async function deployDiscourse(
 
   await client.connect();
 
-  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
+  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16"), false); // prettier-ignore
 
   let domainName = await getUniqueDomainName(client, "dc", name);
 

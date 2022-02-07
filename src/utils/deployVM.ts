@@ -27,7 +27,7 @@ export default async function deployVM(data: VM, profile: IProfile) {
 
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = createNetwork(nw);
+  vms.network = createNetwork(nw, false);
   vms.machines = [vm];
 
   return deploy(profile, "VM", name, (grid) => {

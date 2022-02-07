@@ -19,7 +19,7 @@ export default async function deployCaprover(
   const { name, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
 
   // const http = new HTTPMessageBusClient(0, "");
-  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
+  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16"), false); // prettier-ignore
 
   /* Docker disk */
   const disk = new DiskModel();

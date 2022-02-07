@@ -55,7 +55,7 @@ export default async function deployPeertube(
   const domain = `${domainName}.${nodeDomain}`;
 
   // define a network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
+  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16"), false); // prettier-ignore
 
   // deploy the peertube
   await deployPeertubeVM(
