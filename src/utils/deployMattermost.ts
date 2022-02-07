@@ -60,7 +60,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
 
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = createNetwork(new Network(), false);
+  vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
   return deploy(profile, "VM", name, (grid) => {

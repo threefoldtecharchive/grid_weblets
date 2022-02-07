@@ -50,7 +50,7 @@ export default async function deployFunkwhale(
   const domain = `${domainName}.${nodeDomain}`;
 
   // define network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16"), false); // prettier-ignore
+  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
   await deployFunkwhaleVM(
     profile,
