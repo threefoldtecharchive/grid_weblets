@@ -6,8 +6,13 @@ import deploy from "./deploy";
 import { selectGatewayNode } from "./gatewayHelpers";
 import getGrid from "./getGrid";
 import rootFs from "./rootFs";
-const { MachineModel, MachinesModel, GatewayNameModel } =
-  window.configs?.grid3_client ?? {};
+const {
+  MachineModel,
+  MachinesModel,
+  GatewayNameModel,
+  DiskModel,
+  generateString,
+} = window.configs?.grid3_client ?? {};
 
 export default async function deployMattermost(
   profile: IProfile,
@@ -35,17 +40,36 @@ export default async function deployMattermost(
 }
 
 function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
-  const { name, username, password, server, domain, port, nodeId } = mattermost;
+  const {
+    name,
+    username,
+    password,
+    server,
+    domain,
+    port,
+    nodeId,
+    cpu,
+    memory,
+    disks,
+    publicIp,
+  } = mattermost;
+
+  let randomSuffix = generateString(10).toLowerCase();
+
+  const disk = new DiskModel();
+  disk.name = `disk${randomSuffix}`;
+  disk.size = disks[0].size;
+  disk.mountpoint = "/var/lib/postgresql";
 
   const vm = new MachineModel();
   vm.name = name;
   vm.node_id = nodeId;
-  vm.disks = [];
-  vm.public_ip = false;
+  vm.disks = [disk];
+  vm.public_ip = publicIp;
   vm.planetary = true;
-  vm.cpu = 4;
-  vm.memory = 8 * 1024;
-  vm.rootfs_size = rootFs(4, 8 * 1024);
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.rootfs_size = rootFs(cpu, memory);
   vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-mattermost-latest.flist"; // prettier-ignore
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
