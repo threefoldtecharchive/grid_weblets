@@ -74,17 +74,17 @@
       type: "password",
       invalid: false,
     },
-    {
-      label: "Admin Email Address",
-      symbol: "adminEmail",
-      placeholder: "admin@example.com",
-      type: "text",
-      validator: validateEmail,
-      invalid: false,
-    },
   ];
 
   let mailFields: IFormField[] = [
+    {
+      label: "From Email Address",
+      symbol: "smtpFromEmail",
+      placeholder: "support@example.com",
+      type: "text",
+      validator: validateOptionalEmail,
+      invalid: false,
+    },
     {
       label: "Host Name",
       symbol: "smtpHost",
@@ -116,6 +116,8 @@
       type: "password",
       invalid: false,
     },
+    { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
+    { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
   ];
 
   let message: string;

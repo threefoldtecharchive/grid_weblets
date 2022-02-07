@@ -5,7 +5,8 @@
   import type { IFormField, ITab, IPackage } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
+  import Peertube from "../../types/peertube";
   import deployPeertube from "../../utils/deployPeertube";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -21,6 +22,7 @@
     isInvalid,
     validateCpu,
     validateMemory,
+    validateEmail,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
@@ -29,19 +31,33 @@
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const emailField: IFormField = { label: "Email", placeholder: "Instance Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
+  const passField: IFormField = { label: "Password", placeholder: "Instance Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
+<<<<<<< HEAD
   // define this solution packages
   const packages: IPackage[] = [
     { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
+=======
+  // prettier-ignore
+  const baseFields: IFormField[] = [
+    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false },
+    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
+>>>>>>> development
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
+<<<<<<< HEAD
   let data = new VM();
   data.cpu = 2;
   data.memory = 2048;
   data.disks = [new Disk(undefined, undefined, 20, undefined)];
+=======
+  let data = new Peertube();
+>>>>>>> development
 
   let active: string = "base";
   let loading = false;
@@ -126,6 +142,16 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
+        <Input
+          bind:data={data.adminEmail}
+          bind:invalid={emailField.invalid}
+          field={emailField}
+        />
+        <Input
+          bind:data={data.adminPassword}
+          bind:invalid={passField.invalid}
+          field={passField}
+        />
 
         <SelectCapacity
           bind:cpu={data.cpu}
@@ -135,7 +161,7 @@
         />
 
         <SelectNodeId
-          publicIp={false}
+          publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(
