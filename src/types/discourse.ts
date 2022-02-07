@@ -3,7 +3,7 @@ import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
 import type { IFormField } from ".";
 import { validateEmail, validatePortNumber } from "../utils/validateName";
-import  validateDomainName from "../utils/validateDomainName";
+import validateDomainName from "../utils/validateDomainName";
 
 import TweetNACL from "tweetnacl";
 import { Disk } from "./vm";
@@ -78,7 +78,7 @@ export default class Discourse {
     public diskSize = 50,
     public publicIp = false,
     public planetary = true,
-    public disks = [new Disk(undefined, undefined, diskSize, undefined)];
+    public disks = [new Disk(undefined, undefined, diskSize, undefined)],
 
     public developerEmail = "",
 
