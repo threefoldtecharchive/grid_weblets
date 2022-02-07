@@ -22,12 +22,12 @@ import validateDomainName from "../../utils/validateDomainName";
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost name", validator: validateName, invalid: false },
-    { label: "SMTP Username", symbol: "username", type: "text", placeholder: "Mattermost Username", validator, invalid: false },
-    { label: "SMTP Password", symbol: "password", type: "password", placeholder: "Database & Mattermost Password", validator, invalid: false },
+    { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost Instance Name", validator: validateName, invalid: false },
+    { label: "SMTP Username", symbol: "username", type: "text", placeholder: "SMTP Username", validator, invalid: false },
+    { label: "SMTP Password", symbol: "password", type: "password", placeholder: "SMTP Password", validator, invalid: false },
     // { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator, invalid: false },
     { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator: validateDomainName, invalid: false },
-    { label: "SMTP port", symbol: "port", type: "text", placeholder: "SMTP port", validator, invalid: false },
+    { label: "SMTP Port", symbol: "port", type: "text", placeholder: "SMTP Port", validator, invalid: false },
   ];
 
   let profile: IProfile;
@@ -61,7 +61,7 @@ import validateDomainName from "../../utils/validateDomainName";
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployMattermost}>
-    <h4 class="is-size-4">Deploy Mattermost</h4>
+    <h4 class="is-size-4">Deploy a Mattermost Instance</h4>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}

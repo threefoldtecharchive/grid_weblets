@@ -32,8 +32,8 @@
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-  const emailField: IFormField = { label: "Email", placeholder: "Instance Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
-  const passField: IFormField = { label: "Password", placeholder: "Instance Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
+  const emailField: IFormField = { label: "Email", placeholder: "Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
+  const passField: IFormField = { label: "Password", placeholder: "Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
   // prettier-ignore
   const baseFields: IFormField[] = [

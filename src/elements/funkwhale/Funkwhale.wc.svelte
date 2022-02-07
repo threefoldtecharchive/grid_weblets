@@ -36,7 +36,7 @@ import Funkwhale from "../../types/funkwhale";
   let failed = false;
   let status: "valid" | "invalid";
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Funkwhale Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: true }; // prettier-ignore
 
