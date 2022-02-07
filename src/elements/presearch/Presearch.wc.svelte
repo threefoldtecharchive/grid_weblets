@@ -34,7 +34,10 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // Tabs
-  const tabs: ITab[] = [{ label: "Base", value: "base" }];
+  const tabs: ITab[] = [
+    { label: "Base", value: "base" },
+    { label: "Restore", value: "restore" },
+  ];
   let active = "base";
 
   // Fields
@@ -142,29 +145,6 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-
-        <div class="notification is-warning is-light">
-          <p>
-            Only configure these Presearch Restore Keys fields if you want to
-            restore previous node. see backup steps <a
-              href="https://docs.presearch.org/nodes/backing-up-and-migrating-nodes"
-              target="_blank">here</a
-            >.
-          </p>
-        </div>
-
-        {#each restoreFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
@@ -178,6 +158,27 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
+      {:else if active === "restore"}
+        <div class="notification is-warning is-light">
+          <p>
+            Only configure these Presearch Restore Keys fields if you want to
+            restore previous node. see backup steps <a
+              href="https://docs.presearch.org/nodes/backing-up-and-migrating-nodes"
+              target="_blank">here</a
+            >.
+          </p>
+        </div>
+        {#each restoreFields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
       {/if}
     {/if}
 

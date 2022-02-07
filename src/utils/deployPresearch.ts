@@ -7,11 +7,11 @@ import createNetwork from "./createNetwork";
 import rootFs from "./rootFs";
 import deploy from "./deploy";
 
-const { MachinesModel, DiskModel, GridClient, MachineModel, GatewayNameModel } =
+const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
   window.configs?.grid3_client ?? {};
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
-export default async function deployDiscourse(
+export default async function deployPresearch(
   data: Presearch,
   profile: IProfile
 ) {
@@ -30,7 +30,7 @@ export default async function deployDiscourse(
 
   await client.connect();
 
-  await depoloyPresearchVM(data, profile);
+  return await depoloyPresearchVM(data, profile);
 }
 
 async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
@@ -47,18 +47,23 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
     publicRestoreKey,
   } = data;
 
+  // sub deployments model (vm, disk, net): <type><random_suffix>
+  let randomSuffix = generateString(10).toLowerCase();
+
   // Private network
-  const network = createNetwork(new Network(`nw${name}`, "10.200.0.0/16"));
+  const network = createNetwork(
+    new Network(`nw${randomSuffix}`, "10.200.0.0/16")
+  );
 
   // Docker disk
   const disk = new DiskModel();
-  disk.name = "data0";
+  disk.name = `disk${randomSuffix}`;
   disk.size = diskSize;
   disk.mountpoint = "/var/lib/docker";
 
   // Machine specs
   const machine = new MachineModel();
-  machine.name = name;
+  machine.name = `vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];
