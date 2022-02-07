@@ -6,6 +6,7 @@ import { validateEmail, validatePortNumber } from "../utils/validateName";
 import  validateDomainName from "../utils/validateDomainName";
 
 import TweetNACL from "tweetnacl";
+import { Disk } from "./vm";
 
 function generatePubKey(): String {
   const keypair = TweetNACL.box.keyPair();
@@ -77,6 +78,7 @@ export default class Discourse {
     public diskSize = 50,
     public publicIp = false,
     public planetary = true,
+    public disks = [new Disk(undefined, undefined, diskSize, undefined)];
 
     public developerEmail = "",
 
