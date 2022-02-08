@@ -2,7 +2,7 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import { Disk, Env } from "../../types/vm";
   import Owncloud from "../../types/owncloud";
@@ -31,6 +31,7 @@
 
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Owncloud();
   let domain: string, planetaryIP: string;
@@ -45,6 +46,13 @@
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
     { label: "Mail Server", value: "mail" },
+  ];
+
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
+    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
@@ -203,6 +211,12 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
 
         <SelectNodeId
           publicIp={data.publicIp}
