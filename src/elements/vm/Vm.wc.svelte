@@ -26,6 +26,7 @@
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
+  import RootFsSize from "../../components/RootFsSize.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -102,6 +103,17 @@
     const nameSet = new Set(names);
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
+
+  // const rootFsField: IFormField = {
+  //   label: "Root File System",
+  //   placeholder: "rootFs Size",
+  //   symbol: "rootFs",
+  //   type: "number",
+  //   validator(value) {
+  //     const rFs = rootFs(data.cpu, data.memory);
+  //     if (value < rFs) return `RootFs value can't be less than ${rFs}`;
+  //   },
+  // };
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -238,6 +250,12 @@
           />
         {/if}
 
+        <RootFsSize
+          cpu={data.cpu}
+          memory={data.memory}
+          on:update={({ detail }) => (data.rootFs = detail)}
+        />
+
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -256,7 +274,7 @@
           memory={data.memory}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
+            data.rootFs
           )}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}

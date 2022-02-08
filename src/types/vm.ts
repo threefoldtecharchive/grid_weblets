@@ -1,6 +1,7 @@
 import { v4 } from "uuid";
 import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
+import rootFs from "../utils/rootFs";
 import { validateDisk } from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
@@ -77,11 +78,12 @@ export default class VM {
     public publicIp = false,
     public publicIp6 = false,
 
-    public selection = new NodeID()
+    public selection = new NodeID(),
+    public rootFs = 2
   ) {}
 
   public get valid(): boolean {
-    const { name, flist, cpu, memory, entrypoint, nodeId } = this;
+    const { name, flist, cpu, memory, entrypoint, nodeId, rootFs: rFs } = this;
     const { network, envs, disks } = this;
     return (
       name !== "" &&
@@ -92,7 +94,8 @@ export default class VM {
       isValidInteger(nodeId) &&
       network.valid &&
       envs.reduce((res, env) => res && env.valid, true) &&
-      disks.reduce((res, disk) => res && disk.valid, true)
+      disks.reduce((res, disk) => res && disk.valid, true) &&
+      rFs >= rootFs(cpu, memory)
     );
   }
 }
