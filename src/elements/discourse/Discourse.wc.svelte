@@ -1,7 +1,7 @@
 <svelte:options tag="tf-discourse" />
 
 <script lang="ts">
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import { default as Discourse } from "../../types/discourse";
   import deployDiscourse from "../../utils/deployDiscourse";
   import type { IProfile } from "../../types/Profile";
@@ -23,7 +23,7 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const data = new Discourse();
 
@@ -41,21 +41,24 @@
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
     { label: "Mail Server", value: "mail" },
-
   ];
   let active = "config";
 
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Discourse Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
     { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
-  
+
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 10 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 50 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
+  ];
+
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
 
   let message: string;
@@ -134,6 +137,13 @@
           {/if}
         {/each}
 
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
+
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
@@ -149,10 +159,11 @@
         />
 
         <!-- SMTP fields -->
-        {:else if active === "mail"}
+      {:else if active === "mail"}
         <div class="notification is-warning is-light">
           <p>
-            Discourse needs SMTP service so please configure these settings properly.
+            Discourse needs SMTP service so please configure these settings
+            properly.
           </p>
         </div>
         {#each data.smtp.fields as field (field.symbol)}
