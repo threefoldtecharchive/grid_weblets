@@ -36,7 +36,7 @@
     const tabs: ITab[] = [{ label: "Base", value: "base" }];
 
     const nameField: IFormField = { label: "Name", placeholder: "Casperlabs Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-    const knownValidator: IFormField = { label: "Known Validator", placeholder: "Validator Node IP (optional)", symbol: "validatorIP", type: "text", validator: undefined, invalid: false }; // prettier-ignore
+    const knownValidator: IFormField = { label: "Known Validator", placeholder: "Validator Node IP (optional)", symbol: "knownValidator", type: "text", validator: undefined, invalid: false }; // prettier-ignore
 
     let message: string;
     let modalData: Object;
