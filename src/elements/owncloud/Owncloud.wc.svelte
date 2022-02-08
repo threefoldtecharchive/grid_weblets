@@ -59,18 +59,18 @@
 
   let adminFields: IFormField[] = [
     {
-      label: "Admin User Name",
+      label: "Username",
       symbol: "adminUsername",
-      placeholder: "admin",
+      placeholder: "Admin Username",
       type: "text",
       validator: validateName,
       invalid: false,
     },
     {
       label:
-        "Admin Password (It's important to save the admin username and password for login)",
+        "Password",
       symbol: "adminPassword",
-      placeholder: "password",
+      placeholder: "Admin Password",
       type: "password",
       invalid: false,
     },
@@ -102,7 +102,7 @@
       invalid: false,
     },
     {
-      label: "User Name",
+      label: "Username",
       symbol: "smtpHostUser",
       placeholder: "user@example.com",
       type: "text",
@@ -173,7 +173,7 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy an owncloud Instance</h4>
+    <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}

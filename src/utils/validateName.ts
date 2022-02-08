@@ -1,11 +1,13 @@
 import type { IFormField } from "../types";
 
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/;
+const ALPHA_ONLY_REGEX = /[A-Za-z]/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
 // prettier-ignore
 export default function validateName(name: string): string | void {
-    if (name.length === 0) return "Name must be at least 1 character";
-    if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters or start with a number";
+    if (name.length < 2) return "Name must be at least 2 characters";
+    if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number or a whitespace";
+    if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
     if (name.length > 15) return "Name must be at most 15 characters";
 }
 

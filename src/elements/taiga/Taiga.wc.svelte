@@ -42,26 +42,26 @@
     { label: "Base", value: "base" },
     { label: "Mail Server", value: "mail" },
   ];
-  const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Taiga Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   let adminFields: IFormField[] = [
     {
-      label: "Admin User Name",
+      label: "Username",
       symbol: "adminUsername",
-      placeholder: "admin",
+      placeholder: "Admin Username",
       type: "text",
       validator: validateName,
       invalid: false,
     },
     {
-      label: "Admin Password",
+      label: "Password",
       symbol: "adminPassword",
-      placeholder: "password",
+      placeholder: "Admin Password",
       type: "password",
       invalid: false,
     },
     {
-      label: "Admin Email Address",
+      label: "Email",
       symbol: "adminEmail",
       placeholder: "admin@example.com",
       type: "text",
@@ -69,6 +69,15 @@
       invalid: false,
     },
   ];
+
+  const diskField: IFormField = {
+    label: "Disk (GB)",
+    symbol: "disk",
+    placeholder: "Your disk size in GB",
+    type: "number",
+    validator: validateDisk,
+    invalid: false,
+  };
 
   let mailFields: IFormField[] = [
     {
