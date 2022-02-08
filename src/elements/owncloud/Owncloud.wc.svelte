@@ -146,9 +146,7 @@
       .then((data) => {
         deploymentStore.set(0);
         success = true;
-        modalData = data.deployment;
-        domain = data.domain;
-        planetaryIP = data.planetaryIP;
+        modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
@@ -181,11 +179,9 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed owncloud."
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}

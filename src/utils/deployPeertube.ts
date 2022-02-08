@@ -58,7 +58,7 @@ export default async function deployPeertube(
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
   // deploy the peertube
-  await deployPeertubeVM(
+  const deploymentInfo = await deployPeertubeVM(
     profile,
     client,
     network,
@@ -94,10 +94,7 @@ export default async function deployPeertube(
     throw error;
   }
 
-  // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, domainName);
-  const gatewayDomain = gatewayInfo[0]["domain"];
-  return { domain, planetaryIP };
+  return { deploymentInfo };
 }
 
 async function deployPeertubeVM(

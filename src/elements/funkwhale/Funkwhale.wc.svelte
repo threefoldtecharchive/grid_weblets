@@ -16,6 +16,8 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
@@ -34,6 +36,7 @@
   let profile: IProfile;
 
   let active: string = "base";
+  let modalData: Object;
   let loading = false;
   let success = false;
   let failed = false;
@@ -56,8 +59,6 @@
 
   let message: string;
 
-  let domain: string, planetaryIP: string;
-
   async function onDeployVM() {
     loading = true;
     success = false;
@@ -73,11 +74,10 @@
     }
 
     deployFunkwhale(data, profile)
-      .then(({ domain: d, planetaryIP: ip }) => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
-        domain = d;
-        planetaryIP = ip;
+        modalData = data.deploymentInfo;
       })
       .catch((err) => {
         failed = true;
@@ -110,11 +110,9 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed a Funkwhale instance"
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}
@@ -185,6 +183,10 @@
     />
   </form>
 </div>
+
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

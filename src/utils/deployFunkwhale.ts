@@ -58,7 +58,7 @@ export default async function deployFunkwhale(
   // define network
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
-  await deployFunkwhaleVM(
+  const deploymentInfo = await deployFunkwhaleVM(
     profile,
     client,
     name,
@@ -92,8 +92,7 @@ export default async function deployFunkwhale(
     throw error;
   }
 
-  const gatewayInfo = await getGatewayInfo(client, domainName);
-  return { domain, planetaryIP };
+  return { deploymentInfo };
 }
 
 async function deployFunkwhaleVM(

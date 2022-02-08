@@ -53,7 +53,6 @@
   let modalData: Object;
   let status: "valid" | "invalid";
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
-  let domain: string, planetaryIP: string;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -70,11 +69,10 @@
       return;
     }
     deployPeertube(data, profile)
-      .then(({ domain: d, planetaryIP: ip }) => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
-        domain = d;
-        planetaryIP = ip;
+        modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
@@ -109,11 +107,9 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed a Peertube instance"
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}
