@@ -38,12 +38,17 @@ export default class App extends Vue {
     "kubernetes",
     "deployedlist",
     "caprover",
+    "discourse",
     "farmingcalculator",
     "funkwhale",
     "peertube",
     "taiga",
     "owncloud",
     "contractslist",
+    "disclaimer",
+    "version",
+    "mattermost",
+
   ];
   sidenav: ISidenav | null = null;
 

@@ -2,7 +2,7 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import { Disk, Env } from "../../types/vm";
   import Owncloud from "../../types/owncloud";
@@ -31,6 +31,7 @@
 
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Owncloud();
   let domain: string, planetaryIP: string;
@@ -47,36 +48,43 @@
     { label: "Mail Server", value: "mail" },
   ];
 
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
+    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
+  ];
+
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   let adminFields: IFormField[] = [
     {
-      label: "Admin User Name",
+      label: "Username",
       symbol: "adminUsername",
-      placeholder: "admin",
+      placeholder: "Admin Username",
       type: "text",
       validator: validateName,
       invalid: false,
     },
     {
       label:
-        "Admin Password (It's important to save the admin username and password for login)",
+        "Password",
       symbol: "adminPassword",
-      placeholder: "password",
+      placeholder: "Admin Password",
       type: "password",
-      invalid: false,
-    },
-    {
-      label: "Admin Email Address",
-      symbol: "adminEmail",
-      placeholder: "admin@example.com",
-      type: "text",
-      validator: validateEmail,
       invalid: false,
     },
   ];
 
   let mailFields: IFormField[] = [
+    {
+      label: "From Email Address",
+      symbol: "smtpFromEmail",
+      placeholder: "support@example.com",
+      type: "text",
+      validator: validateOptionalEmail,
+      invalid: false,
+    },
     {
       label: "Host Name",
       symbol: "smtpHost",
@@ -94,7 +102,7 @@
       invalid: false,
     },
     {
-      label: "User Name",
+      label: "Username",
       symbol: "smtpHostUser",
       placeholder: "user@example.com",
       type: "text",
@@ -108,6 +116,8 @@
       type: "password",
       invalid: false,
     },
+    { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
+    { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
   ];
 
   let message: string;
@@ -161,7 +171,7 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy an owncloud Instance</h4>
+    <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}
@@ -197,6 +207,12 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
 
         <SelectNodeId
           publicIp={data.publicIp}

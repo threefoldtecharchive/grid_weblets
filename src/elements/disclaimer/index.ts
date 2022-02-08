@@ -1,0 +1,1 @@
+import "./Disclaimer.wc.svelte";

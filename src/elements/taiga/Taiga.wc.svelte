@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { Disk, Env } from "../../types/vm";
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import deployTaiga from "../../utils/deployTaiga";
   import type { IProfile } from "../../types/Profile";
   import Taiga from "../../types/taiga";
@@ -23,11 +23,11 @@
     validateOptionalEmail,
     validateDisk,
     validateMemory,
-validatePortNumber,
-
+    validatePortNumber,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Taiga();
 
@@ -42,44 +42,26 @@ validatePortNumber,
     { label: "Base", value: "base" },
     { label: "Mail Server", value: "mail" },
   ];
-  const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Taiga Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-  let baseFields: IFormField[] = [
-    {
-      label: "CPU",
-      symbol: "cpu",
-      placeholder: "CPU Cores",
-      type: "number",
-      validator: validateCpu,
-      invalid: false,
-    },
-    {
-      label: "Memory (MB)",
-      symbol: "memory",
-      placeholder: "Your Memory in MB",
-      type: "number",
-      validator: validateMemory,
-      invalid: false,
-    },
-  ];
   let adminFields: IFormField[] = [
     {
-      label: "Admin User Name",
+      label: "Username",
       symbol: "adminUsername",
-      placeholder: "admin",
+      placeholder: "Admin Username",
       type: "text",
       validator: validateName,
       invalid: false,
     },
     {
-      label: "Admin Password",
+      label: "Password",
       symbol: "adminPassword",
-      placeholder: "password",
+      placeholder: "Admin Password",
       type: "password",
       invalid: false,
     },
     {
-      label: "Admin Email Address",
+      label: "Email",
       symbol: "adminEmail",
       placeholder: "admin@example.com",
       type: "text",
@@ -91,7 +73,7 @@ validatePortNumber,
   const diskField: IFormField = {
     label: "Disk (GB)",
     symbol: "disk",
-    placeholder: "Your Disk size in GB",
+    placeholder: "Your disk size in GB",
     type: "number",
     validator: validateDisk,
     invalid: false,
@@ -141,13 +123,20 @@ validatePortNumber,
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
   ];
 
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 2, memory: 1024 * 4, diskSize: 200 },
+  ];
+
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -217,19 +206,12 @@ validatePortNumber,
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-        {#each baseFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-
-        <Input bind:data={data.disks[0].size} field={diskField} />
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
 
         {#each adminFields as field (field.symbol)}
           {#if field.invalid !== undefined}

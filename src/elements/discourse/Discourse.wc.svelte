@@ -1,11 +1,11 @@
-<svelte:options tag="tf-caprover" />
+<svelte:options tag="tf-discourse" />
 
 <script lang="ts">
   import type { IFormField, IPackage, ITab } from "../../types";
-  import { default as Caprover } from "../../types/caprover";
-  import deployCaprover from "../../utils/deployCaprover";
+  import { default as Discourse } from "../../types/discourse";
+  import deployDiscourse from "../../utils/deployDiscourse";
   import type { IProfile } from "../../types/Profile";
-
+  import rootFs from "../../utils/rootFs";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
@@ -19,45 +19,52 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateEmail,
     validateMemory,
   } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
 
-  const data = new Caprover();
+  const data = new Discourse();
+
   let loading = false;
   let success = false;
   let failed = false;
-  const deploymentStore = window.configs?.deploymentStore;
-  let profile: IProfile;
+
   let status: "valid" | "invalid";
+  let profile: IProfile;
+
+  const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
+    { label: "Mail Server", value: "mail" },
   ];
   let active = "config";
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
-    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
+    { label: "Name", symbol: "name", placeholder: "Discourse Instance Name", type: "text", validator: validateName, invalid: false },
+    { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
+    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
+    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
+  // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+    { name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 10 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 50 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+
   let message: string;
   let modalData: Object;
-  async function deployCaproverHandler() {
+
+  async function deployDiscourseHandler() {
     loading = true;
 
     if (!hasEnoughBalance()) {
@@ -72,8 +79,8 @@
     failed = false;
     message = undefined;
 
-    deployCaprover(data, profile)
-      .then((data) => {
+    deployDiscourse(data, profile)
+      .then((data: any) => {
         modalData = data;
         deploymentStore.set(0);
         success = true;
@@ -93,37 +100,27 @@
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.publicKey = detail.sshKey;
-    }
   }}
 />
 
 <div style="padding: 15px;">
-  <form class="box" on:submit|preventDefault={deployCaproverHandler}>
-    <h4 class="is-size-4 mb-4">Caprover Deployer</h4>
-    <p>
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
-      >
-        Quick start documentation</a
-      >
-    </p>
+  <form class="box" on:submit|preventDefault={deployDiscourseHandler}>
+    <h4 class="is-size-4 mb-4">Deploy a Discourse Instance</h4>
+
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "CapRover")}
+    {#if loading || (logs !== null && logs.type === "Discourse")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully Deployed Caprover."
+        message="Successfully Deployed Discourse."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
+      <Alert type="danger" message={message || "Failed to Deploy Discourse."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -138,39 +135,19 @@
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
-          {#if field.symbol === "domain"}
-            <div class="notification is-warning is-light">
-              <p>
-                You will need to point a wildcard DNS entry for the domain you
-                entered above to this CapRover instance IP Address after
-                deployment,<br />
-                otherwise, you won't be able to access the CapRover dashboard using
-                this domain.
-              </p>
-              <br />
-              <strong>
-                If you don't know what Captain root domain is, make sure to
-                visit <a
-                  target="_blank"
-                  href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
-                >
-                  the Quick start documentation
-                </a>.
-              </strong>
-            </div>
-          {/if}
         {/each}
 
         <SelectCapacity
           bind:cpu={data.cpu}
           bind:memory={data.memory}
-          bind:diskSize={data.diskSize}
+          bind:diskSize={data.disks[0].size}
           {packages}
         />
+
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
-          publicIp={true}
+          publicIp={data.publicIp}
           ssd={data.diskSize + rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
@@ -180,6 +157,26 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
+
+        <!-- SMTP fields -->
+      {:else if active === "mail"}
+        <div class="notification is-warning is-light">
+          <p>
+            Discourse needs SMTP service so please configure these settings
+            properly.
+          </p>
+        </div>
+        {#each data.smtp.fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data.smtp[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data.smtp[field.symbol]} {field} />
+          {/if}
+        {/each}
       {/if}
     {/if}
 
@@ -199,6 +196,7 @@
     />
   </form>
 </div>
+
 {#if modalData}
   <Modal data={modalData} on:closed={() => (modalData = null)} />
 {/if}

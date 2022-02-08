@@ -2,10 +2,11 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, ITab, IPackage } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
+  import Peertube from "../../types/peertube";
   import deployPeertube from "../../utils/deployPeertube";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -20,37 +21,28 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateMemory,
+    validateEmail,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
-
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const emailField: IFormField = { label: "Email", placeholder: "Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
+  const passField: IFormField = { label: "Password", placeholder: "Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
-  // prettier-ignore
-  const baseFields: IFormField[] = [
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false }
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
   ];
 
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
-
   const deploymentStore = window.configs?.deploymentStore;
-  let data = new VM(); // set the default specs for peertube
-  data.cpu = 2;
-  data.memory = 2048;
-  data.disks = [new Disk(undefined, undefined, 20, undefined)];
+  let data = new Peertube();
 
   let active: string = "base";
   let loading = false;
@@ -60,7 +52,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -131,22 +123,26 @@
           bind:invalid={nameField.invalid}
           field={nameField}
         />
+        <Input
+          bind:data={data.adminEmail}
+          bind:invalid={emailField.invalid}
+          field={emailField}
+        />
+        <Input
+          bind:data={data.adminPassword}
+          bind:invalid={passField.invalid}
+          field={passField}
+        />
 
-        {#each baseFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-        <Input bind:data={data.disks[0].size} field={diskField} />
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
 
         <SelectNodeId
-          publicIp={false}
+          publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
           ssd={data.disks.reduce(
