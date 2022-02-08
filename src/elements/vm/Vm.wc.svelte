@@ -251,9 +251,12 @@
         {/if}
 
         <RootFsSize
+          rootFs={data.rootFs}
+          editable={data.rootFsEditable}
           cpu={data.cpu}
           memory={data.memory}
           on:update={({ detail }) => (data.rootFs = detail)}
+          on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
         />
 
         {#each baseFields as field (field.symbol)}

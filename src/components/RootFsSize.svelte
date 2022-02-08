@@ -2,22 +2,34 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{ update: number }>();
+  const dispatch =
+    createEventDispatcher<{ update: number; editableUpdate: boolean }>();
 
-  import rootFs from "../utils/rootFs";
+  import rootFsUtil from "../utils/rootFs";
   import Input from "./Input.svelte";
 
+  export let rootFs: number;
+  export let editable: boolean;
   export let cpu: number;
   export let memory: number;
 
-  let editable = false;
-
   let size: number;
+  let _init = false;
   $: {
-    if (!editable) {
-      size = rootFs(cpu, memory);
-      dispatch("update", size);
+    if (editable !== undefined && cpu !== undefined && memory !== undefined) {
+      if (!editable) {
+        size = rootFsUtil(cpu, memory);
+        dispatch("update", size);
+      } else if (!_init) {
+        _init = true;
+        size = rootFs;
+      }
     }
+  }
+
+  function _updateEditable(e: Event) {
+    const input = e.target as HTMLInputElement;
+    dispatch("editableUpdate", input.checked);
   }
 </script>
 
@@ -34,8 +46,8 @@
         symbol: "rootFs",
         type: "number",
         error:
-          editable && size < rootFs(cpu, memory)
-            ? `RootFs value can't be less than ${rootFs(cpu, memory)}`
+          editable && size < rootFsUtil(cpu, memory)
+            ? `RootFs value can't be less than ${rootFsUtil(cpu, memory)}`
             : undefined,
         disabled: !editable,
         validator() {},
@@ -44,12 +56,13 @@
   </div>
   <div>
     <Input
-      bind:data={editable}
+      data={editable}
       field={{
         label: "",
         symbol: "editable",
         type: "checkbox",
       }}
+      on:input={_updateEditable}
     />
   </div>
 </div>

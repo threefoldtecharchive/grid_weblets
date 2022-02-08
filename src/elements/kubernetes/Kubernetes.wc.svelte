@@ -26,6 +26,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
+  import RootFsSize from "../../components/RootFsSize.svelte";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -168,12 +169,22 @@
             <Input bind:data={data.master[field.symbol]} {field} />
           {/if}
         {/each}
+
+        <RootFsSize
+          rootFs={data.master.rootFs}
+          editable={data.master.rootFsEditable}
+          cpu={data.master.cpu}
+          memory={data.master.memory}
+          on:update={({ detail }) => (data.master.rootFs = detail)}
+          on:editableUpdate={({ detail }) =>
+            (data.master.rootFsEditable = detail)}
+        />
+
         <SelectNodeId
           cpu={data.master.cpu}
           memory={data.master.memory}
           publicIp={data.master.publicIp}
-          ssd={data.master.diskSize +
-            rootFs(data.master.cpu, data.master.memory)}
+          ssd={data.master.diskSize + data.master.rootFs}
           bind:data={data.master.node}
           bind:nodeSelection={data.master.selection.type}
           filters={data.master.selection.filters}
@@ -205,11 +216,22 @@
                   <Input bind:data={worker[field.symbol]} {field} />
                 {/if}
               {/each}
+
+              <RootFsSize
+                rootFs={worker.rootFs}
+                editable={worker.rootFsEditable}
+                cpu={worker.cpu}
+                memory={worker.memory}
+                on:update={({ detail }) => (worker.rootFs = detail)}
+                on:editableUpdate={({ detail }) =>
+                  (worker.rootFsEditable = detail)}
+              />
+
               <SelectNodeId
                 cpu={worker.cpu}
                 memory={worker.memory}
                 publicIp={worker.publicIp}
-                ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
+                ssd={worker.diskSize + worker.rootFs}
                 filters={worker.selection.filters}
                 bind:data={worker.node}
                 bind:nodeSelection={worker.selection.type}

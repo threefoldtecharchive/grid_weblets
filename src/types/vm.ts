@@ -79,7 +79,8 @@ export default class VM {
     public publicIp6 = false,
 
     public selection = new NodeID(),
-    public rootFs = 2
+    public rootFs = 2,
+    public rootFsEditable = false
   ) {}
 
   public get valid(): boolean {
