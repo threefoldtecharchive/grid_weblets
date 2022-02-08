@@ -6,8 +6,14 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 
-const { MachinesModel, DiskModel, GridClient, MachineModel, GatewayNameModel } =
-  window.configs?.grid3_client ?? {};
+const {
+  generateString,
+  MachinesModel,
+  DiskModel,
+  GridClient,
+  MachineModel,
+  GatewayNameModel,
+} = window.configs?.grid3_client ?? {};
 
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
@@ -33,14 +39,16 @@ export default async function deployDiscourse(
 
   await client.connect();
 
-  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
+  let randomSuffix = generateString(10).toLowerCase();
+
+  const network = createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16")); // prettier-ignore
 
   let domainName = await getUniqueDomainName(client, "dc", name);
 
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
   const domain = `${domainName}.${nodeDomain}`;
 
-  await depoloyDiscourseVM(data, profile, domain, network);
+  await depoloyDiscourseVM(data, profile, domain, network, randomSuffix);
 
   const discourseInfo = await getDiscourseInfo(client, name);
   const planetaryIP = discourseInfo[0]["planetary"] as string;
@@ -68,7 +76,8 @@ async function depoloyDiscourseVM(
   data: Discourse,
   profile: IProfile,
   domain: string,
-  network: any
+  network: any,
+  randomeSuffix: string
 ) {
   const {
     name,
@@ -86,12 +95,12 @@ async function depoloyDiscourseVM(
 
   /* Docker disk */
   const disk = new DiskModel();
-  disk.name = "data0";
+  disk.name = `disk${randomeSuffix}`;
   disk.size = diskSize;
   disk.mountpoint = "/var/lib/docker";
 
   const machine = new MachineModel();
-  machine.name = name;
+  machine.name = `vm${randomeSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];
