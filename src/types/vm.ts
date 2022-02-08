@@ -62,6 +62,7 @@ export default class VM {
     public id = v4(),
     public name = "VM" + id.split("-")[0],
     public flist = "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+    public pkg = "",
     public cpu = 4,
     public memory = 1024 * 8,
     public entrypoint = "/sbin/zinit init",

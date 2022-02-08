@@ -1,12 +1,12 @@
 <svelte:options tag="tf-funkwhale" />
 
 <script lang="ts">
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  import VM, { Env } from "../../types/vm";
+  import VM, { Disk, Env } from "../../types/vm";
   import deployFunkwhale from "../../utils/deployFunkwhale";
 
   // Components
@@ -24,9 +24,12 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
-import Funkwhale from "../../types/funkwhale";
+  import Funkwhale from "../../types/funkwhale";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const data = new Funkwhale();
+  data.disks = [new Disk()];
+
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let profile: IProfile;
 
@@ -39,8 +42,14 @@ import Funkwhale from "../../types/funkwhale";
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: true }; // prettier-ignore
-
   const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: (value: string) => value.trim().length === 0 ? "Password can't be empty." : undefined, invalid: false}; // prettier-ignore
+
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+  ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -133,6 +142,14 @@ import Funkwhale from "../../types/funkwhale";
           bind:invalid={passwordField.invalid}
           field={passwordField}
         />
+
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
+
         <SelectNodeId
           publicIp={false}
           cpu={data.cpu}

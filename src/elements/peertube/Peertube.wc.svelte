@@ -2,7 +2,7 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, ITab, IPackage } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
   import { Disk, Env } from "../../types/vm";
@@ -21,13 +21,12 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateMemory,
     validateEmail,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
-
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -35,21 +34,12 @@
   const emailField: IFormField = { label: "Email", placeholder: "Instance Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
   const passField: IFormField = { label: "Password", placeholder: "Instance Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
-  // prettier-ignore
-  const baseFields: IFormField[] = [
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
   ];
-
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new Peertube();
@@ -62,7 +52,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
   let domain: string, planetaryIP: string;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -147,19 +137,13 @@
           bind:invalid={passField.invalid}
           field={passField}
         />
-        <Input bind:data={data.disks[0].size} field={diskField} />
 
-        {#each baseFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          {packages}
+        />
 
         <SelectNodeId
           publicIp={data.publicIp}
