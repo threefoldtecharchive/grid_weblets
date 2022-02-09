@@ -104,17 +104,6 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  // const rootFsField: IFormField = {
-  //   label: "Root File System",
-  //   placeholder: "rootFs Size",
-  //   symbol: "rootFs",
-  //   type: "number",
-  //   validator(value) {
-  //     const rFs = rootFs(data.cpu, data.memory);
-  //     if (value < rFs) return `RootFs value can't be less than ${rFs}`;
-  //   },
-  // };
-
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = { loading: false, error: null };
