@@ -25,7 +25,6 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
   import RootFsSize from "../../components/RootFsSize.svelte";
 
   // prettier-ignore
