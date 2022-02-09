@@ -26,6 +26,7 @@
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
+  import RootFsSize from "../../components/RootFsSize.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -238,6 +239,15 @@
           />
         {/if}
 
+        <RootFsSize
+          rootFs={data.rootFs}
+          editable={data.rootFsEditable}
+          cpu={data.cpu}
+          memory={data.memory}
+          on:update={({ detail }) => (data.rootFs = detail)}
+          on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
+        />
+
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -256,7 +266,7 @@
           memory={data.memory}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
+            data.rootFs
           )}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}

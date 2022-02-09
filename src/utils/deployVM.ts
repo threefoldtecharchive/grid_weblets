@@ -4,10 +4,9 @@ const { DiskModel, MachineModel, MachinesModel } =
   window.configs?.grid3_client ?? {};
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
-import rootFs from "./rootFs";
 
 export default async function deployVM(data: VM, profile: IProfile) {
-  const { envs, disks, ...base } = data;
+  const { envs, disks, rootFs, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, publicIp6 } = base;
 
@@ -20,7 +19,7 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vm.planetary = planetary;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = rootFs(cpu, memory);
+  vm.rootfs_size = rootFs;
   vm.flist = flist;
   vm.entrypoint = entrypoint;
   vm.env = createEnvs(envs);

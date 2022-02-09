@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
+import rootFs from "../utils/rootFs";
 import NodeID from "./nodeId";
 
 export abstract class Base {
@@ -15,17 +16,20 @@ export abstract class Base {
     public planetary: boolean = true,
 
     public selection = new NodeID(),
-    public status: "valid" | "invalid" = null
+    public status: "valid" | "invalid" = null,
+    public rootFs = 2,
+    public rootFsEditable = false
   ) {}
 
   public get valid(): boolean {
-    const { name, node, cpu, diskSize, memory } = this;
+    const { name, node, cpu, diskSize, memory, rootFs: rFs } = this;
     return (
       name !== "" &&
       isValidInteger(node) &&
       isValidInteger(cpu) &&
       isValidInteger(diskSize) &&
-      isValidInteger(memory)
+      isValidInteger(memory) &&
+      rFs >= rootFs(cpu, memory)
     );
   }
 }

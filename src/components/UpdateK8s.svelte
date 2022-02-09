@@ -12,14 +12,12 @@
   // components
   import Alert from "./Alert.svelte";
   import Input from "./Input.svelte";
-  import Tabs from "./Tabs.svelte";
   import SelectNodeId from "./SelectNodeId.svelte";
   import getGrid from "../utils/getGrid";
   import DeployBtn from "./DeployBtn.svelte";
   import { createEventDispatcher } from "svelte";
   import Table from "./Table.svelte";
-  import rootFs from "../utils/rootFs";
-  import { dataset_dev } from "svelte/internal";
+  import RootFsSize from "./RootFsSize.svelte";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -52,7 +50,7 @@
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
     getGrid(profile, (grid) => {
-      const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node } = worker; // prettier-ignore
+      const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node, rootFs } = worker; // prettier-ignore
       const workerModel = new AddWorkerModel();
       workerModel.deployment_name = k8s.name;
       workerModel.name = name;
@@ -62,7 +60,7 @@
       workerModel.public_ip = publicIp;
       workerModel.public_ip6 = publicIp6;
       workerModel.planetary = planetary;
-      workerModel.rootfs_size = rootFs(cpu, memory);
+      workerModel.rootfs_size = rootFs;
       workerModel.node_id = node;
       grid.k8s
         .add_worker(workerModel)
@@ -230,11 +228,22 @@
                 <Input bind:data={worker[field.symbol]} {field} />
               {/if}
             {/each}
+
+            <RootFsSize
+              rootFs={worker.rootFs}
+              editable={worker.rootFsEditable}
+              cpu={worker.cpu}
+              memory={worker.memory}
+              on:update={({ detail }) => (worker.rootFs = detail)}
+              on:editableUpdate={({ detail }) =>
+                (worker.rootFsEditable = detail)}
+            />
+
             <SelectNodeId
               cpu={worker.cpu}
               memory={worker.memory}
               publicIp={worker.publicIp}
-              ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
+              ssd={worker.diskSize + worker.rootFs}
               filters={worker.selection.filters}
               bind:data={worker.node}
               bind:nodeSelection={worker.selection.type}
