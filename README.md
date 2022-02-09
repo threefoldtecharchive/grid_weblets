@@ -7,6 +7,11 @@ It solves such problem where you had to write complex HTML (and associated style
 
 [^1]: In case you wonder what is [svelte](https://github.com/sveltejs/svelte), It's a compiler that takes your declarative components and converts them into efficient JavaScript that surgically updates the DOM. if your are interested to learn more about Sevlte and how to get started with it you can check this [tutorial](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Svelte_getting_started)
 
+## Depolyments links:
+- dev environment: rapidly changing environment on development branch merges: https://play.dev.grid.tf
+- test environment: more stable environment on pre-releases: https://play.test.grid.tf
+- stable environment: most stable / verified code, based on releases: https://play.grid.tf
+
 ## The Contents
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
