@@ -19,6 +19,8 @@ jobs:
   build-and-deploy:
 
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096"
 
     strategy:
       matrix:
