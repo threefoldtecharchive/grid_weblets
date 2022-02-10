@@ -91,6 +91,9 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
 
   // Deploy
   return deploy(profile, "Presearch", name, (grid) => {
-    return grid.machines.deploy(machines);
+    return grid.machines
+      .deploy(machines)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
