@@ -53,7 +53,7 @@
     </aside>
 
     <div class="editor__content" v-if="active >= 0">
-        <tf-disclaimer></tf-disclaimer>
+      <tf-disclaimer></tf-disclaimer>
       <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-end mt-2 mb-2 mr-2" style="height: 112px">
           <tf-profiles></tf-profiles>
@@ -119,6 +119,7 @@ export default class Editor extends Vue {
 
     new Weblet("Taiga", "taiga", "taiga", "deployment"),
     new Weblet("Owncloud", "owncloud", "owncloud", "deployment"),
+    new Weblet("Presearch", "presearch", "presearch", "deployment"),
 
     new Weblet("Contracts", "contractslist", "", "my account"),
     new Weblet("Deployments", "deployedlist", "", "my account"),
