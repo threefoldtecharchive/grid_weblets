@@ -10,14 +10,19 @@ export default function deploy<T>(
   deployer: (grid: GridClient) => Promise<T>
 ) {
   window.configs.currentDeploymentStore.deploy(type, name);
-  return getGrid(profile, (grid) => {
-    return deployer(grid)
-      .then((res) => {
-        window.configs.balanceStore.updateBalance();
-        return res;
-      })
-      .finally(() => {
-        window.configs.currentDeploymentStore.clear();
-      });
-  });
+  return getGrid(
+    profile,
+    (grid) => {
+      return deployer(grid)
+        .then((res) => {
+          window.configs.balanceStore.updateBalance();
+          return res;
+        })
+        .finally(() => {
+          window.configs.currentDeploymentStore.clear();
+        });
+    },
+    undefined,
+    type
+  );
 }

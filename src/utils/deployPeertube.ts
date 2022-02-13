@@ -1,15 +1,14 @@
 import type { default as Peertube } from "../types/peertube";
 import type { IProfile } from "../types/Profile";
-import deploy from "./deploy";
-
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
-import rootFs from "./rootFs";
-import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
 
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
+import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import createNetwork from "./createNetwork";
+import deploy from "./deploy";
+import rootFs from "./rootFs";
+import destroy from "./destroy";
+
 const {
-  GridClient,
   DiskModel,
   MachineModel,
   MachinesModel,
@@ -21,105 +20,64 @@ export default async function deployPeertube(
   data: Peertube,
   profile: IProfile
 ) {
-  const {
-    envs,
-    disks: [{ size }],
-    adminEmail,
-    adminPassword,
-    ...base
-  } = data;
-  let { name, flist, cpu, memory, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
-
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const client = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
+  let domainName = await getUniqueDomainName(
+    "grid",
+    "pt",
+    data.name,
+    profile,
+    "Peertube"
   );
-
-  await client.connect();
-
-  // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
-
-  // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "pt", name);
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${domainName}.${nodeDomain}`;
-
-  // define a network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
+  data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the peertube
-  const deploymentInfo = await deployPeertubeVM(
-    profile,
-    client,
-    network,
-    nodeId,
-    name,
-    domain,
-    cpu,
-    memory,
-    size,
-    sshKey,
-    randomSuffix,
-    publicIp,
-    adminEmail,
-    adminPassword
-  );
+  const deploymentInfo = await deployPeertubeVM(profile, data);
 
-  // get the info of peertube deployment
-  const peertubeInfo = await getPeertubeInfo(client, name);
-  const planetaryIP = peertubeInfo[0]["planetary"];
+  const planetaryIP = deploymentInfo["planetary"] as string;
 
   try {
     // deploy the gateway
-    await deployPrefixGateway(
-      profile,
-      client,
-      domainName,
-      planetaryIP,
-      publicNodeId
-    );
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback peertube deployment if gateway deployment failed
-    await client.machines.delete({ name: name });
+    await destroy(profile, "Peertube", data.name);
     throw error;
   }
 
   return { deploymentInfo };
 }
 
-async function deployPeertubeVM(
-  profile: IProfile,
-  client: any,
-  net: any,
-  nodeId: any,
-  name: string,
-  domain: string,
-  cpu: number,
-  memory: number,
-  diskSize: number,
-  sshKey: string,
-  randomSuffix: string,
-  publicIp: boolean,
-  email: string,
-  password: string
-) {
-  // disk
+async function deployPeertubeVM(profile: IProfile, data: Peertube) {
+  const {
+    name,
+    cpu,
+    memory,
+    disks: [{ size }],
+    publicIp,
+    nodeId,
+    adminEmail,
+    adminPassword,
+    envs,
+    domain,
+  } = data;
+
+  // sub deployments model (vm, disk, net): <type><random_suffix>
+  let randomSuffix = generateString(10).toLowerCase();
+
+  // Network Specs
+  const net = new Network();
+  net.name = `net${randomSuffix}`;
+  const network = createNetwork(net);
+
+  // Disk Specs
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
+  disk.size = size;
   disk.mountpoint = "/data";
 
-  // vm specs
+  // VM Specs
   const vm = new MachineModel();
   vm.name = `vm${randomSuffix}`;
   vm.node_id = nodeId;
@@ -133,9 +91,9 @@ async function deployPeertubeVM(
     "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.1.flist";
   vm.entrypoint = "/usr/local/bin/entrypoint.sh";
   vm.env = {
-    SSH_KEY: sshKey,
-    PEERTUBE_ADMIN_EMAIL: email,
-    PT_INITIAL_ROOT_PASSWORD: password,
+    SSH_KEY: profile.sshKey,
+    PEERTUBE_ADMIN_EMAIL: adminEmail,
+    PT_INITIAL_ROOT_PASSWORD: adminPassword,
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
     PEERTUBE_WEBSERVER_PORT: "443",
     PEERTUBE_DB_SUFFIX: "_prod",
@@ -143,36 +101,38 @@ async function deployPeertubeVM(
     PEERTUBE_DB_PASSWORD: "peertube",
   };
 
-  // vms specs
+  // VMS Specs
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = net;
+  vms.network = network;
   vms.machines = [vm];
 
   // deploy
   return deploy(profile, "Peertube", name, (grid) => {
-    return grid.machines
-      .deploy(vms)
-      .then(async () => {
-        for (const gw of await grid.gateway._list()) {
-          try {
-            await grid.gateway.getObj(gw);
-          } catch {}
-        }
-      })
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+    return (
+      grid.machines
+        .deploy(vms)
+        // For fixing the kvstore cached contracts
+        // .then(async () => {
+        //   for (const gw of await grid.gateway._list()) {
+        //     try {
+        //       await grid.gateway.getObj(gw);
+        //     } catch {}
+        //   }
+        // })
+        .then(() => grid.machines.getObj(name))
+        .then(([vm]) => vm)
+    );
   });
 }
 
 async function deployPrefixGateway(
   profile: IProfile,
-  client: any,
   domainName: string,
   backend: string,
   publicNodeId: number
 ) {
-  // define specs
+  // Gateway Specs
   const gw = new GatewayNameModel();
   gw.name = domainName;
   gw.node_id = publicNodeId;
@@ -185,14 +145,4 @@ async function deployPrefixGateway(
       .then(() => grid.gateway.getObj(domainName))
       .then(([gw]) => gw);
   });
-}
-
-async function getPeertubeInfo(client: any, name: string) {
-  const info = await client.machines.getObj(name);
-  return info;
-}
-
-async function getGatewayInfo(client: any, name: string) {
-  const info = await client.gateway.getObj(name);
-  return info;
 }
