@@ -75,8 +75,10 @@ export default class DeployedList {
     });
   }
 
-  public loadVm(): Promise<any[]> {
+  public loadVm(projectName?: string): Promise<any[]> {
     try {
+      this.grid.projectName = projectName;
+      this.grid._connect(); // update the values of grid props
       return this.grid.machines
         .list()
         .then((names) => {
@@ -109,9 +111,7 @@ export default class DeployedList {
   }
 
   public loadPeertube(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("peertube"));
-    });
+    return this.loadVm("Peertube");
   }
 
   public loadMattermost(): Promise<any[]> {
