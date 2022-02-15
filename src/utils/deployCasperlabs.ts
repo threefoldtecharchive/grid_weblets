@@ -23,7 +23,6 @@ export default async function deployCasperlabs(data: Casperlabs, profile: IProfi
 
   let { name, flist, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId } = base;
-  const { knownValidator } = base;
   const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
 
   const http = new HTTPMessageBusClient(0, "", "", "");
@@ -58,7 +57,6 @@ export default async function deployCasperlabs(data: Casperlabs, profile: IProfi
     network,
     nodeId,
     name,
-    knownValidator,
     domain,
     cpu,
     memory,
@@ -98,7 +96,6 @@ async function deployCasperlabsVM(
   network: any,
   nodeId: any,
   name: string,
-  knownValidator: string,
   domain: string,
   cpu: number,
   memory: number,
@@ -110,7 +107,7 @@ async function deployCasperlabsVM(
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
   disk.size = diskSize;
-  disk.mountpoint = "/data";
+  disk.mountpoint = "/var/lib/casper/casper-node";
 
   // vm specs
   const vm = new MachineModel();
@@ -127,8 +124,7 @@ async function deployCasperlabsVM(
     "https://hub.grid.tf/ranatarek.3bot/ranatrk-casperlabs-dev.flist"; // FIXME
   vm.entrypoint = "/start_casper";
   vm.env = {
-    SSH_KEY: sshKey,
-    KNOWN_VALIDATOR_IP: knownValidator,
+    SSH_KEY: sshKey
   };
 
   // vms specs
