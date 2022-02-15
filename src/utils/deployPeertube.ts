@@ -20,6 +20,7 @@ export default async function deployPeertube(
   data: Peertube,
   profile: IProfile
 ) {
+  // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
     "grid",
     "pt",
@@ -32,7 +33,7 @@ export default async function deployPeertube(
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
   data.domain = `${domainName}.${nodeDomain}`;
 
-  // deploy the peertube
+  // deploy peertube
   const deploymentInfo = await deployPeertubeVM(profile, data);
 
   const planetaryIP = deploymentInfo["planetary"] as string;
@@ -108,21 +109,13 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.machines = [vm];
 
   // deploy
-  return deploy(profile, "Peertube", name, (grid) => {
-    return (
-      grid.machines
-        .deploy(vms)
-        // For fixing the kvstore cached contracts
-        // .then(async () => {
-        //   for (const gw of await grid.gateway._list()) {
-        //     try {
-        //       await grid.gateway.getObj(gw);
-        //     } catch {}
-        //   }
-        // })
-        .then(() => grid.machines.getObj(name))
-        .then(([vm]) => vm)
-    );
+  return deploy(profile, "Peertube", name, async (grid) => {
+    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+    await grid.machines.getObj(name);
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
 
@@ -139,7 +132,9 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
 
-  return deploy(profile, "GatewayName", domainName, (grid) => {
+  return deploy(profile, "GatewayName", domainName, async (grid) => {
+    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+    await grid.machines.getObj(domainName);
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))
