@@ -105,9 +105,7 @@ export default class DeployedList {
   }
 
   public loadFunkwhale(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("funk"));
-    });
+    return this.loadVm("Funkwhale");
   }
 
   public loadPeertube(): Promise<any[]> {

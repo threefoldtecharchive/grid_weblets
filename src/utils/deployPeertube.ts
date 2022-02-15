@@ -134,7 +134,7 @@ async function deployPrefixGateway(
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-    await grid.machines.getObj(domainName);
+    await grid.gateway.getObj(domainName);
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

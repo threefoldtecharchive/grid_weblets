@@ -1,18 +1,17 @@
 import type { default as Funkwhale } from "../types/funkwhale";
 import type { IProfile } from "../types/Profile";
-import deploy from "./deploy";
-
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
-import rootFs from "./rootFs";
-import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
 
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
+import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import createNetwork from "./createNetwork";
+import deploy from "./deploy";
+import rootFs from "./rootFs";
+import destroy from "./destroy";
+
 const {
   DiskModel,
   MachineModel,
   MachinesModel,
-  GridClient,
   GatewayNameModel,
   generateString,
 } = window.configs?.grid3_client ?? {};
@@ -21,105 +20,70 @@ export default async function deployFunkwhale(
   data: Funkwhale,
   profile: IProfile
 ) {
-  const {
-    envs,
-    disks: [{ size }],
-    adminUsername,
-    adminEmail,
-    adminPassword,
-    ...base
-  } = data;
-  let { name, flist, cpu, memory, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv } = profile;
-
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const client = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
-  );
-
-  await client.connect();
-
-  // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
-
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "fw", name);
+  let domainName = await getUniqueDomainName(
+    "grid",
+    "fw",
+    data.name,
+    profile,
+    "Funkwhale"
+  );
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${domainName}.${nodeDomain}`;
+  data.domain = `${domainName}.${nodeDomain}`;
 
-  // define network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
+  const deploymentInfo = await deployFunkwhaleVM(profile, data);
 
-  const deploymentInfo = await deployFunkwhaleVM(
-    profile,
-    client,
-    name,
-    network,
-    nodeId,
-    domain,
-    randomSuffix,
-    adminUsername,
-    adminEmail,
-    adminPassword,
-    size,
-    cpu,
-    memory
-  );
-
-  const info = await getFunkwhaleInfo(client, name);
-  const planetaryIP = info[0]["planetary"];
+  const planetaryIP = deploymentInfo["planetary"] as string;
 
   try {
     // deploy the gateway
-    await deployPrefixGateway(
-      profile,
-      client,
-      domainName,
-      planetaryIP,
-      publicNodeId
-    );
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback the FunkwhaleVM if the gateway fails to deploy
-    await client.machines.delete({ name: name });
+    await destroy(profile, "Funkwhale", data.name);
     throw error;
   }
 
   return { deploymentInfo };
 }
 
-async function deployFunkwhaleVM(
-  profile: IProfile,
-  client: any,
-  name: string,
-  network: any,
-  nodeId: number,
-  domain: string,
-  randomSuffix: string,
-  adminUsername: string,
-  adminEmail: string,
-  adminPassword: string,
-  size: number,
-  cpu: number,
-  memory: number
-) {
+async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
+  const {
+    name,
+    cpu,
+    memory,
+    disks: [{ size }],
+    publicIp,
+    nodeId,
+    adminEmail,
+    adminUsername,
+    adminPassword,
+    envs,
+    domain,
+  } = data;
+
+  // sub deployments model (vm, disk, net): <type><random_suffix>
+  let randomSuffix = generateString(10).toLowerCase();
+
+  // Network Specs
+  const net = new Network();
+  net.name = `net${randomSuffix}`;
+  const network = createNetwork(net);
+
+  // Disk Specs
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
   disk.size = size;
   disk.mountpoint = "/data";
 
+  // VM Specs
   const vm = new MachineModel();
   vm.name = `vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
-  vm.public_ip = false;
+  vm.public_ip = publicIp;
   vm.planetary = true;
   vm.cpu = cpu;
   vm.memory = memory;
@@ -134,24 +98,17 @@ async function deployFunkwhaleVM(
     DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
 
+  // VMS Specs
   const vms = new MachinesModel();
   vms.name = name;
   vms.network = network;
   vms.machines = [vm];
 
-  return deploy(profile, "Funkwhale", name, (grid) => {
+  return deploy(profile, "Funkwhale", name, async (grid) => {
+    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+    await grid.machines.getObj(name);
     return grid.machines
       .deploy(vms)
-      .then(async () => {
-        for (const gw of await grid.gateway._list()) {
-          console.log(gw);
-          try {
-            await grid.gateway.getObj(gw);
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });
@@ -159,31 +116,23 @@ async function deployFunkwhaleVM(
 
 async function deployPrefixGateway(
   profile: IProfile,
-  client: any,
   domainName: string,
   backend: string,
   publicNodeId: number
 ) {
+  // Gateway Specs
   const gw = new GatewayNameModel();
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
 
-  return deploy(profile, "GatewayName", domainName, (grid) => {
+  return deploy(profile, "GatewayName", domainName, async (grid) => {
+    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+    await grid.gateway.getObj(domainName);
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))
       .then(([gw]) => gw);
   });
-}
-
-async function getFunkwhaleInfo(client: any, name: string) {
-  const info = await client.machines.getObj(name);
-  return info;
-}
-
-async function getGatewayInfo(client: any, name: string) {
-  const info = await client.gateway.getObj(name);
-  return info;
 }
