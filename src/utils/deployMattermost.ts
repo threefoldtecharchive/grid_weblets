@@ -1,11 +1,14 @@
-import { Network } from "../types/kubernetes";
 import type Mattermost from "../types/mattermost";
 import type { IProfile } from "../types/Profile";
+import { Network } from "../types/kubernetes";
+
+import { getUniqueDomainName, selectGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import { selectGatewayNode } from "./gatewayHelpers";
-import getGrid from "./getGrid";
+// import getGrid from "./getGrid";
 import rootFs from "./rootFs";
+import destroy from "./destroy";
+
 const {
   MachineModel,
   MachinesModel,
@@ -18,21 +21,25 @@ export default async function deployMattermost(
   profile: IProfile,
   mattermost: Mattermost
 ) {
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${mattermost.name}.${nodeDomain}`;
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(
+    "grid",
+    "mm",
+    mattermost.name,
+    profile,
+    "Mattermost"
+  );
 
-  mattermost.domain = domain;
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  mattermost.domain = `${domainName}.${nodeDomain}`;
 
   const matterMostVm = await _deployMatterMost(profile, mattermost);
   const ip = matterMostVm.planetary as string;
 
   try {
-    await _deployGateway(profile, mattermost, ip, publicNodeId);
+    await _deployGateway(profile, domainName, ip, publicNodeId);
   } catch (err) {
-    await getGrid(profile, (grid) => {
-      return grid.machines.delete({ name: mattermost.name });
-    });
-    console.log("Error", err);
+    await destroy(profile, "Mattermost", mattermost.name);
     throw err;
   }
 
@@ -87,7 +94,8 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
-  return deploy(profile, "VM", name, (grid) => {
+  return deploy(profile, "Mattermost", name, async (grid) => {
+    await grid.machines.getObj(name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -97,7 +105,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
 
 function _deployGateway(
   profile: IProfile,
-  { name }: Mattermost,
+  name: string,
   ip: string,
   nodeId: number
 ) {
@@ -107,7 +115,8 @@ function _deployGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:8000`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", name, async (grid) => {
+    await grid.gateway.getObj(name);
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(name))
