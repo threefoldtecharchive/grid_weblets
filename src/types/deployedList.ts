@@ -99,9 +99,7 @@ export default class DeployedList {
   }
 
   public loadDiscourse(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("discourse"));
-    });
+    return this.loadVm("Discourse");
   }
 
   public loadFunkwhale(): Promise<any[]> {

@@ -81,7 +81,7 @@
 
     deployDiscourse(data, profile)
       .then((data: any) => {
-        modalData = data;
+        modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;
       })
