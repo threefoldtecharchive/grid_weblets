@@ -22,11 +22,10 @@ export default async function deployPeertube(
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
-    "grid",
-    "pt",
-    data.name,
     profile,
-    "Peertube"
+    data.name,
+    "Peertube",
+    "pt"
   );
 
   // Dynamically select node to deploy the gateway

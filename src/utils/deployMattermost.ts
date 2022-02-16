@@ -23,11 +23,10 @@ export default async function deployMattermost(
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
-    "grid",
-    "mm",
-    mattermost.name,
     profile,
-    "Mattermost"
+    mattermost.name,
+    "Mattermost",
+    "mm"
   );
 
   let [publicNodeId, nodeDomain] = await selectGatewayNode();

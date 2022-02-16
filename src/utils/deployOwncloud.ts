@@ -21,11 +21,10 @@ export default async function deployOwncloud(
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
-    "client",
-    "oc",
-    data.name,
     profile,
-    "Owncloud"
+    data.name,
+    "Owncloud",
+    "oc"
   );
 
   // Dynamically select node to deploy the gateway

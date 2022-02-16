@@ -22,11 +22,10 @@ export default async function deployFunkwhale(
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
-    "grid",
-    "fw",
-    data.name,
     profile,
-    "Funkwhale"
+    data.name,
+    "Funkwhale",
+    "fw"
   );
 
   // Dynamically select node to deploy the gateway

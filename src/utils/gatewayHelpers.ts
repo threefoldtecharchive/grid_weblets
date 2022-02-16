@@ -15,11 +15,10 @@ export async function selectGatewayNode(): Promise<[number, string]> {
 }
 
 export async function getUniqueDomainName(
-  grid,
-  solutionCode,
+  profile,
   name,
-  profile?,
-  solutionType?
+  solutionType,
+  solutionCode
 ) {
   const { networkEnv, mnemonics, storeSecret } = profile;
   const client = new window.configs.grid3_client.GridClient(
