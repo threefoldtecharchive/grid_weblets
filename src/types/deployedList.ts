@@ -122,9 +122,7 @@ export default class DeployedList {
     return this.loadVm("Taiga");
   }
   public loadPresearch(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("presearch"));
-    });
+    return this.loadVm("Presearch");
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {

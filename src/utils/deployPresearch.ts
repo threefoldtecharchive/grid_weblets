@@ -9,28 +9,13 @@ import deploy from "./deploy";
 
 const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
   window.configs?.grid3_client ?? {};
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 export default async function deployPresearch(
   data: Presearch,
   profile: IProfile
 ) {
-  const name = data.name;
-  const { mnemonics, storeSecret, networkEnv } = profile;
-
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const client = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
-  );
-
-  await client.connect();
-
-  return await depoloyPresearchVM(data, profile);
+  const deploymentInfo = await depoloyPresearchVM(data, profile);
+  return { deploymentInfo };
 }
 
 async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
@@ -90,7 +75,8 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.description = "presearch node";
 
   // Deploy
-  return deploy(profile, "Presearch", name, (grid) => {
+  return deploy(profile, "Presearch", name, async (grid) => {
+    await grid.machines.getObj(name);
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))
