@@ -115,9 +115,7 @@ export default class DeployedList {
   }
 
   public loadOwncloud(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("owncloud"));
-    });
+    return this.loadVm("Owncloud");
   }
 
   public loadTaiga(): Promise<any[]> {

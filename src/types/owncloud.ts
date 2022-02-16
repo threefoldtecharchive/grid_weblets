@@ -5,46 +5,54 @@ import { validateEmail, validateOptionalEmail } from "../utils/validateName";
 import validateName from "../utils/validateName";
 import validateDomainName from "../utils/validateDomainName";
 export default class Owncloud extends VM {
-    /* Superuser settings */
-    public adminEmail = "";
-    public adminUsername = "admin";
-    public adminPassword = generatePassword((length = Math.floor(Math.random() * 5) + 10)); // prettier-ignore
+  /* Superuser settings */
+  public adminEmail = "";
+  public adminUsername = "admin";
+  public adminPassword = generatePassword((length = Math.floor(Math.random() * 5) + 10)); // prettier-ignore
 
-    /* Mail server settings */
-    public smtpFromEmail = "";
-    public smtpHost = "";
-    public smtpPort = "";
-    public smtpHostUser = "";
-    public smtpHostPassword = "";
-    public smtpUseTLS = false;
-    public smtpUseSSL = false;
-    
-    public cpu = 8;
-    public memory = 8192;
-    public diskSize = 100;
+  /* Mail server settings */
+  public smtpFromEmail = "";
+  public smtpHost = "";
+  public smtpPort = "";
+  public smtpHostUser = "";
+  public smtpHostPassword = "";
+  public smtpUseTLS = false;
+  public smtpUseSSL = false;
 
-    public get valid(): boolean {
-        const { name, flist, cpu, memory, diskSize, entrypoint, nodeId } = this;
-        const { network, envs, disks } = this;
-        const { adminUsername, adminPassword } = this;
-        const { smtpFromEmail, smtpHost, smtpPort, smtpHostUser, smtpHostPassword } = this;
+  public cpu = 8;
+  public memory = 8192;
+  public diskSize = 100;
 
-        return (
-            name !== "" &&
-            flist !== "" &&
-            entrypoint !== "" &&
-            isValidInteger(cpu) &&
-            isValidInteger(memory) &&
-            isValidInteger(nodeId) &&
-            network.valid &&
-            envs.reduce((res, env) => res && env.valid, true) &&
-            disks.reduce((res, disk) => res && disk.valid, true) &&
-            !validateName(adminUsername) &&
-            adminPassword !== "" &&
-            !validateOptionalEmail(smtpFromEmail) &&
-            !validateOptionalEmail(smtpHostUser) &&
-            (!validateDomainName(smtpHost) || smtpHost === "") &&
-            (isValidInteger(smtpPort) || smtpPort === "")
-        );
-    }
+  public domain = "";
+
+  public get valid(): boolean {
+    const { name, flist, cpu, memory, diskSize, entrypoint, nodeId } = this;
+    const { network, envs, disks } = this;
+    const { adminUsername, adminPassword } = this;
+    const {
+      smtpFromEmail,
+      smtpHost,
+      smtpPort,
+      smtpHostUser,
+      smtpHostPassword,
+    } = this;
+
+    return (
+      name !== "" &&
+      flist !== "" &&
+      entrypoint !== "" &&
+      isValidInteger(cpu) &&
+      isValidInteger(memory) &&
+      isValidInteger(nodeId) &&
+      network.valid &&
+      envs.reduce((res, env) => res && env.valid, true) &&
+      disks.reduce((res, disk) => res && disk.valid, true) &&
+      !validateName(adminUsername) &&
+      adminPassword !== "" &&
+      !validateOptionalEmail(smtpFromEmail) &&
+      !validateOptionalEmail(smtpHostUser) &&
+      (!validateDomainName(smtpHost) || smtpHost === "") &&
+      (isValidInteger(smtpPort) || smtpPort === "")
+    );
+  }
 }

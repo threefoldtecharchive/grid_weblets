@@ -1,13 +1,12 @@
 import type { default as Owncloud } from "../types/owncloud";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
+import destroy from "./destroy";
 
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
-  GridClient,
   DiskModel,
   MachineModel,
   MachinesModel,
@@ -20,6 +19,37 @@ export default async function deployOwncloud(
   data: Owncloud,
   profile: IProfile
 ) {
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(
+    "client",
+    "oc",
+    data.name,
+    profile,
+    "Owncloud"
+  );
+
+  // Dynamically select node to deploy the gateway
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  data.domain = `${domainName}.${nodeDomain}`;
+
+  // deploy the owncloud
+  const deploymentInfo = await deployOwncloudVM(profile, data);
+
+  const planetaryIP = deploymentInfo["planetary"] as string;
+
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
+  } catch (error) {
+    // rollback owncloud deployment if gateway deployment failed
+    await destroy(profile, "Peertube", data.name);
+    throw error;
+  }
+
+  return { deploymentInfo };
+}
+
+async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   const {
     envs,
     adminUsername,
@@ -34,110 +64,19 @@ export default async function deployOwncloud(
     cpu,
     memory,
     diskSize,
-    ...base
+    name,
+    nodeId,
+    domain,
   } = data;
-  let { name, flist, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
-
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const client = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
-  );
-
-  await client.connect();
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
   let randomSuffix = generateString(10).toLowerCase();
-
-  // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "oc", name);
-
-  // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${domainName}.${nodeDomain}`;
 
   // define a network
   const network = new NetworkModel();
   network.name = `net${randomSuffix}`;
   network.ip_range = "10.1.0.0/16";
 
-  // deploy the owncloud
-  const deploymentInfo = await deployOwncloudVM(
-    profile,
-    client,
-    name,
-    network,
-    nodeId,
-    domain,
-    cpu,
-    memory,
-    diskSize,
-    adminUsername,
-    adminPassword,
-    sshKey,
-    smtpFromEmail,
-    smtpHost,
-    smtpPort,
-    smtpHostPassword,
-    smtpHostUser,
-    smtpUseTLS,
-    smtpUseSSL,
-    randomSuffix
-  );
-
-  // get the info of owncloud deployment
-  const owncloudInfo = await getOwncloudInfo(client, name);
-  const planetaryIP = owncloudInfo[0]["planetary"];
-
-  try {
-    // deploy the gateway
-    await deployPrefixGateway(
-      profile,
-      client,
-      domainName,
-      planetaryIP,
-      publicNodeId
-    );
-  } catch (error) {
-    // rollback owncloud deployment if gateway deployment failed
-    await client.machines.delete({ name: name });
-    throw error;
-  }
-
-  // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, domainName);
-  const gatewayDomain = gatewayInfo[0]["domain"];
-  return { deploymentInfo };
-}
-
-async function deployOwncloudVM(
-  profile: IProfile,
-  client: any,
-  name: string,
-  network: any,
-  nodeId: number,
-  domain: string,
-  cpu: number,
-  memory: number,
-  diskSize: number,
-  adminUsername: string,
-  adminPassword: string,
-  sshKey: string,
-  smtpFromEmail: string,
-  smtpHost: string,
-  smtpPort: string,
-  smtpHostPassword: string,
-  smtpHostUser: string,
-  smtpUseTLS: boolean,
-  smtpUseSSL: boolean,
-  randomSuffix: string
-) {
   // disk
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
@@ -157,6 +96,7 @@ async function deployOwncloudVM(
   vm.flist =
     "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-owncloud-10.9.1.flist";
   vm.entrypoint = "/sbin/zinit init";
+
   let smtp_secure = "none";
   let emailName = "";
   let emailDomain = "";
@@ -172,7 +112,7 @@ async function deployOwncloudVM(
     emailDomain = email[1];
   }
   vm.env = {
-    SSH_KEY: sshKey,
+    SSH_KEY: profile.sshKey,
     OWNCLOUD_DOMAIN: domain,
     OWNCLOUD_ADMIN_USERNAME: adminUsername,
     OWNCLOUD_ADMIN_PASSWORD: adminPassword,
@@ -192,7 +132,8 @@ async function deployOwncloudVM(
   vms.machines = [vm];
 
   // deploy
-  return deploy(profile, "Owncloud", name, (grid) => {
+  return deploy(profile, "Owncloud", name, async (grid) => {
+    await grid.machines.getObj(name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -202,7 +143,6 @@ async function deployOwncloudVM(
 
 async function deployPrefixGateway(
   profile: IProfile,
-  client: any,
   domainName: string,
   backend: string,
   publicNodeId: number
@@ -214,20 +154,11 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
 
-  return deploy(profile, "GatewayName", domainName, (grid) => {
+  return deploy(profile, "GatewayName", domainName, async (grid) => {
+    await grid.gateway.getObj(domainName);
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))
       .then(([gw]) => gw);
   });
-}
-
-async function getOwncloudInfo(client: any, name: string) {
-  const info = await client.machines.getObj(name);
-  return info;
-}
-
-async function getGatewayInfo(client: any, name: string) {
-  const info = await client.gateway.getObj(name);
-  return info;
 }
