@@ -78,9 +78,10 @@ export default class DeployedList {
   public loadVm(projectName?: string): Promise<any[]> {
     try {
       projectName
-        ? (this.grid.projectName = projectName)
-        : (this.grid.projectName = "");
+        ? (this.grid.projectName = projectName) // to load project named deployments
+        : (this.grid.projectName = ""); // to load orphan deployments
       this.grid._connect(); // update the values of grid props
+
       return this.grid.machines
         .list()
         .then((names) => {
@@ -94,35 +95,16 @@ export default class DeployedList {
     }
   }
 
-  public loadCaprover(): Promise<any[]> {
-    return this.loadVm("CapRover");
-  }
+  public async loadDeployments(projectName, flistKey) {
+    // list the deployment created without project name that includes `flistkey` "Backward compatibility"
+    let deps1 = await this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes(flistKey));
+    });
 
-  public loadDiscourse(): Promise<any[]> {
-    return this.loadVm("Discourse");
-  }
+    // list deployments create with project name
+    let deps2 = await this.loadVm(projectName);
 
-  public loadFunkwhale(): Promise<any[]> {
-    return this.loadVm("Funkwhale");
-  }
-
-  public loadPeertube(): Promise<any[]> {
-    return this.loadVm("Peertube");
-  }
-
-  public loadMattermost(): Promise<any[]> {
-    return this.loadVm("Mattermost");
-  }
-
-  public loadOwncloud(): Promise<any[]> {
-    return this.loadVm("Owncloud");
-  }
-
-  public loadTaiga(): Promise<any[]> {
-    return this.loadVm("Taiga");
-  }
-  public loadPresearch(): Promise<any[]> {
-    return this.loadVm("Presearch");
+    return [...deps1, ...deps2];
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {

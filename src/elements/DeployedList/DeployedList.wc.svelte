@@ -278,7 +278,7 @@
 
         <!-- Caprover -->
       {:else if active === "caprover"}
-        {#await list?.loadCaprover()}
+        {#await list?.loadDeployments("CapRover", "caprover")}
           <Alert type="info" message="Listing CapRover..." />
         {:then rows}
           {#if rows.length}
@@ -323,7 +323,7 @@
 
         <!-- Peertube -->
       {:else if active === "peertube"}
-        {#await list?.loadPeertube()}
+        {#await list?.loadDeployments("Peertube", "peertube")}
           <Alert type="info" message="Listing Peertube..." />
         {:then rows}
           {#if rows.length}
@@ -371,7 +371,7 @@
 
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
-        {#await list?.loadFunkwhale()}
+        {#await list?.loadDeployments("Funkwhale", "funk")}
           <Alert type="info" message="Listing Funkwhale..." />
         {:then rows}
           {#if rows.length}
@@ -414,7 +414,7 @@
 
         <!-- Taiga -->
       {:else if active === "taiga"}
-        {#await list.loadTaiga()}
+        {#await list.loadDeployments("Taiga", "taiga")}
           <Alert type="info" message="Listing Taiga Instances..." />
         {:then rows}
           {#if rows.length}
@@ -474,7 +474,7 @@
 
         <!-- Mattermost -->
       {:else if active === "mattermost"}
-        {#await list?.loadMattermost()}
+        {#await list?.loadDeployments("Mattermost", "mattermost")}
           <Alert type="info" message="Listing Mattermost..." />
         {:then rows}
           {#if rows.length}
@@ -517,7 +517,7 @@
 
         <!-- Discourse -->
       {:else if active === "discourse"}
-        {#await list?.loadDiscourse()}
+        {#await list?.loadDeployments("Discourse", "discourse")}
           <Alert type="info" message="Listing Discourse..." />
         {:then rows}
           {#if rows.length}
@@ -560,7 +560,7 @@
 
         <!-- Owncloud -->
       {:else if active === "owncloud"}
-        {#await list.loadOwncloud()}
+        {#await list.loadDeployments("Owncloud", "owncloud")}
           <Alert type="info" message="Listing owncloud Instances..." />
         {:then rows}
           {#if rows.length}
@@ -606,7 +606,7 @@
 
         <!-- Presearch -->
       {:else if active === "presearch"}
-        {#await list.loadPresearch()}
+        {#await list.loadDeployments("Presearch", "presearch")}
           <Alert type="info" message="Listing presearch Instances..." />
         {:then rows}
           {#if rows.length}
