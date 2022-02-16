@@ -121,9 +121,7 @@ export default class DeployedList {
   }
 
   public loadTaiga(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("taiga"));
-    });
+    return this.loadVm("Taiga");
   }
   public loadPresearch(): Promise<any[]> {
     return this.loadVm().then((vms) => {

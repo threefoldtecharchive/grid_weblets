@@ -16,6 +16,7 @@ export default class Taiga extends VM {
   public smtpPort = "";
   public smtpHostUser = "";
   public smtpHostPassword = "";
+  public domain = "";
 
   public smtpUseTLS = false;
   public smtpUseSSL = false;
@@ -23,7 +24,13 @@ export default class Taiga extends VM {
     const { name, flist, cpu, memory, entrypoint, nodeId } = this;
     const { network, envs, disks } = this;
     const { adminEmail, adminUsername, adminPassword } = this;
-    const { smtpFromEmail, smtpHost, smtpPort, smtpHostUser, smtpHostPassword } = this;
+    const {
+      smtpFromEmail,
+      smtpHost,
+      smtpPort,
+      smtpHostUser,
+      smtpHostPassword,
+    } = this;
 
     return (
       name !== "" &&
