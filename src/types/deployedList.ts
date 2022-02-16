@@ -77,7 +77,9 @@ export default class DeployedList {
 
   public loadVm(projectName?: string): Promise<any[]> {
     try {
-      this.grid.projectName = projectName;
+      projectName
+        ? (this.grid.projectName = projectName)
+        : (this.grid.projectName = "");
       this.grid._connect(); // update the values of grid props
       return this.grid.machines
         .list()
