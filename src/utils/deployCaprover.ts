@@ -1,6 +1,7 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
+import checkVMExist from "./checkVM";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
@@ -51,7 +52,7 @@ export default async function deployCaprover(
   machines.description = "caprover leader machine/node";
 
   return deploy(profile, "CapRover", name, async (grid) => {
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "caprover", name);
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))

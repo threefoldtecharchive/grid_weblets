@@ -6,6 +6,7 @@ import createNetwork from "./createNetwork";
 
 import rootFs from "./rootFs";
 import deploy from "./deploy";
+import checkVMExist from "./checkVM";
 
 const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
   window.configs?.grid3_client ?? {};
@@ -76,7 +77,8 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
 
   // Deploy
   return deploy(profile, "Presearch", name, async (grid) => {
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "presearch", name);
+
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))

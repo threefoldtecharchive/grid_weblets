@@ -7,6 +7,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
+import checkVMExist from "./checkVM";
 
 const {
   DiskModel,
@@ -104,8 +105,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   vms.machines = [vm];
 
   return deploy(profile, "Funkwhale", name, async (grid) => {
-    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "funkwhale", name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

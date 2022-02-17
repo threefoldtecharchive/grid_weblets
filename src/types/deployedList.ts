@@ -95,14 +95,14 @@ export default class DeployedList {
     }
   }
 
-  public async loadDeployments(projectName, flistKey) {
+  public async loadDeployments(type) {
     // list the deployment created without project name that includes `flistkey` "Backward compatibility"
     let deps1 = await this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes(flistKey));
+      return vms.filter((vm) => vm.flist.toLowerCase().includes(type));
     });
 
     // list deployments create with project name
-    let deps2 = await this.loadVm(projectName);
+    let deps2 = await this.loadVm(type);
 
     return [...deps1, ...deps2];
   }

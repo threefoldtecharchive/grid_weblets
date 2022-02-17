@@ -13,7 +13,7 @@ export default async function getGrid<T>(
     mnemonics,
     storeSecret,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
-    solutionType,
+    undefined,
     window.configs.grid3_client.BackendStorageType.tfkvstore
   );
 

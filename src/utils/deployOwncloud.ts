@@ -1,5 +1,6 @@
 import type { default as Owncloud } from "../types/owncloud";
 import type { IProfile } from "../types/Profile";
+import checkVMExist from "./checkVM";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
@@ -132,7 +133,8 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
 
   // deploy
   return deploy(profile, "Owncloud", name, async (grid) => {
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "owncloud", name);
+
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

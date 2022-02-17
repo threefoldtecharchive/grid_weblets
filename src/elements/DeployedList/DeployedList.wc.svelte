@@ -138,9 +138,7 @@
 
     const key = active === "k8s" ? "k8s" : "machines";
     for (const row of selectedRows) {
-      // format the value of the tab to match the project name on the gridclient
-      let projectName = active[0].toUpperCase() + active.slice(1);
-      await onRemoveHandler(key, row.name, projectName);
+      await onRemoveHandler(key, row.name, active);
     }
     selectedRows = [];
     _reloadTab();
@@ -284,7 +282,7 @@
 
         <!-- Caprover -->
       {:else if active === "caprover"}
-        {#await list?.loadDeployments("CapRover", "caprover")}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing CapRover..." />
         {:then rows}
           {#if rows.length}
@@ -329,7 +327,7 @@
 
         <!-- Peertube -->
       {:else if active === "peertube"}
-        {#await list?.loadDeployments("Peertube", "peertube")}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Peertube..." />
         {:then rows}
           {#if rows.length}
@@ -377,7 +375,7 @@
 
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
-        {#await list?.loadDeployments("Funkwhale", "funk")}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Funkwhale..." />
         {:then rows}
           {#if rows.length}
@@ -420,7 +418,7 @@
 
         <!-- Taiga -->
       {:else if active === "taiga"}
-        {#await list.loadDeployments("Taiga", "taiga")}
+        {#await list.loadDeployments(active)}
           <Alert type="info" message="Listing Taiga Instances..." />
         {:then rows}
           {#if rows.length}
@@ -480,7 +478,7 @@
 
         <!-- Mattermost -->
       {:else if active === "mattermost"}
-        {#await list?.loadDeployments("Mattermost", "mattermost")}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Mattermost..." />
         {:then rows}
           {#if rows.length}
@@ -523,7 +521,7 @@
 
         <!-- Discourse -->
       {:else if active === "discourse"}
-        {#await list?.loadDeployments("Discourse", "discourse")}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Discourse..." />
         {:then rows}
           {#if rows.length}
@@ -566,7 +564,7 @@
 
         <!-- Owncloud -->
       {:else if active === "owncloud"}
-        {#await list.loadDeployments("Owncloud", "owncloud")}
+        {#await list.loadDeployments(active)}
           <Alert type="info" message="Listing owncloud Instances..." />
         {:then rows}
           {#if rows.length}
@@ -612,7 +610,7 @@
 
         <!-- Presearch -->
       {:else if active === "presearch"}
-        {#await list.loadDeployments("Presearch", "presearch")}
+        {#await list.loadDeployments(active)}
           <Alert type="info" message="Listing presearch Instances..." />
         {:then rows}
           {#if rows.length}

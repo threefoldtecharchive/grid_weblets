@@ -5,9 +5,9 @@ import { Network } from "../types/kubernetes";
 import { getUniqueDomainName, selectGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-// import getGrid from "./getGrid";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
+import checkVMExist from "./checkVM";
 
 const {
   MachineModel,
@@ -33,7 +33,7 @@ export default async function deployMattermost(
   mattermost.domain = `${domainName}.${nodeDomain}`;
 
   const matterMostVm = await _deployMatterMost(profile, mattermost);
-  const ip = matterMostVm.planetary as string;
+  const ip = matterMostVm["planetary"] as string;
 
   try {
     await _deployGateway(profile, domainName, ip, publicNodeId);
@@ -94,7 +94,8 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.machines = [vm];
 
   return deploy(profile, "Mattermost", name, async (grid) => {
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "mattermost", name);
+
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

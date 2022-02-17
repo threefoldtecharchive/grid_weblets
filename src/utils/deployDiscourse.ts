@@ -6,6 +6,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
+import checkVMExist from "./checkVM";
 
 const {
   generateString,
@@ -108,8 +109,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machines.description = "discourse machine/node";
 
   return deploy(profile, "Discourse", name, async (grid) => {
-    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "discourse", name);
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))

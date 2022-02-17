@@ -5,6 +5,7 @@ import deploy from "./deploy";
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
+import checkVMExist from "./checkVM";
 
 const {
   DiskModel,
@@ -107,8 +108,8 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vms.machines = [vm];
 
   return deploy(profile, "Taiga", name, async (grid) => {
-    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-    await grid.machines.getObj(name);
+    await checkVMExist(grid, "taiga", name);
+
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

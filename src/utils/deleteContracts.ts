@@ -26,9 +26,13 @@ export default async function deleteContracts(
 
   // remove named vms
   console.log({ grid });
-  await grid.connect().then(() => {
+  const obj = await grid.connect().then(() => {
     return grid[key].delete({ name });
   });
+
+  if (obj["deleted"].length) {
+    return obj;
+  }
 
   grid.projectName = "";
   await grid._connect();
