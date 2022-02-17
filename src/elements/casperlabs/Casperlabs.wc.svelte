@@ -63,8 +63,6 @@
             .then((data) => {
                 deploymentStore.set(0);
                 success = true;
-                console.log("hereeeee");
-                console.log(data);
                 modalData = data.deployment;
                 domain = data.domain;
                 planetaryIP = data.planetaryIP;
