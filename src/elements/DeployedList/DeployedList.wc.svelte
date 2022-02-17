@@ -77,10 +77,14 @@
   }
 
   let removing: string = null;
-  function onRemoveHandler(key: "k8s" | "machines", name: string) {
+  function onRemoveHandler(
+    key: "k8s" | "machines",
+    name: string,
+    type: string
+  ) {
     removing = name;
     window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
-    return deleteContracts(profile, key, name)
+    return deleteContracts(profile, key, name, type)
       .catch((err) => {
         console.log("Error while removing", err);
         message = err.message || err;
@@ -134,7 +138,9 @@
 
     const key = active === "k8s" ? "k8s" : "machines";
     for (const row of selectedRows) {
-      await onRemoveHandler(key, row.name);
+      // format the value of the tab to match the project name on the gridclient
+      let projectName = active[0].toUpperCase() + active.slice(1);
+      await onRemoveHandler(key, row.name, projectName);
     }
     selectedRows = [];
     _reloadTab();
