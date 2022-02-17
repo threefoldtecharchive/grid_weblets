@@ -49,6 +49,7 @@ export default class App extends Vue {
     "disclaimer",
     "version",
     "mattermost",
+    "casperlabs"
   ];
   sidenav: ISidenav | null = null;
 

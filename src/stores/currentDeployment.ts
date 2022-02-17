@@ -14,7 +14,8 @@ export interface IStore {
     | "Deleting Deployment"
     | "Taiga"
     | "Owncloud"
-    | "Presearch";
+    | "Presearch"
+    | "Casperlabs";
   name: string;
   message: string;
 }
@@ -49,3 +50,4 @@ function createCurrentDeploymentStore() {
 }
 
 export default createCurrentDeploymentStore();
+
