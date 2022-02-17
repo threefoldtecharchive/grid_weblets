@@ -41,7 +41,7 @@ export default async function deployCasperlabs(data: Casperlabs, profile: IProfi
   let randomSuffix = generateString(10).toLowerCase();
 
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "pt", name);
+  let domainName = await getUniqueDomainName(client, "cl", name);
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
