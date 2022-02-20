@@ -7,10 +7,10 @@ import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
+import destroy from "./destroy";
+import checkVMExist from "./checkVM";
 
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
 const {
-  GridClient,
   DiskModel,
   MachineModel,
   MachinesModel,
@@ -18,95 +18,62 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployCasperlabs(data: Casperlabs, profile: IProfile) {
-  const { envs, cpu, memory, diskSize, ...base } = data;
-
-  let { name, flist, entrypoint, network: nw } = base;
-  const { publicIp, planetary, nodeId } = base;
-  const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
-
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const client = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
+export default async function deployCasperlabs(
+  data: Casperlabs,
+  profile: IProfile
+) {
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(
+    profile,
+    data.name,
+    "Casperlabs",
+    "cl"
   );
 
-  await client.connect();
+  // Dynamically select node to deploy the gateway
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  data.domain = `${domainName}.${nodeDomain}`;
+
+  // deploy the casper labs
+  const deploymentInfo = await deployCasperlabsVM(profile, data);
+
+  // get the info of casperlabs deployment
+  const planetaryIP = deploymentInfo["planetary"] as string;
+
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
+  } catch (error) {
+    // rollback casperlabs deployment if gateway deployment failed
+    await destroy(profile, "Casperlabs", data.name);
+    throw error;
+  }
+
+  return { deploymentInfo };
+}
+
+async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
+  const {
+    name,
+    cpu,
+    memory,
+    disks: [{ size }],
+    publicIp,
+    nodeId,
+    envs,
+    domain,
+  } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
   let randomSuffix = generateString(10).toLowerCase();
 
-  // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(client, "cl", name);
-
-  // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${domainName}.${nodeDomain}`;
-
   // define a network
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
-  // deploy the casper labs
-  const deployment = await deployCasperlabsVM(
-    profile,
-    client,
-    network,
-    nodeId,
-    name,
-    domain,
-    cpu,
-    memory,
-    diskSize,
-    sshKey,
-    randomSuffix
-  );
-
-  // get the info of casperlabs deployment
-  const casperlabsInfo = await getCasperlabsInfo(client, name);
-  const planetaryIP = casperlabsInfo[0]["planetary"];
-
-  try {
-    // deploy the gateway
-    await deployPrefixGateway(
-      profile,
-      client,
-      domainName,
-      planetaryIP,
-      publicNodeId
-    );
-  } catch (error) {
-    // rollback casperlabs deployment if gateway deployment failed
-    await client.machines.delete({ name: name });
-    throw error;
-  }
-
-  // get the info of the deployed gateway
-  const gatewayInfo = await getGatewayInfo(client, domainName);
-  const gatewayDomain = gatewayInfo[0]["domain"];
-  return { deployment, domain, planetaryIP };
-}
-
-async function deployCasperlabsVM(
-  profile: IProfile,
-  client: any,
-  network: any,
-  nodeId: any,
-  name: string,
-  domain: string,
-  cpu: number,
-  memory: number,
-  diskSize: number,
-  sshKey: string,
-  randomSuffix: string
-) {
   // disk
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
+  disk.size = size;
   disk.mountpoint = "/var/lib/casper/casper-node";
 
   // vm specs
@@ -124,7 +91,8 @@ async function deployCasperlabsVM(
     "https://hub.grid.tf/ranatarek.3bot/ranatrk-casperlabs-latest.flist"; // FIXME
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    SSH_KEY: sshKey
+    SSH_KEY: profile.sshKey,
+    CASPERLABS_HOSTNAME: domain,
   };
 
   // vms specs
@@ -134,17 +102,10 @@ async function deployCasperlabsVM(
   vms.machines = [vm];
 
   // deploy
-  return deploy(profile, "Casperlabs", name, (grid) => {
+  return deploy(profile, "Casperlabs", name, async (grid) => {
+    await checkVMExist(grid, "casperlabs", name);
     return grid.machines
       .deploy(vms)
-      .then(async () => {
-        for (const gw of await grid.gateway._list()) {
-          try {
-            await grid.gateway.getObj(gw);
-          }
-          catch { }
-        }
-      })
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });
@@ -152,7 +113,6 @@ async function deployCasperlabsVM(
 
 async function deployPrefixGateway(
   profile: IProfile,
-  client: any,
   domainName: string,
   backend: string,
   publicNodeId: number
@@ -164,20 +124,12 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
 
-  return deploy(profile, "GatewayName", domainName, (grid) => {
+  return deploy(profile, "GatewayName", domainName, async (grid) => {
+    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+    await grid.gateway.getObj(domainName);
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))
       .then(([gw]) => gw);
   });
-}
-
-async function getCasperlabsInfo(client: any, name: string) {
-  const info = await client.machines.getObj(name);
-  return info;
-}
-
-async function getGatewayInfo(client: any, name: string) {
-  const info = await client.gateway.getObj(name);
-  return info;
 }

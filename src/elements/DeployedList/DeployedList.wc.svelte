@@ -565,7 +565,7 @@
 
         <!-- Casperlabs -->
       {:else if active === "casperlabs"}
-        {#await list?.loadCasperlabs()}
+        {#await list?.loadVm(active)}
           <Alert type="info" message="Listing Casperlabs..." />
         {:then rows}
           {#if rows.length}
