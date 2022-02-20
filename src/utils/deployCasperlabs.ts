@@ -26,7 +26,7 @@ export default async function deployCasperlabs(
   let domainName = await getUniqueDomainName(
     profile,
     data.name,
-    "Casperlabs",
+    "casperlabs",
     "cl"
   );
 
@@ -45,7 +45,7 @@ export default async function deployCasperlabs(
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback casperlabs deployment if gateway deployment failed
-    await destroy(profile, "Casperlabs", data.name);
+    await destroy(profile, "casperlabs", data.name);
     throw error;
   }
 

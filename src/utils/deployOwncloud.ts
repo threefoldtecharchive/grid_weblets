@@ -24,7 +24,7 @@ export default async function deployOwncloud(
   let domainName = await getUniqueDomainName(
     profile,
     data.name,
-    "Owncloud",
+    "owncloud",
     "oc"
   );
 
@@ -42,7 +42,7 @@ export default async function deployOwncloud(
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback owncloud deployment if gateway deployment failed
-    await destroy(profile, "Peertube", data.name);
+    await destroy(profile, "owncloud", data.name);
     throw error;
   }
 

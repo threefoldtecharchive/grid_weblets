@@ -18,7 +18,7 @@ const {
 
 export default async function deployTaiga(data: Taiga, profile: IProfile) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "Taiga", "tg");
+  let domainName = await getUniqueDomainName(profile, data.name, "taiga", "tg");
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
@@ -33,7 +33,7 @@ export default async function deployTaiga(data: Taiga, profile: IProfile) {
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback the TaigaVM if the gateway fails to deploy
-    await destroy(profile, "Peertube", data.name);
+    await destroy(profile, "taiga", data.name);
     throw error;
   }
 

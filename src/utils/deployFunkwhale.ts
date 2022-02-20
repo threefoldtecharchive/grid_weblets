@@ -25,7 +25,7 @@ export default async function deployFunkwhale(
   let domainName = await getUniqueDomainName(
     profile,
     data.name,
-    "Funkwhale",
+    "funkwhale",
     "fw"
   );
 
@@ -42,7 +42,7 @@ export default async function deployFunkwhale(
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback the FunkwhaleVM if the gateway fails to deploy
-    await destroy(profile, "Funkwhale", data.name);
+    await destroy(profile, "funkwhale", data.name);
     throw error;
   }
 

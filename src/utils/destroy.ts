@@ -1,11 +1,7 @@
 import type { IProfile } from "../types/Profile";
 import type { IStore } from "../stores/currentDeployment";
 
-export default function destroy(
-  profile: IProfile,
-  type: IStore["type"],
-  name: string
-) {
+export default function destroy(profile: IProfile, type: string, name: string) {
   const { networkEnv, mnemonics, storeSecret } = profile;
   const client = new window.configs.grid3_client.GridClient(
     networkEnv as any,

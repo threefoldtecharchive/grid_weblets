@@ -25,7 +25,7 @@ export default async function deployMattermost(
   let domainName = await getUniqueDomainName(
     profile,
     mattermost.name,
-    "Mattermost",
+    "mattermost",
     "mm"
   );
 
@@ -38,7 +38,7 @@ export default async function deployMattermost(
   try {
     await _deployGateway(profile, domainName, ip, publicNodeId);
   } catch (err) {
-    await destroy(profile, "Mattermost", mattermost.name);
+    await destroy(profile, "mattermost", mattermost.name);
     throw err;
   }
 

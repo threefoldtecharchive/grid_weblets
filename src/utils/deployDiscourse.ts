@@ -23,7 +23,7 @@ export default async function deployDiscourse(
   let domainName = await getUniqueDomainName(
     profile,
     data.name,
-    "Discourse",
+    "discourse",
     "dc"
   );
 
@@ -42,7 +42,7 @@ export default async function deployDiscourse(
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback peertube deployment if gateway deployment failed
-    await destroy(profile, "Discourse", data.name);
+    await destroy(profile, "discourse", data.name);
     throw error;
   }
 

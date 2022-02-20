@@ -25,7 +25,7 @@ export default async function deployPeertube(
   let domainName = await getUniqueDomainName(
     profile,
     data.name,
-    "Peertube",
+    "peertube",
     "pt"
   );
 
@@ -43,7 +43,7 @@ export default async function deployPeertube(
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback peertube deployment if gateway deployment failed
-    await destroy(profile, "Peertube", data.name);
+    await destroy(profile, "peertube", data.name);
     throw error;
   }
 
@@ -110,7 +110,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
 
   // deploy
   return deploy(profile, "Peertube", name, async (grid) => {
-    await checkVMExist(grid, "peertube", name);
+    await checkVMExist(grid, "peertube", name); // change the project name of the grid to be peertube
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
