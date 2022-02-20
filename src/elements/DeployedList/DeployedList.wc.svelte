@@ -17,7 +17,8 @@
     | "discourse"
     | "taiga"
     | "owncloud"
-    | "presearch";
+    | "presearch"
+    | "casperlabs";
   export let tab: TabsType = undefined;
 
   // components
@@ -40,8 +41,8 @@
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
-    { label: "Presearch", value: "presearch" }
-
+    { label: "Presearch", value: "presearch" },
+    { label: "Casperlabs", value: "casperlabs" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -559,6 +560,51 @@
           <Alert
             type="danger"
             message={err.message || err || "Failed to list Discourse"}
+          />
+        {/await}
+
+        <!-- Casperlabs -->
+      {:else if active === "casperlabs"}
+        {#await list?.loadCasperlabs()}
+          <Alert type="info" message="Listing Casperlabs..." />
+        {:then rows}
+          {#if rows.length}
+            <Table
+              rowsData={rows}
+              headers={_vmHeader}
+              rows={_createVMRow(rows)}
+              actions={[
+                {
+                  type: "info",
+                  label: "Show Details",
+                  click: (_, i) => (infoToShow = rows[i].details),
+                  disabled: () => removing !== null,
+                  loading: (i) => removing === rows[i].name,
+                },
+                {
+                  type: "warning",
+                  label: "Visit",
+                  click: (_, i) => {
+                    const domain = rows[i].details.env.CASPERLABS_HOSTNAME;
+                    window.open("https://" + domain, "_blank").focus();
+                  },
+                  disabled: (i) => {
+                    const env = rows[i].details.env;
+                    return (
+                      !env || !env.CASPERLABS_HOSTNAME || removing !== null
+                    );
+                  },
+                },
+              ]}
+              on:selected={_onSelectRowHandler}
+            />
+          {:else}
+            <Alert type="info" message="No Casperlabs found on this profile." />
+          {/if}
+        {:catch err}
+          <Alert
+            type="danger"
+            message={err.message || err || "Failed to list Casperlabs"}
           />
         {/await}
 

@@ -120,6 +120,7 @@ export default class Editor extends Vue {
     new Weblet("Taiga", "taiga", "taiga", "deployment"),
     new Weblet("Owncloud", "owncloud", "owncloud", "deployment"),
     new Weblet("Presearch", "presearch", "presearch", "deployment"),
+    new Weblet("Casperlabs", "casperlabs", "casperlabs", "deployment"),
 
     new Weblet("Contracts", "contractslist", "", "my account"),
     new Weblet("Deployments", "deployedlist", "", "my account"),

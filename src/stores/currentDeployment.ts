@@ -15,7 +15,8 @@ export interface IStore {
     | "Taiga"
     | "Owncloud"
     | "Presearch"
-    | "Mattermost";
+    | "Mattermost"
+    | "Casperlabs";
   name: string;
   message: string;
 }

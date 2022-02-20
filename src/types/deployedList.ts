@@ -4,7 +4,7 @@ import type { GridClient } from "grid3_client";
 import formatConsumption from "../utils/formatConsumption";
 
 export default class DeployedList {
-  constructor(public readonly grid: GridClient) {}
+  constructor(public readonly grid: GridClient) { }
 
   private _loadK8s(name: string) {
     return new Promise((res) => {
@@ -105,6 +105,12 @@ export default class DeployedList {
     let deps2 = await this.loadVm(type);
 
     return [...deps1, ...deps2];
+  }
+
+  public loadCasperlabs(): Promise<any[]> {
+    return this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes("casperlabs"));
+    });
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {
