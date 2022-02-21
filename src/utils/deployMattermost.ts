@@ -7,7 +7,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
-import checkVMExist from "./checkVM";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 
 const {
   MachineModel,
@@ -115,7 +115,7 @@ function _deployGateway(
   gw.backends = [`http://[${ip}]:8000`];
 
   return deploy(profile, "GatewayName", name, async (grid) => {
-    await grid.gateway.getObj(name);
+    await checkGW(grid, name, "mattermost");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(name))

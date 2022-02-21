@@ -1,6 +1,6 @@
 import type { default as Owncloud } from "../types/owncloud";
 import type { IProfile } from "../types/Profile";
-import checkVMExist from "./checkVM";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
@@ -151,7 +151,7 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:80`];
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
-    await grid.gateway.getObj(domainName);
+    await checkGW(grid, domainName, "owncloud");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

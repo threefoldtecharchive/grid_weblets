@@ -7,7 +7,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
-import checkVMExist from "./checkVM";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 
 const {
   DiskModel,
@@ -122,8 +122,7 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:80/`];
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
-    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-    await grid.gateway.getObj(domainName);
+    await checkGW(grid, domainName, "funkwhale");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

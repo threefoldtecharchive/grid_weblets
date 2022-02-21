@@ -9,7 +9,7 @@ interface IConfig {
   networkEnv: string;
 }
 
-export default async function deleteContracts(
+export default async function deleteDeployment(
   configs: IConfig,
   key: "k8s" | "machines",
   name: string,
@@ -28,23 +28,23 @@ export default async function deleteContracts(
 
   // remove deployment in namespace `type`
   console.log({ grid });
-  const obj = await grid.connect().then(() => {
-    return grid[key].delete({ name });
-  });
+  await grid.connect();
+  const obj = await _deleteDeployments(grid, name, configs, type, key);
 
-  // if (obj["deleted"].length) {
-  //   return obj;
-  // }
+  console.log({ obj });
+  if (obj["deleted"].length) {
+    return obj;
+  }
 
   // remove deployments (vm, gw) in default namespace ``
   grid.projectName = "";
   await grid._connect();
   console.log({ grid });
+  return await _deleteDeployments(grid, name, configs, "", key);
+}
 
-  return grid.connect().then(() => {
-    return grid[key].delete({ name } /* test */).then(async () => {
-      const domainName = await getUniqueDomainName(configs, name, type);
-      await grid.gateway.delete_name({ name: domainName });
-    });
-  });
+async function _deleteDeployments(grid, name, configs, type, key) {
+  const domainName = await getUniqueDomainName(configs, name, type);
+  await grid.gateway.delete_name({ name: domainName });
+  return await grid[key].delete({ name });
 }

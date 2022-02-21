@@ -1,7 +1,7 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
-import checkVMExist from "./checkVM";
+import checkVMExist from "./prepareDeployment";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
