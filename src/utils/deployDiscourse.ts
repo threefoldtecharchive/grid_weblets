@@ -20,12 +20,7 @@ export default async function deployDiscourse(
   data: Discourse,
   profile: IProfile
 ) {
-  let domainName = await getUniqueDomainName(
-    profile,
-    data.name,
-    "discourse",
-    "dc"
-  );
+  let domainName = await getUniqueDomainName(profile, data.name, "discourse");
 
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
   data.domain = `${domainName}.${nodeDomain}`;

@@ -22,12 +22,7 @@ export default async function deployFunkwhale(
   profile: IProfile
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(
-    profile,
-    data.name,
-    "funkwhale",
-    "fw"
-  );
+  let domainName = await getUniqueDomainName(profile, data.name, "funkwhale");
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();

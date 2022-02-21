@@ -18,7 +18,7 @@ const {
 
 export default async function deployTaiga(data: Taiga, profile: IProfile) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "taiga", "tg");
+  let domainName = await getUniqueDomainName(profile, data.name, "taiga");
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();

@@ -25,8 +25,7 @@ export default async function deployMattermost(
   let domainName = await getUniqueDomainName(
     profile,
     mattermost.name,
-    "mattermost",
-    "mm"
+    "mattermost"
   );
 
   let [publicNodeId, nodeDomain] = await selectGatewayNode();

@@ -1,3 +1,5 @@
+import { getUniqueDomainName } from "./gatewayHelpers";
+
 const { GridClient } = window.configs?.grid3_client ?? {};
 const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
@@ -24,22 +26,25 @@ export default async function deleteContracts(
     "tfkvstore" as any
   );
 
-  // remove named vms
+  // remove deployment in namespace `type`
   console.log({ grid });
   const obj = await grid.connect().then(() => {
     return grid[key].delete({ name });
   });
 
-  if (obj["deleted"].length) {
-    return obj;
-  }
+  // if (obj["deleted"].length) {
+  //   return obj;
+  // }
 
+  // remove deployments (vm, gw) in default namespace ``
   grid.projectName = "";
   await grid._connect();
-
-  // remove orphan vms
   console.log({ grid });
+
   return grid.connect().then(() => {
-    return grid[key].delete({ name });
+    return grid[key].delete({ name } /* test */).then(async () => {
+      const domainName = await getUniqueDomainName(configs, name, type);
+      await grid.gateway.delete_name({ name: domainName });
+    });
   });
 }

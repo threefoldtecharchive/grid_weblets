@@ -28,8 +28,13 @@
 
   // define this solution packages
   const packages: IPackage[] = [
+<<<<<<< HEAD
+    { name: "Minimum", cpu: 4, memory: 1024 * 4, diskSize: 100 },
+    { name: "Standard", cpu: 4, memory: 1024 * 16, diskSize: 500 },
+=======
     { name: "Minimum", cpu: 1, memory: 1024 * 4, diskSize: 100 },
     { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+>>>>>>> development
     { name: "Recommended", cpu: 4, memory: 1024 * 32, diskSize: 1000 },
   ];
 
