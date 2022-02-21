@@ -79,6 +79,7 @@ export default class Discourse {
     public publicIp = false,
     public planetary = true,
     public disks = [new Disk(undefined, undefined, diskSize, undefined)],
+    public domain = "",
 
     public developerEmail = "",
 

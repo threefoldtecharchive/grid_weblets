@@ -4,7 +4,7 @@ import type { GridClient } from "grid3_client";
 import formatConsumption from "../utils/formatConsumption";
 
 export default class DeployedList {
-  constructor(public readonly grid: GridClient) { }
+  constructor(public readonly grid: GridClient) {}
 
   private _loadK8s(name: string) {
     return new Promise((res) => {
@@ -75,8 +75,13 @@ export default class DeployedList {
     });
   }
 
-  public loadVm(): Promise<any[]> {
+  public loadVm(projectName?: string): Promise<any[]> {
     try {
+      projectName
+        ? (this.grid.projectName = projectName) // to load project named deployments
+        : (this.grid.projectName = ""); // to load orphan deployments
+      this.grid._connect(); // update the values of grid props
+
       return this.grid.machines
         .list()
         .then((names) => {
@@ -90,57 +95,16 @@ export default class DeployedList {
     }
   }
 
-  public loadCaprover(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("caprover"));
+  public async loadDeployments(type) {
+    // list the deployment created without project name that includes `flistkey` "Backward compatibility"
+    let deps1 = await this.loadVm().then((vms) => {
+      return vms.filter((vm) => vm.flist.toLowerCase().includes(type));
     });
-  }
 
-  public loadDiscourse(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("discourse"));
-    });
-  }
+    // list deployments create with project name
+    let deps2 = await this.loadVm(type);
 
-  public loadFunkwhale(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("funk"));
-    });
-  }
-
-  public loadPeertube(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("peertube"));
-    });
-  }
-
-  public loadMattermost(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("mattermost"));
-    });
-  }
-
-  public loadOwncloud(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("owncloud"));
-    });
-  }
-
-  public loadTaiga(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("taiga"));
-    });
-  }
-  public loadPresearch(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("presearch"));
-    });
-  }
-
-  public loadCasperlabs(): Promise<any[]> {
-    return this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes("casperlabs"));
-    });
+    return [...deps1, ...deps2];
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {

@@ -6,4 +6,5 @@ export default class Funkwhale extends VM {
   public adminEmail = "";
   public adminUsername = "admin";
   public adminPassword = generatePassword((length = Math.floor(Math.random() * 5) + 10)); // prettier-ignore
+  public domain = "";
 }

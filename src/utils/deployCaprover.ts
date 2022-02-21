@@ -1,12 +1,12 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
+import checkVMExist from "./checkVM";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import getGrid from "./getGrid";
 import rootFs from "./rootFs";
-// const { HTTPMessageBusClient } = window.configs?.client ?? {};
-const { MachinesModel, DiskModel /* , GridClient */, MachineModel } =
+
+const { MachinesModel, DiskModel, MachineModel } =
   window.configs?.grid3_client ?? {};
 
 const CAPROVER_FLIST =
@@ -18,7 +18,6 @@ export default async function deployCaprover(
 ) {
   const { name, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
 
-  // const http = new HTTPMessageBusClient(0, "");
   const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
 
   /* Docker disk */
@@ -52,7 +51,8 @@ export default async function deployCaprover(
   machines.network = network;
   machines.description = "caprover leader machine/node";
 
-  return deploy(profile, "CapRover", name, (grid) => {
+  return deploy(profile, "CapRover", name, async (grid) => {
+    await checkVMExist(grid, "caprover", name);
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))

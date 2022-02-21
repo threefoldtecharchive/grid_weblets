@@ -15,6 +15,7 @@ export interface IStore {
     | "Taiga"
     | "Owncloud"
     | "Presearch"
+    | "Mattermost"
     | "Casperlabs";
   name: string;
   message: string;
@@ -50,4 +51,3 @@ function createCurrentDeploymentStore() {
 }
 
 export default createCurrentDeploymentStore();
-

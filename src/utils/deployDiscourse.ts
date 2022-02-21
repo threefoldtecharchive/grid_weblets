@@ -5,80 +5,51 @@ import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
+import destroy from "./destroy";
+import checkVMExist from "./checkVM";
 
 const {
   generateString,
   MachinesModel,
   DiskModel,
-  GridClient,
   MachineModel,
   GatewayNameModel,
 } = window.configs?.grid3_client ?? {};
-
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
-
-const DISCOURSE_FLIST =
-  "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v4.0.flist";
 
 export default async function deployDiscourse(
   data: Discourse,
   profile: IProfile
 ) {
-  const name = data.name;
-  const { mnemonics, storeSecret, networkEnv, sshKey } = profile;
-
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const client = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    undefined,
-    "tfkvstore" as any
+  let domainName = await getUniqueDomainName(
+    profile,
+    data.name,
+    "discourse",
+    "dc"
   );
 
-  await client.connect();
-
-  let randomSuffix = generateString(10).toLowerCase();
-
-  const network = createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16")); // prettier-ignore
-
-  let domainName = await getUniqueDomainName(client, "dc", name);
-
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${domainName}.${nodeDomain}`;
+  data.domain = `${domainName}.${nodeDomain}`;
 
-  await depoloyDiscourseVM(data, profile, domain, network, randomSuffix);
+  const deploymentInfo = await depoloyDiscourseVM(data, profile);
 
-  const discourseInfo = await getDiscourseInfo(client, name);
-  const planetaryIP = discourseInfo[0]["planetary"] as string;
-  const publicIP = discourseInfo[0]["publicIP"]
-    ? discourseInfo[0]["publicIP"]["ip"].split("/")[0]
-    : "";
+  const planetaryIP = deploymentInfo["planetary"] as string;
+
+  // const publicIP = deploymentInfo[0]["publicIP"]
+  //   ? deploymentInfo[0]["publicIP"]["ip"].split("/")[0]
+  //   : "";
 
   try {
-    await deployPrefixGateway(
-      profile,
-      client,
-      domainName,
-      planetaryIP,
-      publicNodeId,
-      publicIP
-    );
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback peertube deployment if gateway deployment failed
-    await client.machines.delete({ name: name });
+    await destroy(profile, "discourse", data.name);
     throw error;
   }
+
+  return { deploymentInfo };
 }
 
-async function depoloyDiscourseVM(
-  data: Discourse,
-  profile: IProfile,
-  domain: string,
-  network: any,
-  randomeSuffix: string
-) {
+async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   const {
     name,
     cpu,
@@ -91,23 +62,29 @@ async function depoloyDiscourseVM(
     flaskSecretKey,
     publicIp,
     planetary,
+    domain,
   } = data;
+
+  let randomSuffix = generateString(10).toLowerCase();
+
+  const network = createNetwork(new Network(`nw${randomSuffix}`));
 
   /* Docker disk */
   const disk = new DiskModel();
-  disk.name = `disk${randomeSuffix}`;
+  disk.name = `disk${randomSuffix}`;
   disk.size = diskSize;
   disk.mountpoint = "/var/lib/docker";
 
   const machine = new MachineModel();
-  machine.name = `vm${randomeSuffix}`;
+  machine.name = `vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = planetary;
-  machine.flist = DISCOURSE_FLIST;
+  machine.flist =
+    "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v4.0.flist";
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/.start_discourse.sh";
@@ -131,23 +108,20 @@ async function depoloyDiscourseVM(
   machines.network = network;
   machines.description = "discourse machine/node";
 
-  return deploy(profile, "Discourse", name, (grid) => {
-    return grid.machines.deploy(machines);
+  return deploy(profile, "Discourse", name, async (grid) => {
+    await checkVMExist(grid, "discourse", name);
+    return grid.machines
+      .deploy(machines)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
-}
-
-async function getDiscourseInfo(client: any, name: string) {
-  const info = await client.machines.getObj(name);
-  return info;
 }
 
 async function deployPrefixGateway(
   profile: IProfile,
-  client: any,
   domainName: string,
   backend: string,
-  publicNodeId: number,
-  publicIP: string
+  publicNodeId: number
 ) {
   // define specs
   const gw = new GatewayNameModel();
@@ -156,7 +130,12 @@ async function deployPrefixGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
 
-  return deploy(profile, "GatewayName", domainName, (grid) => {
-    return grid.gateway.deploy_name(gw);
+  return deploy(profile, "GatewayName", domainName, async (grid) => {
+    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+    await grid.gateway.getObj(domainName);
+    return grid.gateway
+      .deploy_name(gw)
+      .then(() => grid.gateway.getObj(domainName))
+      .then(([gw]) => gw);
   });
 }

@@ -78,10 +78,14 @@
   }
 
   let removing: string = null;
-  function onRemoveHandler(key: "k8s" | "machines", name: string) {
+  function onRemoveHandler(
+    key: "k8s" | "machines",
+    name: string,
+    type: string
+  ) {
     removing = name;
     window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
-    return deleteContracts(profile, key, name)
+    return deleteContracts(profile, key, name, type)
       .catch((err) => {
         console.log("Error while removing", err);
         message = err.message || err;
@@ -135,7 +139,7 @@
 
     const key = active === "k8s" ? "k8s" : "machines";
     for (const row of selectedRows) {
-      await onRemoveHandler(key, row.name);
+      await onRemoveHandler(key, row.name, active);
     }
     selectedRows = [];
     _reloadTab();
@@ -279,7 +283,7 @@
 
         <!-- Caprover -->
       {:else if active === "caprover"}
-        {#await list?.loadCaprover()}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing CapRover..." />
         {:then rows}
           {#if rows.length}
@@ -324,7 +328,7 @@
 
         <!-- Peertube -->
       {:else if active === "peertube"}
-        {#await list?.loadPeertube()}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Peertube..." />
         {:then rows}
           {#if rows.length}
@@ -372,7 +376,7 @@
 
         <!-- FunkWhale -->
       {:else if active === "funkwhale"}
-        {#await list?.loadFunkwhale()}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Funkwhale..." />
         {:then rows}
           {#if rows.length}
@@ -415,7 +419,7 @@
 
         <!-- Taiga -->
       {:else if active === "taiga"}
-        {#await list.loadTaiga()}
+        {#await list.loadDeployments(active)}
           <Alert type="info" message="Listing Taiga Instances..." />
         {:then rows}
           {#if rows.length}
@@ -475,7 +479,7 @@
 
         <!-- Mattermost -->
       {:else if active === "mattermost"}
-        {#await list?.loadMattermost()}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Mattermost..." />
         {:then rows}
           {#if rows.length}
@@ -518,7 +522,7 @@
 
         <!-- Discourse -->
       {:else if active === "discourse"}
-        {#await list?.loadDiscourse()}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Discourse..." />
         {:then rows}
           {#if rows.length}
@@ -561,7 +565,7 @@
 
         <!-- Casperlabs -->
       {:else if active === "casperlabs"}
-        {#await list?.loadCasperlabs()}
+        {#await list?.loadDeployments(active)}
           <Alert type="info" message="Listing Casperlabs..." />
         {:then rows}
           {#if rows.length}
@@ -606,7 +610,7 @@
 
         <!-- Owncloud -->
       {:else if active === "owncloud"}
-        {#await list.loadOwncloud()}
+        {#await list.loadDeployments(active)}
           <Alert type="info" message="Listing owncloud Instances..." />
         {:then rows}
           {#if rows.length}
@@ -652,7 +656,7 @@
 
         <!-- Presearch -->
       {:else if active === "presearch"}
-        {#await list.loadPresearch()}
+        {#await list.loadDeployments(active)}
           <Alert type="info" message="Listing presearch Instances..." />
         {:then rows}
           {#if rows.length}

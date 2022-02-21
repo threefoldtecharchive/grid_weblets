@@ -7,10 +7,11 @@ interface IConfig {
   networkEnv: string;
 }
 
-export default function deleteContracts(
+export default async function deleteContracts(
   configs: IConfig,
   key: "k8s" | "machines",
-  name: string
+  name: string,
+  type: string
 ) {
   const { mnemonics, networkEnv, storeSecret } = configs;
   const http = new HTTPMessageBusClient(0, "", "", "");
@@ -19,10 +20,25 @@ export default function deleteContracts(
     mnemonics,
     storeSecret,
     http,
-    undefined,
+    type,
     "tfkvstore" as any
   );
 
+  // remove named vms
+  console.log({ grid });
+  const obj = await grid.connect().then(() => {
+    return grid[key].delete({ name });
+  });
+
+  if (obj["deleted"].length) {
+    return obj;
+  }
+
+  grid.projectName = "";
+  await grid._connect();
+
+  // remove orphan vms
+  console.log({ grid });
   return grid.connect().then(() => {
     return grid[key].delete({ name });
   });
