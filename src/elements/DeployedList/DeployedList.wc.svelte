@@ -5,7 +5,7 @@
   import type { IProfile } from "../../types/Profile";
   import type { ITab } from "../../types";
   import DeployedList from "../../types/deployedList";
-  import deleteContracts from "../../utils/deleteContracts";
+  import deleteDeployment from "../../utils/deleteDeployment";
 
   type TabsType =
     | "k8s"
@@ -85,7 +85,7 @@
   ) {
     removing = name;
     window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
-    return deleteContracts(profile, key, name, type)
+    return deleteDeployment(profile, key, name, type)
       .catch((err) => {
         console.log("Error while removing", err);
         message = err.message || err;

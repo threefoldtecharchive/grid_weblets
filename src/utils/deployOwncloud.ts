@@ -1,6 +1,6 @@
 import type { default as Owncloud } from "../types/owncloud";
 import type { IProfile } from "../types/Profile";
-import checkVMExist from "./checkVM";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
@@ -21,12 +21,7 @@ export default async function deployOwncloud(
   profile: IProfile
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(
-    profile,
-    data.name,
-    "owncloud",
-    "oc"
-  );
+  let domainName = await getUniqueDomainName(profile, data.name, "owncloud");
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
@@ -156,7 +151,7 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:80`];
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
-    await grid.gateway.getObj(domainName);
+    await checkGW(grid, domainName, "owncloud");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

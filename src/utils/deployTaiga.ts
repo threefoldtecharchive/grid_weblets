@@ -5,7 +5,7 @@ import deploy from "./deploy";
 import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
-import checkVMExist from "./checkVM";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 
 const {
   DiskModel,
@@ -18,7 +18,7 @@ const {
 
 export default async function deployTaiga(data: Taiga, profile: IProfile) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "taiga", "tg");
+  let domainName = await getUniqueDomainName(profile, data.name, "taiga");
 
   // Dynamically select node to deploy the gateway
   let [publicNodeId, nodeDomain] = await selectGatewayNode();
@@ -130,8 +130,7 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:9000/`];
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
-    // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-    await grid.gateway.getObj(domainName);
+    await checkGW(grid, domainName, "taiga");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

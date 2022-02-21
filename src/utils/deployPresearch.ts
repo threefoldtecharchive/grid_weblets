@@ -6,7 +6,7 @@ import createNetwork from "./createNetwork";
 
 import rootFs from "./rootFs";
 import deploy from "./deploy";
-import checkVMExist from "./checkVM";
+import checkVMExist from "./prepareDeployment";
 
 const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
   window.configs?.grid3_client ?? {};

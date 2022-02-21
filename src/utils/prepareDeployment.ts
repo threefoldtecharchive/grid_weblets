@@ -15,3 +15,12 @@ export default async function checkVMExist(grid, type, name) {
   grid._connect();
   await grid.machines.getObj(name);
 }
+
+export async function checkGW(grid, domainName, type) {
+  // deploy on project namespace
+  grid.projectName = type;
+  grid._connect();
+
+  // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
+  await grid.gateway.getObj(domainName);
+}
