@@ -2982,10 +2982,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.2.3, graceful-fs@^4.2.4, 
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.8.tgz"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.1.4.tgz#ac6b0abb23198b1ac899452ad32c6261c7ddb919"
-  integrity sha512-tkc58XGattf9JI6A5mOCfOO0HbyIc20D4wDcHTTM9svfM2j7TrqCFKTNXXKgvLT2/HHkyAXWN78FCbkrh9k0tQ==
+grid3_client@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.2.0.tgz#f4c965b6fe6a28d23d10c8600e99d62d2e2e3f95"
+  integrity sha512-zLVUpoXO5PJY38Knu4Bo7UN4TTn0uMCP9r2jsLLuO9SBazcCHs8sXdV/nyJ7QQVn7gbPR2RPDG7k9vos7fzsBg==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
