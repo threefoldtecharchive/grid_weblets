@@ -30,9 +30,12 @@
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-  const emailField: IFormField = { label: "Email", placeholder: "Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
-  const passField: IFormField = { label: "Password", placeholder: "Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
+
+  const fields: IFormField[] = [
+    { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }, // prettier-ignore
+    { label: "Email", placeholder: "Admin Email", symbol: "adminEmail", type: "text", validator: validateEmail, invalid: false }, // prettier-ignore
+    { label: "Password", placeholder: "Admin Password", symbol: "adminPassword", type: "password", invalid: false }, // prettier-ignore
+  ];
 
   // define this solution packages
   const packages: IPackage[] = [
@@ -52,7 +55,7 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid"; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -118,21 +121,17 @@
       <Tabs bind:active {tabs} />
 
       {#if active === "base"}
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
-        <Input
-          bind:data={data.adminEmail}
-          bind:invalid={emailField.invalid}
-          field={emailField}
-        />
-        <Input
-          bind:data={data.adminPassword}
-          bind:invalid={passField.invalid}
-          field={passField}
-        />
+        {#each fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
 
         <SelectCapacity
           bind:cpu={data.cpu}
