@@ -3,7 +3,7 @@
 <script lang="ts">
   import Presearch from "../../types/presearch";
   import type { IProfile } from "../../types/Profile";
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import deployPresearch from "../../utils/deployPresearch";
   import rootFs from "../../utils/rootFs";
 
@@ -20,6 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validateCpu, validateDisk, validateEmail, validateMemory} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Presearch();
   let profile: IProfile;
@@ -40,13 +41,16 @@
   ];
   let active = "base";
 
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024 * 1, diskSize: 10 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 25 },
+    { name: "Recommended", cpu: 2, memory: 1024 * 4, diskSize: 50 },
+  ];
+
   // Fields
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Presearch Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: 'memory', placeholder: "Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk Size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Presearch Registeration Code", symbol: "preCode", placeholder: "Presearch Registeration Code", type: "password", invalid: false },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
@@ -145,6 +149,14 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.diskSize}
+          {packages}
+        />
+
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
