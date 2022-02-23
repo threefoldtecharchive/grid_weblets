@@ -84,17 +84,13 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/threefoldtech-peertube-v3.1.flist";
-  vm.entrypoint = "/usr/local/bin/entrypoint.sh";
+    "https://hub.grid.tf/omarabdulaziz.3bot/omarabdul3ziz-peertube-v3.1.1.flist";
+  vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
     PEERTUBE_ADMIN_EMAIL: adminEmail,
     PT_INITIAL_ROOT_PASSWORD: adminPassword,
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
-    PEERTUBE_WEBSERVER_PORT: "443",
-    PEERTUBE_DB_SUFFIX: "_prod",
-    PEERTUBE_DB_USERNAME: "peertube",
-    PEERTUBE_DB_PASSWORD: "peertube",
   };
 
   // VMS Specs
