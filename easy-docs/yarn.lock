@@ -5572,10 +5572,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.2.0.tgz#f4c965b6fe6a28d23d10c8600e99d62d2e2e3f95"
-  integrity sha512-zLVUpoXO5PJY38Knu4Bo7UN4TTn0uMCP9r2jsLLuO9SBazcCHs8sXdV/nyJ7QQVn7gbPR2RPDG7k9vos7fzsBg==
+grid3_client@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.2.1.tgz#cc7e9efa43f7ba5c76eb1884784bf5c6d7540ebe"
+  integrity sha512-MPa77hAm2ibhzACEy0Rl2oPKTg+B0N4mm5LREaY137jLwgFSShpUNj57U41rNAnmVnr699h2R1Wb7OMAdZyrrQ==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -5592,7 +5592,7 @@ grid3_client@1.2.0:
     stellar-sdk "^9.1.0"
     tfgrid-api-client "^1.0.4"
     ts-rmb-client-base "^0.0.1"
-    ts-rmb-http-client "^1.0.3"
+    ts-rmb-http-client "^1.0.4"
     ts-rmb-redis-client "^0.0.3"
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
@@ -10596,10 +10596,10 @@ ts-rmb-client-base@0.0.1, ts-rmb-client-base@^0.0.1:
   resolved "https://registry.yarnpkg.com/ts-rmb-client-base/-/ts-rmb-client-base-0.0.1.tgz#7405aa498a50f34d562caec740bffcc25f15777a"
   integrity sha512-xe7NxHgDyQnHTOFNfuHnhRXSY1xAEyRC/dRmCLI8H3THXLfLr3UcTqNg4Cxli0JEa2oW7s9DQvfZXek91FYo+w==
 
-ts-rmb-http-client@1.0.3, ts-rmb-http-client@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.3.tgz#33a491fd2feb67d2d219bedbc9b951cedcba59a7"
-  integrity sha512-XO9DwFcmvDB5LB3hp78VAbI2rHaNpPg0FiKYjo9LctqtwAtjdyuA43RovmGrN4XZswFdRhDAW8hhL5j+OFMhiQ==
+ts-rmb-http-client@1.0.4, ts-rmb-http-client@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.4.tgz#d8ae38e88a9c0cd29fda828a6cdc708fadc81000"
+  integrity sha512-QVAYOQ8jxLd2jsvspK6Y9tAocuzRlW08NQNIuLkNlw4on/c4BhMvbYskaSVMx3W5cEMgc58Kqh8wvR2rbOyh5g==
   dependencies:
     "@polkadot/keyring" "^6.11.1"
     "@types/crypto-js" "^4.1.0"
