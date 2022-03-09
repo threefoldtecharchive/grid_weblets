@@ -87,7 +87,7 @@
           data = null;
           status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-        } else {
+        } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
@@ -264,7 +264,6 @@
     requestAnimationFrame(() => {
       _nodeId = null;
       if (nodeSelection === "automatic") {
-        data = null;
         onLoadNodesHandler();
       }
     });
