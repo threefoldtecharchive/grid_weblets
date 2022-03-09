@@ -3,6 +3,11 @@ import type { IProfile } from "./Profile";
 import type { GridClient } from "grid3_client";
 import formatConsumption from "../utils/formatConsumption";
 
+export interface IListReturn<T = any> {
+  total: number;
+  data: T[];
+}
+
 export default class DeployedList {
   constructor(public readonly grid: GridClient) {}
 
@@ -35,18 +40,27 @@ export default class DeployedList {
         .catch(() => res(null));
     });
   }
-  public loadK8s(): Promise<any[]> {
+  public loadK8s(): Promise<IListReturn> {
+    let total = 0;
     try {
       return this.grid.k8s
         .list()
         .then((names) => {
+          total = names.length;
           return Promise.all(names.map((name) => this._loadK8s(name)));
         })
+        .then((d) => d.filter((x) => [null, undefined].includes(x) === false))
         .then((data) => {
-          return data.filter((x) => [null, undefined].includes(x) === false);
+          return {
+            total,
+            data,
+          };
         });
     } catch {
-      return Promise.resolve([]);
+      return Promise.resolve({
+        total,
+        data: [],
+      });
     }
   }
 

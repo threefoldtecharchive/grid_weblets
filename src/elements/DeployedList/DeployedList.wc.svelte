@@ -210,9 +210,18 @@
         {#await list?.loadK8s()}
           <Alert type="info" message="Listing Kubernetes..." />
         {:then rows}
-          {#if rows.length}
+          {#if rows.data.length}
+            {#if rows.data.length !== rows.total}
+              <Alert
+                type="info"
+                message={`
+                Failed to load 
+                <strong>${rows.total - rows.data.length}</strong> 
+                out of ${rows.total} Deployments`}
+              />
+            {/if}
             <Table
-              rowsData={rows}
+              rowsData={rows.data}
               headers={[
                 "#",
                 "Name",
@@ -222,19 +231,19 @@
                 "Workers",
                 "Billing Rate",
               ]}
-              rows={_createK8sRows(rows)}
+              rows={_createK8sRows(rows.data)}
               actions={[
                 {
                   type: "info",
                   label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
+                  click: (_, i) => (infoToShow = rows.data[i].details),
                   disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
+                  loading: (i) => removing === rows.data[i].name,
                 },
                 {
                   type: "warning",
                   label: "Manage Workers",
-                  click: (_, i) => (k8sToUpdate = rows[i]),
+                  click: (_, i) => (k8sToUpdate = rows.data[i]),
                   disabled: () => removing !== null,
                 },
               ]}

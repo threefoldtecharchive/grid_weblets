@@ -7,7 +7,7 @@
 </script>
 
 <div class={"notification is-" + type}>
-  {message}
+  {@html message}
 </div>
 {#if deployed}
   <div class="notification is-info">
