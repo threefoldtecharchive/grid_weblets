@@ -361,7 +361,7 @@
     },
     {
       get(target, prop) {
-        return prop in target ? target[prop] : [];
+        return prop in target ? target[prop] : () => [];
       },
     }
   );
