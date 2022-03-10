@@ -121,6 +121,23 @@ export default class DeployedList {
     }
   }
 
+  public async loadDeployments(type?: string): Promise<IListReturn> {
+    if (!type) return this.loadVm();
+
+    // list the deployment created without project name that includes `flistkey` "Backward compatibility"
+    let deps1 = await this.loadVm().then((vms) => {
+      return vms.data.filter((vm) => vm.flist.toLowerCase().includes(type));
+    });
+
+    // list deployments create with project name
+    let deps2 = await this.loadVm(type);
+
+    return {
+      total: deps2.total + deps1.length,
+      data: [...deps1, ...deps2.data],
+    };
+  }
+
   public static async init(profile: IProfile): Promise<DeployedList> {
     return new DeployedList(await getGrid(profile, (grid) => grid, false));
   }

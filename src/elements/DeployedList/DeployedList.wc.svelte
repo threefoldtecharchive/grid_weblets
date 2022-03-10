@@ -461,7 +461,7 @@
           />
         {/await}
       {:else}
-        {#await list?.loadVm(active === "vm" ? undefined : active)}
+        {#await list?.loadDeployments(active === "vm" ? undefined : active)}
           <Alert
             type="info"
             message={`Listing ${active.toLocaleUpperCase()}s...`}
