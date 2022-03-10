@@ -2,16 +2,9 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import type { IAction } from "../types/table-action";
 
   const dispatch = createEventDispatcher<{ selected: any[] }>();
-
-  interface IAction {
-    type: "info" | "success" | "warning" | "danger";
-    label: string;
-    click: (e: Event, index: number) => void;
-    disabled?: (index: number) => boolean;
-    loading?: (index: number) => boolean;
-  }
 
   export let rowsData: any[] = [];
   export let headers: string[];

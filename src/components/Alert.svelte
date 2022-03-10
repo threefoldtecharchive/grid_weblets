@@ -1,7 +1,7 @@
 <svelte:options tag="tf-alert" />
 
 <script lang="ts">
-  export let type: "info" | "success" | "danger";
+  export let type: "info" | "success" | "danger" | "warning";
   export let message: string;
   export let deployed: Boolean = false;
 </script>
