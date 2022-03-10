@@ -156,206 +156,215 @@
     "Billing Rate",
   ];
 
-  const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = {
-    vm: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-    ],
-    caprover: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Admin Panel",
-        click: (_, i) => {
-          const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
-          window.open("http://captain." + domain, "_blank").focus();
+  const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = new Proxy(
+    {
+      vm: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.CAPROVER_ROOT_DOMAIN || removing !== null;
+      ],
+      caprover: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-      },
-    ],
-    peertube: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
-          window.open("https://" + domain, "_blank").focus();
+        {
+          type: "warning",
+          label: "Admin Panel",
+          click: (_, i) => {
+            const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
+            window.open("http://captain." + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.CAPROVER_ROOT_DOMAIN || removing !== null;
+          },
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.PEERTUBE_WEBSERVER_HOSTNAME || removing !== null;
+      ],
+      peertube: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-      },
-    ],
-    funkwhale: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.FUNKWHALE_HOSTNAME;
-          window.open("https://" + domain, "_blank").focus();
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return (
+              !env || !env.PEERTUBE_WEBSERVER_HOSTNAME || removing !== null
+            );
+          },
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.FUNKWHALE_HOSTNAME || removing !== null;
+      ],
+      funkwhale: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-      },
-    ],
-    taiga: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.DOMAIN_NAME;
-          window.open("https://" + domain, "_blank").focus();
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.FUNKWHALE_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.FUNKWHALE_HOSTNAME || removing !== null;
+          },
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.DOMAIN_NAME || removing !== null;
+      ],
+      taiga: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-      },
-      {
-        type: "warning",
-        label: "Admin Panel",
-        click: (_, i) => {
-          const domain = rows[i].details.env.DOMAIN_NAME;
-          window.open("http://" + domain + "/admin/", "_blank").focus();
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DOMAIN_NAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.DOMAIN_NAME || removing !== null;
+        {
+          type: "warning",
+          label: "Admin Panel",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DOMAIN_NAME;
+            window.open("http://" + domain + "/admin/", "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
         },
-      },
-    ],
-    mattermost: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.SITE_URL;
-          window.open(domain, "_blank").focus();
+      ],
+      mattermost: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.SITE_URL || removing !== null;
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.SITE_URL;
+            window.open(domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.SITE_URL || removing !== null;
+          },
         },
-      },
-    ],
-    discourse: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.DISCOURSE_HOSTNAME;
-          window.open("https://" + domain, "_blank").focus();
+      ],
+      discourse: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.DISCOURSE_HOSTNAME || removing !== null;
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DISCOURSE_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DISCOURSE_HOSTNAME || removing !== null;
+          },
         },
-      },
-    ],
-    casperlabs: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.CASPERLABS_HOSTNAME;
-          window.open("https://" + domain, "_blank").focus();
+      ],
+      casperlabs: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.CASPERLABS_HOSTNAME || removing !== null;
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.CASPERLABS_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.CASPERLABS_HOSTNAME || removing !== null;
+          },
         },
-      },
-    ],
-    owncloud: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-      {
-        type: "warning",
-        label: "Visit",
-        click: (_, i) => {
-          const domain = rows[i].details.env.OWNCLOUD_DOMAIN;
-          window.open("https://" + domain, "_blank").focus();
+      ],
+      owncloud: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
-        disabled: (i) => {
-          const env = rows[i].details.env;
-          return !env || !env.OWNCLOUD_DOMAIN || removing !== null;
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.OWNCLOUD_DOMAIN;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.OWNCLOUD_DOMAIN || removing !== null;
+          },
         },
+      ],
+      presearch: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+    },
+    {
+      get(target, prop) {
+        return prop in target ? target[prop] : [];
       },
-    ],
-    presearch: (rows) => [
-      {
-        type: "info",
-        label: "Show Details",
-        click: (_, i) => (infoToShow = rows[i].details),
-        disabled: () => removing !== null,
-        loading: (i) => removing === rows[i].name,
-      },
-    ],
-  };
+    }
+  );
 </script>
 
 <SelectProfile
