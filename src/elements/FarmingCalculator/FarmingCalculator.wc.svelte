@@ -62,7 +62,7 @@
 
   // prettier-ignore
   const outputFields = [
-    { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft", fullWidth: true },
+    { label: "Total Monthly Farming Reward In TFT", symbol: "totalFarmingRewardInTft", fullWidth: true },
     { label: "CU", symbol: "cu" },
     { label: "SU", symbol: "su" },
     { label: "NU", symbol: "nu" },
