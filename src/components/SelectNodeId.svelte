@@ -92,6 +92,8 @@
           nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
+        } else {
+          status = "valid";
         }
       })
       .catch((err) => {
