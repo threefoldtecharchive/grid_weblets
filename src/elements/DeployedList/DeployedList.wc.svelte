@@ -376,7 +376,7 @@
   }}
 />
 
-<div style="padding: 15px;" class="slider">
+<div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
       Deployment List {tab ? `(${tab})` : ""}
@@ -527,12 +527,6 @@
   />
 {/if}
 
-<style lang="scss">
+<style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-  .slider {
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;	
-    -webkit-overflow-scrolling: touch;
-  }
-  </style>
+</style>
