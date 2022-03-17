@@ -12,7 +12,7 @@
   import { noActiveProfile } from "../../utils/message";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployMattermost from "../../utils/deployMattermost";
-  import validateName from "../../utils/validateName";
+  import validateName, { isInvalid } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import rootFs from "../../utils/rootFs";
@@ -44,7 +44,12 @@
   let failed: boolean = false;
   let success: boolean = false;
   let message: string;
-  $: disabled = data.invalid || data.status !== "valid";
+
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = data.invalid || data.status !== "valid" || isInvalid([diskField, memoryField, cpuField]);
 
   function onDeployMattermost() {
     loading = true;
@@ -101,6 +106,9 @@
         bind:cpu={data.cpu}
         bind:memory={data.memory}
         bind:diskSize={data.disks[0].size}
+        bind:diskField={diskField}
+        bind:cpuField={cpuField}
+        bind:memoryField={memoryField}
         {packages}
       />
 
