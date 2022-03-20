@@ -123,7 +123,11 @@
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
       const { name, publicIp, publicIp6, planetary, flist, consumption } = row;
-      return [i + 1, name, publicIp, publicIp6, planetary, flist, consumption];
+      const _flist =
+        typeof flist === "string"
+          ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "")
+          : flist;
+      return [i + 1, name, publicIp, publicIp6, planetary, _flist, consumption];
     });
   }
 
