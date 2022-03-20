@@ -125,9 +125,9 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
-    { name: "Recommended", cpu: 2, memory: 1024 * 4, diskSize: 200 },
+    { name: "Minimum", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 150 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
   let message: string;
