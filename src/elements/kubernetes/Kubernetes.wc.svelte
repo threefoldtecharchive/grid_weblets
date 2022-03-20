@@ -43,13 +43,13 @@
 
   // prettier-ignore
   const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName },
+    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
     { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text" },
   ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName },
+    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false},
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
