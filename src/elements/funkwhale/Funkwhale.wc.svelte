@@ -54,7 +54,11 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField]); // prettier-ignore
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField, diskField, cpuField, memoryField]) ; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
@@ -145,6 +149,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
           {packages}
         />
 

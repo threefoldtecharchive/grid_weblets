@@ -59,7 +59,11 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -141,6 +145,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
           {packages}
         />
 

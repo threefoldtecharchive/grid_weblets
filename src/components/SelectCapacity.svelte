@@ -15,7 +15,7 @@
   export let diskSize: number;
   export let packages: IPackage[];
 
-  let cpuField: IFormField = {
+  export let cpuField: IFormField = {
     label: "CPU (Cores)",
     symbol: "cpu",
     placeholder: "CPU Cores",
@@ -23,7 +23,7 @@
     validator: validateCpu,
     invalid: false,
   };
-  let memoryField: IFormField = {
+  export let memoryField: IFormField = {
     label: "Memory (MB)",
     symbol: "memory",
     placeholder: "Your Memory in MB",
@@ -31,7 +31,7 @@
     validator: validateMemory,
     invalid: false,
   };
-  let diskField: IFormField = {
+  export let diskField: IFormField = {
     label: "Disk (GB)",
     symbol: "diskSize",
     placeholder: "Your Disk size in GB",

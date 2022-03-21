@@ -55,7 +55,12 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -137,6 +142,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
           {packages}
         />
 
