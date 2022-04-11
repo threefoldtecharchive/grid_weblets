@@ -41,12 +41,6 @@
   ];
   let active = "base";
 
-  const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024 * 1, diskSize: 10 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 25 },
-    { name: "Recommended", cpu: 2, memory: 1024 * 4, diskSize: 50 },
-  ];
-
   // Fields
   // prettier-ignore
   const fields: IFormField[] = [
@@ -153,16 +147,6 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-
-        <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.diskSize}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
-          {packages}
-        />
 
         <SelectNodeId
           cpu={data.cpu}
