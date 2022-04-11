@@ -5572,10 +5572,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.2.2.tgz#fec9af9547302e464e02e219a6dbe63da0e3940a"
-  integrity sha512-gpKjXg+pO6TjlCjLNcUSqZNVwWvDfaoMt1YxFUa9Z66tluD/8z3DiNoEQO6SzzJhsaM8ejnye+YhnkkL3VYJag==
+grid3_client@1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.2.3.tgz#030a3b908a2c4fc500279404aa5c692f970e20fc"
+  integrity sha512-NC0MgAZt52GGZK+sfwx4c7Ox0bxNmQn1czUZtt86tVhiTC5k/Yuf0jcvi8nEHdHQQboSmh/Yo5dQ2m/9IeuhCQ==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -5590,9 +5590,9 @@ grid3_client@1.2.2:
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
-    tfgrid-api-client "^1.7.0"
+    tfgrid-api-client "^1.8.0"
     ts-rmb-client-base "^0.0.1"
-    ts-rmb-http-client "^1.0.4"
+    ts-rmb-http-client "^1.0.5"
     ts-rmb-redis-client "^0.0.3"
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
@@ -10383,10 +10383,10 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-tfgrid-api-client@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.7.0.tgz#964abcdb9a4210db80790da82fa9f2b317a00247"
-  integrity sha512-W0gnFwEfETOLbidbXhTcvQwBrHY6Uc9VuCmPayrPSopzJsYu6VoqePwTuRlMfKWsvQ7HCzA04aryZqgEwGNpCA==
+tfgrid-api-client@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.8.0.tgz#1c2598877ce59c9dcb8ca05e22b89e5fbb400d1d"
+  integrity sha512-VgxddOlRJHHNj0n8VnsLigldIoIC3fqw9H85XgqLKzZeOgCq2ykEHhbmKUe2eMhqz1Hjp4gH10nE7zGOjZnJYA==
   dependencies:
     "@polkadot/api" "^4.0.3"
     bip39 "^3.0.3"
@@ -10596,10 +10596,10 @@ ts-rmb-client-base@0.0.1, ts-rmb-client-base@^0.0.1:
   resolved "https://registry.yarnpkg.com/ts-rmb-client-base/-/ts-rmb-client-base-0.0.1.tgz#7405aa498a50f34d562caec740bffcc25f15777a"
   integrity sha512-xe7NxHgDyQnHTOFNfuHnhRXSY1xAEyRC/dRmCLI8H3THXLfLr3UcTqNg4Cxli0JEa2oW7s9DQvfZXek91FYo+w==
 
-ts-rmb-http-client@1.0.4, ts-rmb-http-client@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.4.tgz#d8ae38e88a9c0cd29fda828a6cdc708fadc81000"
-  integrity sha512-QVAYOQ8jxLd2jsvspK6Y9tAocuzRlW08NQNIuLkNlw4on/c4BhMvbYskaSVMx3W5cEMgc58Kqh8wvR2rbOyh5g==
+ts-rmb-http-client@1.0.5, ts-rmb-http-client@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.5.tgz#7131967d9fe95e1ca742b43209fba9bbc5d75da4"
+  integrity sha512-EZfyzH/OjfgKKMXAP/buXuMi2xfUm8uaC7WSfj77BQk3hBXQlIKX5xE9rDor2PS9lsswQpgpuB1yJmpNpzRLXg==
   dependencies:
     "@polkadot/keyring" "^6.11.1"
     "@types/crypto-js" "^4.1.0"
