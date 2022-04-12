@@ -3,6 +3,11 @@ import type { IProfile } from "./Profile";
 import type { GridClient } from "grid3_client";
 import formatConsumption from "../utils/formatConsumption";
 
+export interface IListReturn<T = any> {
+  total: number;
+  data: T[];
+}
+
 export default class DeployedList {
   constructor(public readonly grid: GridClient) {}
 
@@ -35,18 +40,28 @@ export default class DeployedList {
         .catch(() => res(null));
     });
   }
-  public loadK8s(): Promise<any[]> {
+  public loadK8s(): Promise<IListReturn> {
+    let total = 0;
     try {
       return this.grid.k8s
         .list()
+        .then(DeployedList.__filterNames)
         .then((names) => {
+          total = names.length;
           return Promise.all(names.map((name) => this._loadK8s(name)));
         })
+        .then((d) => d.filter((x) => [null, undefined].includes(x) === false))
         .then((data) => {
-          return data.filter((x) => [null, undefined].includes(x) === false);
+          return {
+            total,
+            data,
+          };
         });
     } catch {
-      return Promise.resolve([]);
+      return Promise.resolve({
+        total,
+        data: [],
+      });
     }
   }
 
@@ -75,7 +90,9 @@ export default class DeployedList {
     });
   }
 
-  public loadVm(projectName?: string): Promise<any[]> {
+  public loadVm(projectName?: string): Promise<IListReturn> {
+    let total = 0;
+
     try {
       projectName
         ? (this.grid.projectName = projectName) // to load project named deployments
@@ -84,30 +101,48 @@ export default class DeployedList {
 
       return this.grid.machines
         .list()
+        .then(DeployedList.__filterNames)
         .then((names) => {
+          total = names.length;
           return Promise.all(names.map((name) => this._loadVm(name)));
         })
+        .then((d) => d.filter((x) => [null, undefined].includes(x) === false))
         .then((data) => {
-          return data.filter((x) => [null, undefined].includes(x) === false);
+          return {
+            total,
+            data,
+          };
         });
     } catch {
-      return Promise.resolve([]);
+      return Promise.resolve({
+        total,
+        data: [],
+      });
     }
   }
 
-  public async loadDeployments(type) {
+  public async loadDeployments(type?: string): Promise<IListReturn> {
+    if (!type) return this.loadVm();
+
     // list the deployment created without project name that includes `flistkey` "Backward compatibility"
     let deps1 = await this.loadVm().then((vms) => {
-      return vms.filter((vm) => vm.flist.toLowerCase().includes(type));
+      return vms.data.filter((vm) => vm.flist.toLowerCase().includes(type));
     });
 
     // list deployments create with project name
     let deps2 = await this.loadVm(type);
 
-    return [...deps1, ...deps2];
+    return {
+      total: deps2.total + deps1.length,
+      data: [...deps1, ...deps2.data],
+    };
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {
     return new DeployedList(await getGrid(profile, (grid) => grid, false));
+  }
+
+  public static __filterNames(names: string[]): string[] {
+    return names.filter((name) => !name.startsWith("."));
   }
 }

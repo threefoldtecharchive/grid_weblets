@@ -87,10 +87,12 @@
           data = null;
           status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-        } else {
+        } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
+          status = "valid";
+        } else {
           status = "valid";
         }
       })
@@ -229,11 +231,11 @@
               if (filters.publicIPs) {
                 return gqlApi<{ nodes: { id: number }[] }>(
                   profile,
-                  "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
+                  "query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}",
                   { id: data }
                 )
                   .then(({ nodes: [{ id }] }) => {
-                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
+                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractID_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
                   })
                   .then(({ publicIps: ips }) => {
                     status = ips.length > 0 ? "valid" : "invalid";
@@ -264,7 +266,6 @@
     requestAnimationFrame(() => {
       _nodeId = null;
       if (nodeSelection === "automatic") {
-        data = null;
         onLoadNodesHandler();
       }
     });

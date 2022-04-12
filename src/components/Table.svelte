@@ -2,16 +2,9 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import type { IAction } from "../types/table-action";
 
   const dispatch = createEventDispatcher<{ selected: any[] }>();
-
-  interface IAction {
-    type: "info" | "success" | "warning" | "danger";
-    label: string;
-    click: (e: Event, index: number) => void;
-    disabled?: (index: number) => boolean;
-    loading?: (index: number) => boolean;
-  }
 
   export let rowsData: any[] = [];
   export let headers: string[];
@@ -48,76 +41,34 @@
       selectedRows.map((i) => rowsData[i])
     );
   }
+
+  const style = `
+    <style>
+      th, td {
+        white-space: nowrap;
+      }  
+    </style>
+  `;
 </script>
 
-<table class="table" style="width: 100%;">
-  <thead>
-    <tr>
-      {#if selectable}
-        <th>
-          <input
-            type="checkbox"
-            on:change={onSelectAllHandler}
-            checked={allChecked}
-          />
-        </th>
-      {/if}
+<div>
+  {@html style}
+</div>
 
-      {#if headers}
-        {#each headers as hd (hd)}
-          <th title={hd}>{hd}</th>
-        {/each}
-      {/if}
-
-      {#if actions.length}
-        <th title="Actions">Actions</th>
-      {/if}
-    </tr>
-  </thead>
-
-  <tbody>
-    {#if rows}
-      {#each rows as row, idx}
-        <tr>
-          {#if selectable}
-            <td>
-              <input
-                type="checkbox"
-                on:change={onSelectHandler.bind(undefined, idx)}
-                checked={_selectedRows.includes(idx)}
-              />
-            </td>
-          {/if}
-
-          {#each row as item (item)}
-            <td>{item}</td>
-          {/each}
-
-          {#if actions.length}
-            <td>
-              <div class="buttons">
-                {#each actions as { type, label, click, disabled, loading }}
-                  <button
-                    class={"button is-" +
-                      type +
-                      (loading && loading(idx) ? " is-loading" : "")}
-                    on:click={(e) => click(e, idx)}
-                    disabled={disabled ? disabled(idx) : false}
-                  >
-                    {label}
-                  </button>
-                {/each}
-              </div>
-            </td>
-          {/if}
-        </tr>
-      {/each}
-    {/if}
-  </tbody>
-
-  {#if footer}
-    <tfoot>
+<div style="width: 100%; overflow-x: auto;">
+  <table class="table" style="width: 100%;">
+    <thead>
       <tr>
+        {#if selectable}
+          <th>
+            <input
+              type="checkbox"
+              on:change={onSelectAllHandler}
+              checked={allChecked}
+            />
+          </th>
+        {/if}
+
         {#if headers}
           {#each headers as hd (hd)}
             <th title={hd}>{hd}</th>
@@ -128,6 +79,62 @@
           <th title="Actions">Actions</th>
         {/if}
       </tr>
-    </tfoot>
-  {/if}
-</table>
+    </thead>
+
+    <tbody>
+      {#if rows}
+        {#each rows as row, idx}
+          <tr>
+            {#if selectable}
+              <td>
+                <input
+                  type="checkbox"
+                  on:change={onSelectHandler.bind(undefined, idx)}
+                  checked={_selectedRows.includes(idx)}
+                />
+              </td>
+            {/if}
+
+            {#each row as item (item)}
+              <td>{item}</td>
+            {/each}
+
+            {#if actions.length}
+              <td>
+                <div class="buttons">
+                  {#each actions as { type, label, click, disabled, loading }}
+                    <button
+                      class={"button is-" +
+                        type +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      {label}
+                    </button>
+                  {/each}
+                </div>
+              </td>
+            {/if}
+          </tr>
+        {/each}
+      {/if}
+    </tbody>
+
+    {#if footer}
+      <tfoot>
+        <tr>
+          {#if headers}
+            {#each headers as hd (hd)}
+              <th title={hd}>{hd}</th>
+            {/each}
+          {/if}
+
+          {#if actions.length}
+            <th title="Actions">Actions</th>
+          {/if}
+        </tr>
+      </tfoot>
+    {/if}
+  </table>
+</div>

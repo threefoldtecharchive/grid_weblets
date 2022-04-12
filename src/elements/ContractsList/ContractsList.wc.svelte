@@ -29,8 +29,8 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractId }) => ({ id: contractId, type: "name" } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractId }) => ({ id: contractId, type: "node" } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID }) => ({ id: contractID, type: "name" } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID }) => ({ id: contractID, type: "node" } as IContract)); // prettier-ignore
             contracts = [...names, ...nodes];
           })
           .catch((err) => {

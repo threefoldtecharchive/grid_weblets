@@ -70,14 +70,6 @@
     },
   ];
 
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
 
   let mailFields: IFormField[] = [
     {
@@ -125,9 +117,9 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
-    { name: "Recommended", cpu: 2, memory: 1024 * 4, diskSize: 200 },
+    { name: "Minimum", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 150 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
   let message: string;
@@ -136,7 +128,11 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -210,6 +206,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
           {packages}
         />
 

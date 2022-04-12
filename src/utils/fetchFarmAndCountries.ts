@@ -3,8 +3,8 @@ import gqlApi from "./gqlApi";
 
 const queryCount = `
 query GetLimits {
-    farms: farmsConnection { farms_limit: totalCount }
-    countries: countriesConnection { countries_limit: totalCount }
+    farms: farmsConnection(orderBy: farmID_ASC) { farms_limit: totalCount }
+    countries: countriesConnection(orderBy: countryID_ASC) { countries_limit: totalCount }
 }
 `;
 
