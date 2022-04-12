@@ -125,7 +125,7 @@
     const [option] = filtersFields[index].options;
     filtersFields[index].options = items.reduce(
       (res, { name, code }) => {
-        const op = { label: name, value: code || name } as ISelectOption;
+        const op = { label: name, value: name } as ISelectOption;
         res.push(op);
         return res;
       },
