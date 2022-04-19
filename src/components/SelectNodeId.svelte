@@ -235,7 +235,7 @@
                   { id: data }
                 )
                   .then(({ nodes: [{ id }] }) => {
-                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractID_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
+                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
                   })
                   .then(({ publicIps: ips }) => {
                     status = ips.length > 0 ? "valid" : "invalid";
