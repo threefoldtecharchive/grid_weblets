@@ -10,6 +10,7 @@
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
+  import baseConfig from "../stores/baseConfig";
   const { GridClient } = window.configs?.grid3_client ?? {};
 
   const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
@@ -24,6 +25,8 @@
 
   export let profile: IProfile;
   let loadingNodes: boolean = false;
+
+  const configs = window.configs?.baseConfig;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
@@ -78,6 +81,7 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
+      availableFor: $configs.twinId,
     };
 
     findNodes(_filters, profile)
@@ -216,8 +220,13 @@
             signal: _ctrl.signal,
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
-            .then(({ capacity }) => {
-              const { total_resources: total, used_resources: used } = capacity;
+            .then((node: any) => {
+              if (node.dedicated && node.rentedByTwinId != $configs.twinId) {
+                status = "invalid";
+                return;
+              }
+              const { total_resources: total, used_resources: used } =
+                node.capacity;
               // prettier-ignore
               let valid = (total.cru - used.cru) >= filters.cru &&
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&

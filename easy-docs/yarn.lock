@@ -5572,10 +5572,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.2.3.tgz#030a3b908a2c4fc500279404aa5c692f970e20fc"
-  integrity sha512-NC0MgAZt52GGZK+sfwx4c7Ox0bxNmQn1czUZtt86tVhiTC5k/Yuf0jcvi8nEHdHQQboSmh/Yo5dQ2m/9IeuhCQ==
+grid3_client@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.3.0.tgz#42e3d528fe6c976fcc40d20ec2b7e4e4049832ef"
+  integrity sha512-1PVMWdlU3/1zVnA8UT7PjMZ/U9QgWjbC47mtusnEPCCvFhuevk15bavxIz9z3qf+ZTvWoQR7X+Yj0xVJiO7nNA==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -5590,7 +5590,7 @@ grid3_client@1.2.3:
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
-    tfgrid-api-client "^1.8.0"
+    tfgrid-api-client "^1.9.0"
     ts-rmb-client-base "^0.0.1"
     ts-rmb-http-client "^1.0.5"
     ts-rmb-redis-client "^0.0.3"
@@ -10383,10 +10383,10 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-tfgrid-api-client@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.8.0.tgz#1c2598877ce59c9dcb8ca05e22b89e5fbb400d1d"
-  integrity sha512-VgxddOlRJHHNj0n8VnsLigldIoIC3fqw9H85XgqLKzZeOgCq2ykEHhbmKUe2eMhqz1Hjp4gH10nE7zGOjZnJYA==
+tfgrid-api-client@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.9.0.tgz#b4de589ae6136e230fea122a38975585cf81a984"
+  integrity sha512-AnirV/rgyBO77s3GtCdntTbaqk04tLjAUHaGlohJzKOXSxOM4uq4amHcWtfcUffDh0AtbbTYvGsCD3f1suOQJw==
   dependencies:
     "@polkadot/api" "^4.0.3"
     bip39 "^3.0.3"
