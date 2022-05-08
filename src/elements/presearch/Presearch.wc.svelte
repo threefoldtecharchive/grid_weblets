@@ -20,7 +20,6 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validateCpu, validateDisk, validateEmail, validateMemory} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Presearch();
   let profile: IProfile;
@@ -47,6 +46,7 @@
     { label: "Name", symbol: "name", placeholder: "Presearch Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Presearch Registeration Code", symbol: "preCode", placeholder: "Presearch Registeration Code", type: "password", invalid: false },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
   const restoreFields: IFormField[] = [
@@ -66,17 +66,16 @@
     },
   ];
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, cpuField, memoryField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
 
   let message: string;
   let modalData: Object;
 
   async function deployPresearchHandler() {
     loading = true;
+    success = false;
+    failed = false;
+    message = undefined;
 
     if (!hasEnoughBalance()) {
       failed = true;
@@ -86,12 +85,8 @@
       return;
     }
 
-    success = false;
-    failed = false;
-    message = undefined;
-
     deployPresearch(data, profile)
-      .then((data: any) => {
+      .then((data) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;

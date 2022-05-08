@@ -54,7 +54,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machine.memory = memory;
   machine.disks = [disk];
   machine.node_id = nodeId;
-  machine.public_ip = true;
+  machine.public_ip = publicIp;
   machine.planetary = planetary;
   machine.flist =
     "https://hub.grid.tf/omarabdul3ziz.3bot/omarabdul3ziz-presearch-v2.2.flist";
