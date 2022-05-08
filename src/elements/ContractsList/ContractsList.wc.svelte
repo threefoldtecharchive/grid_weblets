@@ -83,7 +83,7 @@
     return getGrid(profile, async (grid) => {
       for (const contract of selectedContracts) {
         try {
-          await grid.contracts.cancel({ id: contract.id });
+          await grid.contracts.cancel({ id: +contract.id });
         } catch (err) {
           console.log("Error", err);
           message = err.message || err;
