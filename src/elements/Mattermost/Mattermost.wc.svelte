@@ -4,32 +4,73 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import type { IFormField, IPackage } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
+  import Modal from "../../components/DeploymentModal.svelte";
   import Mattermost from "../../types/mattermost";
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployMattermost from "../../utils/deployMattermost";
-  import validateName, { isInvalid } from "../../utils/validateName";
+  import validateName, {
+    isInvalid,
+    validatePortNumber,
+    validateOptionalEmail,
+  } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import rootFs from "../../utils/rootFs";
+  import Tabs from "../../components/Tabs.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
   const data = new Mattermost();
   const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
 
+  const tabs: ITab[] = [
+    { label: "Base", value: "base" },
+    { label: "SMTP Server", value: "smtp" },
+  ];
+  let active = "base";
+
   // prettier-ignore
-  const fields: IFormField[] = [
+  const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", type: "text", placeholder: "Mattermost Instance Name", validator: validateName, invalid: false },
-    { label: "SMTP Username", symbol: "username", type: "text", placeholder: "SMTP Username", validator, invalid: false },
-    { label: "SMTP Password", symbol: "password", type: "password", placeholder: "SMTP Password", validator, invalid: false },
-    // { label: "Domain", symbol: "domain", type: "text", placeholder: "Site Url", validator, invalid: false },
-    { label: "SMTP Server", symbol: "server", type: "text", placeholder: "SMTP server", validator: validateDomainName, invalid: false },
-    { label: "SMTP Port", symbol: "port", type: "text", placeholder: "SMTP Port", validator, invalid: false },
+  ];
+
+  const smtpFields: IFormField[] = [
+    {
+      label: "SMTP Username",
+      symbol: "username",
+      type: "text",
+      placeholder: "SMTP Username",
+      validator: validateOptionalEmail,
+      invalid: false,
+    },
+    {
+      label: "SMTP Password",
+      symbol: "password",
+      type: "password",
+      placeholder: "SMTP Password",
+      invalid: false,
+    },
+    {
+      label: "SMTP Server",
+      symbol: "server",
+      type: "text",
+      placeholder: "SMTP server",
+      validator: validateDomainName,
+      invalid: false,
+    },
+    {
+      label: "SMTP Port",
+      symbol: "port",
+      type: "text",
+      placeholder: "SMTP Port",
+      validator: validatePortNumber,
+      invalid: false,
+    },
   ];
 
   // define this solution packages
@@ -48,13 +89,18 @@
   let diskField: IFormField;
   let cpuField: IFormField;
   let memoryField: IFormField;
+  let modalData: Object;
 
-  $: disabled = data.invalid || data.status !== "valid" || isInvalid([diskField, memoryField, cpuField]);
+  $: disabled =
+    data.invalid ||
+    data.status !== "valid" ||
+    isInvalid([diskField, memoryField, cpuField]);
 
   function onDeployMattermost() {
     loading = true;
     deployMattermost(profile, data)
-      .then((res) => {
+      .then((data) => {
+        modalData = data
         deploymentStore.set(0);
         success = true;
       })
@@ -94,40 +140,57 @@
         message={message || "Failed to deploy Mattermost."}
       />
     {:else}
-      {#each fields as field (field.symbol)}
-        <Input
-          bind:data={data[field.symbol]}
-          bind:invalid={field.invalid}
-          {field}
+      <Tabs {tabs} bind:active />
+
+      {#if active === "base"}
+        {#each baseFields as field (field.symbol)}
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
+        {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
+          {packages}
         />
-      {/each}
 
-      <SelectCapacity
-        bind:cpu={data.cpu}
-        bind:memory={data.memory}
-        bind:diskSize={data.disks[0].size}
-        bind:diskField={diskField}
-        bind:cpuField={cpuField}
-        bind:memoryField={memoryField}
-        {packages}
-      />
-
-      <SelectNodeId
-        bind:data={data.nodeId}
-        bind:status={data.status}
-        bind:nodeSelection={data.selection.type}
-        {profile}
-        cpu={data.cpu}
-        ssd={data.disks.reduce(
-          (total, disk) => total + disk.size,
-          rootFs(data.cpu, data.memory)
-        )}
-        memory={data.memory}
-        publicIp={data.publicIp}
-        nodes={data.selection.nodes}
-        filters={data.selection.filters}
-        on:fetch={({ detail }) => (data.selection.nodes = detail)}
-      />
+        <SelectNodeId
+          bind:data={data.nodeId}
+          bind:status={data.status}
+          bind:nodeSelection={data.selection.type}
+          {profile}
+          cpu={data.cpu}
+          ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            rootFs(data.cpu, data.memory)
+          )}
+          memory={data.memory}
+          publicIp={data.publicIp}
+          nodes={data.selection.nodes}
+          filters={data.selection.filters}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
+        />
+      {:else if active === "smtp"}
+        <div class="notification is-warning is-light">
+          <p>
+            Mattermost does not require an SMTP server. If you want to use an
+            SMTP server, you can configure it.
+          </p>
+        </div>
+        {#each smtpFields as field (field.symbol)}
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
+        {/each}
+      {/if}
     {/if}
 
     <DeployBtn
@@ -146,6 +209,9 @@
     />
   </form>
 </div>
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
