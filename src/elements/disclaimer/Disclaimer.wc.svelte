@@ -1,8 +1,8 @@
 <svelte:options tag="tf-disclaimer" />
 <script lang="ts">
     const envs = {
-        dev: { env: "development", url: "https://circles.threefold.me/project/test-tfgrid3/issues" },
-        test: { env: "testing", url: "https://circles.threefold.me/project/test-tfgrid3/issues" },
+        dev: { env: "development", url: "https://github.com/threefoldtech/test_feedback/issues" },
+        test: { env: "testing", url: "https://github.com/threefoldtech/test_feedback/issues" },
     };
 
     $: env = envs[process.env.NETWORK];
