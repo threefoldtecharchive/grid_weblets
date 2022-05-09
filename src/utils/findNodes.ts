@@ -28,14 +28,29 @@ export default function findNodes(
           }
         }`)) as any;
         const totalNumber = res1.data.nodeContractsConnection.totalCount;
-          const res2 = (await gqlClient.query(`query MyQuery {
+        const res2 = (await gqlClient.query(`query MyQuery {
             nodeContracts(where: {deploymentData_contains: "${exclusiveFor}", state_eq: Created}, limit: ${totalNumber}) {
               nodeID
             }
           }`)) as any;
         const nodeIds = res2.data.nodeContracts.map((n) => n.nodeID);
+        let farmIds = [];
+        for (let nodeId of nodeIds) {
+          const res = await fetch(`${rmbProxy}/nodes/${nodeId}`);
+          farmIds.push(res.json()["farmId"]);
+        }
+
+        let farmNodes = [];
+        for (let farmId of farmIds) {
+          const res = (await gqlClient.query(`query MyQuery {
+          nodes(where: {farmID_eq: ${farmId}}) {
+            nodeID
+          }
+        }`)) as any;
+          farmNodes.push(...res.data.nodes);
+        }
         items = items.filter(
-          (node) => !nodeIds.find((nodeId) => node.nodeId === nodeId)
+          (node) => !farmNodes.find((nodeId) => node.nodeId === nodeId)
         );
       }
       // ... Ended.
