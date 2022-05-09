@@ -155,6 +155,7 @@
           {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
+          exclusiveFor="presearch"
         />
       {:else if active === "restore"}
         <div class="notification is-warning is-light">

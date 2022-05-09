@@ -74,6 +74,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.machines = [machine];
   machines.network = network;
   machines.description = "presearch node";
+  machines.metadata = "presearch"
 
   // Deploy
   return deploy(profile, "Presearch", name, async (grid) => {
