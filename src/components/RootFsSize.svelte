@@ -54,7 +54,7 @@
       }}
     />
   </div>
-  <div>
+  <div style="padding-top: 30px;">
     <Input
       data={editable}
       field={{
