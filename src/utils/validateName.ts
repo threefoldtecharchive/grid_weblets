@@ -62,3 +62,7 @@ export function validatePreCode(value: string): string | void {
   if (value === "") return "Presearch registration code is required";
   if (!PRECODE_REGEX.test(value)) return "That is not looks like a valid presearch registration code";
 }
+
+export function validatePassword(value: string): string | void {
+  if (value.length < 6) return "Password must be at least 6 characters";
+}
