@@ -113,6 +113,15 @@
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployPresearchHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Presearch Instance</h4>
+    <p>
+      Presearch is a community-powered, decentralized search engine that provides better results while protecting your privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_presearch"
+      >
+        Quick start documentation</a
+      >
+    </p>
 
     <hr />
 

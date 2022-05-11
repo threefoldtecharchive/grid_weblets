@@ -179,6 +179,15 @@
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Taiga Instance</h4>
+    <p>
+      Taiga is the project management tool for multi-functional agile teams. It has a rich feature set and at the same time it is very simple to start with through its intuitive user interface.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_taiga"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}

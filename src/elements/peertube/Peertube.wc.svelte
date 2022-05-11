@@ -107,6 +107,15 @@
   <!-- Container -->
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Peertube Instance</h4>
+    <p>
+      Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     <!-- Status -->
