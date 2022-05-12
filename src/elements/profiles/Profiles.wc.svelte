@@ -147,7 +147,7 @@
         style="display: flex; justify-content: space-between; align-items: center;"
       >
         <h4 class="is-size-4">Profile Manager</h4>
-        <p>
+        <!-- <p>
           Currently, we’re supporting three different networks. One for testing (Testnet) where you can find it at https://play.test.grid.tf, one for development purposes (Devnet) where you can find it at https://play.dev.grid.tf and last one is for our mainnet and you can find it at https://play.grid.tf.
           <a
             target="_blank"
@@ -155,7 +155,7 @@
           >
             Quick start documentation</a
           >
-        </p>
+        </p> -->
 
         {#if configured}
           <div>
