@@ -52,6 +52,9 @@ export interface ITab {
   label: string;
   value: string;
   removable?: boolean;
+  isDeployed?:boolean;
+  isDeployed_list?:boolean;
+
 }
 
 export interface IPackage {

@@ -30,6 +30,8 @@
   import { noActiveProfile } from "../../utils/message";
   import UpdateK8s from "../../components/UpdateK8s.svelte";
   import type { IAction } from "../../types/table-action";
+  const isDeployed = true;
+  const isDeployed_list = true;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -42,7 +44,7 @@
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
-    { label: "Presearch", value: "presearch" },
+    { label: "Presearch", value: "presearch"  },
     { label: "Casperlabs", value: "casperlabs" }
   ];
   let active: string = "k8s";
@@ -387,132 +389,140 @@
     </h4>
     <hr />
 
-    {#if loading}
-      <Alert type="info" message="Loading..." />
-    {:else if !configed || !profile}
-      <Alert type="info" message={noActiveProfile} />
-    {:else if !list}
-      <Alert type="info" message="Initializing..." />
-    {:else}
-      {#if !tab}
-        <Tabs
-          bind:active
-          {tabs}
-          disabled={removing !== null}
-          on:select={() => (selectedRows = [])}
-        />
-      {/if}
+    <div style="display: flex;">
+      {#if loading}
+        <Alert type="info" message="Loading..." />
+      {:else if !configed || !profile}
+        <Alert type="info" message={noActiveProfile} />
+      {:else if !list}
+        <Alert type="info" message="Initializing..." />
+      {:else}
+        {#if !tab}
+          <Tabs
+            bind:active
+            {tabs}
+            disabled={removing !== null}
+            on:select={() => (selectedRows = [])}
+            {isDeployed}
+            {isDeployed_list}
+          />
+        {/if}
 
-      <div
-        class="is-flex is-justify-content-space-between is-align-items-center mt-2 mb-2"
-      >
-        <div style="width: 100%;">
-          {#if message}
-            <Alert type="danger" {message} />
+        <!-- K8S -->
+        <div style="width: 100%; overflow-x: auto;">
+          <div
+            class="is-flex is-justify-content-space-between is-align-items-center mt-2 mb-2"
+          >
+            <div style="width: 100%;">
+              {#if message}
+                <Alert type="danger" {message} />
+              {/if}
+            </div>
+            <button
+              class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
+              disabled={selectedRows.length === 0 || removing !== null}
+              on:click={onDeleteHandler}
+            >
+              Delete
+            </button>
+          </div>
+          {#if active === "k8s"}
+            {#await list?.loadK8s()}
+              <Alert type="info" message="Listing Kubernetes..." />
+            {:then rows}
+              {#if rows.data.length}
+                {#if rows.data.length !== rows.total}
+                  <Alert
+                    type="warning"
+                    message={`
+                Failed to load 
+                <strong>${rows.total - rows.data.length}</strong> 
+                out of ${rows.total} Deployments`}
+                  />
+                {/if}
+                <Table
+                  rowsData={rows.data}
+                  headers={[
+                    "#",
+                    "Name",
+                    "Public IPv4",
+                    "Public IPv6",
+                    "Planetary Network IP",
+                    "Workers",
+                    "Billing Rate",
+                  ]}
+                  rows={_createK8sRows(rows.data)}
+                  actions={[
+                    {
+                      type: "info",
+                      label: "Show Details",
+                      click: (_, i) => (infoToShow = rows.data[i].details),
+                      disabled: () => removing !== null,
+                      loading: (i) => removing === rows.data[i].name,
+                    },
+                    {
+                      type: "warning",
+                      label: "Manage Workers",
+                      click: (_, i) => (k8sToUpdate = rows.data[i]),
+                      disabled: () => removing !== null,
+                    },
+                  ]}
+                  on:selected={_onSelectRowHandler}
+                />
+              {:else}
+                <Alert
+                  type="info"
+                  message="No Kubernetes found on this profile."
+                />
+              {/if}
+            {:catch err}
+              <Alert
+                type="danger"
+                message={err.message || err || "Failed to list Kubernetes"}
+              />
+            {/await}
+          {:else}
+            {#await list?.loadDeployments(active === "vm" ? undefined : active)}
+              <Alert
+                type="info"
+                message={`Listing ${active.toLocaleUpperCase()}s...`}
+              />
+            {:then rows}
+              {#if rows.data.length}
+                {#if rows.data.length !== rows.total}
+                  <Alert
+                    type="warning"
+                    message={`
+                Failed to load 
+                <strong>${rows.total - rows.data.length}</strong> 
+                out of ${rows.total} Deployments`}
+                  />
+                {/if}
+                <Table
+                  rowsData={rows.data}
+                  headers={_vmHeader}
+                  rows={_createVMRow(rows.data)}
+                  actions={actions[active](rows.data)}
+                  on:selected={_onSelectRowHandler}
+                />
+              {:else}
+                <Alert
+                  type="info"
+                  message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
+                />
+              {/if}
+            {:catch err}
+              <Alert
+                type="danger"
+                message={err.message ||
+                  err ||
+                  `Failed to list ${active.toLocaleUpperCase()}s`}
+              />
+            {/await}
           {/if}
         </div>
-        <button
-          class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
-          disabled={selectedRows.length === 0 || removing !== null}
-          on:click={onDeleteHandler}
-        >
-          Delete
-        </button>
-      </div>
-
-      <!-- K8S -->
-      {#if active === "k8s"}
-        {#await list?.loadK8s()}
-          <Alert type="info" message="Listing Kubernetes..." />
-        {:then rows}
-          {#if rows.data.length}
-            {#if rows.data.length !== rows.total}
-              <Alert
-                type="warning"
-                message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
-                out of ${rows.total} Deployments`}
-              />
-            {/if}
-            <Table
-              rowsData={rows.data}
-              headers={[
-                "#",
-                "Name",
-                "Public IPv4",
-                "Public IPv6",
-                "Planetary Network IP",
-                "Workers",
-                "Billing Rate",
-              ]}
-              rows={_createK8sRows(rows.data)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows.data[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows.data[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Manage Workers",
-                  click: (_, i) => (k8sToUpdate = rows.data[i]),
-                  disabled: () => removing !== null,
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No Kubernetes found on this profile." />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list Kubernetes"}
-          />
-        {/await}
-      {:else}
-        {#await list?.loadDeployments(active === "vm" ? undefined : active)}
-          <Alert
-            type="info"
-            message={`Listing ${active.toLocaleUpperCase()}s...`}
-          />
-        {:then rows}
-          {#if rows.data.length}
-            {#if rows.data.length !== rows.total}
-              <Alert
-                type="warning"
-                message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
-                out of ${rows.total} Deployments`}
-              />
-            {/if}
-            <Table
-              rowsData={rows.data}
-              headers={_vmHeader}
-              rows={_createVMRow(rows.data)}
-              actions={actions[active](rows.data)}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert
-              type="info"
-              message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
-            />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message ||
-              err ||
-              `Failed to list ${active.toLocaleUpperCase()}s`}
-          />
-        {/await}
       {/if}
-    {/if}
+    </div>
   </section>
 </div>
 

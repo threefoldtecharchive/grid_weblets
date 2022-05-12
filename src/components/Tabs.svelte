@@ -3,6 +3,8 @@
 <script lang="ts">
   import type { ITab } from "../types";
   import { createEventDispatcher, onMount } from "svelte";
+  export let isDeployed: boolean = false;
+  export let isDeployed_list: boolean = false;
 
   const dispatch =
     createEventDispatcher<{ removed: number; select: string; init: void }>();
@@ -25,8 +27,17 @@
   });
 </script>
 
-<div class={"tabs " + (centered ? "is-centered" : "")}>
-  <ul style={disabled ? "pointer-events: none; cursor: default;" : ""}>
+<div
+  class={"tabs " + (centered ? "is-centered" : "")}
+  style={isDeployed_list ? "width: 30%;" : ""}
+>
+  <ul
+    style={isDeployed
+      ? "display: block;padding-right:10px;overflow-y: auto;"
+      : disabled
+      ? "pointer-events: none; cursor: default;"
+      : ""}
+  >
     {#if tabs}
       {#each tabs as tab, index (tab.label)}
         <li class={active === tab.value ? "is-active" : ""}>
@@ -50,4 +61,7 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  .Deployed .tabs ul {
+    display: block !important;
+  }
 </style>
