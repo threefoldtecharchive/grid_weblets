@@ -8,7 +8,7 @@ export default class Presearch extends VM {
   public memory = 1024 * 1;
   public diskSize = 10;
   public preCode = "";
-  public publicIp = true;
+  public publicIp = false;
   public privateRestoreKey = "";
   public publicRestoreKey = "";
 
