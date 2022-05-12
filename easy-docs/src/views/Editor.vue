@@ -1,6 +1,7 @@
 <template>
   <section class="editor">
     <aside class="editor__side menu" style="padding-bottom: 100px">
+      <img class="logo" src="../../../src/assets/images/logoTF.png" />
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
@@ -198,5 +199,25 @@ export default class Editor extends Vue {
       @include nice-scroll;
     }
   }
+}
+
+.logo {
+  display: block;
+  width: 185px;
+  margin: 15px 15px 30px;
+}
+
+.menu {
+  background-color: #064663;
+}
+.menu-list a,
+.menu-label {
+  color: #fff;
+}
+.is-active {
+  color: #3e8ed0;
+}
+.menu-list a:hover {
+  color: #000;
 }
 </style>
