@@ -183,6 +183,15 @@
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+    <p>
+      Deploy a new virtual machine on the Threefold Grid
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}

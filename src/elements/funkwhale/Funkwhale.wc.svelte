@@ -107,6 +107,15 @@
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
+    <p>
+      Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_funkwhale"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "Funkwhale")}

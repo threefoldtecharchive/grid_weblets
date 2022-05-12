@@ -107,6 +107,7 @@
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
     <h4 class="is-size-4 mb-4">Caprover Deployer</h4>
     <p>
+      CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
