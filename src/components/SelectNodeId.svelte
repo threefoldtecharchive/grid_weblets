@@ -23,6 +23,8 @@
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
+  export let exclusiveFor: string = "";
+
   export let profile: IProfile;
   let loadingNodes: boolean = false;
 
@@ -81,10 +83,10 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
-      availableFor: $configs.twinId,
+      availableFor: $configs.twinId
     };
 
-    findNodes(_filters, profile)
+    findNodes(_filters, profile, exclusiveFor)
       .then((_nodes) => {
         dispatch("fetch", _nodes);
         if (_nodes.length <= 0) {
