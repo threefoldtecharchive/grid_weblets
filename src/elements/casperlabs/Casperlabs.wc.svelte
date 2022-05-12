@@ -101,7 +101,7 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a casperlabs Instance</h4>
     <p>
-      Casper Networkis a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.
+      Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_casper"
