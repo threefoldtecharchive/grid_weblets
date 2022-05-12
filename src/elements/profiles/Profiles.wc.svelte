@@ -147,6 +147,14 @@
         style="display: flex; justify-content: space-between; align-items: center;"
       >
         <h4 class="is-size-4">Profile Manager</h4>
+        <p>
+          <a
+            target="_blank"
+            href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
+          >
+            Quick start documentation</a
+          >
+        </p>
 
         {#if configured}
           <div>
