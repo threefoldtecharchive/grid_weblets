@@ -8,7 +8,8 @@
     "serve:app": "yarn build && sh build.sh && cd easy-docs && yarn serve",
     "dev": "rollup -c rollup.config.dev.js -w",
     "start": "sirv public --no-clear",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "deps": "sh install_deps.sh"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
