@@ -45,7 +45,7 @@ export default class Mattermost implements IMattermost {
     this.password = password || generatePassword(10);
     this.nodeId = nodeId;
     this.domain = domain || "";
-    this.server = server || "";
+    this.server = server || "smtp.gmail.com";
     this.port = port || "587";
   }
 
@@ -54,11 +54,11 @@ export default class Mattermost implements IMattermost {
     const { domain, server, port } = this;
     return (
       name.trim() === "" ||
-      username.trim() === "" ||
-      password.trim() === "" ||
-      // domain.trim() === "" ||
-      server.trim() === "" ||
-      port.trim() === "" ||
+      // username.trim() === "" ||
+      // password.trim() === "" ||
+      // // domain.trim() === "" ||
+      // server.trim() === "" ||
+      // port.trim() === "" ||
       !isValidInteger(port.trim()) ||
       !isValidInteger(nodeId)
     );
