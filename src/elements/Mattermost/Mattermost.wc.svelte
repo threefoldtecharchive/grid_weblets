@@ -76,6 +76,15 @@
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployMattermost}>
     <h4 class="is-size-4">Deploy a Mattermost Instance</h4>
+    <p>
+      Mattermost A single point of collaboration. Designed specifically for digital operations.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}

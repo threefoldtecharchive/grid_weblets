@@ -1,6 +1,7 @@
 import type { IFormField } from "../types";
 
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/;
+const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
 // prettier-ignore
@@ -55,4 +56,9 @@ export function validatePortNumber(value: string): string | void {
   if (port.toFixed(0) !== value) return "Port must be a valid integer";
   if (port < 1) return "Minimum allowed port is 1";
   if (port > 65535) return "Maximum allowed port is 65535";
+}
+
+export function validatePreCode(value: string): string | void {
+  if (value === "") return "Presearch registration code is required";
+  if (!PRECODE_REGEX.test(value)) return "That is not looks like a valid presearch registration code";
 }

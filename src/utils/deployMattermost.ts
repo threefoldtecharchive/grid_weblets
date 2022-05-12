@@ -61,15 +61,11 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
 
   let randomSuffix = generateString(10).toLowerCase();
 
-  const disk = new DiskModel();
-  disk.name = `disk${randomSuffix}`;
-  disk.size = disks[0].size;
-  disk.mountpoint = "/var/lib/postgresql";
 
   const vm = new MachineModel();
   vm.name = name;
   vm.node_id = nodeId;
-  vm.disks = [disk];
+  vm.disks = [];
   vm.public_ip = publicIp;
   vm.planetary = true;
   vm.cpu = cpu;

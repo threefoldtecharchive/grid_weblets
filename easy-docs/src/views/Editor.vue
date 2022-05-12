@@ -105,7 +105,7 @@ class Weblet {
   name: "Editor",
 })
 export default class Editor extends Vue {
-  public sections = ["deployment", "my account", "calculator"];
+  public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
     new Weblet("Virtual Machine", "vm", "vm", "deployment"),
     new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
@@ -125,7 +125,7 @@ export default class Editor extends Vue {
     new Weblet("Contracts", "contractslist", "", "my account"),
     new Weblet("Deployments", "deployedlist", "", "my account"),
 
-    new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
+    // new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
   ];
   public active = 0;
 

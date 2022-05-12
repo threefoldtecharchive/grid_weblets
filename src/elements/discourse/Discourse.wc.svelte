@@ -110,6 +110,15 @@
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployDiscourseHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Discourse Instance</h4>
+    <p>
+      Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a mailing list, discussion forum, long-form chat room, and more!
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_discourse"
+      >
+        Quick start documentation</a
+      >
+    </p>
 
     <hr />
 

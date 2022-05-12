@@ -18,7 +18,7 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateCpu, validateDisk, validateEmail, validateMemory} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
 
   let data = new Presearch();
@@ -44,7 +44,7 @@
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Presearch Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "Presearch Registeration Code", symbol: "preCode", placeholder: "Presearch Registeration Code", type: "password", invalid: false },
+    { label: "Presearch Registeration Code", symbol: "preCode", placeholder: "Presearch Registeration Code", type: "password", validator: validatePreCode, invalid: false },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
@@ -112,6 +112,15 @@
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployPresearchHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Presearch Instance</h4>
+    <p>
+      Presearch is a community-powered, decentralized search engine that provides better results while protecting your privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_presearch"
+      >
+        Quick start documentation</a
+      >
+    </p>
 
     <hr />
 

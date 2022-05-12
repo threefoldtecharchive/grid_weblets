@@ -20,6 +20,6 @@ export default function getContractsConsumption(
   contracts: { id: number }[]
 ) {
   return getGrid(profile, (grid) => {
-    return Promise.all(contracts.map(({ id }) => _getConsumption(id, grid)));
+    return Promise.all(contracts.map(({ id }) => _getConsumption(+id, grid)));
   });
 }
