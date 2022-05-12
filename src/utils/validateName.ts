@@ -60,7 +60,8 @@ export function validatePortNumber(value: string): string | void {
 
 export function validatePreCode(value: string): string | void {
   if (value === "") return "Presearch registration code is required";
-  if (!PRECODE_REGEX.test(value)) return "That is not looks like a valid presearch registration code";
+  if (!PRECODE_REGEX.test(value)) return "Invalid presearch registration code";
+  if (value.length !== 32) return "Presearch registration code must be 32 characters long";
 }
 
 export function validatePassword(value: string): string | void {
