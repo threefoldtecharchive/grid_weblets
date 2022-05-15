@@ -15,25 +15,16 @@
               "
               v-if="el.section === section"
             >
-              <a
-                v-if="section !== 'coming soon'"
-                v-bind:class="{ 'is-active': idx === active }"
-              >
-                {{ el.name }}
+              <a v-bind:class="{ 'is-active': idx === active }">
+                <span class="icon-text">
+                  <span class="icon" v-if="el.img">
+                    <img :src="'/icons/' + el.img" alt="logo" />
+                  </span>
+                  <span class="ml-2">
+                    {{ el.name }}
+                  </span>
+                </span>
               </a>
-
-              <p
-                v-if="section === 'coming soon'"
-                class="menu-label"
-                style="
-                  text-transform: inherit;
-                  margin-left: 1rem;
-                  margin-bottom: 0.5rem;
-                  font-size: 0.8rem;
-                "
-              >
-                {{ el.name }}
-              </p>
             </li>
           </template>
         </ul>
@@ -79,7 +70,8 @@ class Weblet {
     public name: string,
     public symbol: string,
     deployment = "",
-    public section: "deployment" | "calculator" | "my account"
+    public section: "deployment" | "calculator" | "my account",
+    public img: string | null = null
   ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
@@ -108,23 +100,89 @@ class Weblet {
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
-    new Weblet("Virtual Machine", "vm", "vm", "deployment"),
-    new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment"),
-    new Weblet("CapRover", "caprover", "caprover", "deployment"),
+    new Weblet("Virtual Machine", "vm", "vm", "deployment", "blockchain.png"),
+    new Weblet(
+      "Kubernetes",
+      `kubernetes`,
+      "k8s",
+      "deployment",
+      "blockchain.png"
+    ),
+    new Weblet(
+      "CapRover",
+      "caprover",
+      "caprover",
+      "deployment",
+      "blockchain.png"
+    ),
 
-    new Weblet("Peertube", "peertube", "peertube", "deployment"),
-    new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment"),
+    new Weblet(
+      "Peertube",
+      "peertube",
+      "peertube",
+      "deployment",
+      "blockchain.png"
+    ),
+    new Weblet(
+      "Funkwhale",
+      "funkwhale",
+      "funkwhale",
+      "deployment",
+      "blockchain.png"
+    ),
 
-    new Weblet("Mattermost", "mattermost", "mattermost", "deployment"),
-    new Weblet("Discourse", "discourse", "discourse", "deployment"),
+    new Weblet(
+      "Mattermost",
+      "mattermost",
+      "mattermost",
+      "deployment",
+      "blockchain.png"
+    ),
+    new Weblet(
+      "Discourse",
+      "discourse",
+      "discourse",
+      "deployment",
+      "blockchain.png"
+    ),
 
-    new Weblet("Taiga", "taiga", "taiga", "deployment"),
-    new Weblet("Owncloud", "owncloud", "owncloud", "deployment"),
-    new Weblet("Presearch", "presearch", "presearch", "deployment"),
-    new Weblet("Casperlabs", "casperlabs", "casperlabs", "deployment"),
+    new Weblet("Taiga", "taiga", "taiga", "deployment", "blockchain.png"),
+    new Weblet(
+      "Owncloud",
+      "owncloud",
+      "owncloud",
+      "deployment",
+      "blockchain.png"
+    ),
+    new Weblet(
+      "Presearch",
+      "presearch",
+      "presearch",
+      "deployment",
+      "blockchain.png"
+    ),
+    new Weblet(
+      "Casperlabs",
+      "casperlabs",
+      "casperlabs",
+      "deployment",
+      "blockchain.png"
+    ),
 
-    new Weblet("Contracts", "contractslist", "", "my account"),
-    new Weblet("Deployments", "deployedlist", "", "my account"),
+    new Weblet(
+      "Contracts",
+      "contractslist",
+      "",
+      "my account",
+      "blockchain.png"
+    ),
+    new Weblet(
+      "Deployments",
+      "deployedlist",
+      "",
+      "my account",
+      "blockchain.png"
+    ),
 
     // new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
   ];
