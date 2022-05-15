@@ -5,6 +5,6 @@ rm -rf ./node_modules
 yarn 
 
 # install playground dependencies
-cd /easy-docs
+cd ./playground
 rm -rf ./node_modules
 yarn

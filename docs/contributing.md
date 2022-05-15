@@ -87,8 +87,8 @@ The `index.html` file should be like the following.
 ```
 
 ## Add Weblet to The Playground
-1. Deploy the weblet in the playground app by appending the weblet to the elements list in `easy-docs/src/App.vue`
-2. Create new tab in the sideNav by appending the weblet list with new class of `Weblet` in `easy-docs/src/views/Editor.vue`
+1. Deploy the weblet in the playground app by appending the weblet to the elements list in `playground/src/App.vue`
+2. Create new tab in the sideNav by appending the weblet list with new class of `Weblet` in `playground/src/views/Editor.vue`
 
 ## Add a Solution Weblet
 > TODO

@@ -80,7 +80,7 @@ https://user-images.githubusercontent.com/31689104/149097600-be76b899-32a7-498d-
   rm package-lock.json
   # install project dependencies
   yarn install
-  cd easy-docs/ && yarn install
+  cd playground/ && yarn install
   cd ..
   ```
 - **Compile**
@@ -192,7 +192,7 @@ yarn build
 
 ## Playground
 
-- `cd easy-docs`
+- `cd playground`
 - `yarn build`  will output in the docs directory
 - serve content in docs dir for path `/grid_weblets` so `play.grid.tf/grid_weblets`
 
@@ -244,12 +244,12 @@ The `index.html` file should be like the following.
 
 - Add new folder for your weblet as `src/elements/demo`
 - Import `Demo.wc` svelte into `App.svelte`
-- Add your weblet on elements list in `easy-docs/src/App.vue`
-- Append a weblet in `easy-docs/src/views/Editor.vue` by appending the weblets list
+- Add your weblet on elements list in `playground/src/App.vue`
+- Append a weblet in `playground/src/views/Editor.vue` by appending the weblets list
 
 ### Build
 
-- Make sure to install dependencies in both `/` and `/easy-docs` by running `yarn`
+- Make sure to install dependencies in both `/` and `/playground` by running `yarn`
 - `yarn serve:app`
 
 ### Use

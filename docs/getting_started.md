@@ -13,7 +13,7 @@ The repo contains two projects:
   - available in the `/` directory.
 - The playground as a web app where you can try out the weblets.
   - which written in `Vue`
-  - available in the `/easy-docs` directory.
+  - available in the `/playground` directory.
 
 ## Usage
 
@@ -26,7 +26,7 @@ You can use one of the live instances of the playground:
 Or run the playground locally:
 First you need to [Install dependencies and config the environment](./config.md)
 
-Then, to run the playground you need to first build the weblets then move the built files to the `/easy-docs` directory. to serve it. and this can be done with `yarn serve:app` script.
+Then, to run the playground you need to first build the weblets then move the built files to the `/playground` directory. to serve it. and this can be done with `yarn serve:app` script.
 
 ```bash
 yarn deps           # to install the dependencies

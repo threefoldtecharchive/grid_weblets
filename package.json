@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "build": "rollup -c",
-    "build:app": "yarn build && sh build.sh && cd easy-docs && yarn build",
-    "serve:app": "yarn build && sh build.sh && cd easy-docs && yarn serve",
+    "build:app": "yarn build && sh scripts/build.sh && cd playground && yarn build",
+    "serve:app": "yarn build && sh scripts/build.sh && cd playground && yarn serve",
     "dev": "rollup -c rollup.config.dev.js -w",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "deps": "sh install_deps.sh"
+    "deps": "sh scripts/install_deps.sh",
+    "serve": "serve ./dist"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -66,6 +67,7 @@
     "plotly.js-dist": "^2.6.3",
     "rollup-plugin-node-builtins": "^2.1.2",
     "sirv-cli": "^1.0.0",
+    "serve": "^13.0.2",
     "ts-rmb-http-client": "1.0.5",
     "uuid": "^8.3.2",
     "yarn": "^1.22.17"
