@@ -265,7 +265,7 @@ export default class Editor extends Vue {
   margin: 15px 15px 30px;
 }
 .menu {
-  background-color: #064663;
+  background-color: #333;
 }
 .menu-list a,
 .menu-label {
@@ -277,7 +277,7 @@ export default class Editor extends Vue {
 }
 .menu-list a:hover,
 .menu-list a.is-active {
-  background-color: #065d85;
+  background-color: #1982b1;
   color: #fff;
 }
 </style>
