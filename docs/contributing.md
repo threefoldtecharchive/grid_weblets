@@ -41,14 +41,14 @@ We are going to add new weblet called `demo` .
     yarn build
     ```
 
-    Find the output in the docs directory.
+    Find the output in the `.build/` directory.
 
 ## Add Weblet To Plain HTML File
 
 Assume we need to include `vm` weblet in its own `index.html` file.  
 Notes:
 
-1. You will need to include `base.wc.js` & `profiles.wc.js` for every component to workز
+1. You will need to include `base.wc.js` & `profiles.wc.js` for every component to work.
 2. Also, You will need to inject the required libraries [grid3_client](https://www.npmjs.com/package/grid3_client) and [ts-rmb-http-client](https://www.npmjs.com/package/ts-rmb-http-client) in `window.configs` Object.
 
 The `index.html` file should be like the following.
@@ -99,3 +99,12 @@ The `index.html` file should be like the following.
 5. update the deployment list with the new weblet.
 6. Inject the new weblet in the playground.
 7. ...
+
+## Build Flow
+> TODO
+- Compile the weblet for development.
+- Compile the weblet for production.
+- Move the weblet compiled code to playground.
+- Serve the weblet in the playground for development.
+- Build the playground for production.
+- Serve the dist folder for development/production.
