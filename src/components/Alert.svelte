@@ -4,9 +4,21 @@
   export let type: "info" | "success" | "danger" | "warning";
   export let message: string;
   export let deployed: Boolean = false;
+
+  function selectColor(t: typeof type): string {
+    switch (t) {
+      case "info":
+        return "#47bcda";
+      default:
+        return "white";
+    }
+  }
 </script>
 
-<div class={"notification is-" + type}>
+<div
+  class={"notification"}
+  style={`background-color: ${selectColor(type)}; color: white`}
+>
   {@html message}
 </div>
 {#if deployed}
