@@ -1,7 +1,7 @@
 <template>
   <section class="editor">
     <aside class="editor__side menu" style="padding-bottom: 100px">
-      <img class="logo" src="../../../src/assets/images/logoTF.png" />
+      <img class="logo" src="/images/logoTF.png" />
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
@@ -100,20 +100,20 @@ class Weblet {
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
-    new Weblet("Virtual Machine", "vm", "vm", "deployment", "blockchain.png"),
+    new Weblet("Virtual Machine", "vm", "vm", "deployment", "vm.png"),
     new Weblet(
       "Kubernetes",
       `kubernetes`,
       "k8s",
       "deployment",
-      "blockchain.png"
+      "kubernetes.png"
     ),
     new Weblet(
       "CapRover",
       "caprover",
       "caprover",
       "deployment",
-      "blockchain.png"
+      "caprover.png"
     ),
 
     new Weblet(
@@ -121,14 +121,14 @@ export default class Editor extends Vue {
       "peertube",
       "peertube",
       "deployment",
-      "blockchain.png"
+      "peertube.png"
     ),
     new Weblet(
       "Funkwhale",
       "funkwhale",
       "funkwhale",
       "deployment",
-      "blockchain.png"
+      "funkwhale.png"
     ),
 
     new Weblet(
@@ -136,37 +136,37 @@ export default class Editor extends Vue {
       "mattermost",
       "mattermost",
       "deployment",
-      "blockchain.png"
+      "mattermost.png"
     ),
     new Weblet(
       "Discourse",
       "discourse",
       "discourse",
       "deployment",
-      "blockchain.png"
+      "discourse.png"
     ),
 
-    new Weblet("Taiga", "taiga", "taiga", "deployment", "blockchain.png"),
+    new Weblet("Taiga", "taiga", "taiga", "deployment", "taiga.png"),
     new Weblet(
       "Owncloud",
       "owncloud",
       "owncloud",
       "deployment",
-      "blockchain.png"
+      "owncloud.png"
     ),
     new Weblet(
       "Presearch",
       "presearch",
       "presearch",
       "deployment",
-      "blockchain.png"
+      "presearch.png"
     ),
     new Weblet(
       "Casperlabs",
       "casperlabs",
       "casperlabs",
       "deployment",
-      "blockchain.png"
+      "casperlabs.png"
     ),
 
     new Weblet(
@@ -174,14 +174,14 @@ export default class Editor extends Vue {
       "contractslist",
       "",
       "my account",
-      "blockchain.png"
+      ""
     ),
     new Weblet(
       "Deployments",
       "deployedlist",
       "",
       "my account",
-      "blockchain.png"
+      ""
     ),
 
     // new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
@@ -273,10 +273,11 @@ export default class Editor extends Vue {
 }
 .menu-list a {
   margin: 5px 0;
+  transition: all .35s ease-in-out;
 }
 .menu-list a:hover,
 .menu-list a.is-active {
-  background-color: #fff;
-  color: #000;
+  background-color: #065d85;
+  color: #fff;
 }
 </style>
