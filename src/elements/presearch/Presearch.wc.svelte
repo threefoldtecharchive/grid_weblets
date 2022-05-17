@@ -20,7 +20,6 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Presearch();
   let profile: IProfile;
@@ -47,6 +46,7 @@
     { label: "Name", symbol: "name", placeholder: "Presearch Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Presearch Registeration Code", symbol: "preCode", placeholder: "Presearch Registeration Code", type: "password", validator: validatePreCode, invalid: false },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
   const restoreFields: IFormField[] = [
@@ -73,6 +73,9 @@
 
   async function deployPresearchHandler() {
     loading = true;
+    success = false;
+    failed = false;
+    message = undefined;
 
     if (!hasEnoughBalance()) {
       failed = true;
@@ -82,12 +85,8 @@
       return;
     }
 
-    success = false;
-    failed = false;
-    message = undefined;
-
     deployPresearch(data, profile)
-      .then((data: any) => {
+      .then((data) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;
@@ -165,6 +164,7 @@
           {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
+          exclusiveFor="presearch"
         />
       {:else if active === "restore"}
         <div class="notification is-warning is-light">
