@@ -8,7 +8,6 @@
   export let failed: boolean;
   export let disabled: boolean;
   export let label: string = "Deploy";
-
   $: deployment = $currentDeployment;
 </script>
 
@@ -28,7 +27,8 @@
     {/if}
   </div>
   <button
-    class={"button is-primary " + (loading ? "is-loading" : "")}
+    class={"button " + (loading ? "is-loading" : "")}
+    style={`background-color: #1982b1; color: white`}
     type="submit"
     on:click
     disabled={disabled || !!deployment}
