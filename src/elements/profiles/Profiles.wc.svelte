@@ -302,10 +302,10 @@
     align-items: center;
     padding: 15px;
     background-color: white;
-    border-radius: 50px;
+    border-radius: 6px;
     border: 1px solid #ddd8d8;
     cursor: pointer;
-
+    margin: 10px;
     button {
       height: 60px;
       width: 60px;
