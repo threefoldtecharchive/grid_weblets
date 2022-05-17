@@ -8,7 +8,7 @@
   function selectColor(t: typeof type): string {
     switch (t) {
       case "info":
-        return "#47bcda";
+        return "#1982b1";
       default:
         return "white";
     }
