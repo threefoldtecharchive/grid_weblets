@@ -148,7 +148,11 @@
       >
         <h4 class="is-size-4">Profile Manager</h4>
         <p>
-          Currently, we’re supporting three different networks. One for testing (Testnet) where you can find it at https://play.test.grid.tf, one for development purposes (Devnet) where you can find it at https://play.dev.grid.tf and last one is for our mainnet and you can find it at https://play.grid.tf.
+          Currently, we’re supporting three different networks. One for testing
+          (Testnet) where you can find it at https://play.test.grid.tf, one for
+          development purposes (Devnet) where you can find it at
+          https://play.dev.grid.tf and last one is for our mainnet and you can
+          find it at https://play.grid.tf.
           <a
             target="_blank"
             href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"

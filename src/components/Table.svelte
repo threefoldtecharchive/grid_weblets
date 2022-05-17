@@ -44,9 +44,15 @@
 
   const style = `
     <style>
+      @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+      @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
       th, td {
         white-space: nowrap;
       }  
+      .icon {
+        color: #454545 !important;
+        cursor: pointer;
+      }
     </style>
   `;
 </script>
@@ -101,7 +107,41 @@
 
             {#if actions.length}
               <td>
-                <div class="buttons">
+                {#each actions as { type, label, click, disabled, loading }}
+                  {#if label == "Show Details"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-eye" />
+                    </span>
+                  {:else if label == "Visit"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-globe" />
+                    </span>
+                  {:else if label == "Admin Panel"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-user-gear" />
+                    </span>
+                  {/if}
+                {/each}
+
+                <!-- <div class="buttons">
                   {#each actions as { type, label, click, disabled, loading }}
                     <button
                       class={"button is-" +
@@ -110,10 +150,10 @@
                       on:click={(e) => click(e, idx)}
                       disabled={disabled ? disabled(idx) : false}
                     >
-                      {label}
+                      <i class="fa-solid fa-trash-can" />
                     </button>
                   {/each}
-                </div>
+                </div> -->
               </td>
             {/if}
           </tr>

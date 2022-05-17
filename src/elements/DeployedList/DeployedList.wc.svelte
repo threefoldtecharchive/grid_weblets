@@ -180,7 +180,7 @@
           loading: (i) => removing === rows[i].name,
         },
         {
-          type: "warning",
+          type: "success",
           label: "Admin Panel",
           click: (_, i) => {
             const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
@@ -257,7 +257,7 @@
           },
         },
         {
-          type: "warning",
+          type: "success",
           label: "Admin Panel",
           click: (_, i) => {
             const domain = rows[i].details.env.DOMAIN_NAME;
