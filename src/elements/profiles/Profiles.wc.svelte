@@ -282,7 +282,7 @@
           <div style="display: flex; justify-content: center;">
             <button
               class="button"
-              style={`background-color: #1982b1`}
+              style={`background-color: #1982b1; color: #fff`}
               type="submit"
               disabled={password === ""}
             >

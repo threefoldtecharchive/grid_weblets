@@ -466,7 +466,7 @@
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Kubernetes found on this profile." />
+            <Alert type="gray" message="No Kubernetes found on this profile." />
           {/if}
         {:catch err}
           <Alert
@@ -500,7 +500,7 @@
             />
           {:else}
             <Alert
-              type="info"
+              type="gray"
               message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
             />
           {/if}
