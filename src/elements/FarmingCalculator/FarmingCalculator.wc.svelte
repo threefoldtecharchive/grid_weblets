@@ -194,7 +194,8 @@
       </h4>
       {#if !profileChoosing}
         <button
-          class="button is-primary is-outlined"
+          class="button is-outlined"
+          style={`border-color: #1982b1; color: #1982b1`}
           on:click={onBackProfileChoosing}
         >
           Back
@@ -223,7 +224,8 @@
         <div class="mt-4">
           <button
             disabled={activeProfile === null}
-            class="button is-primary"
+            class="button"
+            style={`background-color: #1982b1; color: #fff`}
             on:click={onProfileChoosing}
           >
             Select Configuration

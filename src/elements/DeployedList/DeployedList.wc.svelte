@@ -413,6 +413,7 @@
         </div>
         <button
           class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
+          style={`background-color: #FF5151; color: #fff`}
           disabled={selectedRows.length === 0 || removing !== null}
           on:click={onDeleteHandler}
         >

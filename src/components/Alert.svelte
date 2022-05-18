@@ -9,6 +9,10 @@
     switch (t) {
       case "info":
         return "#1982b1";
+      case "danger":
+        return "#FF5151";
+      case "success":
+        return "#1982b1";
       default:
         return "white";
     }

@@ -144,13 +144,14 @@
       >
         <div style="flex-grow: 1;" class="mr-2">
           {#if message}
-            <Alert type="danger" {message} />
+            <Alert type="danger" style={`color: #FF5151`} {message} />
           {/if}
         </div>
         <div>
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
+            style={`border-color: #FF5151; color: #FF5151`}
             disabled={!profile ||
               loading ||
               deleting ||
@@ -161,8 +162,9 @@
             Delete Selected
           </button>
           <button
-            class={"button is-danger " +
+            class={"button is-danger" +
               (deleting && deletingType === "all" ? "is-loading" : "")}
+            style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
             on:click={onDeleteHandler}
           >

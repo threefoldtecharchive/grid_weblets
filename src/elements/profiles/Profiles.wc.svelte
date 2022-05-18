@@ -147,19 +147,20 @@
         style="display: flex; justify-content: space-between; align-items: center;"
       >
         <h4 class="is-size-4">Profile Manager</h4>
-        <p>
+        <!-- <p>
           <a
             target="_blank"
             href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
           >
             Quick start documentation</a
           >
-        </p>
+        </p> -->
 
         {#if configured}
           <div>
             <button
-              class="button is-primary is-outlined mr-2"
+              class="button is-outlined mr-2"
+              style={`border-color: #1982b1; color: #1982b1`}
               type="button"
               on:click={() => {
                 selectedIdx = configs.addProfile();
@@ -169,7 +170,8 @@
               + Add Profile
             </button>
             <button
-              class="button is-primary mr-2"
+              class="button mr-2"
+              style={`background-color: #1982b1; color: #fff`}
               type="button"
               on:click={onEventHandler.bind(undefined, "save")}
             >
@@ -177,6 +179,7 @@
             </button>
             <button
               class="button is-danger"
+              style={`background-color: #FF5151; color: #fff`}
               type="button"
               on:click={() => {
                 configured = false;
@@ -219,7 +222,8 @@
 
         <div class="is-flex is-justify-content-flex-end">
           <button
-            class={"button is-success" + (activating ? " is-loading" : "")}
+            class={"button" + (activating ? " is-loading" : "")}
+            style={`background-color: #1982b1; color: #fff`}
             disabled={activating || activeProfileId === activeProfile?.id}
             on:click={onActiveProfile}
           >
@@ -277,7 +281,8 @@
 
           <div style="display: flex; justify-content: center;">
             <button
-              class="button is-primary"
+              class="button"
+              style={`background-color: #1982b1`}
               type="submit"
               disabled={password === ""}
             >
