@@ -1,0 +1,413 @@
+
+{
+  "header": {
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20220519.111344.9403.0.001.json",
+    "dumpEventTime": "2022-05-19T11:13:44Z",
+    "dumpEventTimeStamp": "1652951624000",
+    "processId": 9403,
+    "cwd": "/media/samar/DATA/github/threefoldtech/grid_weblets",
+    "commandLine": [
+      "/usr/local/bin/node",
+      "/media/samar/DATA/github/threefoldtech/grid_weblets/node_modules/.bin/rollup",
+      "-c"
+    ],
+    "nodejsVersion": "v12.0.0",
+    "glibcVersionRuntime": "2.35",
+    "glibcVersionCompiler": "2.17",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "linux",
+    "componentVersions": {
+      "node": "12.0.0",
+      "v8": "7.4.288.21-node.16",
+      "uv": "1.28.0",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "72",
+      "nghttp2": "1.38.0",
+      "napi": "4",
+      "llhttp": "1.1.1",
+      "http_parser": "2.8.0",
+      "openssl": "1.1.1b",
+      "cldr": "34.0",
+      "icu": "63.1",
+      "tz": "2018e",
+      "unicode": "11.0"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v12.0.0/node-v12.0.0-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.0.0/node-v12.0.0.tar.gz"
+    },
+    "osName": "Linux",
+    "osRelease": "5.15.0-30-generic",
+    "osVersion": "#31-Ubuntu SMP Thu May 5 10:00:34 UTC 2022",
+    "osMachine": "x86_64",
+    "host": "del"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x0000000000a94fed",
+      "symbol": "report::TriggerNodeReport(v8::Isolate*, node::Environment*, char const*, char const*, std::string const&, v8::Local<v8::String>) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x000000000097b219",
+      "symbol": "node::OnFatalError(char const*, char const*) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000af2d0e",
+      "symbol": "v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, bool) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000af3089",
+      "symbol": "v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, bool) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000efe235",
+      "symbol": " [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f08b9b",
+      "symbol": "v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::GCCallbackFlags) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f098b7",
+      "symbol": "v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f0c355",
+      "symbol": "v8::internal::Heap::AllocateRawWithRetryOrFail(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000ed7380",
+      "symbol": "v8::internal::Factory::NewFillerObject(int, bool, v8::internal::AllocationSpace) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x00000000011a917e",
+      "symbol": "v8::internal::Runtime_AllocateInNewSpace(int, unsigned long*, v8::internal::Isolate*) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000001a5c1a2",
+      "symbol": " [/usr/local/bin/node]"
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 2178740224,
+    "totalCommittedMemory": 2156308408,
+    "usedMemory": 2117402680,
+    "availableMemory": 53689600,
+    "memoryLimit": 2197815296,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 524288,
+        "committedMemory": 32024,
+        "capacity": 523976,
+        "used": 31712,
+        "available": 492264
+      },
+      "new_space": {
+        "memorySize": 33554432,
+        "committedMemory": 13643024,
+        "capacity": 16767232,
+        "used": 1493056,
+        "available": 15274176
+      },
+      "old_space": {
+        "memorySize": 2040651776,
+        "committedMemory": 2040124376,
+        "capacity": 2016145632,
+        "used": 2015731784,
+        "available": 413848
+      },
+      "code_space": {
+        "memorySize": 8552448,
+        "committedMemory": 7321184,
+        "capacity": 8249664,
+        "used": 6582656,
+        "available": 1667008
+      },
+      "map_space": {
+        "memorySize": 3149824,
+        "committedMemory": 2880344,
+        "capacity": 1557120,
+        "used": 1557120,
+        "available": 0
+      },
+      "large_object_space": {
+        "memorySize": 91877376,
+        "committedMemory": 91877376,
+        "capacity": 91636144,
+        "used": 91636144,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 430080,
+        "committedMemory": 430080,
+        "capacity": 370208,
+        "used": 370208,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 16767232,
+        "used": 0,
+        "available": 16767232
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 132.167,
+    "kernelCpuSeconds": 6.91028,
+    "cpuConsumptionPercent": 158.042,
+    "maxRss": 2954989568,
+    "pageFaults": {
+      "IORequired": 20,
+      "IONotRequired": 1947436
+    },
+    "fsActivity": {
+      "reads": 1440,
+      "writes": 3824
+    }
+  },
+  "uvthreadResourceUsage": {
+    "userCpuSeconds": 54.4432,
+    "kernelCpuSeconds": 4.61064,
+    "cpuConsumptionPercent": 67.1066,
+    "fsActivity": {
+      "reads": 1440,
+      "writes": 0
+    }
+  },
+  "libuv": [
+  ],
+  "environmentVariables": {
+    "GJS_DEBUG_TOPICS": "JS ERROR;JS LOG",
+    "npm_package_dependencies_decimal_js": "^10.3.1",
+    "npm_package_devDependencies_ts_node": "^10.4.0",
+    "npm_package_devDependencies_rollup": "^2.3.4",
+    "npm_package_dependencies_bulma": "^0.9.3",
+    "npm_package_dependencies__polkadot_extension_dapp": "^0.41.1",
+    "USER": "samar",
+    "LC_TIME": "en_GB.UTF-8",
+    "npm_package_dependencies_page": "^1.11.6",
+    "npm_package_devDependencies_webpack_cli": "^4.9.1",
+    "npm_package_devDependencies__rollup_plugin_node_resolve": "^11.0.0",
+    "npm_config_version_commit_hooks": "true",
+    "npm_config_user_agent": "yarn/1.22.17 npm/? node/v12.0.0 linux x64",
+    "npm_package_dependencies_add": "^2.0.6",
+    "npm_package_devDependencies_rollup_plugin_css_only": "^3.1.0",
+    "npm_config_bin_links": "true",
+    "npm_config_wrap_output": "",
+    "XDG_SESSION_TYPE": "x11",
+    "npm_node_execpath": "/usr/local/bin/node",
+    "npm_config_init_version": "1.0.0",
+    "npm_config_user": "0",
+    "SHLVL": "1",
+    "HOME": "/home/samar",
+    "OLDPWD": "/home/samar",
+    "LESS": "-R",
+    "npm_package_dependencies_chart_js": "^3.6.0",
+    "npm_package_devDependencies_sass": "^1.43.4",
+    "npm_package_scripts_deps": "sh scripts/install_deps.sh",
+    "DESKTOP_SESSION": "ubuntu",
+    "GIO_LAUNCHED_DESKTOP_FILE": "/usr/share/applications/terminator.desktop",
+    "ZSH": "/home/samar/.oh-my-zsh",
+    "LSCOLORS": "Gxfxcxdxbxegedabagacad",
+    "npm_package_devDependencies_svelte_preprocess": "^4.0.0",
+    "npm_config_init_license": "MIT",
+    "GTK_MODULES": "gail:atk-bridge",
+    "GNOME_SHELL_SESSION_MODE": "ubuntu",
+    "PAGER": "less",
+    "YARN_WRAP_OUTPUT": "false",
+    "npm_package_devDependencies_svelte_check": "^2.0.0",
+    "npm_config_version_tag_prefix": "v",
+    "MANAGERPID": "2095",
+    "LC_MONETARY": "en_GB.UTF-8",
+    "npm_package_scripts_serve": "serve ./dist",
+    "npm_package_scripts_check": "svelte-check --tsconfig ./tsconfig.json",
+    "SYSTEMD_EXEC_PID": "2432",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+    "npm_package_devDependencies_css_minimizer_webpack_plugin": "^3.1.1",
+    "npm_package_devDependencies__types_marked": "^3.0.2",
+    "GIO_LAUNCHED_DESKTOP_FILE_PID": "3524",
+    "TERMINATOR_DBUS_NAME": "net.tenshu.Terminator23558193cd9818af7fe4d2c2f5bd9d00f",
+    "COLORTERM": "truecolor",
+    "npm_package_description": "![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets?style=flat-square)",
+    "npm_package_dependencies_bip39": "^3.0.4",
+    "npm_package_devDependencies_typescript": "^4.4.4",
+    "npm_package_readmeFilename": "README.md",
+    "npm_package_devDependencies_svelte_loader": "^3.1.2",
+    "MANDATORY_PATH": "/usr/share/gconf/ubuntu.mandatory.path",
+    "IM_CONFIG_PHASE": "1",
+    "npm_package_devDependencies_ts_loader": "^9.2.6",
+    "npm_package_scripts_dev": "rollup -c rollup.config.dev.js -w",
+    "LOGNAME": "samar",
+    "npm_package_scripts_build_app": "yarn build && sh scripts/build.sh && cd playground && yarn build",
+    "JOURNAL_STREAM": "8:36742",
+    "rvm_bin_path": "/home/samar/.rvm/bin",
+    "_": "/usr/bin/yarn",
+    "npm_package_dependencies_grid3_client": "1.3.1",
+    "npm_package_devDependencies_node_sass": "^6.0.1",
+    "npm_package_devDependencies_autoprefixer": "^10.3.7",
+    "npm_package_devDependencies__rollup_plugin_commonjs": "^17.0.0",
+    "npm_package_private": "true",
+    "XDG_SESSION_CLASS": "user",
+    "DEFAULTS_PATH": "/usr/share/gconf/ubuntu.default.path",
+    "npm_package_devDependencies__types_uuid": "^8.3.1",
+    "npm_package_devDependencies__types_js_yaml": "^4.0.4",
+    "npm_package_devDependencies__rollup_plugin_json": "^4.1.0",
+    "npm_config_registry": "https://registry.yarnpkg.com",
+    "USERNAME": "samar",
+    "TERM": "xterm-256color",
+    "GNOME_DESKTOP_SESSION_ID": "this-is-deprecated",
+    "npm_package_dependencies_sirv_cli": "^1.0.0",
+    "npm_package_dependencies__polkadot_api": "^6.8.1",
+    "npm_package_devDependencies_clean_webpack_plugin": "^4.0.0",
+    "npm_package_scripts_start": "sirv public --no-clear",
+    "npm_config_ignore_scripts": "",
+    "WINDOWPATH": "2",
+    "npm_package_dependencies_plotly_js_dist": "^2.6.3",
+    "PATH": "/tmp/yarn--1652951535424-0.4078815464651637:/media/samar/DATA/github/threefoldtech/grid_weblets/node_modules/.bin:/home/samar/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/tmp/yarn--1652951535188-0.31676611295072865:/media/samar/DATA/github/threefoldtech/grid_weblets/node_modules/.bin:/home/samar/.config/yarn/link/node_modules/.bin:/home/samar/.yarn/bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/home/samar/.local/bin:/home/samar/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/samar/.rvm/bin:/home/samar/.fzf/bin",
+    "NODE": "/usr/local/bin/node",
+    "INVOCATION_ID": "dbd7c8aeff724f998dff705f60dcb72a",
+    "SESSION_MANAGER": "local/del:@/tmp/.ICE-unix/2398,unix/del:/tmp/.ICE-unix/2398",
+    "PAPERSIZE": "a4",
+    "npm_package_dependencies_serve": "^13.0.2",
+    "npm_package_devDependencies__types_crypto_js": "^4.0.2",
+    "npm_package_name": "svelte-app",
+    "XDG_RUNTIME_DIR": "/run/user/1000",
+    "LC_ADDRESS": "en_GB.UTF-8",
+    "XDG_MENU_PREFIX": "gnome-",
+    "npm_package_dependencies_marked": "^3.0.8",
+    "npm_package_devDependencies_rollup_plugin_svelte": "^7.0.0",
+    "npm_package_devDependencies_require_json5": "^1.1.0",
+    "DISPLAY": ":1",
+    "npm_package_devDependencies__rollup_plugin_typescript": "^8.0.0",
+    "LC_TELEPHONE": "en_GB.UTF-8",
+    "TERMINATOR_DBUS_PATH": "/net/tenshu/Terminator2",
+    "LANG": "en_US.UTF-8",
+    "IBUS_DISABLE_SNOOPER": "1",
+    "XDG_CURRENT_DESKTOP": "ubuntu:GNOME",
+    "npm_package_devDependencies_webpack": "^5.60.0",
+    "npm_package_devDependencies_rollup_plugin_terser": "^7.0.0",
+    "XAUTHORITY": "/run/user/1000/gdm/Xauthority",
+    "XDG_SESSION_DESKTOP": "ubuntu",
+    "XMODIFIERS": "@im=ibus",
+    "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:",
+    "npm_lifecycle_script": "rollup -c",
+    "SSH_AGENT_LAUNCHER": "gnome-keyring",
+    "SSH_AUTH_SOCK": "/run/user/1000/keyring/ssh",
+    "npm_package_devDependencies_webpack_dev_server": "^4.3.1",
+    "npm_package_devDependencies__tsconfig_svelte": "^2.0.0",
+    "npm_config_version_git_message": "v%s",
+    "TERMINATOR_UUID": "urn:uuid:8c540087-595f-4dfe-8d5c-5b64e0390d71",
+    "LC_NAME": "en_GB.UTF-8",
+    "SHELL": "/usr/bin/zsh",
+    "npm_lifecycle_event": "build",
+    "npm_package_version": "1.0.0",
+    "GDMSESSION": "ubuntu",
+    "rvm_prefix": "/home/samar",
+    "QT_ACCESSIBILITY": "1",
+    "npm_config_argv": "{\"remain\":[],\"cooked\":[\"run\",\"build:app\"],\"original\":[\"build:app\"]}",
+    "npm_package_dependencies_uuid": "^8.3.2",
+    "npm_package_dependencies_js_yaml": "^4.1.0",
+    "npm_package_dependencies_buffer": "^6.0.3",
+    "npm_package_dependencies__fortawesome_fontawesome_free": "^5.15.4",
+    "npm_package_devDependencies_tslib": "^2.0.0",
+    "npm_package_devDependencies_svelte": "^3.44.0",
+    "npm_package_scripts_build": "rollup -c",
+    "LC_MEASUREMENT": "en_GB.UTF-8",
+    "npm_config_version_git_tag": "true",
+    "npm_config_version_git_sign": "",
+    "GJS_DEBUG_OUTPUT": "stderr",
+    "GPG_AGENT_INFO": "/run/user/1000/gnupg/S.gpg-agent:0:1",
+    "LC_IDENTIFICATION": "en_GB.UTF-8",
+    "rvm_version": "1.29.9 (latest)",
+    "npm_package_dependencies_yarn": "^1.22.17",
+    "npm_package_dependencies_ts_rmb_http_client": "1.0.5",
+    "npm_config_strict_ssl": "true",
+    "QT_IM_MODULE": "ibus",
+    "npm_package_dependencies_front_matter": "^4.0.2",
+    "npm_package_dependencies_crypto_js": "^4.1.1",
+    "PWD": "/media/samar/DATA/github/threefoldtech/grid_weblets",
+    "npm_execpath": "/usr/share/yarn/bin/yarn.js",
+    "XDG_DATA_DIRS": "/home/samar/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share/:/usr/share/ubuntu:/usr/share/gnome:/home/samar/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop",
+    "XDG_CONFIG_DIRS": "/etc/xdg/xdg-ubuntu:/etc/xdg",
+    "npm_package_devDependencies__rollup_plugin_replace": "^3.0.1",
+    "LC_NUMERIC": "en_GB.UTF-8",
+    "npm_config_save_prefix": "^",
+    "npm_config_ignore_optional": "",
+    "LC_PAPER": "en_GB.UTF-8",
+    "npm_package_devDependencies_rollup_plugin_livereload": "^2.0.0",
+    "npm_package_devDependencies_mini_css_extract_plugin": "^2.4.3",
+    "npm_package_scripts_serve_app": "yarn build && sh scripts/build.sh && cd playground && yarn serve",
+    "VTE_VERSION": "6800",
+    "rvm_path": "/home/samar/.rvm",
+    "INIT_CWD": "/media/samar/DATA/github/threefoldtech/grid_weblets",
+    "npm_package_dependencies_rollup_plugin_node_builtins": "^2.1.2",
+    "npm_package_devDependencies_node_polyfill_webpack_plugin": "^1.1.4"
+  },
+  "userLimits": {
+    "core_file_size_blocks": {
+      "soft": 0,
+      "hard": "unlimited"
+    },
+    "data_seg_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_locked_memory_bytes": {
+      "soft": 2079739904,
+      "hard": 2079739904
+    },
+    "max_memory_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "open_files": {
+      "soft": 1048576,
+      "hard": 1048576
+    },
+    "stack_size_bytes": {
+      "soft": 8388608,
+      "hard": "unlimited"
+    },
+    "cpu_time_seconds": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_user_processes": {
+      "soft": 63198,
+      "hard": 63198
+    },
+    "virtual_memory_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    }
+  },
+  "sharedObjects": [
+    "linux-vdso.so.1",
+    "/lib/x86_64-linux-gnu/libdl.so.2",
+    "/lib/x86_64-linux-gnu/librt.so.1",
+    "/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "/lib/x86_64-linux-gnu/libm.so.6",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/lib/x86_64-linux-gnu/libc.so.6",
+    "/lib64/ld-linux-x86-64.so.2"
+  ]
+}
