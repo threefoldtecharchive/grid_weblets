@@ -24,6 +24,7 @@
     validateMemory,
     validateEmail,
   } from "../../utils/validateName";
+  import validatePassword from '../../utils/validatePassword';
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -34,7 +35,7 @@
   const fields: IFormField[] = [
     { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }, // prettier-ignore
     { label: "Email", placeholder: "Admin Email", symbol: "adminEmail", type: "text", validator: validateEmail, invalid: false }, // prettier-ignore
-    { label: "Password", placeholder: "Admin Password", symbol: "adminPassword", type: "password", invalid: false }, // prettier-ignore
+    { label: "Password", placeholder: "Admin Password", symbol: "adminPassword", type: "password", validator: validatePassword, invalid: false }, // prettier-ignore
   ];
 
   // define this solution packages

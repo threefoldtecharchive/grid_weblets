@@ -24,6 +24,7 @@
     validateDisk,
     validateMemory,
   } from "../../utils/validateName";
+  import validateToken from '../../utils/validateToken';
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
 
@@ -37,7 +38,7 @@
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text", validator: validateName, invalid: false },
-    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
   ];
 
