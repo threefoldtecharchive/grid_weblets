@@ -23,8 +23,8 @@
     validateCpu,
     validateDisk,
     validateMemory,
+    validateToken,
   } from "../../utils/validateName";
-  import validateToken from '../../utils/validateToken';
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
 

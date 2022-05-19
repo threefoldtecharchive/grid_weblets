@@ -23,8 +23,9 @@
     validateCpu,
     validateMemory,
     validateEmail,
+    validatePassword
   } from "../../utils/validateName";
-  import validatePassword from '../../utils/validatePassword';
+
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";

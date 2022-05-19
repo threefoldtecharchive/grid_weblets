@@ -20,8 +20,8 @@
     validateCpu,
     validateDisk,
     validateMemory,
+    validatePassword
   } from "../../utils/validateName";
-  import validatePassword from '../../utils/validatePassword';
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
