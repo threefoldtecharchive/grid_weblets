@@ -1,4 +1,4 @@
-# easy-docs
+# playground
 
 ## Project setup
 ```

@@ -40,7 +40,7 @@ jobs:
     - name: Install dependencies
       run: |
         yarn install
-        cd easy-docs
+        cd playground
         yarn install
         cd ..
 
@@ -73,7 +73,7 @@ jobs:
         key: ${{ secrets.DEV_SSH_KEY }}
         passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
         rm: true
-        source: "docs/"
+        source: "dist/"
         target: "${{ secrets.DEV_REMOTE_DIR }}"
 
     - name: Copying files to testing server - Pre-release
@@ -85,7 +85,7 @@ jobs:
         key: ${{ secrets.DEV_SSH_KEY }}
         passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
         rm: true
-        source: "docs/"
+        source: "dist/"
         target: "${{ secrets.TEST_REMOTE_DIR }}"
 
     - name: Copying files to production server - Release
@@ -99,5 +99,5 @@ jobs:
         key: ${{ secrets.PROD_SSH_KEY }}
         passphrase: ${{ secrets.PROD_SSH_KEY_PASSPHRASE }}
         rm: true
-        source: "docs/"
+        source: "dist/"
         target: "${{ secrets.PROD_REMOTE_DIR }}"

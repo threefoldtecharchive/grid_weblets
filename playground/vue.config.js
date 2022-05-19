@@ -4,6 +4,6 @@ module.exports = {
     transpileDependencies: [
       'vuetify'
     ],
-    outputDir: join(__dirname, '..', 'docs'),
+    outputDir: join(__dirname, '..', 'dist'),
     publicPath: '/'
 }
