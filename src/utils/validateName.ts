@@ -68,7 +68,6 @@ export function validatePreCode(value: string): string | void {
 
 export function validatePassword(value: string): string | void {
   if (value.length < 6) return "Password must be at least 6 characters";
-<<<<<<< HEAD
   if (value.length < 15) return "Password must be at least 15 characters";
 }
 
@@ -77,6 +76,3 @@ export function validateToken(token: string): string | void {
   if (!ALPHA_NUMS_ONLY_REGEX.test(token)) return "Token can't contain any characters other than alphabets and numbers.";
   if (token.length > 15) return "Token must be at most 15 characters";
 }
-=======
-}
->>>>>>> b976b3a980c2e4990c6d8a6e5c4c1703e04b4b9d

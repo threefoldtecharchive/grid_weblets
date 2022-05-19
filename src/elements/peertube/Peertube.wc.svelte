@@ -23,11 +23,7 @@
     validateCpu,
     validateMemory,
     validateEmail,
-<<<<<<< HEAD
     validatePassword
-=======
-    validatePassword,
->>>>>>> b976b3a980c2e4990c6d8a6e5c4c1703e04b4b9d
   } from "../../utils/validateName";
 
   import { noActiveProfile } from "../../utils/message";
