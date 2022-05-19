@@ -4,7 +4,7 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-
+  import validateName from "../../utils/validateName";
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
@@ -39,7 +39,7 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text", validator: validateName, invalid: false  },
     // { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
