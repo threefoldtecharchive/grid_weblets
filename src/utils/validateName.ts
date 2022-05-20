@@ -1,15 +1,24 @@
 import type { IFormField } from "../types";
 
+const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/;
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
 // prettier-ignore
-export default function validateName(name: string): string | void {
-    if (name.length < 2) return "Name must be at least 2 characters";
-    if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace";
-    if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
-    if (name.length > 15) return "Name must be at most 15 characters";
+
+export default function validateProfileName(name: string): string | void {
+  if (name.length < 2) return "Name must be at least 2 characters";
+  if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace";
+  if (!PROFILE_NAME_REGEX.test(name)) return "Name can only include alphanumeric characters and spaces.";
+  if (name.length > 15) return "Name must be at most 15 characters";
+}
+
+export function validateName(name: string): string | void {
+  if (name.length < 2) return "Name must be at least 2 characters";
+  if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace";
+  if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
+  if (name.length > 15) return "Name must be at most 15 characters";
 }
 
 export function validateEmail(email: string): string | void {
@@ -18,7 +27,7 @@ export function validateEmail(email: string): string | void {
 
 export function validateOptionalEmail(email: string): string | void {
   if (email == "") return null;
-  if (!EMAIL_REGEX.test(email) ) return "Invalid email format";
+  if (!EMAIL_REGEX.test(email)) return "Invalid email format";
 }
 
 export function isInvalid(fields: IFormField[]) {
