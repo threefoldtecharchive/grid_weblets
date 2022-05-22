@@ -32,6 +32,7 @@ export function validateOptionalEmail(email: string): string | void {
 
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
+  console.log("Validate method " + fields.reduce((res, { invalid }) => res || !!invalid, false))
 }
 
 export function validateMemory(value: number): string | void {
@@ -75,4 +76,6 @@ export function validatePreCode(value: string): string | void {
 
 export function validatePassword(value: string): string | void {
   if (value.length < 6) return "Password must be at least 6 characters";
+  if (value.length > 15) return "Password must be less than 15 characters";
+
 }
