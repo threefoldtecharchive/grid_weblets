@@ -79,12 +79,15 @@
           <Tabs bind:active={vmActiveTab} tabs={vmTabs} />
           <FormatData vm={vms[vmActiveTab]} />
         {:else if active === "json"}
-          <div class="json">
-            {json}
-          </div>
+          <pre>
+            <code>
+              {json}
+            </code>
+          </pre>
+
           <hr />
           <div class="is-flex is-justify-content-flex-end">
-            <button class="button is-primary" on:click={() => copy(json)}>
+            <button class="button " on:click={() => copy(json)}>
               Copy
             </button>
           </div>
@@ -98,3 +101,17 @@
     on:click|preventDefault={() => dispatch("closed")}
   />
 </div>
+
+<style lang="scss" scoped>
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  pre code {
+    display: block;
+    background: none;
+    white-space: pre;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: scroll;
+    max-width: 100%;
+    min-width: 100px;
+    padding: 0;
+  }
+</style>

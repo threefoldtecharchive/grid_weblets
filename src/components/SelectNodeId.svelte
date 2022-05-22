@@ -83,7 +83,7 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
-      availableFor: $configs.twinId
+      availableFor: $configs.twinId,
     };
 
     findNodes(_filters, profile, exclusiveFor)
@@ -316,7 +316,8 @@
   {/each}
 
   <button
-    class={"button is-primary mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
+    class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
+    style={`background-color: #1982b1; color: #fff`}
     disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}
@@ -337,11 +338,13 @@
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
   {#if validating && data}
-    <p class="help is-success">Validating node {data}</p>
+    <p class="help" style={`color: #1982b1`}>
+      Validating node {data}
+    </p>
   {/if}
   {#if !validating && data}
     {#if status == "valid"}
-      <p class="help is-success">
+      <p class="help" style={`color: #1982b1`}>
         Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
     {:else if status === "invalid"}

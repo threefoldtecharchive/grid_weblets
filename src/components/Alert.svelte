@@ -1,14 +1,40 @@
 <svelte:options tag="tf-alert" />
 
 <script lang="ts">
-  export let type: "info" | "success" | "danger" | "warning";
+  export let type: "info" | "success" | "danger" | "warning" | "gray";
   export let message: string;
   export let deployed: Boolean = false;
+
+  function selectColor(t: typeof type): string {
+    switch (t) {
+      case "info":
+        return "#1982b1";
+      case "danger":
+        return "#FF5151";
+      case "success":
+        return "#1982b1";
+      default:
+        return "";
+    }
+  }
 </script>
 
-<div class={"notification is-" + type}>
-  {@html message}
-</div>
+{#if type == "gray"}
+  <div
+    class="notification"
+    style={`background-color: transparent; color: #333`}
+  >
+    {@html message}
+  </div>
+{:else}
+  <div
+    class={"notification"}
+    style={`background-color: ${selectColor(type)}; color: white`}
+  >
+    {@html message}
+  </div>
+{/if}
+
 {#if deployed}
   <div class="notification is-info">
     Your solution is now starting. Please be patient
