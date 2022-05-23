@@ -90,21 +90,3 @@ The `index.html` file should be like the following.
 1. Deploy the weblet in the playground app by appending the weblet to the elements list in `playground/src/App.vue`
 2. Create new tab in the sideNav by appending the weblet list with new class of `Weblet` in `playground/src/views/Editor.vue`
 
-## Add a Solution Weblet
-> TODO
-1. add new type extended the VM class. <!-- Or maybe refactor to have a base class-->
-2. add folder in elements.
-3. add the deploy script in utils folder <!-- Or maybe unifing the deploy script -->
-4. update the types for deploying and deleting the weblet.
-5. update the deployment list with the new weblet.
-6. Inject the new weblet in the playground.
-7. ...
-
-## Build Flow
-> TODO
-- Compile the weblet for development.
-- Compile the weblet for production.
-- Move the weblet compiled code to playground.
-- Serve the weblet in the playground for development.
-- Build the playground for production.
-- Serve the dist folder for development/production.
