@@ -22,11 +22,13 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateIP,
     validateMemory,
     validateToken,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
+
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -42,10 +44,11 @@
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
   ];
 
+  
   // prettier-ignore
   const networkFields: IFormField[] = [
     { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text" },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text", validator: validateIP, invalid: false },
   ];
 
   // prettier-ignore

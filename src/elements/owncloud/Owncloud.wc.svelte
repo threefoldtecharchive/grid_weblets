@@ -72,7 +72,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      invalid: false,
+      validator: validateName, invalid: false
     },
   ];
 
@@ -114,7 +114,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      invalid: false,
+      validator: validateName, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -130,7 +130,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
