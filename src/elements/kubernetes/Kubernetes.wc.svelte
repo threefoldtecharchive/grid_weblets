@@ -71,7 +71,11 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid(baseFields) || isInvalid(kubernetesFields) || isInvalid(networkFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid([...baseFields, ...kubernetesFields, ...networkFields]); 
+  
+
+  
+  // prettier-ignore
   let modalData: Object;
 
   async function onDeployKubernetes() {
