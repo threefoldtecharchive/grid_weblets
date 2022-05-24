@@ -123,9 +123,6 @@
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.sshKey = detail.sshKey;
-    }
   }}
 />
 
