@@ -180,7 +180,7 @@
           loading: (i) => removing === rows[i].name,
         },
         {
-          type: "warning",
+          type: "success",
           label: "Admin Panel",
           click: (_, i) => {
             const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
@@ -257,7 +257,7 @@
           },
         },
         {
-          type: "warning",
+          type: "success",
           label: "Admin Panel",
           click: (_, i) => {
             const domain = rows[i].details.env.DOMAIN_NAME;
@@ -413,6 +413,7 @@
         </div>
         <button
           class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
+          style={`background-color: #FF5151; color: #fff`}
           disabled={selectedRows.length === 0 || removing !== null}
           on:click={onDeleteHandler}
         >
@@ -465,7 +466,7 @@
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Kubernetes found on this profile." />
+            <Alert type="gray" message="No Kubernetes found on this profile." />
           {/if}
         {:catch err}
           <Alert
@@ -499,7 +500,7 @@
             />
           {:else}
             <Alert
-              type="info"
+              type="gray"
               message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
             />
           {/if}

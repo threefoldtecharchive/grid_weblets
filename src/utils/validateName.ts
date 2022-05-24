@@ -1,10 +1,10 @@
 import type { IFormField } from "../types";
 
+const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/;
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
 const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
 
