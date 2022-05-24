@@ -354,7 +354,7 @@
       </p>
     {:else if status === "dedicated"}
       <p class="help is-danger">
-        Node(<strong>{data}</strong>) is dedicated and not reserved for you. please check the portal.
+        Node(<strong>{data}</strong>) is dedicated and not reserved for your account, please check the portal.
       </p>
     {/if}
   {/if}
