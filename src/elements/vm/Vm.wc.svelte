@@ -21,6 +21,9 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateEntrypoint,
+    validateFlistvalue,
+    validateKey,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -80,7 +83,7 @@
 
   // prettier-ignore
   const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text"},
+    { label: 'Key', symbol: 'key', placeholder: "Environment Key", validator: validateKey, type: "text"},
     { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
   ];
 
@@ -104,7 +107,7 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid([...baseFields,...envFields, nameField,flistField]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = { loading: false, error: null };
 
@@ -232,6 +235,7 @@
               label: "FList",
               symbol: "flist",
               placeholder: "VM Image",
+              validator: validateFlistvalue,
               type: "text",
               ...validateFlist,
             }}
@@ -243,6 +247,7 @@
               label: "Entry Point",
               symbol: "entrypoint",
               placeholder: "Entrypoint",
+              validator: validateEntrypoint,
               type: "text",
             }}
           />

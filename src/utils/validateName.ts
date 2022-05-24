@@ -14,6 +14,16 @@ export default function validateProfileName(name: string): string | void {
   if (name.length > 15) return "Name must be at most 15 characters";
 }
 
+
+
+
+export function validateFlistvalue(value: string): string | void {
+  if (value === "") return "Flist Value is required";
+  if (!ALPHA_ONLY_REGEX.test(value[0])) return "Flist can't start with a number, a non-alphanumeric character or a whitespace";
+}
+export function validateEntrypoint(value: string): string | void {
+  if (value === "") return "Entrypoint is required";
+}
 export function validateName(name: string): string | void {
   if (name.length < 2) return "Name must be at least 2 characters";
   if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace";
@@ -75,4 +85,10 @@ export function validatePreCode(value: string): string | void {
 
 export function validatePassword(value: string): string | void {
   if (value.length < 6) return "Password must be at least 6 characters";
+}
+
+export function validateKey(value: string): string | void {
+  if (value.length < 2) return "key must be at least  characters";
+  if (value.length > 15) return "key must be at less than 15 characters";
+
 }
