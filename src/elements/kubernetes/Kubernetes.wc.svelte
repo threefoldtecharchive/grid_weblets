@@ -41,7 +41,7 @@
   const kubernetesFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text", validator: validateName, invalid: false },
     { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
+    // { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
   ];
 
   
