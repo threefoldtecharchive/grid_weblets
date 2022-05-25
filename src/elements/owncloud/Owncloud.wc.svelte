@@ -26,6 +26,7 @@
     validateDisk,
     validateMemory,
     validatePortNumber,
+    validatePassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
@@ -72,7 +73,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      validator: validateName, invalid: false
+      validator: validatePassword, invalid: false
     },
   ];
 
@@ -114,7 +115,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validateName, invalid: false
+      validator: validatePassword, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },

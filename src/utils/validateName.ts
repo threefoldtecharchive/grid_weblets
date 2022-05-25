@@ -88,7 +88,7 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIP(IP: string): string | void {
-  if (IP.length < 6) return "IP must be at least 6 characters";
-  if (!IP_REGEX.test(IP)) return "IP can't contain any characters other than alphabets and numbers.";
-  if (IP.length > 15) return "IP must be at most 15 characters";
+  // if (IP.length < 6) return "Invalid IP range.";
+  if (!IP_REGEX.test(IP)) return "Invalid IP range.";
+  // if (IP.length > 15) return "Invalid IP range.";
 }
