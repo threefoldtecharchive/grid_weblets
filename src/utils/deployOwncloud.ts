@@ -89,7 +89,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-owncloud-10.9.1.flist";
+    "https://hub.grid.tf/samehabouelsaad.3bot/threefolddev-grid3_owncloud_10.9.1-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
 
   let smtp_secure = "none";
