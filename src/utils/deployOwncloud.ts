@@ -58,7 +58,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
     smtpUseSSL,
     cpu,
     memory,
-    diskSize,
+    disks: [{ size }],
     name,
     nodeId,
     domain,
@@ -75,7 +75,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   // disk
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
+  disk.size = size;
   disk.mountpoint = "/var/lib/docker";
 
   // vm specs
