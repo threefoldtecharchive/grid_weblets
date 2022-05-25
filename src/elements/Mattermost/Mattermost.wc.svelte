@@ -17,11 +17,13 @@
     isInvalid,
     validatePortNumber,
     validateOptionalEmail,
+    validatePassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import rootFs from "../../utils/rootFs";
   import Tabs from "../../components/Tabs.svelte";
+  import AddBtn from "../../components/AddBtn.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -52,6 +54,7 @@
       label: "SMTP Password",
       symbol: "password",
       type: "password",
+      validator: validatePassword,
       placeholder: "SMTP Password",
       invalid: false,
     },
@@ -94,13 +97,13 @@
   $: disabled =
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([diskField, memoryField, cpuField]);
+    isInvalid([...smtpFields, ...baseFields, diskField, memoryField, cpuField]);
 
   function onDeployMattermost() {
     loading = true;
     deployMattermost(profile, data)
       .then((data) => {
-        modalData = data
+        modalData = data;
         deploymentStore.set(0);
         success = true;
       })
@@ -123,7 +126,8 @@
   <form class="box" on:submit|preventDefault={onDeployMattermost}>
     <h4 class="is-size-4">Deploy a Mattermost Instance</h4>
     <p>
-      Mattermost A single point of collaboration. Designed specifically for digital operations.
+      Mattermost A single point of collaboration. Designed specifically for
+      digital operations.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost"

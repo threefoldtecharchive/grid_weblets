@@ -63,7 +63,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -111,7 +111,9 @@
   <form class="box" on:submit|preventDefault={deployDiscourseHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Discourse Instance</h4>
     <p>
-      Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a mailing list, discussion forum, long-form chat room, and more!
+      Discourse is the 100% open source discussion platform built for the next
+      decade of the Internet. Use it as a mailing list, discussion forum,
+      long-form chat room, and more!
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_discourse"
@@ -154,9 +156,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
           {packages}
         />
 

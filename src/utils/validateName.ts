@@ -28,6 +28,7 @@ export function validateOptionalEmail(email: string): string | void {
 
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
+  console.log("Validate method " + fields.reduce((res, { invalid }) => res || !!invalid, false))
 }
 
 export function validateMemory(value: number): string | void {
@@ -88,7 +89,5 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIP(IP: string): string | void {
-  // if (IP.length < 6) return "Invalid IP range.";
   if (!IP_REGEX.test(IP)) return "Invalid IP range.";
-  // if (IP.length > 15) return "Invalid IP range.";
 }

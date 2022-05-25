@@ -50,7 +50,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
     cpu,
     memory,
     nodeId,
-    diskSize,
+    disks: [{ size }],
     smtp,
     developerEmail,
     threebotPRKey,
@@ -67,7 +67,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   /* Docker disk */
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
+  disk.size = size;
   disk.mountpoint = "/var/lib/docker";
 
   const machine = new MachineModel();

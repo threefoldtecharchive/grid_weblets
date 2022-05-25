@@ -19,7 +19,7 @@
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number;
-  export let status: "valid" | "invalid";
+  export let status: "valid" | "invalid" | "dedicated";
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
@@ -224,7 +224,7 @@
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
               if (node.dedicated && node.rentedByTwinId != $configs.twinId) {
-                status = "invalid";
+                status = "dedicated";
                 return;
               }
               const { total_resources: total, used_resources: used } =
@@ -351,6 +351,10 @@
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
         resources.
+      </p>
+    {:else if status === "dedicated"}
+      <p class="help is-danger">
+        Node(<strong>{data}</strong>) is dedicated and not reserved for your account, please check the portal.
       </p>
     {/if}
   {/if}
