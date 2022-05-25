@@ -138,6 +138,16 @@
                     >
                       <i class="fa-solid fa-user-gear" />
                     </span>
+                  {:else if label == "Manage Workers"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-gears" />
+                    </span>
                   {/if}
                 {/each}
 
