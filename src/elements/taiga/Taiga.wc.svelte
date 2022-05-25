@@ -24,6 +24,7 @@
     validateDisk,
     validateMemory,
     validatePortNumber,
+    validatePassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
@@ -58,6 +59,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
+      validator: validatePassword,
       invalid: false,
     },
     {
@@ -69,7 +71,6 @@
       invalid: false,
     },
   ];
-
 
   let mailFields: IFormField[] = [
     {
@@ -109,6 +110,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
+      validator: validatePassword,
       invalid: false,
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
@@ -132,7 +134,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField, ]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -180,7 +182,9 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Taiga Instance</h4>
     <p>
-      Taiga is the project management tool for multi-functional agile teams. It has a rich feature set and at the same time it is very simple to start with through its intuitive user interface.
+      Taiga is the project management tool for multi-functional agile teams. It
+      has a rich feature set and at the same time it is very simple to start
+      with through its intuitive user interface.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_taiga"
@@ -215,9 +219,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
           {packages}
         />
 

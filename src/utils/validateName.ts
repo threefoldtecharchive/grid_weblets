@@ -32,6 +32,7 @@ export function validateOptionalEmail(email: string): string | void {
 
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
+  console.log("Validate method " + fields.reduce((res, { invalid }) => res || !!invalid, false))
 }
 
 export function validateMemory(value: number): string | void {

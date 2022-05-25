@@ -67,8 +67,7 @@
       invalid: false,
     },
     {
-      label:
-        "Password",
+      label: "Password",
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
@@ -177,7 +176,9 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
     <p>
-      ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.
+      ownCloud develops and provides open-source software for content
+      collaboration, allowing teams to easily share and work on files seamlessly
+      regardless of device or location.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud"
@@ -224,9 +225,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
           {packages}
         />
 
