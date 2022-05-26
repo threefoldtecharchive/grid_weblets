@@ -23,7 +23,7 @@ export class Disk {
   // prettier-ignore
   public diskFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
-    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
+    { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator: validateMountPoint, invalid: false},
   ]
 
