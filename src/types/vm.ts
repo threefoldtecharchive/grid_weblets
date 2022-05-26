@@ -2,7 +2,11 @@ import { v4 } from "uuid";
 import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
-import { validateDisk } from "../utils/validateName";
+import {
+  validateDisk,
+  validateDiskName,
+  validateMountPoint,
+} from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 
@@ -18,14 +22,9 @@ export class Env {
 export class Disk {
   // prettier-ignore
   public diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
     { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
-    {
-      label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator(point: string): string | void {
-        point = point.trim();
-        if (point === "" || point === "/" || !point.startsWith("/")) return "Mount Point must start '/' and can't be positioned at root('/')"
-      }, invalid: false
-    },
+    { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator: validateMountPoint, invalid: false},
   ]
 
   constructor(
@@ -52,6 +51,8 @@ export class Disk {
       point !== "" &&
       point !== "/" &&
       point.startsWith("/") &&
+      validateDiskName(name) === undefined &&
+      validateMountPoint(point) === undefined &&
       this._diskFieldsValid
     );
   }
