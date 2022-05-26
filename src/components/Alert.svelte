@@ -26,6 +26,10 @@
   >
     {@html message}
   </div>
+{:else if type == "warning"}
+  <div class="notification" style={`background-color: #fffaeb; color: #946c00`}>
+    {@html message}
+  </div>
 {:else}
   <div
     class={"notification"}
@@ -36,7 +40,10 @@
 {/if}
 
 {#if deployed}
-  <div class="notification is-info">
+  <div
+    class={"notification"}
+    style={`background-color: ${selectColor(type)}; color: white`}
+  >
     Your solution is now starting. Please be patient
   </div>
 {/if}
