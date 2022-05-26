@@ -1,12 +1,16 @@
 import type { IFormField } from "../types";
 
-const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
-const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/;
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
-const ALPHA_ONLY_REGEX = /[A-Za-z]/;
-const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
 const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
+const EMAIL_REGEX =
+  /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
+const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
+const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start with digit
+const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
+const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
+// prettier-ignore
 
 
 // prettier-ignore
@@ -28,7 +32,10 @@ export function validateOptionalEmail(email: string): string | void {
 
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
-  console.log("Validate method " + fields.reduce((res, { invalid }) => res || !!invalid, false))
+  console.log(
+    "Validate method " +
+    fields.reduce((res, { invalid }) => res || !!invalid, false)
+  );
 }
 
 export function validateMemory(value: number): string | void {
@@ -88,6 +95,21 @@ export function validateToken(token: string): string | void {
   if (token.length > 15) return "Token must be at most 15 characters";
 }
 
-export function validateIP(IP: string): string | void {
-  if (!IP_REGEX.test(IP)) return "Invalid IP range.";
+export function validateIP(value: string): string | void {
+  if (!IP_REGEX.test(value)) return "Invalid IP range.";
+  if (value.length > 15) return "Password must be less than 15 characters";
+}
+
+export function validateMountPoint(value: string): string | void {
+  if (value === "") return "Mount point is required";
+  if (!UNIX_PATH_REGEX.test(value)) return "Invalid path";
+  value = value.trim();
+  if (value === "" || value === "/" || !value.startsWith("/"))
+    return "Mount Point must start '/' and can't be positioned at root('/')";
+}
+
+export function validateDiskName(value: string): string | void {
+  if (value === "") return "Disk Name is required";
+  if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid name";
+  if (value.length > 32) return "Name must be at most 15 characters";
 }
