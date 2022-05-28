@@ -5,6 +5,13 @@ const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/;
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
+// const URL_REGEX = /^(ftp|http|https):\/\/[^ "]+$/;
+// const URL_REGEX = /^(ftp|http|https):\/\/[^ "]+$/;
+const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
+
+// const SPECIAL_CHAR_REGEX = /^[A-Za-z0-9 ]+$/;
+const SPECIAL_CHAR_REGEX = /[^A-Za-z_]/g;
+
 // prettier-ignore
 
 export default function validateProfileName(name: string): string | void {
@@ -19,7 +26,7 @@ export default function validateProfileName(name: string): string | void {
 
 export function validateFlistvalue(value: string): string | void {
   if (value === "") return "Flist Value is required";
-  if (!ALPHA_ONLY_REGEX.test(value[0])) return "Flist can't start with a number, a non-alphanumeric character or a whitespace";
+  if (!URL_REGEX.test(value)) return "Invalid flist";
 }
 export function validateEntrypoint(value: string): string | void {
   if (value === "") return "Entrypoint is required";
@@ -88,7 +95,8 @@ export function validatePassword(value: string): string | void {
 }
 
 export function validateKey(value: string): string | void {
-  if (value.length < 2) return "key must be at least  characters";
-  if (value.length > 15) return "key must be at less than 15 characters";
+  if (!ALPHA_ONLY_REGEX.test(value[0])) return "Key can't start with a number, a non-alphanumeric character or a whitespace";
+  if (SPECIAL_CHAR_REGEX.test(value)) return "Invalid key format";
+
 
 }

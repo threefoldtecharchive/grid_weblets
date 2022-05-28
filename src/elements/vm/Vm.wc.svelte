@@ -49,6 +49,13 @@
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const FlistUrlField: IFormField = { 
+              label: "FList",
+              symbol: "flist",
+              placeholder: "VM Image",
+              validator: validateFlistvalue,
+              type: "text",
+              }; // prettier-ignore
 
   // prettier-ignore
   const flists: IFlist[] = [
@@ -107,7 +114,10 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid([...baseFields,...envFields, nameField,flistField]) || _isInvalidDisks(); // prettier-ignore
+  // $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid([nameField,flistField]) || _isInvalidDisks(); // prettier-ignore
+  // $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...envFields, ...baseFields,nameField, FlistUrlField]) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, FlistUrlField, ...envFields, ...baseFields]); // prettier-ignore
+
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = { loading: false, error: null };
 
@@ -115,10 +125,10 @@
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
-
       if (await isInvalidFlist(data.flist)) {
         validateFlist.loading = false;
         validateFlist.error = "Invalid Flist URL.";
+
         return;
       }
     }
@@ -229,17 +239,7 @@
         />
 
         {#if flistSelectValue === "other"}
-          <Input
-            bind:data={data.flist}
-            field={{
-              label: "FList",
-              symbol: "flist",
-              placeholder: "VM Image",
-              validator: validateFlistvalue,
-              type: "text",
-              ...validateFlist,
-            }}
-          />
+          <Input bind:data={data.flist} field={FlistUrlField} />
 
           <Input
             bind:data={data.entrypoint}
@@ -354,6 +354,21 @@
     {/if}
 
     <DeployBtn
+      {disabled}
+      {loading}
+      {failed}
+      {success}
+      on:click={(e) => {
+        if (success || failed) {
+          e.preventDefault();
+          success = false;
+          failed = false;
+          loading = false;
+        }
+      }}
+    />
+
+    <!-- <DeployBtn
       disabled={disabled || validateFlist.loading}
       loading={loading || validateFlist.loading}
       {failed}
@@ -366,7 +381,7 @@
           loading = false;
         }
       }}
-    />
+    /> -->
   </form>
 </div>
 {#if modalData}
