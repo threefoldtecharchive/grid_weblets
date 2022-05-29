@@ -234,7 +234,7 @@
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
 
-              if (!valid) {
+              if (!valid || node.status !== "up") {
                 status = "invalid";
                 return;
               }
