@@ -10,6 +10,7 @@ import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
 const network = process.env.NETWORK || "dev";
+const targetWeblets = process.env.TARGET_WEBLETS;
 
 /**
  * 
@@ -72,18 +73,19 @@ function build(options) {
 function buildElements() {
 	const dir = path.join(__dirname, 'src', 'elements');
 	const outDir = `.build/build/elements/`;
-	return fs
-		.readdirSync(dir)
-	// return ["DeployedList"]
-		.map(f => {
-			const name = f.replace(".wc.svelte", "").toLocaleLowerCase();
-			return build({
-				src: `src/elements/${f}/index.ts`,
-				outdir: outDir + `${name}.wc.js`,
-				element: true,
-				keepCss: true
-			});
+	let files = fs.readdirSync(dir);
+	if (targetWeblets) {
+		files = targetWeblets.split(" ");
+	}
+	return files.map((f) => {
+		const name = f.replace(".wc.svelte", "").toLocaleLowerCase();
+		return build({
+			src: `src/elements/${f}/index.ts`,
+			outdir: outDir + `${name}.wc.js`,
+			element: true,
+			keepCss: true
 		});
+	});
 }
 
 

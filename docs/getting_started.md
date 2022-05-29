@@ -31,6 +31,13 @@ yarn deps           # to install the dependencies
 yarn serve:app      # to build, move, and serve the playground
 ```
 
+For targeted build you can export the `TARGET_WEBLETS` environment variable to build only the weblets you want. the value is the name of the folder in `src/elements/` directory seperated by space. for example:
+
+```bash
+export TARGET_WEBLETS="vm peertube DeployedList"
+yarn serve:app
+```
+
 To read about each weblet and how to use it, and also how to config your twin id and activate your profile on the playground you can go to the [weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager).
 
 ## Weblet List
