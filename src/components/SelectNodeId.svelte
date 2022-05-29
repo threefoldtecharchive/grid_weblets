@@ -227,14 +227,19 @@
                 status = "dedicated";
                 return;
               }
+
+              if (node.status !== "up") {
+                status = "invalid";
+                return;
+              }
+
               const { total_resources: total, used_resources: used } =
                 node.capacity;
               // prettier-ignore
-              let valid = (total.cru - used.cru) >= filters.cru &&
+              let hasEnoughResources = (total.cru - used.cru) >= filters.cru &&
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
-
-              if (!valid || node.status !== "up") {
+              if (!hasEnoughResources) {
                 status = "invalid";
                 return;
               }
@@ -354,7 +359,8 @@
       </p>
     {:else if status === "dedicated"}
       <p class="help is-danger">
-        Node(<strong>{data}</strong>) is dedicated and not reserved for your account, please check the portal.
+        Node(<strong>{data}</strong>) is dedicated and not reserved for your
+        account, please check the portal.
       </p>
     {/if}
   {/if}
