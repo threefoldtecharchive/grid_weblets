@@ -2,16 +2,17 @@ import { v4 } from "uuid";
 import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
-import { validateDisk } from "../utils/validateName";
+import { validateDisk, validateFlistvalue, validateKey } from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
+
 
 export class Env {
   constructor(public id = v4(), public key = "", public value = "") {}
 
   public get valid(): boolean {
     const { key, value } = this;
-    return key !== "" && value !== "";
+    return key !== "" && value !== "" && validateKey(key) === undefined;
   }
 }
 
@@ -89,6 +90,7 @@ export default class VM {
     return (
       name !== "" &&
       flist !== "" &&
+      validateFlistvalue(flist) === undefined &&
       entrypoint !== "" &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
