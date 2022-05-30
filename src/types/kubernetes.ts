@@ -19,7 +19,7 @@ export abstract class Base {
     public status: "valid" | "invalid" = null,
     public rootFs = 2,
     public rootFsEditable = false
-  ) {}
+  ) { }
 
   public get valid(): boolean {
     const { name, node, cpu, diskSize, memory, rootFs: rFs } = this;
@@ -34,14 +34,14 @@ export abstract class Base {
   }
 }
 
-export class Master extends Base {}
-export class Worker extends Base {}
+export class Master extends Base { }
+export class Worker extends Base { }
 
 export class Network {
   constructor(
     public name: string = "NW" + v4().split("-")[0],
     public ipRange: string = "10.20.0.0/16"
-  ) {}
+  ) { }
 
   public get valid(): boolean {
     const { name, ipRange } = this;
@@ -57,16 +57,14 @@ export default class Kubernetes {
     public network = new Network(),
     public name: string = "K8S" + id.split("-")[0],
     public secret: string = v4().split("-")[0],
-    public sshKey: string = "",
     public metadata: string = "",
     public description: string = ""
-  ) {}
+  ) { }
 
   public get valid(): boolean {
-    const { secret, sshKey, master, workers, network } = this;
+    const { secret, master, workers, network } = this;
     return (
       secret !== "" &&
-      sshKey !== "" &&
       master.valid &&
       network.valid &&
       workers.reduce((res, w) => res && w.valid, true)

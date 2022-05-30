@@ -26,6 +26,7 @@
     validateDisk,
     validateMemory,
     validatePortNumber,
+    validatePassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
@@ -67,12 +68,11 @@
       invalid: false,
     },
     {
-      label:
-        "Password",
+      label: "Password",
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      invalid: false,
+      validator: validatePassword, invalid: false
     },
   ];
 
@@ -114,7 +114,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      invalid: false,
+      validator: validatePassword, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -130,7 +130,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -177,7 +177,9 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
     <p>
-      ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.
+      ownCloud develops and provides open-source software for content
+      collaboration, allowing teams to easily share and work on files seamlessly
+      regardless of device or location.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud"
@@ -224,9 +226,9 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
           {packages}
         />
 

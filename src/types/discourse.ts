@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
 import type { IFormField } from ".";
-import { validateEmail, validatePortNumber } from "../utils/validateName";
+import { validateEmail, validatePassword, validatePortNumber } from "../utils/validateName";
 import validateDomainName from "../utils/validateDomainName";
 
 import TweetNACL from "tweetnacl";
@@ -46,6 +46,7 @@ class SMTP {
       symbol: "password",
       placeholder: "Password",
       type: "password",
+      validator: validatePassword,
       invalid: false,
     },
     { label: "Use TLS", symbol: "enableTLS", type: "checkbox" },

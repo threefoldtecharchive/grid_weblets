@@ -9,7 +9,7 @@ export default async function deployKubernetes(
   profile: IProfile
 ) {
   const { master, workers, network: nw, ...base } = data;
-  const { secret, sshKey, description, metadata, name } = base;
+  const { secret, description, metadata, name } = base;
 
   const masterNodes = [createNode(master)];
   const workerNodes = workers.map(createNode);
@@ -22,7 +22,7 @@ export default async function deployKubernetes(
   k8s.workers = workerNodes;
   k8s.metadata = metadata;
   k8s.description = description;
-  k8s.ssh_key = sshKey;
+  k8s.ssh_key = profile.sshKey;
 
   return deploy(profile, "Kubernetes", name, (grid) => {
     return grid.k8s.deploy(k8s).then(() => grid.k8s.getObj(name));

@@ -138,22 +138,29 @@
                     >
                       <i class="fa-solid fa-user-gear" />
                     </span>
-                  {/if}
-                {/each}
-
-                <!-- <div class="buttons">
-                  {#each actions as { type, label, click, disabled, loading }}
-                    <button
-                      class={"button is-" +
+                  {:else if label == "Manage Workers"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-gears" />
+                    </span>
+                  {:else if label == "Delete"}
+                    <span
+                      title={label}
+                      class={"icon " +
                         type +
                         (loading && loading(idx) ? " is-loading" : "")}
                       on:click={(e) => click(e, idx)}
                       disabled={disabled ? disabled(idx) : false}
                     >
                       <i class="fa-solid fa-trash-can" />
-                    </button>
-                  {/each}
-                </div> -->
+                    </span>
+                  {/if}
+                {/each}
               </td>
             {/if}
           </tr>

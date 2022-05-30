@@ -20,6 +20,7 @@
     validateCpu,
     validateDisk,
     validateMemory,
+    validatePassword
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
@@ -45,7 +46,7 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
-    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password" },
+    { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password", validator: validatePassword, invalid: false },
   ];
 
   const packages: IPackage[] = [

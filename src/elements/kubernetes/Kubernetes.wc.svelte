@@ -22,10 +22,13 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateIP,
     validateMemory,
+    validateToken,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
+
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -37,20 +40,20 @@
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text", validator: validateName, invalid: false },
-    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
   ];
 
+  
   // prettier-ignore
   const networkFields: IFormField[] = [
     { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text" },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text", validator: validateIP, invalid: false },
   ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false},
-    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
@@ -67,7 +70,11 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid(baseFields) || isInvalid(kubernetesFields) || isInvalid(networkFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid([...baseFields, ...kubernetesFields, ...networkFields]); 
+  
+
+  
+  // prettier-ignore
   let modalData: Object;
 
   async function onDeployKubernetes() {
@@ -115,9 +122,6 @@
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.sshKey = detail.sshKey;
-    }
   }}
 />
 

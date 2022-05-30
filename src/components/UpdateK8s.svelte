@@ -175,7 +175,7 @@
   />
 
   {#if k8s}
-    <div class="modal-content" on:click|stopPropagation>
+    <div class="modal-content" style="width: fit-content" on:click|stopPropagation>
       <div class="box">
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
