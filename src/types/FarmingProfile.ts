@@ -1,5 +1,11 @@
+export enum ProfileTypes {
+  DIY,
+  TITAN,
+}
+
 export default class FarmingProfile {
   public constructor(
+    public readonly type: ProfileTypes = ProfileTypes.DIY,
     public name: string = "DIY",
     public memory: number = 0,
     public cpu: number = 0,
@@ -47,10 +53,14 @@ export default class FarmingProfile {
   }
 
   public get rewardPerCu(): number {
+    const { type, certified } = this;
+    if (type === ProfileTypes.TITAN && certified) return 2.4 + 0.25;
     return 2.4;
   }
 
   public get rewardPerSu(): number {
+    const { type, certified } = this;
+    if (type === ProfileTypes.TITAN && certified) return 1 + 0.25;
     return 1;
   }
 
