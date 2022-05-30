@@ -117,7 +117,7 @@ export function validateDiskName(value: string): string | void {
 
 export function validateKey(value: string): string | void {
   if (!ALPHA_ONLY_REGEX.test(value[0])) return "Key can't start with a number, a non-alphanumeric character or a whitespace";
-  if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid key format";
+  if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid key format ";
 
 
 }
