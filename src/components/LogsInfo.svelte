@@ -35,12 +35,14 @@
 
 {#if logs && logs.message}
   <div
-    class="notification is-info"
+    class="notification"
     style="
 position: fixed; 
 bottom: 15px; 
 left: 15px;
 z-index: 9999;
+background-color: #1982b1; 
+color: white
 "
   >
     <p>
