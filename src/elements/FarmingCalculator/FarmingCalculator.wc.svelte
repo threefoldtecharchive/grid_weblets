@@ -1,7 +1,7 @@
 <svelte:options tag="tf-farming-calculator" />
 
 <script lang="ts">
-  import FarmingProfile from "../../types/FarmingProfile";
+  import FarmingProfile, { ProfileTypes } from "../../types/FarmingProfile";
   import { onMount } from "svelte";
   import { Chart, registerables } from "chart.js";
   import {
@@ -14,8 +14,8 @@
   import type { IFormField } from "../../types";
 
   const profiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.08, 1), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 0, 1000, 0.08, 1), // prettier-ignore
+    new FarmingProfile(ProfileTypes.DIY, "DIY", 32, 8, 10000, 1000, 0.08, 1), // prettier-ignore
+    new FarmingProfile(ProfileTypes.TITAN, "Titan v2.1", 32, 8, 0, 1000, 0.08, 1, undefined, undefined, undefined, undefined, undefined, 800), // prettier-ignore
   ];
 
   let profileChoosing: boolean = true;
