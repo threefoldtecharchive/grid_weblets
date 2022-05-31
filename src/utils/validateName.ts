@@ -5,7 +5,7 @@ const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
 const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
 const EMAIL_REGEX =
   /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
+// const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start with digit
 const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
@@ -99,7 +99,6 @@ export function validateIP(value: string): string | void {
 
 export function validateMountPoint(value: string): string | void {
   if (value === "") return "Mount point is required";
-  if (!UNIX_PATH_REGEX.test(value)) return "Invalid path";
   value = value.trim();
   if (value === "" || value === "/" || !value.startsWith("/"))
     return "Mount Point must start '/' and can't be positioned at root('/')";
