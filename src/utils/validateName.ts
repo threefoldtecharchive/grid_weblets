@@ -31,6 +31,13 @@ export function validateOptionalEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
 }
 
+
+export function validateOptionalPassword(value: string): string | void {
+  if (value == "") return null;
+  if (value.length < 6) return "Password must be at least 6 characters";
+  if (value.length > 15) return "Password must be at least 15 characters";
+}
+
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
   console.log(
