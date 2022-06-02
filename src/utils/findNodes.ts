@@ -34,27 +34,31 @@ export default function findNodes(
             }
           }`)) as any;
         const nodeIds = res2.data.nodeContracts.map((n) => n.nodeID);
-        let farmIds = [];
+
+        let farmIds = new Set();
         for (let nodeId of nodeIds) {
           const res = await fetch(`${rmbProxy}/nodes/${nodeId}`);
-          farmIds.push(res.json()["farmId"]);
+          farmIds.add((await res.json())["farmId"]);
         }
 
         let farmNodes = [];
         for (let farmId of farmIds) {
-          const res = (await gqlClient.query(`query MyQuery {
-          nodes(where: {farmID_eq: ${farmId}}) {
-            nodeID
-          }
-        }`)) as any;
-          farmNodes.push(...res.data.nodes);
+          const res = await gqlClient.query(
+            `query MyQuery {
+              nodes(where: {farmID_eq: ${farmId}}) {
+                nodeID
+              }
+            }`
+          );
+          farmNodes.push(...res.data["nodes"]);
         }
-        items = items.filter(
-          (node) => !farmNodes.find((nodeId) => node.nodeId === nodeId)
-        );
-      }
-      // ... Ended.
 
+        items = items.filter((node) => {
+          return farmNodes.find((nodeId) => {
+            return node.nodeId === nodeId;
+          });
+        });
+      }
       const resNodes = items.map((node) => {
         return {
           label: `NodeID(${node.nodeId})`,
