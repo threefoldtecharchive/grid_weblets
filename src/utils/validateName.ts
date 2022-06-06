@@ -50,6 +50,14 @@ export function validateMemory(value: number): string | void {
   if (value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
 }
 
+export function validateKubernetesMemory(value: number): string | void {
+  value = +value;
+  if (isNaN(value)) return "Memory must be a valid number.";
+  if (+value.toFixed(0) !== value) return "Memory must be a valid integer.";
+  if (value < 1024) return "Minimum allowed memory is 1024 MB.";
+  if (value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
+}
+
 export function validateDisk(value: number): string | void {
   value = +value;
   if (isNaN(value)) return "Disk size must be a valid number.";

@@ -23,7 +23,7 @@
     validateCpu,
     validateDisk,
     validateIP,
-    validateMemory,
+    validateKubernetesMemory,
     validateToken,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -54,7 +54,7 @@
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false},
     { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
