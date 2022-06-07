@@ -16,22 +16,16 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
-  import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
-    validateEmail,
     validateOptionalEmail,
-    validateDisk,
-    validateMemory,
     validatePortNumber,
-    validatePassword,
+    validateOptionalPassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Owncloud();
@@ -58,6 +52,10 @@
 
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
+
+  const portField: IFormField = {   label: "Port", symbol: "smtpPort", placeholder: "587", type: "text", validator: validatePortNumber, invalid: false, }; // prettier-ignore
+
+
   let adminFields: IFormField[] = [
     {
       label: "Username",
@@ -72,7 +70,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      validator: validatePassword, invalid: false
+      validator: validateOptionalPassword, invalid: false
     },
   ];
 
@@ -93,14 +91,14 @@
       validator: validateDomainName,
       invalid: false,
     },
-    {
-      label: "Port",
-      symbol: "smtpPort",
-      placeholder: "587",
-      type: "text",
-      validator: validatePortNumber,
-      invalid: false,
-    },
+    // {
+    //   label: "Port",
+    //   symbol: "smtpPort",
+    //   placeholder: "587",
+    //   type: "text",
+    //   validator: validatePortNumber,
+    //   invalid: false,
+    // },
     {
       label: "Username",
       symbol: "smtpHostUser",
@@ -114,7 +112,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validatePassword, invalid: false
+      validator: validateOptionalPassword, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -130,7 +128,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField, portField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -252,6 +250,12 @@
             know what you’re doing.
           </p>
         </div>
+        <Input
+        bind:data={data.name}
+        bind:invalid={portField.invalid}
+        field={portField}
+        />
+
         {#each mailFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
