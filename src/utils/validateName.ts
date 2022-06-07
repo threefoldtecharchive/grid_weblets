@@ -46,7 +46,7 @@ export function validateMemory(value: number): string | void {
   value = +value;
   if (isNaN(value)) return "Memory must be a valid number.";
   if (+value.toFixed(0) !== value) return "Memory must be a valid integer.";
-  if (value < 250) return "Minimum allowed memory is 250 MB.";
+  if (value < 256) return "Minimum allowed memory is 256 MB.";
   if (value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
 }
 
