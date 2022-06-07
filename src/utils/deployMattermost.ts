@@ -57,6 +57,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     memory,
     disks,
     publicIp,
+    smtpPassword
   } = mattermost;
 
   let randomSuffix = generateString(10).toLowerCase();
@@ -77,7 +78,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     DB_PASSWORD: password,
     SITE_URL: "https://" + domain,
     SMTPUsername: username,
-    SMTPPassword: password,
+    SMTPPassword: smtpPassword,
     SMTPServer: server,
     SMTPPort: port,
     SSH_KEY: profile.sshKey,
