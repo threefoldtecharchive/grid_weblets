@@ -25,11 +25,6 @@ export default function findNodes(
           graphql
         );
 
-        console.log("all nodes");
-        console.log(avilableNodes);
-        console.log("blocked nodes");
-        console.log(blockedNodes);
-
         // remove the blocked nodes from the nodes the first page
         avilableNodes = exclude(blockedNodes, avilableNodes);
 
@@ -42,8 +37,6 @@ export default function findNodes(
               ...filters,
               page: pageNumber,
             });
-            console.log("inside while loop");
-            console.log(avilableNodes);
             avilableNodes = exclude(blockedNodes, avilableNodes);
           } catch (err) {
             console.log("End of the pages.");
@@ -114,6 +107,9 @@ async function getBlockedNodesIDs(
   return farmNodesIDs;
 }
 
-function exclude(_this, _from) {
-  return _from.filter((item) => !_this.includes(item.nodeId));
+function exclude(blocked, all) {
+  // make a list of ids for the blocked nodes
+  const blockedNodesIds = blocked.map((n) => n.nodeID);
+
+  return all.filter((item) => !blockedNodesIds.includes(item.nodeId));
 }
