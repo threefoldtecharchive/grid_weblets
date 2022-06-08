@@ -16,6 +16,7 @@ export interface IStore {
     | "Owncloud"
     | "Presearch"
     | "Mattermost"
+    | "TFhubValidator"
     | "Casperlabs";
   name: string;
   message: string;

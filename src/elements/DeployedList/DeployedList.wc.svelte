@@ -14,6 +14,7 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
+    | "TFhubValidator"
     | "discourse"
     | "taiga"
     | "owncloud"
@@ -39,6 +40,7 @@
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
     { label: "Mattermost", value: "mattermost" },
+    { label: "TFhubValidator", value: "tfhubvalidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
@@ -270,6 +272,27 @@
         },
       ],
       mattermost: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.SITE_URL;
+            window.open(domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.SITE_URL || removing !== null;
+          },
+        },
+      ],
+      tfhubvalidator: (rows) => [
         {
           type: "info",
           label: "Show Details",
