@@ -17,7 +17,7 @@
     isInvalid,
     validatePortNumber,
     validateOptionalEmail,
-    validatePassword,
+    validateOptionalPassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -52,9 +52,9 @@
     },
     {
       label: "SMTP Password",
-      symbol: "password",
+      symbol: "smtpPassword",
       type: "password",
-      validator: validatePassword,
+      validator: validateOptionalPassword,
       placeholder: "SMTP Password",
       invalid: false,
     },
@@ -97,7 +97,7 @@
   $: disabled =
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...smtpFields, ...baseFields, diskField, memoryField, cpuField]);
+    isInvalid([...baseFields, diskField, memoryField, cpuField]);
 
   function onDeployMattermost() {
     loading = true;

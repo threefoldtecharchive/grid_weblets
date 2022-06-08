@@ -3,6 +3,8 @@ import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
 import {
+  validateFlistvalue, 
+  validateKey,
   validateDisk,
   validateDiskName,
   validateMountPoint,
@@ -10,12 +12,13 @@ import {
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 
+
 export class Env {
   constructor(public id = v4(), public key = "", public value = "") {}
 
   public get valid(): boolean {
     const { key, value } = this;
-    return key !== "" && value !== "";
+    return key !== "" && value !== "" && validateKey(key) === undefined;
   }
 }
 
@@ -23,7 +26,7 @@ export class Disk {
   // prettier-ignore
   public diskFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
-    { label: "Size", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
+    { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator: validateMountPoint, invalid: false},
   ]
 
@@ -90,6 +93,7 @@ export default class VM {
     return (
       name !== "" &&
       flist !== "" &&
+      validateFlistvalue(flist) === undefined &&
       entrypoint !== "" &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&

@@ -21,6 +21,8 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateFlistvalue,
+    validateKey,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -38,7 +40,7 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
@@ -80,7 +82,7 @@
 
   // prettier-ignore
   const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text"},
+    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
     { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
   ];
 
@@ -104,9 +106,14 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
-  const validateFlist = { loading: false, error: null };
+  const validateFlist = {
+    loading: false,
+    error: null,
+    validator: validateFlistvalue,
+    invalid: false,
+  };
 
   async function onDeployVM() {
     if (flistSelectValue === "other") {

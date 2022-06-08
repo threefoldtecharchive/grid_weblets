@@ -25,6 +25,7 @@
     validateMemory,
     validatePortNumber,
     validatePassword,
+    validateOptionalPassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
@@ -110,7 +111,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validatePassword,
+      validator: validateOptionalPassword,
       invalid: false,
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },

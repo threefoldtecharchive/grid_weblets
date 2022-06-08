@@ -37,8 +37,10 @@
           z-index: 99;
           transform: translateX(-100%);
           font-size: 0.9rem;
+          background-color: #1982b1;
+          color: white;
         "
-        class="tag is-info is-light"
+        class="tag is-light"
       >
         <tf-version></tf-version>
       </span>
@@ -169,20 +171,8 @@ export default class Editor extends Vue {
       "casperlabs.png"
     ),
 
-    new Weblet(
-      "Contracts",
-      "contractslist",
-      "",
-      "my account",
-      ""
-    ),
-    new Weblet(
-      "Deployments",
-      "deployedlist",
-      "",
-      "my account",
-      ""
-    ),
+    new Weblet("Contracts", "contractslist", "", "my account", ""),
+    new Weblet("Deployments", "deployedlist", "", "my account", ""),
 
     // new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
   ];
@@ -273,7 +263,7 @@ export default class Editor extends Vue {
 }
 .menu-list a {
   margin: 5px 0;
-  transition: all .35s ease-in-out;
+  transition: all 0.35s ease-in-out;
 }
 .menu-list a:hover,
 .menu-list a.is-active {

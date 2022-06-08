@@ -5,7 +5,7 @@
   import type { IProfile } from "../types/Profile";
   import { Worker } from "../types/kubernetes";
   import type { IFormField, ITab } from "../types";
-  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../utils/validateName"; // prettier-ignore
+  import { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -36,7 +36,7 @@
   const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
@@ -175,7 +175,7 @@
   />
 
   {#if k8s}
-    <div class="modal-content" on:click|stopPropagation>
+    <div class="modal-content" style="width: fit-content" on:click|stopPropagation>
       <div class="box">
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers

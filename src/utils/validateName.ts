@@ -5,11 +5,12 @@ const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
 const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
 const EMAIL_REGEX =
   /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
+// const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start with digit
-const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
+const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
 const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
+const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 // prettier-ignore
 
 
@@ -30,19 +31,30 @@ export function validateOptionalEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
 }
 
+
+export function validateOptionalPassword(value: string): string | void {
+  if (value == "") return null;
+  if (value.length < 6) return "Password must be at least 6 characters";
+  if (value.length > 15) return "Password must be at least 15 characters";
+}
+
 export function isInvalid(fields: IFormField[]) {
   return fields.reduce((res, { invalid }) => res || !!invalid, false);
-  console.log(
-    "Validate method " +
-    fields.reduce((res, { invalid }) => res || !!invalid, false)
-  );
 }
 
 export function validateMemory(value: number): string | void {
   value = +value;
   if (isNaN(value)) return "Memory must be a valid number.";
   if (+value.toFixed(0) !== value) return "Memory must be a valid integer.";
-  if (value < 250) return "Minimum allowed memory is 250 MB.";
+  if (value < 256) return "Minimum allowed memory is 256 MB.";
+  if (value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
+}
+
+export function validateKubernetesMemory(value: number): string | void {
+  value = +value;
+  if (isNaN(value)) return "Memory must be a valid number.";
+  if (+value.toFixed(0) !== value) return "Memory must be a valid integer.";
+  if (value < 1024) return "Minimum allowed memory is 1024 MB.";
   if (value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
 }
 
@@ -102,7 +114,6 @@ export function validateIP(value: string): string | void {
 
 export function validateMountPoint(value: string): string | void {
   if (value === "") return "Mount point is required";
-  if (!UNIX_PATH_REGEX.test(value)) return "Invalid path";
   value = value.trim();
   if (value === "" || value === "/" || !value.startsWith("/"))
     return "Mount Point must start '/' and can't be positioned at root('/')";
@@ -110,6 +121,17 @@ export function validateMountPoint(value: string): string | void {
 
 export function validateDiskName(value: string): string | void {
   if (value === "") return "Disk Name is required";
-  if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid name";
-  if (value.length > 32) return "Name must be at most 15 characters";
+  if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid disk name";
+  if (value.length > 15) return "Name must be at most 15 characters";
+}
+
+export function validateKey(value: string): string | void {
+  if (!ALPHA_ONLY_REGEX.test(value[0])) return "Key can't start with a number, a non-alphanumeric character or a whitespace";
+  if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid key format ";
+
+
+}
+export function validateFlistvalue(value: string): string | void {
+  if (value === "") return "Flist Value is required";
+  if (!URL_REGEX.test(value)) return "Invalid flist";
 }
