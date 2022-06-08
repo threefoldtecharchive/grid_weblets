@@ -11,6 +11,8 @@ const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start wit
 const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
 const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
 const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
+const WHITE_SPACE_REGEX= /^\S*$/;
+
 // prettier-ignore
 
 
@@ -35,7 +37,7 @@ export function validateOptionalEmail(email: string): string | void {
 export function validateOptionalPassword(value: string): string | void {
   if (value == "") return null;
   if (value.length < 6) return "Password must be at least 6 characters";
-  if (value.length > 15) return "Password must be at least 15 characters";
+  if (value.length > 15) return "Password must be less than 15 characters";
 }
 
 export function isInvalid(fields: IFormField[]) {
@@ -128,10 +130,17 @@ export function validateDiskName(value: string): string | void {
 export function validateKey(value: string): string | void {
   if (!ALPHA_ONLY_REGEX.test(value[0])) return "Key can't start with a number, a non-alphanumeric character or a whitespace";
   if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid key format ";
+  if (value.length > 128) return "key must be less than 128 characters";
+
 
 
 }
 export function validateFlistvalue(value: string): string | void {
+  if (!WHITE_SPACE_REGEX.test(value)) return "Please remove from white spaces from flist";
   if (value === "") return "Flist Value is required";
   if (!URL_REGEX.test(value)) return "Invalid flist";
+}
+
+export function validateEntryPoint(value: string): string | void {
+  if (value === "") return "Entry point is required";
 }
