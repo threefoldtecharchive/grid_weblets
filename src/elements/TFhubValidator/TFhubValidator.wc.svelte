@@ -28,7 +28,7 @@
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
-    { label: "SMTP Server", value: "smtp" },
+    { label: "Environment Variables", value: "envvars" },
   ];
   let active = "base";
 
@@ -37,11 +37,92 @@
     { label: "Name", symbol: "name", type: "text", placeholder: "Validator Instance Name", validator: validateName, invalid: false },
   ];
 
+  const envvars: IFormField[] = [
+    {
+      label: "Mnemonics",
+      symbol: "mnemonics",
+      type: "password",
+      placeholder: "Mnemonics",
+      invalid: false,
+    },
+    {
+      label: "keyname",
+      symbol: "keyName",
+      type: "text",
+      placeholder: "Keyname",
+      invalid: false,
+    },
+    {
+      label: "Stake Amount",
+      symbol: "stakeAmount",
+      type: "text",
+      placeholder: "100000000TFT",
+      invalid: false,
+    },
+    {
+      label: "Moniker",
+      symbol: "moniker",
+      type: "text",
+      placeholder: "Threefold node",
+      invalid: false,
+    },
+    {
+      label: "Chain ID",
+      symbol: "chainId",
+      type: "text",
+      placeholder: "chain id",
+      invalid: false,
+    },
+    {
+      label: "Ethereum Address",
+      symbol: "ethereumAddress",
+      type: "text",
+      placeholder: "Ethereum Address",
+      invalid: false,
+    },
+    {
+      label: "Ethereum Private Key",
+      symbol: "ethereumPrivKey",
+      type: "password",
+      placeholder: "Ethereum Address",
+      invalid: false,
+    },
+    {
+      label: "Gravity Address",
+      symbol: "gravityAddress",
+      type: "text",
+      placeholder: "Gravity Address",
+      invalid: false,
+    },
+    {
+      label: "Ethereum RPC",
+      symbol: "ethereumRpc",
+      type: "text",
+      placeholder: "Ethereum RPC",
+      invalid: false,
+    },
+    {
+      label: "Persistent Peers",
+      symbol: "persistentPeers",
+      type: "text",
+      placeholder: "Persistent Peers",
+      invalid: false,
+    },
+    {
+      label: "Genesis URL",
+      symbol: "genesisUrl",
+      type: "text",
+      placeholder: "Genesis URL",
+      invalid: false,
+    },
+
+
+  ];
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 10 },
-    { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 50 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
+    { name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 150 },
   ];
 
   let profile: IProfile;
@@ -82,7 +163,14 @@
 
 </script>
 
-<SelectProfile on:profile={({ detail }) => (profile = detail)} />
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+    if (detail) {
+      data.ssh_key = detail?.sshKey;
+    }
+  }}
+/>
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployTFhubValidator}>
@@ -148,6 +236,20 @@
         filters={data.selection.filters}
         on:fetch={({ detail }) => (data.selection.nodes = detail)}
         />
+
+        {:else if active === "envvars"}
+        <div class="notification is-warning is-light">
+          <p>
+            please provide the required envvars for the validator
+          </p>
+        </div>
+        {#each envvars as field (field.symbol)}
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
+        {/each}
       {/if}
     {/if}
     <DeployBtn

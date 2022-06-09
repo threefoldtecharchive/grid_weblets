@@ -14,7 +14,7 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
-    | "TFhubValidator"
+    | "tfhubvalidator"
     | "discourse"
     | "taiga"
     | "owncloud"

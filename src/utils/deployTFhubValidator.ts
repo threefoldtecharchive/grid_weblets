@@ -46,6 +46,8 @@ function _deployTfHubValidator(
         cpu,
         memory,
         publicIp,
+        ssh_key,
+        planetary
     } = tfhubValidator;
 
 
@@ -61,18 +63,18 @@ function _deployTfHubValidator(
   vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-threefold_hub-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    name: name,
-    mnemonics: mnemonics,
-    keyName: keyName,
-    stakeAmount: stakeAmount,
-    moniker: moniker,
-    chainId: chainId,
-    ethereumAddress: ethereumAddress,
-    ethereumPrivKey: ethereumPrivKey,
-    gravityAddress: gravityAddress,
-    ethereumRpc: ethereumRpc,
-    persistentPeers: persistentPeers,
-    genesisUrl: genesisUrl,
+    MNEMONICS: mnemonics,
+    KEYNAME: keyName,
+    STAKE_AMOUNT: stakeAmount,
+    MONIKER: moniker,
+    CHAIN_ID: chainId,
+    ETHEREUM_ADDRESS: ethereumAddress,
+    ETHEREUM_PRIV_KEY: ethereumPrivKey,
+    GRAVITY_ADDRESS: gravityAddress,
+    ETHEREUM_RPC: ethereumRpc,
+    PERSISTENT_PEERS: persistentPeers,
+    GENESIS_URL: genesisUrl,
+    SSH_KEY: ssh_key,
   };
 
   const vms = new MachinesModel();
