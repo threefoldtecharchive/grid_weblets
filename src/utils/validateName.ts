@@ -28,7 +28,7 @@ export function validateEmail(email: string): string | void {
 
 export function validateRequiredEmail(email: string): string | void {
   if (email == "") return "Email is required";
-  validateEmail(email);
+  return validateEmail(email);
 }
 
 
@@ -91,7 +91,7 @@ export function validatePortNumber(value: string): string | void {
 
 export function validateRequiredPortNumber(value: string): string | void {
   if (value === "") return "Port is required.";
-  validatePortNumber(value);
+  return validatePortNumber(value);
 }
 
 export function validatePreCode(value: string): string | void {
@@ -114,7 +114,7 @@ export function validatePassword(value: string): string | void {
 
 export function validateRequiredPassword(value: string): string | void {
   if (value == "") return "Password is required";
-  validatePassword(value);
+  return validatePassword(value);
 }
 
 export function validateToken(token: string): string | void {
