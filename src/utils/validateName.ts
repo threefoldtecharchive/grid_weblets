@@ -26,6 +26,12 @@ export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
 }
 
+export function validateRequiredEmail(email: string): string | void {
+  if (email == "") return "Email is required";
+  return validateEmail(email);
+}
+
+
 export function validateOptionalEmail(email: string): string | void {
   if (email == "") return null;
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
@@ -83,6 +89,11 @@ export function validatePortNumber(value: string): string | void {
   if (port > 65535) return "Maximum allowed port is 65535.";
 }
 
+export function validateRequiredPortNumber(value: string): string | void {
+  if (value === "") return "Port is required.";
+  return validatePortNumber(value);
+}
+
 export function validatePreCode(value: string): string | void {
   if (value === "") return "Presearch registration code is required.";
   if (!PRECODE_REGEX.test(value)) return "Invalid presearch registration code.";
@@ -99,6 +110,11 @@ export function validateProfileName(name: string): string | void {
 export function validatePassword(value: string): string | void {
   if (value.length < 6) return "Password must be at least 6 characters";
   if (value.length > 15) return "Password must be at least 15 characters";
+}
+
+export function validateRequiredPassword(value: string): string | void {
+  if (value == "") return "Password is required";
+  return validatePassword(value);
 }
 
 export function validateToken(token: string): string | void {
