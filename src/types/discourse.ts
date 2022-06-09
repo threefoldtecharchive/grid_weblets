@@ -3,7 +3,7 @@ import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
 import type { IFormField } from ".";
 import { validateRequiredEmail, validateRequiredPassword, validateRequiredPortNumber } from "../utils/validateName";
-import { validateRequiredDomainName } from "../utils/validateDomainName";
+import { validateRequiredHostName } from "../utils/validateDomainName";
 
 import TweetNACL from "tweetnacl";
 import { Disk } from "./vm";
@@ -22,7 +22,7 @@ class SMTP {
       symbol: "address",
       placeholder: "smtp.example.com",
       type: "text",
-      validator: validateRequiredDomainName,
+      validator: validateRequiredHostName,
       invalid: false,
     },
     {

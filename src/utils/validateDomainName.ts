@@ -8,8 +8,8 @@ export default function validateDomainName(domain: string): string | void {
     if (!DOMAIN_NAME_REGEX.test(domain)) return "Domain name is not valid";
 }
 
-export function validateRequiredDomainName(domain: string): string | void {
+export function validateRequiredHostName(domain: string): string | void {
     // for optional fields to work
-    if (domain === "") return "Domain name is required";
-    if (!DOMAIN_NAME_REGEX.test(domain)) return "Domain name is not valid";
+    if (domain === "") return "Host name is required";
+    if (!DOMAIN_NAME_REGEX.test(domain)) return "Host name is not valid";
 }
