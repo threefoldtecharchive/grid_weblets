@@ -2,8 +2,8 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import NodeID from "./nodeId";
 import type { IFormField } from ".";
-import { validateEmail, validatePassword, validatePortNumber } from "../utils/validateName";
-import validateDomainName from "../utils/validateDomainName";
+import { validateRequiredEmail, validateRequiredPassword, validateRequiredPortNumber } from "../utils/validateName";
+import { validateRequiredDomainName } from "../utils/validateDomainName";
 
 import TweetNACL from "tweetnacl";
 import { Disk } from "./vm";
@@ -22,7 +22,7 @@ class SMTP {
       symbol: "address",
       placeholder: "smtp.example.com",
       type: "text",
-      validator: validateDomainName,
+      validator: validateRequiredDomainName,
       invalid: false,
     },
     {
@@ -30,7 +30,7 @@ class SMTP {
       symbol: "port",
       placeholder: "587",
       type: "text",
-      validator: validatePortNumber,
+      validator: validateRequiredPortNumber,
       invalid: false,
     },
     {
@@ -38,7 +38,7 @@ class SMTP {
       symbol: "userName",
       placeholder: "user@example.com",
       type: "text",
-      validator: validateEmail,
+      validator: validateRequiredEmail,
       invalid: false,
     },
     {
@@ -46,7 +46,7 @@ class SMTP {
       symbol: "password",
       placeholder: "Password",
       type: "password",
-      validator: validatePassword,
+      validator: validateRequiredPassword,
       invalid: false,
     },
     { label: "Use TLS", symbol: "enableTLS", type: "checkbox" },
