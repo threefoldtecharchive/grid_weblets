@@ -1,6 +1,7 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
+import validateName, { validateIP } from '../utils/validateName';
 import NodeID from "./nodeId";
 
 export abstract class Base {
@@ -45,7 +46,10 @@ export class Network {
 
   public get valid(): boolean {
     const { name, ipRange } = this;
-    return name !== "" && ipRange !== "";
+    return name !== "" &&
+      ipRange !== "" &&
+      !!validateName(name) &&
+      !!validateIP(ipRange)
   }
 }
 
