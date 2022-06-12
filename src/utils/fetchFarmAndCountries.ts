@@ -1,3 +1,4 @@
+import type { FilterOptions } from "grid3_client";
 import type { IProfile } from "../types/Profile";
 import gqlApi from "./gqlApi";
 
@@ -5,6 +6,14 @@ const queryCount = `
 query GetLimits {
     farms: farmsConnection(orderBy: farmID_ASC) { farms_limit: totalCount }
     countries: countriesConnection(orderBy: countryID_ASC) { countries_limit: totalCount }
+}
+`;
+
+const queryCountIPFilter = `
+query GetLimits {
+  farms: farmsConnection(where: {publicIPs_some: {}}, orderBy: farmID_ASC) { farms_limit: totalCount }
+  countries: countriesConnection(orderBy: countryID_ASC) { countries_limit: totalCount }
+
 }
 `;
 
@@ -25,8 +34,12 @@ interface IQueryData {
   countries: Array<{ name: string; code: string }>;
 }
 
-export default function fetchFarmAndCountries(profile: IProfile) {
-  return gqlApi<IQueryCount>(profile, queryCount)
+export default function fetchFarmAndCountries(profile: IProfile, filters: FilterOptions,) {
+  var query = queryCount;
+  if(filters.publicIPs)
+    query = queryCountIPFilter;
+    
+  return gqlApi<IQueryCount>(profile, query)
     .then(({ farms: { farms_limit }, countries: { countries_limit } }) => {
       return { farms_limit, countries_limit };
     })
