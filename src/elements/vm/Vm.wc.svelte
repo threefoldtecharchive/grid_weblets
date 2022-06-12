@@ -111,7 +111,6 @@
   const validateFlist = {
     loading: false,
     error: null,
-    validator: validateFlistvalue,
     invalid: false,
   };
 
