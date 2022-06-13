@@ -149,24 +149,28 @@
       /* Cache last used network */
       _network = profile.networkEnv;
 
-      /* Loading farms & countries */
-      const farmsLabel = _setLabel(0);
-      const countriesLabel = _setLabel(1);
-
-      fetchFarmAndCountries(profile)
-        .then(({ farms, countries }) => {
-          farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
-          _setOptions(0, farms);
-          _setOptions(1, countries);
-        })
-        .catch((err) => {
-          console.log("Error", err);
-        })
-        .finally(() => {
-          _setLabel(0, farmsLabel);
-          _setLabel(1, countriesLabel);
-        });
+      onLoadFarmsHandler();
     }
+  }
+
+  function onLoadFarmsHandler(){
+    /* Loading farms & countries */
+    const farmsLabel = _setLabel(0);
+    const countriesLabel = _setLabel(1);
+
+    fetchFarmAndCountries(profile, filters)
+      .then(({ farms, countries }) => {
+        farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
+        _setOptions(0, farms);
+        _setOptions(1, countries);
+      })
+      .catch((err) => {
+        console.log("Error", err);
+      })
+      .finally(() => {
+        _setLabel(0, farmsLabel);
+        _setLabel(1, countriesLabel);
+      });
   }
 
   function _update(key: string) {
@@ -283,6 +287,7 @@
       _nodeId = null;
       if (nodeSelection === "automatic") {
         onLoadNodesHandler();
+        onLoadFarmsHandler();
       }
     });
   };
