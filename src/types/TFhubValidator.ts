@@ -47,7 +47,6 @@ export default class TFHubValidator implements ITFHubValidator {
   public memory = 1024 * 4;
   public disks = [new Disk(undefined, undefined, 20, undefined)];
   constructor({
-    name,
     mnemonics,
     keyName,
     stakeAmount,
@@ -80,15 +79,14 @@ export default class TFHubValidator implements ITFHubValidator {
 
   get invalid(): boolean {
     const { 
-      name, mnemonics, keyName, stakeAmount,
-      moniker, ethereumAddress, ethereumPrivKey,
+      mnemonics,
+      stakeAmount,
+      ethereumAddress,
+      ethereumPrivKey,
     } = this;
     return (
-      name.trim() === "" ||
       mnemonics.trim() === "" ||
-      keyName.trim() === "" ||
       stakeAmount.trim() === "" ||
-      moniker.trim() === "" ||
       ethereumAddress.trim() === "" ||
       ethereumPrivKey.trim() === ""
     );

@@ -40,7 +40,7 @@
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
     { label: "Mattermost", value: "mattermost" },
-    { label: "TFhubValidator", value: "tfhubvalidator" },
+    { label: "TFhubValidator", value: "tfhubValidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
@@ -392,6 +392,7 @@
       },
     }
   );
+  
 </script>
 
 <SelectProfile

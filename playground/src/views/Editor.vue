@@ -143,7 +143,7 @@ export default class Editor extends Vue {
     new Weblet(
       "TFhubValidator",
       "vaildator",
-      "tfhubvalidator",
+      "tfhubValidator",
       "deployment",
       "vm.png"
     ),

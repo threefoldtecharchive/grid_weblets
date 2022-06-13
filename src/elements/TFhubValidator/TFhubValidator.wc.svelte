@@ -23,11 +23,10 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
   const data = new TFhubValidator();
-  const validateValue = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null;
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
-    { label: "Environment Variables", value: "envvars" },
+    { label: "Confgration", value: "valConf" },
   ];
   let active = "base";
 
@@ -36,7 +35,7 @@
     { label: "Name", symbol: "name", type: "text", placeholder: "Validator Instance Name", validator: validateName, invalid: false },
   ];
 
-  const envvars: IFormField[] = [
+  const valConf: IFormField[] = [
     {
       label: "Mnemonics",
       symbol: "mnemonics",
@@ -45,24 +44,10 @@
       invalid: false,
     },
     {
-      label: "keyname",
-      symbol: "keyName",
-      type: "text",
-      placeholder: "Any name to use as a key name in the keyring.",
-      invalid: false,
-    },
-    {
       label: "Stake Amount",
       symbol: "stakeAmount",
       type: "text",
       placeholder: "100000000TFT",
-      invalid: false,
-    },
-    {
-      label: "Moniker",
-      symbol: "moniker",
-      type: "text",
-      placeholder: "any name as a node name. e.g. 'validator-1'.",
       invalid: false,
     },
     {
@@ -199,13 +184,13 @@
         on:fetch={({ detail }) => (data.selection.nodes = detail)}
         />
 
-        {:else if active === "envvars"}
+        {:else if active === "valConf"}
         <div class="notification is-warning is-light">
           <p>
-            please provide the required envvars for the validator
+            please provide the required valConf for the validator
           </p>
         </div>
-        {#each envvars as field (field.symbol)}
+        {#each valConf as field (field.symbol)}
           <Input
             bind:data={data[field.symbol]}
             bind:invalid={field.invalid}
