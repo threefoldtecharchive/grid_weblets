@@ -3,16 +3,14 @@ import type { IFormField } from "../types";
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
 const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
-const EMAIL_REGEX =
-  /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 // const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start with digit
 const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
 const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
-const URL_REGEX =
-  /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
-const NUM_REGEX = /^[0-9]+$/;
+const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
+const NUM_REGEX = /^[1-9](\d?|\d+)$/;
 // prettier-ignore
 
 // prettier-ignore
