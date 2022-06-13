@@ -22,7 +22,7 @@ function getNetwork() :string {
 function defaultEnvVars(host: string){
   // Replace dev with main when you deploying the validator on localhost. 
   const env = {
-    main: {
+    dev: {
       chainId: "threefold-hub-testnet",
       gravityAddress: "0x7968da29488c498535352b809c158cde2e42497a",
       ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
@@ -43,7 +43,7 @@ function defaultEnvVars(host: string){
       persistentPeers: "",
       genesisUrl: "",
     },
-    dev: {
+    main: {
       chainId: "",
       gravityAddress: "",
       ethereumRpc: "",
