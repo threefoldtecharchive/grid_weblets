@@ -73,7 +73,6 @@
             success = true;
             shouldBeUpdated = true;
             worker = new Worker();
-            console.log({ name: k8s.name });
             return grid.k8s.getObj(k8s.name);
           } else {
             failed = true;
