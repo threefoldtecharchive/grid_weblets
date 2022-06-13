@@ -16,7 +16,6 @@
   import validateName, {
     isInvalid
   } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import rootFs from "../../utils/rootFs";
   import Tabs from "../../components/Tabs.svelte";
@@ -42,14 +41,14 @@
       label: "Mnemonics",
       symbol: "mnemonics",
       type: "password",
-      placeholder: "Mnemonics",
+      placeholder: "For the cosmos account that will stake token.",
       invalid: false,
     },
     {
       label: "keyname",
       symbol: "keyName",
       type: "text",
-      placeholder: "Keyname",
+      placeholder: "Any name to use as a key name in the keyring.",
       invalid: false,
     },
     {
@@ -63,60 +62,23 @@
       label: "Moniker",
       symbol: "moniker",
       type: "text",
-      placeholder: "Threefold node",
-      invalid: false,
-    },
-    {
-      label: "Chain ID",
-      symbol: "chainId",
-      type: "text",
-      placeholder: "chain id",
+      placeholder: "any name as a node name. e.g. 'validator-1'.",
       invalid: false,
     },
     {
       label: "Ethereum Address",
       symbol: "ethereumAddress",
       type: "text",
-      placeholder: "Ethereum Address",
+      placeholder: "This address will be used in the bridge.",
       invalid: false,
     },
     {
       label: "Ethereum Private Key",
       symbol: "ethereumPrivKey",
       type: "password",
-      placeholder: "Ethereum Address",
+      placeholder: "The private key of the previous address.",
       invalid: false,
     },
-    {
-      label: "Gravity Address",
-      symbol: "gravityAddress",
-      type: "text",
-      placeholder: "Gravity Address",
-      invalid: false,
-    },
-    {
-      label: "Ethereum RPC",
-      symbol: "ethereumRpc",
-      type: "text",
-      placeholder: "Ethereum RPC",
-      invalid: false,
-    },
-    {
-      label: "Persistent Peers",
-      symbol: "persistentPeers",
-      type: "text",
-      placeholder: "Persistent Peers",
-      invalid: false,
-    },
-    {
-      label: "Genesis URL",
-      symbol: "genesisUrl",
-      type: "text",
-      placeholder: "Genesis URL",
-      invalid: false,
-    },
-
-
   ];
   // define this solution packages
   const packages: IPackage[] = [

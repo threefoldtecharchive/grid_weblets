@@ -7,6 +7,50 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
 
+function getNetwork() :string {
+  const networks = ['test', 'dev', 'qa', 'main'];
+  const host = window.location.host;
+  let keyword = '';
+  let match = networks.includes(
+    host.split('.')[1])
+    ? keyword = host.split('.')[1]
+    : keyword = 'main';
+  return match;
+}
+
+function defaultEnvVars(host: string){
+  const env = {
+    main: {
+      chainId: "threefold-hub-testnet",
+      gravityAddress: "0x7968da29488c498535352b809c158cde2e42497a",
+      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
+      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@tfhub.test.grid.tf:26656",
+      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
+    },
+    qa: {
+      chainId: "",
+      gravityAddress: "",
+      ethereumRpc: "",
+      persistentPeers: "",
+      genesisUrl: "",
+    },
+    test: {
+      chainId: "",
+      gravityAddress: "",
+      ethereumRpc: "",
+      persistentPeers: "",
+      genesisUrl: "",
+    },
+    dev: {
+      chainId: "",
+      gravityAddress: "",
+      ethereumRpc: "",
+      persistentPeers: "",
+      genesisUrl: "",
+    },
+  }
+  return env[host];
+}
 
 const {
     MachineModel,
@@ -35,19 +79,12 @@ function _deployTfHubValidator(
         keyName,
         stakeAmount,
         moniker,
-        chainId,
         ethereumAddress,
         ethereumPrivKey,
-        gravityAddress,
-        ethereumRpc,
-        persistentPeers,
-        genesisUrl,
         nodeId,
         cpu,
         memory,
         publicIp,
-        ssh_key,
-        planetary
     } = tfhubValidator;
 
 
@@ -67,15 +104,19 @@ function _deployTfHubValidator(
     KEYNAME: keyName,
     STAKE_AMOUNT: stakeAmount,
     MONIKER: moniker,
-    CHAIN_ID: chainId,
+    CHAIN_ID: defaultEnvVars(getNetwork()).chainId,
     ETHEREUM_ADDRESS: ethereumAddress,
     ETHEREUM_PRIV_KEY: ethereumPrivKey,
-    GRAVITY_ADDRESS: gravityAddress,
-    ETHEREUM_RPC: ethereumRpc,
-    PERSISTENT_PEERS: persistentPeers,
-    GENESIS_URL: genesisUrl,
-    SSH_KEY: ssh_key,
+    GRAVITY_ADDRESS: defaultEnvVars(getNetwork()).gravityAddress,
+    ETHEREUM_RPC: defaultEnvVars(getNetwork()).ethereumRpc,
+    PERSISTENT_PEERS: defaultEnvVars(getNetwork()).persistentPeers,
+    GENESIS_URL: defaultEnvVars(getNetwork()).genesisUrl,
+    SSH_KEY: profile.sshKey,
   };
+  console.log(getNetwork());
+  console.log(profile.sshKey);
+  
+  console.log(defaultEnvVars(getNetwork()).genesisUrl);
 
   const vms = new MachinesModel();
   vms.name = name;
