@@ -21,6 +21,7 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateEntryPoint,
     validateFlistvalue,
     validateKey,
     validateMemory,
@@ -249,6 +250,7 @@
             field={{
               label: "Entry Point",
               symbol: "entrypoint",
+              validator: validateEntryPoint,
               placeholder: "Entrypoint",
               type: "text",
             }}

@@ -8,6 +8,7 @@ import {
   validateDisk,
   validateDiskName,
   validateMountPoint,
+  validateEntryPoint,
 } from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
@@ -94,7 +95,7 @@ export default class VM {
       name !== "" &&
       flist !== "" &&
       validateFlistvalue(flist) === undefined &&
-      entrypoint !== "" &&
+      validateEntryPoint(entrypoint) === undefined &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
       isValidInteger(nodeId) &&
