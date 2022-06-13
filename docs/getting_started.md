@@ -18,6 +18,7 @@ The repo contains two projects:
 You can use one of the live instances of the playground:
 
 - dev environment: rapidly changing environment on development branch merges: https://play.dev.grid.tf
+- qa environment: more stable environment on pre-releases: https://play.qa.grid.tf
 - test environment: more stable environment on pre-releases: https://play.test.grid.tf
 - stable environment: most stable / verified code, based on releases: https://play.grid.tf
 
