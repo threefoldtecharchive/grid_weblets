@@ -30,7 +30,7 @@
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
       /* Hack for now */
-    } else if (target.type === "number") {
+    } else if (target.getAttribute("data-type") === "number") {
       let __err = +target.value <= 0 ? "Value must be positive" : null;
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
@@ -168,7 +168,8 @@
             />
           {:else if field.type === "number"}
             <input
-              type="number"
+              type="text"
+              data-type="number"
               class={"input" + (field.error || _error ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
