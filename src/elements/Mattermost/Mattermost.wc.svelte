@@ -97,7 +97,7 @@
   $: disabled =
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, diskField, memoryField, cpuField]);
+    isInvalid([...baseFields, diskField, memoryField, cpuField, ...smtpFields]);
 
   function onDeployMattermost() {
     loading = true;
