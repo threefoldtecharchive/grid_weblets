@@ -5,7 +5,7 @@
   import type { IProfile } from "../types/Profile";
   import { Worker } from "../types/kubernetes";
   import type { IFormField, ITab } from "../types";
-  import { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -34,7 +34,7 @@
   let worker = new Worker();
   // prettier-ignore
   const workerFields: IFormField[] = [ 
-    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false },
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
@@ -43,7 +43,7 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
-  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid"; // prettier-ignore
+  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid" || worker.rootFs < 2 || !worker.rootFs; // prettier-ignore
   $: logs = $currentDeployment;
 
   function onAddWorker() {

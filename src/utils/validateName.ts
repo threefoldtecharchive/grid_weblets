@@ -151,3 +151,10 @@ export function validateFlistvalue(value: string): string | void {
   if (value === "") return "Flist Value is required";
   if (!URL_REGEX.test(value)) return "Invalid flist";
 }
+
+// export function validateWorkerName(name: string): string | void {
+//   if (name.length < 2) return "Name must be at least 2 characters";
+//   if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace.";
+//   if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
+//   if (name.length > 15) return "Name must be at most 15 characters.";
+// }
