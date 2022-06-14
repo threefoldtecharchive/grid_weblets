@@ -74,7 +74,7 @@
   function onLoadNodesHandler() {
     loadingNodes = true;
     status = null;
-    const label = nodeIdSelectField.options[0].label;
+    const label = "Please select a node id.";
     nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
       publicIPs: filters.publicIPs,
@@ -99,6 +99,7 @@
           data = +_nodes[0].value;
           status = "valid";
         } else {
+          nodeIdSelectField.options[0].label = label;
           status = "valid";
         }
       })
