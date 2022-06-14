@@ -51,8 +51,8 @@ export class Network {
     const { name, ipRange } = this;
     return name !== "" &&
       ipRange !== "" &&
-      !!isValidNetworkName(name) &&
-      !!isValidIP(ipRange)
+      isValidNetworkName(name) &&
+      isValidIP(ipRange)
   }
 }
 

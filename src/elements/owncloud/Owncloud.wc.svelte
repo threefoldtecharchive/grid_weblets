@@ -91,14 +91,6 @@
       validator: validateDomainName,
       invalid: false,
     },
-    // {
-    //   label: "Port",
-    //   symbol: "smtpPort",
-    //   placeholder: "587",
-    //   type: "text",
-    //   validator: validatePortNumber,
-    //   invalid: false,
-    // },
     {
       label: "Username",
       symbol: "smtpHostUser",
