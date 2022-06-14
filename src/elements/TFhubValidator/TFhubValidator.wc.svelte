@@ -187,7 +187,7 @@
         {:else if active === "valConf"}
         <div class="notification is-warning is-light">
           <p>
-            please provide the required valConf for the validator
+            please provide the required values for the validator
           </p>
         </div>
         {#each valConf as field (field.symbol)}

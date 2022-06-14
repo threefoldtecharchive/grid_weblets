@@ -9,14 +9,14 @@ import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
 
 function getNetwork() :string {
-  const networks = ['test', 'dev', 'qa', 'main'];
+  const networks = ['dev', 'qa', 'test', 'main'];
   const host = window.location.host;
-  let keyword = '';
-  let match = networks.includes(
+  let netWork = '';
+  networks.includes(
     host.split('.')[1])
-    ? keyword = host.split('.')[1]
-    : keyword = 'main';
-  return match;
+    ? netWork = host.split('.')[1]
+    : netWork = 'main';
+  return netWork;
 }
 
 function defaultEnvVars(host: string){
@@ -70,7 +70,6 @@ export default async function deployTFhubValidator(
       profile, tfhubValidator
     );
 
-  const ip = validatorVm["planetary"] as string;
   return validatorVm;
 }
 
@@ -96,7 +95,7 @@ function _deployTfHubValidator(
 
   disk.name = `disk${randomSuffix}`;
   disk.size = size;
-  disk.mountpoint = `/mnt/${disk.name}`;
+  disk.mountpoint = `/root/.threefold_hub`;
 
   vm.name = name;
   vm.node_id = nodeId;
