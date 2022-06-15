@@ -2,6 +2,7 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
 import NodeID from "./nodeId";
+import validateName, { validateIPRange } from '../utils/validateName';
 
 export abstract class Base {
   public constructor(
@@ -25,6 +26,7 @@ export abstract class Base {
     const { name, node, cpu, diskSize, memory, rootFs: rFs } = this;
     return (
       name !== "" &&
+      validateName(name) === undefined &&
       isValidInteger(node) &&
       isValidInteger(cpu) &&
       isValidInteger(diskSize) &&
@@ -45,7 +47,10 @@ export class Network {
 
   public get valid(): boolean {
     const { name, ipRange } = this;
-    return name !== "" && ipRange !== "";
+    return name !== "" &&
+      ipRange !== "" &&
+      validateName(name) === undefined &&
+      validateIPRange(ipRange) === undefined
   }
 }
 

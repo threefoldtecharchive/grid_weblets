@@ -10,7 +10,7 @@ const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start wit
 const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
 const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
 const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
-const WHITE_SPACE_REGEX= /^\S*$/;
+const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
 // prettier-ignore
 
@@ -130,7 +130,7 @@ export function validateToken(token: string): string | void {
   if (token.length > 15) return "Token must be at most 15 characters";
 }
 
-export function validateIP(value: string): string | void {
+export function validateIPRange(value: string): string | void {
   if (!IP_REGEX.test(value)) return "Invalid IP range.";
   if (value.length > 15) return "Password must be less than 15 characters";
 }
