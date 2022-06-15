@@ -26,7 +26,7 @@
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
-    { label: "Confgration", value: "valConf" },
+    { label: "Config", value: "valConf" },
   ];
   let active = "base";
 
