@@ -14,6 +14,7 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
+    | "tfhubValidator"
     | "discourse"
     | "taiga"
     | "owncloud"
@@ -39,6 +40,7 @@
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
     { label: "Mattermost", value: "mattermost" },
+    { label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
@@ -290,6 +292,15 @@
           },
         },
       ],
+      tfhubValidator: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
       discourse: (rows) => [
         {
           type: "info",
@@ -369,6 +380,7 @@
       },
     }
   );
+  
 </script>
 
 <SelectProfile
