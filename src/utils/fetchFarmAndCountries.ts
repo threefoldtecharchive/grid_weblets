@@ -49,9 +49,10 @@ interface IQueryData {
 export default function fetchFarmAndCountries(profile: IProfile, filters: FilterOptions,) {
   var query = queryCount;
   var queryDataSelect = queryData;
-  if(filters.publicIPs)
+  if(filters.publicIPs){
     query = queryCountIPFilter;
     queryDataSelect = queryDataIPFilter;
+  }
     
   return gqlApi<IQueryCount>(profile, query)
     .then(({ farms: { farms_limit }, countries: { countries_limit } }) => {
