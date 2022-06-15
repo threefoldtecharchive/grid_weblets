@@ -65,6 +65,7 @@
     "marked": "^3.0.8",
     "page": "^1.11.6",
     "plotly.js-dist": "^2.6.3",
+    "qrcode": "^1.5.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "serve": "^13.0.2",
     "sirv-cli": "^1.0.0",

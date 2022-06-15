@@ -9,6 +9,7 @@
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
+  import QrCode from "../../components/QrCode.svelte";
   import { onDestroy, onMount } from "svelte";
 
   const configs = window.configs?.baseConfig;
@@ -22,6 +23,7 @@
   let opened: boolean = false;
   let currentProfile: IProfile;
   let selectedIdx: string = "0";
+  let bridgeAddress: string = "";
 
   let tabs: ITab[] = [];
   $: {
@@ -34,6 +36,15 @@
       tabs = profiles.map((profile, i) => {
         return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
+
+      if (currentProfile){
+        if (currentProfile.networkEnv == "dev" || currentProfile.networkEnv == "qa"){
+          bridgeAddress = "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
+        }
+        else {
+          bridgeAddress = "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
+        }
+      }
     }
   }
 
@@ -232,21 +243,32 @@
         </div>
 
         {#if activeProfile}
-          {#each fields as field (field.symbol)}
-            <Input
-              bind:data={activeProfile[field.symbol]}
-              field={{
-                ...field,
-                disabled: activeProfileId === activeProfile.id,
-              }}
-            />
-            {#if activeProfileId === activeProfile?.id}
-              {#if field.symbol === "mnemonics"}
-                <Input data={$configs.twinId} field={twinField} />
-                <Input data={$configs.address} field={addressField} />
-              {/if}
-            {/if}
-          {/each}
+          <div
+          style="display: flex; justify-content: space-between;"
+          >
+            <div style="width: 75%;">
+              {#each fields as field (field.symbol)}
+                <Input
+                  bind:data={activeProfile[field.symbol]}
+                  field={{
+                    ...field,
+                    disabled: activeProfileId === activeProfile.id,
+                  }}
+                />
+                {#if activeProfileId === activeProfile?.id}
+                  {#if field.symbol === "mnemonics"}
+                    <Input data={$configs.twinId} field={twinField} />
+                    <Input data={$configs.address} field={addressField} />
+                  {/if}
+                {/if}
+              {/each}
+            </div>
+            <div style="margin: 10px; border-left: 1px solid #afafaf;"> </div>
+            <div style="width: 25%; padding: 3% 1%; text-align: center;">
+              <p class="label">Scan code using Threefold connect to send tokens</p>
+              <QrCode value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100" size="250"/>
+            </div>
+          </div>
         {/if}
       {:else}
         <Tabs
