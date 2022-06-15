@@ -2,9 +2,7 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
 import NodeID from "./nodeId";
-import { isValidNetworkName } from '../utils/isValidNetworkName';
-import { isValidIP } from '../utils/isValidIP';
-import { isValidWorkerName } from '../utils/isValidWorkerName';
+import validateName, { validateIPRange } from '../utils/validateName';
 
 export abstract class Base {
   public constructor(
@@ -28,7 +26,7 @@ export abstract class Base {
     const { name, node, cpu, diskSize, memory, rootFs: rFs } = this;
     return (
       name !== "" &&
-      isValidWorkerName(name) &&
+      validateName(name) === undefined &&
       isValidInteger(node) &&
       isValidInteger(cpu) &&
       isValidInteger(diskSize) &&
@@ -51,8 +49,8 @@ export class Network {
     const { name, ipRange } = this;
     return name !== "" &&
       ipRange !== "" &&
-      isValidNetworkName(name) &&
-      isValidIP(ipRange)
+      validateName(name) === undefined &&
+      validateIPRange(ipRange) === undefined
   }
 }
 
