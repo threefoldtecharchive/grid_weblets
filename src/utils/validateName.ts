@@ -144,6 +144,8 @@ export function validateMountPoint(value: string): string | void {
 
 export function validateDiskName(value: string): string | void {
   if (value === "") return "Disk Name is required";
+  if (!ALPHA_ONLY_REGEX.test(value[0]))
+    return "Key can't start with a number, a non-alphanumeric character or a whitespace";
   if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid disk name";
   if (value.length > 15) return "Name must be at most 15 characters";
 }
