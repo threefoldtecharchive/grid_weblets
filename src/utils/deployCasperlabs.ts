@@ -83,7 +83,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/ranatarek.3bot/ranatrk-casperlabs-latest.flist"; // FIXME
+    "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,

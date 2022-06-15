@@ -79,7 +79,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machine.public_ip = publicIp;
   machine.planetary = planetary;
   machine.flist =
-    "https://hub.grid.tf/rafybenjamin.3bot/threefolddev-discourse-v4.0.flist";
+    "https://hub.grid.tf/tf-official-apps/discourse-v4.0.flist";
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/.start_discourse.sh";

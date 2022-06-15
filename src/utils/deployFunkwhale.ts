@@ -84,7 +84,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/asamirr.3bot/asamirr-tf-funkwhale-dec21.flist";
+    "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist";
   vm.entrypoint = "/init.sh";
   vm.env = {
     FUNKWHALE_HOSTNAME: domain,

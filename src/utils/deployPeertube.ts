@@ -84,7 +84,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/omarabdulaziz.3bot/omarabdul3ziz-peertube-v3.1.1.flist";
+    "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,

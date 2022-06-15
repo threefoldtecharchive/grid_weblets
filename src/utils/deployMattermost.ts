@@ -72,7 +72,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-mattermost-latest.flist"; // prettier-ignore
+  vm.flist = "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist"; // prettier-ignore
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     DB_PASSWORD: password,

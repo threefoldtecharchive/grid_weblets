@@ -57,7 +57,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machine.public_ip = publicIp;
   machine.planetary = planetary;
   machine.flist =
-    "https://hub.grid.tf/omarabdul3ziz.3bot/omarabdul3ziz-presearch-v2.2.flist";
+    "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist";
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";

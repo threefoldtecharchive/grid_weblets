@@ -85,7 +85,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist =
-    "https://hub.grid.tf/samehabouelsaad.3bot/abouelsaad-grid3_taiga_docker-latest.flist";
+    "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
