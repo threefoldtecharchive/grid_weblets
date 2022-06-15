@@ -35,7 +35,7 @@ export class Disk {
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
     public size = 50,
-    public mountpoint = `/mnt/${name.toLocaleLowerCase()}`
+    public mountpoint = `/mnt/${id.split("-")[0]}`
   ) {}
 
   get _diskFieldsValid(): boolean {
