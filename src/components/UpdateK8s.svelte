@@ -24,6 +24,9 @@
   export let profile: IProfile;
   export let k8s: any;
 
+  let workers: any[] = [];
+  $: if (k8s) workers = k8s.details.workers;
+
   let shouldBeUpdated: boolean = false;
   let loading: boolean = false;
   let message: string;
@@ -70,9 +73,14 @@
             success = true;
             shouldBeUpdated = true;
             worker = new Worker();
+            return grid.k8s.getObj(k8s.name);
           } else {
             failed = true;
           }
+        })
+        .then((data) => {
+          if (!data) return;
+          workers = data.workers;
         })
         .catch((err) => {
           failed = true;
@@ -87,7 +95,7 @@
   }
 
   function onDeleteWorker(idx: number) {
-    const worker = k8s.details.workers[idx];
+    const worker = workers[idx];
     removing = worker.name;
     loading = true;
     currentDeployment.deploy("Remove Worker", worker.name);
@@ -102,7 +110,7 @@
             shouldBeUpdated = true;
             let r = removing;
             requestAnimationFrame(() => {
-              k8s.details.workers = k8s.details.workers.filter(({ name }) => name !== r); // prettier-ignore
+              workers = workers.filter(({ name }) => name !== r); // prettier-ignore
             });
           } else {
             failed = true;
@@ -175,7 +183,11 @@
   />
 
   {#if k8s}
-    <div class="modal-content" style="width: fit-content" on:click|stopPropagation>
+    <div
+      class="modal-content"
+      style="width: fit-content"
+      on:click|stopPropagation
+    >
       <div class="box">
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
@@ -183,7 +195,7 @@
         <hr />
 
         <Table
-          rowsData={k8s.details.workers}
+          rowsData={workers}
           headers={[
             "#",
             "Contract ID",
@@ -193,14 +205,13 @@
             "Memory",
             "Disk(GB)",
           ]}
-          rows={_createWorkerRows(k8s.details.workers)}
+          rows={_createWorkerRows(workers)}
           selectable={false}
           actions={[
             {
               label: "Delete",
               type: "danger",
-              loading: (i) =>
-                loading && removing === k8s.details.workers[i].name,
+              loading: (i) => loading && removing === workers[i].name,
               click: (_, i) => onDeleteWorker(i),
               disabled: () => loading || removing !== null,
             },

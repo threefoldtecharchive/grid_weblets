@@ -8,6 +8,7 @@ import {
   validateDisk,
   validateDiskName,
   validateMountPoint,
+  validateEntryPoint,
 } from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
@@ -34,7 +35,7 @@ export class Disk {
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
     public size = 50,
-    public mountpoint = `/mnt/${name.toLocaleLowerCase()}`
+    public mountpoint = `/mnt/${id.split("-")[0]}`
   ) {}
 
   get _diskFieldsValid(): boolean {
@@ -94,7 +95,7 @@ export default class VM {
       name !== "" &&
       flist !== "" &&
       validateFlistvalue(flist) === undefined &&
-      entrypoint !== "" &&
+      validateEntryPoint(entrypoint) === undefined &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
       isValidInteger(nodeId) &&

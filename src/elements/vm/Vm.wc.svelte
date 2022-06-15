@@ -21,6 +21,7 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateEntryPoint,
     validateFlistvalue,
     validateKey,
     validateMemory,
@@ -249,6 +250,7 @@
             field={{
               label: "Entry Point",
               symbol: "entrypoint",
+              validator: validateEntryPoint,
               placeholder: "Entrypoint",
               type: "text",
             }}
@@ -336,9 +338,6 @@
                     field={{
                       ...field,
                       error: validateDiskName(disk),
-                    }}
-                    on:input={() => {
-                      disk.mountpoint = `/mnt/${disk.name}`;
                     }}
                   />
                 {:else}

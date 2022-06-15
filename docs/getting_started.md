@@ -18,6 +18,7 @@ The repo contains two projects:
 You can use one of the live instances of the playground:
 
 - dev environment: rapidly changing environment on development branch merges: https://play.dev.grid.tf
+- qa environment: more stable environment on pre-releases: https://play.qa.grid.tf
 - test environment: more stable environment on pre-releases: https://play.test.grid.tf
 - stable environment: most stable / verified code, based on releases: https://play.grid.tf
 
@@ -29,6 +30,13 @@ Then, to run the playground you need to first build the weblets then move the bu
 ```bash
 yarn deps           # to install the dependencies
 yarn serve:app      # to build, move, and serve the playground
+```
+
+For targeted build you can export the `TARGET_WEBLETS` environment variable to build only the weblets you want. the value is the name of the folder in `src/elements/` directory seperated by space. for example:
+
+```bash
+export TARGET_WEBLETS="vm peertube DeployedList"
+yarn serve:app
 ```
 
 To read about each weblet and how to use it, and also how to config your twin id and activate your profile on the playground you can go to the [weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager).

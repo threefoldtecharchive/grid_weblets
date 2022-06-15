@@ -3124,10 +3124,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.2.3, graceful-fs@^4.2.4, 
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.8.tgz"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.3.2.tgz#0c86d634c3bc247e40b3e4146a319a1993205122"
-  integrity sha512-rQjnTgDEAp9DI3cWZ7Q7jyd34OVusEUKvot+mHRez0JFefxb5B+goGqHUHTLaRAXtSbIcqa18aibX3icH1GoUA==
+grid3_client@1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.3.3.tgz#64648809025483a40332c6867e9841bc70519065"
+  integrity sha512-a+zQK5x6dXIxDgKX81hvYU8+X5p4aYikKogF9GRgQfDFC46jjpGBBXcDasZVI0xkwhcE+JcwUBfzOYo7c6acHQ==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -3142,9 +3142,9 @@ grid3_client@1.3.2:
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
-    tfgrid-api-client "^1.10.0"
+    tfgrid-api-client "^1.12.1"
     ts-rmb-client-base "^0.0.1"
-    ts-rmb-http-client "^1.0.5"
+    ts-rmb-http-client "^1.0.6"
     ts-rmb-redis-client "^0.0.3"
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
@@ -6400,10 +6400,10 @@ terser@^5.0.0, terser@^5.7.2:
     source-map "~0.7.2"
     source-map-support "~0.5.20"
 
-tfgrid-api-client@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.10.0.tgz#b1b83c209c1f228aab8eda675eefbde4b8828340"
-  integrity sha512-KFMfFU0JA0BRDXN3ACoLEp30w2uJ7bv76Mc5L5R6GHZTnRyPiaJdDY/HOqIvUk/lwAVrHmR8TIsNv9KB9jxxFw==
+tfgrid-api-client@^1.12.1:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.12.1.tgz#395b5e881c70c1403ff9360341fd790f0422ba6d"
+  integrity sha512-pGcaKuvMhgUsKjDobXYkoVtBzdm48HgSNT+vSyAi9zSKoZuNl2KBN/Lvr6V/QweOb8IFQtGegVYd7n9Kv2NOgQ==
   dependencies:
     "@polkadot/api" "^4.0.3"
     bip39 "^3.0.3"
@@ -6512,10 +6512,10 @@ ts-rmb-client-base@0.0.1, ts-rmb-client-base@^0.0.1:
   resolved "https://registry.npmjs.org/ts-rmb-client-base/-/ts-rmb-client-base-0.0.1.tgz"
   integrity sha512-xe7NxHgDyQnHTOFNfuHnhRXSY1xAEyRC/dRmCLI8H3THXLfLr3UcTqNg4Cxli0JEa2oW7s9DQvfZXek91FYo+w==
 
-ts-rmb-http-client@1.0.5, ts-rmb-http-client@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.5.tgz#7131967d9fe95e1ca742b43209fba9bbc5d75da4"
-  integrity sha512-EZfyzH/OjfgKKMXAP/buXuMi2xfUm8uaC7WSfj77BQk3hBXQlIKX5xE9rDor2PS9lsswQpgpuB1yJmpNpzRLXg==
+ts-rmb-http-client@1.0.6, ts-rmb-http-client@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/ts-rmb-http-client/-/ts-rmb-http-client-1.0.6.tgz#65f4b7e8bb605235868dc81504d427dfdc60f00c"
+  integrity sha512-4XU1Udb3yfB20PA/hZ6Ln31iR9Ssvai7HjGQE27SEVII3pFXhhmNsUDIkOmFq9IbsD20G6Ti6LXf+AJVUa/Dgg==
   dependencies:
     "@polkadot/keyring" "^6.11.1"
     "@types/crypto-js" "^4.1.0"
