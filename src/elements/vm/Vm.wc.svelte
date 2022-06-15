@@ -339,9 +339,6 @@
                       ...field,
                       error: validateDiskName(disk),
                     }}
-                    on:input={() => {
-                      disk.mountpoint = `/mnt/${disk.name}`;
-                    }}
                   />
                 {:else}
                   <Input
