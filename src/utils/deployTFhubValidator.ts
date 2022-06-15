@@ -37,11 +37,11 @@ function defaultEnvVars(host: string){
       genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
     },
     test: {
-      chainId: "",
-      gravityAddress: "",
-      ethereumRpc: "",
-      persistentPeers: "",
-      genesisUrl: "",
+      chainId: "threefold-hub-testnet",
+      gravityAddress: "0x7968da29488c498535352b809c158cde2e42497a",
+      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
+      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
+      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
     },
     main: {
       chainId: "",
