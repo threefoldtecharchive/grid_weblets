@@ -24,6 +24,7 @@
     validateEntryPoint,
     validateFlistvalue,
     validateKey,
+    validateKeyValue,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
@@ -84,7 +85,7 @@
   // prettier-ignore
   const envFields: IFormField[] = [
     { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
-    { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
+    { label: 'Value', symbol: 'value', placeholder: "Environment Value", validator: validateKeyValue,type: "text" },
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
