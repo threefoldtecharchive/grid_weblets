@@ -155,7 +155,15 @@ export function validateKey(value: string): string | void {
     return "Key can't start with a number, a non-alphanumeric character or a whitespace";
   if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid key format ";
   if (value.length > 128) return "key must be less than 128 characters";
+  if (value === "") return "Key is required";
+
 }
+
+
+export function validateKeyValue(value: string): string | void {
+  if (value === "") return "Key Value is required";
+}
+
 export function validateFlistvalue(value: string): string | void {
   if (!WHITE_SPACE_REGEX.test(value)) return "Please remove from white spaces from flist";
   if (value === "") return "Flist Value is required";

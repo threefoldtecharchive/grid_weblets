@@ -9,6 +9,7 @@ import {
   validateDiskName,
   validateMountPoint,
   validateEntryPoint,
+  validateKeyValue,
 } from "../utils/validateName";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
@@ -19,7 +20,7 @@ export class Env {
 
   public get valid(): boolean {
     const { key, value } = this;
-    return key !== "" && value !== "" && validateKey(key) === undefined;
+    return key !== "" && value !== "" && validateKey(key) === undefined && validateKeyValue(value) === undefined;
   }
 }
 
