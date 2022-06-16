@@ -141,7 +141,7 @@ export default class Editor extends Vue {
       "mattermost.png"
     ),
     new Weblet(
-      "TFhubValidator",
+      "TFhub Validator",
       "vaildator",
       "tfhubValidator",
       "deployment",

@@ -7,6 +7,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
+import hex from "./hex";
 
 function getNetwork() :string {
   const networks = ['dev', 'qa', 'test', 'main'];
@@ -112,7 +113,7 @@ function _deployTfHubValidator(
     STAKE_AMOUNT: stakeAmount,
     ETHEREUM_ADDRESS: ethereumAddress,
     ETHEREUM_PRIV_KEY: ethereumPrivKey,
-    KEYNAME: v4().split("-")[0],
+    KEYNAME: hex(v4().split("-")[0]),
     MONIKER: v4().split("-")[0],
     CHAIN_ID: defaultEnvVars(getNetwork()).chainId,
     GRAVITY_ADDRESS: defaultEnvVars(getNetwork()).gravityAddress,
