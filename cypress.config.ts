@@ -4,6 +4,7 @@ export default defineConfig({
   e2e: {
 
     baseUrl:'https://play.dev.grid.tf',
+    supportFile:false,
 
     setupNodeEvents(on, config) {
       // implement node event listeners here
