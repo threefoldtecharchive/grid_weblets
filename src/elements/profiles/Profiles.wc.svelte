@@ -4,12 +4,13 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-  import validateProfileName from '../../utils/validateName';
+  import validateProfileName, { isInvalid, validateSSH } from '../../utils/validateName';
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
   import { onDestroy, onMount } from "svelte";
+  import * as bip39 from "bip39";
 
   const configs = window.configs?.baseConfig;
   const _balanceStore = window.configs?.balanceStore;
@@ -37,6 +38,10 @@
     }
   }
 
+  function validateMnemonic(value: string): string | void {
+  if (!bip39.validateMnemonic(value)) return "Invalid mnemonic format.";
+  }
+
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text", validator: validateProfileName, invalid: false  },
@@ -44,9 +49,9 @@
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
     // ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password", validator: validateMnemonic, invalid: false },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text", validator:validateSSH, invalid: false },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
@@ -224,7 +229,7 @@
           <button
             class={"button" + (activating ? " is-loading" : "")}
             style={`background-color: #1982b1; color: #fff`}
-            disabled={activating || activeProfileId === activeProfile?.id}
+            disabled={activating || activeProfileId === activeProfile?.id || isInvalid([...fields])}
             on:click={onActiveProfile}
           >
             {activeProfileId === activeProfile?.id ? "Active" : "Activate"}

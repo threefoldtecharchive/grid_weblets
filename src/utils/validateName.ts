@@ -12,7 +12,8 @@ const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
 const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-// prettier-ignore
+const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
+
 
 // prettier-ignore
 export default function validateName(name: string): string | void {
@@ -169,6 +170,12 @@ export function validateFlistvalue(value: string): string | void {
   if (value === "") return "Flist Value is required";
   if (!URL_REGEX.test(value)) return "Invalid flist";
 }
+
+export function validateSSH(value: string): string | void {
+  if (!SSH_REGEX.test(value)) return "Please enter a valid SSH key";
+  if (value === "") return "SSH Value is required";
+}
+
 
 export function validateEntryPoint(value: string): string | void {
   if (value === "") return "Entry point is required";
