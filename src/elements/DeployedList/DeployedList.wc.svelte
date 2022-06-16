@@ -14,7 +14,7 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
-    | "tfhubValidator"
+    | "tfhub Validator"
     | "discourse"
     | "taiga"
     | "owncloud"
@@ -380,7 +380,6 @@
       },
     }
   );
-  
 </script>
 
 <SelectProfile

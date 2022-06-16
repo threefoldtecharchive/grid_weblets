@@ -121,9 +121,9 @@
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployTFhubValidator}>
-  <h4 class="is-size-4">Deploy a TFhubValidator Instance</h4>
+  <h4 class="is-size-4">Deploy a TFhub Validator Instance</h4>
   <p>
-    TFhubValidator A single point of collaboration. Designed specifically for
+    TFhub Validator A single point of collaboration. Designed specifically for
     digital operations.
     <a
       target="_blank"
