@@ -27,7 +27,7 @@
 
    ![image](https://user-images.githubusercontent.com/101194226/173856212-2833f7e2-48cc-4dc3-8ede-205f57087260.png)
 
-- If u choose e2e testing you will be prompted again to choose the prefered browser.
+- If you choose e2e testing you will be prompted again to choose the preferred browser.
 
    ![image](https://user-images.githubusercontent.com/101194226/173856643-5a1c234c-941a-4ac3-883a-b9a8e71a5d50.png)
 
