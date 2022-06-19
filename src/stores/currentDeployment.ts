@@ -17,7 +17,8 @@ export interface IStore {
     | "Presearch"
     | "Mattermost"
     | "TFhubValidator"
-    | "Casperlabs";
+    | "Casperlabs"
+    | "NodePilot";
   name: string;
   message: string;
 }

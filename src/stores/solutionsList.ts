@@ -11,4 +11,5 @@ export const solutionList = {
   caprover: "cp",
   kubernetes: "k8s",
   machines: "vm",
+  nodepilot: "np",
 };

@@ -4,8 +4,10 @@ const { DiskModel, MachineModel, MachinesModel } =
   window.configs?.grid3_client ?? {};
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
+import type { IStore } from "../stores/currentDeployment";
+import checkVMExist from "./prepareDeployment";
 
-export default async function deployVM(data: VM, profile: IProfile) {
+export default async function deployVM(data: VM, profile: IProfile, type: IStore["type"]) {
   const { envs, disks, rootFs, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, publicIp6 } = base;
@@ -29,7 +31,8 @@ export default async function deployVM(data: VM, profile: IProfile) {
   vms.network = createNetwork(nw);
   vms.machines = [vm];
 
-  return deploy(profile, "VM", name, (grid) => {
+  return deploy(profile, type, name, async (grid) => {
+    await checkVMExist(grid, type.toLocaleLowerCase(), name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

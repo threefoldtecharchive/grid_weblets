@@ -58,6 +58,7 @@ There is a several component in the weblets repo, you can find them in the `/src
   - [Owncloud](/src/elements/owncloud)
   - [Presearch](/src/elements/presearch)
   - [Casperlabs](/src/elements/casperlabs)
+  - [Node pilot](/src/elements/nodePilot)
 - Utils Components
   - [Base](/src/elements/base)
   - [Profile](/src/elements/profiles)

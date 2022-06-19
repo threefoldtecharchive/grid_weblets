@@ -51,6 +51,7 @@ export default class App extends Vue {
     "mattermost",
     "casperlabs",
     "tfhubvalidator",
+    "nodepilot",
   ];
   sidenav: ISidenav | null = null;
 
