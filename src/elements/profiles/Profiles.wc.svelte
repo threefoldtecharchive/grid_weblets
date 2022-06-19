@@ -10,7 +10,6 @@
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
   import { onDestroy, onMount } from "svelte";
-  import * as bip39 from "bip39";
 
   const configs = window.configs?.baseConfig;
   const _balanceStore = window.configs?.balanceStore;
@@ -39,7 +38,7 @@
   }
 
   function validateMnemonic(value: string): string | void {
-  if (!bip39.validateMnemonic(value)) return "Invalid mnemonic format.";
+  if (!window.configs.bip39.validateMnemonic(value)) return "Invalid mnemonic format.";
   }
 
   // prettier-ignore
@@ -152,14 +151,6 @@
         style="display: flex; justify-content: space-between; align-items: center;"
       >
         <h4 class="is-size-4">Profile Manager</h4>
-        <!-- <p>
-          <a
-            target="_blank"
-            href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
-          >
-            Quick start documentation</a
-          >
-        </p> -->
 
         {#if configured}
           <div>
