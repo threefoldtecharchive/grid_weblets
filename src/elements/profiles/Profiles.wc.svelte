@@ -39,6 +39,9 @@
 
       if (currentProfile){
         if (currentProfile.networkEnv == "dev" || currentProfile.networkEnv == "qa"){
+          bridgeAddress = "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
+        }
+        else if (currentProfile.networkEnv == "test"){
           bridgeAddress = "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
         }
         else {
@@ -266,7 +269,11 @@
             <div style="margin: 10px; border-left: 1px solid #afafaf;"> </div>
             <div style="width: 25%; padding: 3% 1%; text-align: center;">
               <p class="label">Scan code using Threefold connect to send tokens</p>
+              {#if $configs.twinId}
               <QrCode value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100" size="250"/>
+              {:else}
+              <p class="label">Loading scan code...</p>
+              {/if}
             </div>
           </div>
         {/if}
