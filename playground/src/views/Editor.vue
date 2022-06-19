@@ -141,6 +141,13 @@ export default class Editor extends Vue {
       "mattermost.png"
     ),
     new Weblet(
+      "TFhub Validator",
+      "vaildator",
+      "tfhubValidator",
+      "deployment",
+      "vm.png"
+    ),
+    new Weblet(
       "Discourse",
       "discourse",
       "discourse",
@@ -169,6 +176,14 @@ export default class Editor extends Vue {
       "casperlabs",
       "deployment",
       "casperlabs.png"
+    ),
+
+    new Weblet(
+      "Node pilot",
+      "nodepilot",
+      "nodepilot",
+      "deployment",
+      "vm.png"
     ),
 
     new Weblet("Contracts", "contractslist", "", "my account", ""),

@@ -14,11 +14,13 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
+    | "tfhub Validator"
     | "discourse"
     | "taiga"
     | "owncloud"
     | "presearch"
-    | "casperlabs";
+    | "casperlabs"
+    | "nodepilot";
   export let tab: TabsType = undefined;
 
   // components
@@ -39,11 +41,13 @@
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
     { label: "Mattermost", value: "mattermost" },
+    { label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
     { label: "Presearch", value: "presearch" },
-    { label: "Casperlabs", value: "casperlabs" }
+    { label: "Casperlabs", value: "casperlabs" },
+    { label: "Node pilot", value: "nodepilot" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -290,6 +294,15 @@
           },
         },
       ],
+      tfhubValidator: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
       discourse: (rows) => [
         {
           type: "info",
@@ -354,6 +367,15 @@
         },
       ],
       presearch: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+      nodepilot: (rows) => [
         {
           type: "info",
           label: "Show Details",
