@@ -4,13 +4,17 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-  import validateProfileName from '../../utils/validateName';
+  import validateProfileName, {
+    isInvalid,
+    validateSSH,
+  } from "../../utils/validateName";
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
   import QrCode from "../../components/QrCode.svelte";
   import { onDestroy, onMount } from "svelte";
+  import { set_store_value } from "svelte/internal";
 
   const configs = window.configs?.baseConfig;
   const _balanceStore = window.configs?.balanceStore;
@@ -53,7 +57,7 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text", validator: validateProfileName, invalid: false  },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
     // { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
@@ -131,6 +135,12 @@
   let activePassword: string = "load";
 
   $: balanceStore = $_balanceStore;
+
+  function syncValidateMnemonics(mnemonics: string): string | void {
+    if (!window.configs.bip39.validateMnemonic(mnemonics)) {
+      return "Invalid Mnemonics.";
+    }
+  }
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
@@ -238,7 +248,11 @@
           <button
             class={"button" + (activating ? " is-loading" : "")}
             style={`background-color: #1982b1; color: #fff`}
-            disabled={activating || activeProfileId === activeProfile?.id}
+            disabled={activating ||
+              activeProfileId === activeProfile?.id ||
+              Boolean(validateProfileName(activeProfile.name)) ||
+              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+              Boolean(validateSSH(activeProfile.sshKey))}
             on:click={onActiveProfile}
           >
             {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
