@@ -249,7 +249,7 @@
           <div
           style="display: flex; justify-content: space-between;"
           >
-            <div style="width: 75%;">
+            <div style={activeProfileId === activeProfile?.id ? "width: 75%;" : "width: 100%;"}>
               {#each fields as field (field.symbol)}
                 <Input
                   bind:data={activeProfile[field.symbol]}
@@ -266,15 +266,18 @@
                 {/if}
               {/each}
             </div>
-            <div style="margin: 10px; border-left: 1px solid #afafaf;"> </div>
-            <div style="width: 25%; padding: 3% 1%; text-align: center;">
-              <p class="label">Scan code using Threefold connect to send tokens</p>
-              {#if $configs.twinId}
-              <QrCode value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100" size="250"/>
-              {:else}
-              <p class="label">Loading scan code...</p>
-              {/if}
-            </div>
+            
+            {#if activeProfileId === activeProfile?.id}
+              <div style="margin: 10px; border-left: 1px solid #afafaf;"> </div>
+              <div style="width: 25%; padding: 3% 1%; text-align: center;">
+                <p class="label">Scan code using Threefold connect to send tokens</p>
+                {#if $configs.twinId}
+                  <QrCode value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100" size="250"/>
+                {:else}
+                  <p class="label">Loading scan code...</p>
+                {/if}
+              </div>
+            {/if}
           </div>
         {/if}
       {:else}
