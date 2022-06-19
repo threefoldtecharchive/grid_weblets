@@ -179,7 +179,7 @@ export default class Editor extends Vue {
     ),
 
     new Weblet(
-      "Node pilot",
+      "Node Pilot",
       "nodepilot",
       "nodepilot",
       "deployment",
