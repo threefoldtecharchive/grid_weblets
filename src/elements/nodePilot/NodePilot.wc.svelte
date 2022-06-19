@@ -1,4 +1,4 @@
-<svelte:options tag="tf-vm" />
+<svelte:options tag="tf-nodepilot" />
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
@@ -20,22 +20,15 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
-    validateEntryPoint,
     validateFlistvalue,
     validateKey,
     validateKeyValue,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
-  import isInvalidFlist from "../../utils/isInvalidFlist";
-  import RootFsSize from "../../components/RootFsSize.svelte";
 
   const tabs: ITab[] = [
-    { label: "Config", value: "config" },
-    { label: "Environment Variables", value: "env" },
-    { label: "Disks", value: "disks" },
+    { label: "Config", value: "config" }
   ];
 
   let data = new VM();
@@ -44,42 +37,31 @@
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
-    { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
-    { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
-  ];
+    ];
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Node Pilot Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   // prettier-ignore
   const flists: IFlist[] = [
-    { name: "Ubuntu", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-20.04.flist", entryPoint: "/init.sh" },
-    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist", entryPoint: "/entrypoint.sh" },
-    { name: "CentOS", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist", entryPoint: "/entrypoint.sh" },
-
+    { name: "nodepilot", url: "https://hub.grid.tf/maxux42.3bot/maxux-nodep.flist", entryPoint: "/" },
+    
   ];
 
-  // prettier-ignore
-  const flistField: IFormField = {
-    label: "VM Image",
-    symbol: "flist",
-    type: "select",
-    options: [
-      { label: "Ubuntu-20.04", value: "0", selected: true },
-      { label: "Alpine-3", value: "1" },
-      { label: "CentOS-8", value: "2" },
-      { label: "Other", value: "other" }
-    ]
-  };
-  let selectedFlist: number = 0;
-  let flistSelectValue: string = "0";
   $: {
-    const option = flistField.options[selectedFlist];
-    if (option.value !== "other") {
-      const flist = flists[selectedFlist];
-      data.flist = flist?.url;
-      data.entrypoint = flist?.entryPoint;
-    }
+    data.name = "np" + data.id.split("-")[0],
+    data.flist = flists[0].url;
+    data.entrypoint = flists[0].entryPoint;
+    data.cpu = 8;
+    data.memory = 1024 * 8;
+    data.publicIp = true;
+    data.publicIp6 = true;
+    data.planetary = false;
+
+    let disk1 = new Disk()
+    disk1.size = 15;
+    let disk2 = new Disk()
+    disk2.size = 100;
+    data.disks = [disk1, disk2];
   }
 
   // prettier-ignore
@@ -117,18 +99,7 @@
     invalid: false,
   };
 
-  async function onDeployVM() {
-    if (flistSelectValue === "other") {
-      validateFlist.loading = true;
-      validateFlist.error = null;
-
-      if (await isInvalidFlist(data.flist)) {
-        validateFlist.loading = false;
-        validateFlist.error = "Invalid Flist URL.";
-        return;
-      }
-    }
-
+  async function onDeployNodePilot() {
     loading = true;
 
     if (!hasEnoughBalance()) {
@@ -143,7 +114,7 @@
     failed = false;
     message = undefined;
 
-    deployVM(data, profile, "VM")
+    deployVM(data, profile, "NodePilot")
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -190,10 +161,10 @@
 />
 
 <div style="padding: 15px;">
-  <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+  <form on:submit|preventDefault={onDeployNodePilot} class="box">
+    <h4 class="is-size-4">Deploy a Node Pilot</h4>
     <p>
-      Deploy a new virtual machine on the Threefold Grid
+      Deploy a new node pilot on the Threefold Grid
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
@@ -203,18 +174,18 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "VM")}
+    {#if loading || (logs !== null && logs.type === "NodePilot")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully deployed VM."
+        message="Successfully deployed Node pilot."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || "Failed to deploy Node pilot."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -223,48 +194,6 @@
           bind:data={data.name}
           bind:invalid={nameField.invalid}
           field={nameField}
-        />
-
-        <Input
-          bind:data={flistSelectValue}
-          bind:selected={selectedFlist}
-          field={flistField}
-          on:input={() => {
-            validateFlist.error = null;
-          }}
-        />
-
-        {#if flistSelectValue === "other"}
-          <Input
-            bind:data={data.flist}
-            field={{
-              label: "FList",
-              symbol: "flist",
-              placeholder: "VM Image",
-              type: "text",
-              ...validateFlist,
-            }}
-          />
-
-          <Input
-            bind:data={data.entrypoint}
-            field={{
-              label: "Entry Point",
-              symbol: "entrypoint",
-              validator: validateEntryPoint,
-              placeholder: "Entrypoint",
-              type: "text",
-            }}
-          />
-        {/if}
-
-        <RootFsSize
-          rootFs={data.rootFs}
-          editable={data.rootFsEditable}
-          cpu={data.cpu}
-          memory={data.memory}
-          on:update={({ detail }) => (data.rootFs = detail)}
-          on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
         />
 
         {#each baseFields as field (field.symbol)}

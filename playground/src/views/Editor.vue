@@ -178,6 +178,14 @@ export default class Editor extends Vue {
       "casperlabs.png"
     ),
 
+    new Weblet(
+      "Node pilot",
+      "nodepilot",
+      "nodepilot",
+      "deployment",
+      "vm.png"
+    ),
+
     new Weblet("Contracts", "contractslist", "", "my account", ""),
     new Weblet("Deployments", "deployedlist", "", "my account", ""),
 
