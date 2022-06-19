@@ -47,7 +47,7 @@
     { label: "Owncloud", value: "owncloud" },
     { label: "Presearch", value: "presearch" },
     { label: "Casperlabs", value: "casperlabs" },
-    { label: "Node pilot", value: "nodepilot" }
+    { label: "Node Pilot", value: "nodepilot" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
