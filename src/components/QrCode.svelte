@@ -7,6 +7,7 @@
 
 </script>
 
+
 {#await QRCode.toDataURL(value)}
   <p>Generating QR Code...</p>
 {:then src}

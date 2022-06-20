@@ -41,15 +41,19 @@
         return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
 
-      if (currentProfile){
-        if (currentProfile.networkEnv == "dev" || currentProfile.networkEnv == "qa"){
-          bridgeAddress = "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
-        }
-        else if (currentProfile.networkEnv == "test"){
-          bridgeAddress = "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
-        }
-        else {
-          bridgeAddress = "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
+      if (currentProfile) {
+        if (
+          currentProfile.networkEnv == "dev" ||
+          currentProfile.networkEnv == "qa"
+        ) {
+          bridgeAddress =
+            "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+        } else if (currentProfile.networkEnv == "test") {
+          bridgeAddress =
+            "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4";
+        } else {
+          bridgeAddress =
+            "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC";
         }
       }
     }
@@ -260,33 +264,56 @@
         </div>
 
         {#if activeProfile}
-          <div
-          style="display: flex; justify-content: space-between;"
-          >
-            <div style={activeProfileId === activeProfile?.id ? "width: 75%;" : "width: 100%;"}>
-              {#each fields as field (field.symbol)}
-                <Input
-                  bind:data={activeProfile[field.symbol]}
-                  field={{
-                    ...field,
-                    disabled: activeProfileId === activeProfile.id,
-                  }}
-                />
-                {#if activeProfileId === activeProfile?.id}
-                  {#if field.symbol === "mnemonics"}
-                    <Input data={$configs.twinId} field={twinField} />
-                    <Input data={$configs.address} field={addressField} />
-                  {/if}
-                {/if}
-              {/each}
+          <div style="display: flex; justify-content: space-between;">
+            <div
+              style={activeProfileId === activeProfile?.id
+                ? "width: 75%;"
+                : "width: 100%;"}
+            >
+              <Input
+                bind:data={activeProfile.name}
+                field={{
+                  ...fields[0],
+                  error: validateProfileName(activeProfile.name),
+                  disabled: activeProfileId === activeProfile.id,
+                }}
+              />
+
+              <Input
+                bind:data={activeProfile.mnemonics}
+                field={{
+                  ...fields[1],
+                  error: syncValidateMnemonics(activeProfile.mnemonics),
+                  disabled: activeProfileId === activeProfile.id,
+                }}
+              />
+
+              {#if activeProfileId === activeProfile?.id}
+                <Input data={$configs.twinId} field={twinField} />
+                <Input data={$configs.address} field={addressField} />
+              {/if}
+
+              <Input
+                bind:data={activeProfile.sshKey}
+                field={{
+                  ...fields[2],
+                  error: validateSSH(activeProfile.sshKey),
+                  disabled: activeProfileId === activeProfile.id,
+                }}
+              />
             </div>
-            
+
             {#if activeProfileId === activeProfile?.id}
-              <div style="margin: 10px; border-left: 1px solid #afafaf;"> </div>
+              <div style="margin: 10px; border-left: 1px solid #afafaf;" />
               <div style="width: 25%; padding: 3% 1%; text-align: center;">
-                <p class="label">Scan code using Threefold connect to send tokens</p>
+                <p class="label">
+                  Scan code using Threefold connect to send tokens
+                </p>
                 {#if $configs.twinId}
-                  <QrCode value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100" size="250"/>
+                  <QrCode
+                    value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100"
+                    size="250"
+                  />
                 {:else}
                   <p class="label">Loading scan code...</p>
                 {/if}
