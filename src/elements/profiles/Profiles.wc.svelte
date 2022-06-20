@@ -260,39 +260,37 @@
         </div>
 
         {#if activeProfile}
-          <div
-          style="display: flex; justify-content: space-between;"
-          >
-            <div style={activeProfileId === activeProfile?.id ? "width: 75%;" : "width: 100%;"}>
-              {#each fields as field (field.symbol)}
-                <Input
-                  bind:data={activeProfile[field.symbol]}
-                  field={{
-                    ...field,
-                    disabled: activeProfileId === activeProfile.id,
-                  }}
-                />
-                {#if activeProfileId === activeProfile?.id}
-                  {#if field.symbol === "mnemonics"}
-                    <Input data={$configs.twinId} field={twinField} />
-                    <Input data={$configs.address} field={addressField} />
-                  {/if}
-                {/if}
-              {/each}
-            </div>
-            
-            {#if activeProfileId === activeProfile?.id}
-              <div style="margin: 10px; border-left: 1px solid #afafaf;"> </div>
-              <div style="width: 25%; padding: 3% 1%; text-align: center;">
-                <p class="label">Scan code using Threefold connect to send tokens</p>
-                {#if $configs.twinId}
-                  <QrCode value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100" size="250"/>
-                {:else}
-                  <p class="label">Loading scan code...</p>
-                {/if}
-              </div>
-            {/if}
-          </div>
+          <Input
+          bind:data={activeProfile.name}
+          field={{
+            ...fields[0],
+            error: validateProfileName(activeProfile.name),
+            disabled: activeProfileId === activeProfile.id,
+            }}
+          />
+
+          <Input
+            bind:data={activeProfile.mnemonics}
+            field={{
+              ...fields[1],
+              error: syncValidateMnemonics(activeProfile.mnemonics),
+              disabled: activeProfileId === activeProfile.id,
+            }}
+          />
+
+          {#if activeProfileId === activeProfile?.id}
+            <Input data={$configs.twinId} field={twinField} />
+            <Input data={$configs.address} field={addressField} />
+          {/if}
+
+          <Input
+            bind:data={activeProfile.sshKey}
+            field={{
+              ...fields[2],
+              error: validateSSH(activeProfile.sshKey),
+              disabled: activeProfileId === activeProfile.id,
+            }}
+          />
         {/if}
       {:else}
         <Tabs
