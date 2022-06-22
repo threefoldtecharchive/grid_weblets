@@ -1,0 +1,245 @@
+class Virtualmachine{
+
+    get getVmNameField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder='Virtual Machine Name']")
+        .clear({force: true})
+    }
+
+    get getVmImageList(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > div:nth-child(2)")
+        .find('select')
+    }
+
+    get getRootFsBtn(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(9) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > label:nth-child(1) > span:nth-child(2)")
+    }
+
+    get getRootFsField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder='rootFs Size']")
+        .clear({force: true})
+    }
+
+    get getCpuField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder='CPU Cores']")
+        .clear({force: true})
+    }
+
+    get getMemoryField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder='Your Memory in MB']")
+        .clear({force: true})
+    }
+
+    get getConfigTab(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find('.tabs.is-centered')
+    }
+
+    get getAddBtn(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find('.is-flex.is-justify-content-flex-end.is-align-items-center')
+        .contains('+ Add')
+    }
+
+    get getEnvVarKeyField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(6) > div:nth-child(2) > div:nth-child(3) > div:nth-child(1)")
+        .find("input[placeholder= 'Environment Key']")
+    }
+
+    get getEnvVarValueField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(6) > div:nth-child(2) > div:nth-child(5) > div:nth-child(1)")
+        .find("input[placeholder= 'Environment Value']")
+    }
+
+    get getDiskNameField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder= 'Disk Name']")
+        .clear({force:true})
+    }
+
+    get getDiskSizeField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder='Disk size in GB']")
+        .clear({force:true})
+    }
+
+    get getNodeSelectionList(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(21)")
+        .find('select')
+    }
+
+    get getFarmsList(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(24)")
+        .find('select')
+    }
+
+    get getApplySelectionBtn(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find('.button.mt-2.mb-2')
+    }
+
+    get getDeployBtn(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find(".button[type='submit']")
+    }
+
+    get getDeploymentModalBox(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1)", {timeout:300000})
+    }
+
+    get getBody(){
+        return cy.get('body')
+    }
+
+    get getDeploymentList(){
+        return  cy.get("tf-deployedlist[tab='vm']")
+        .shadow()
+        .find("div:nth-child(2) > section:nth-child(1) > div:nth-child(5)",{timeout:60000})
+    }
+
+    get getDeploymentListCheckBox(){
+        return cy.get("tf-deployedlist[tab='vm']")
+        .shadow()
+        .find("div:nth-child(2) > section:nth-child(1) > div:nth-child(5) > table:nth-child(1) > thead:nth-child(1) > tr:nth-child(1) > th:nth-child(1) > input:nth-child(1)")
+    }
+    
+    get getDeleteBtn(){
+        return cy.get("tf-deployedlist[tab='vm']")
+        .shadow()
+        .find('.is-flex.is-justify-content-space-between.is-align-items-center.mt-2.mb-2')
+        .contains('Delete')
+    }
+
+    get getDeploymentNotFoundText(){
+        return cy.get("tf-deployedlist[tab='vm']")
+        .shadow()
+        .contains("No VMs found on this profile.", {timeout:300000})
+    }
+
+
+    ConfigureResources(vmName, rootFs, cpu, memory){
+
+        //Change the VM Name
+        this.getVmNameField.type(vmName,{force: true})
+
+        //Change the VM Image
+        this.getVmImageList.select('Alpine-3',{force: true}).should('have.value','1')
+
+        //Enable RootFS
+        this.getRootFsBtn.click()
+
+        //Change the RootFS
+        this.getRootFsField.type(rootFs,{force: true})
+
+        //Change the CPU
+        this.getCpuField.type(cpu,{force: true})
+
+        //Change the Memory
+        this.getMemoryField.type(memory,{force: true})
+    }
+
+    ConfigureEnvVars(envVarKey, envVarValue){
+
+        //Switch to the ENV Vars tab
+        this.getConfigTab.contains('Environment Variables').click()
+
+        //Add New ENV Var
+        this.getAddBtn.click()
+
+        //Add Env Var Key
+        this.getEnvVarKeyField.type(envVarKey, {force:true})
+
+        //Add Env Var Value
+        this.getEnvVarValueField.type(envVarValue, {force:true})
+    }
+
+    ConfigureDisk(diskName,diskSize){
+
+        //Switch to the Disks tab
+        this.getConfigTab.contains('Disks').click()
+
+        //Add New Disk
+        this.getAddBtn.click()
+
+        //Change Disk Name
+        this.getDiskNameField.type(diskName, {force:true})
+
+        //Change Disk Size
+        this.getDiskSizeField.type(diskSize, {force:true})
+
+        //Return to the config tab
+        this.getConfigTab.contains('Config').click()
+    }
+
+    SelectNode(farmName){
+
+        //Select Capacity Filter
+        this.getNodeSelectionList.select('Capacity Filter',{force: true}).should('have.value','automatic')
+
+        //Select FreeFarm
+        this.getFarmsList.select(farmName,{force: true}).should('have.value',farmName)
+        
+        //Apply Selection
+        this.getApplySelectionBtn.click()
+    }
+
+    DeployVM(){
+        
+        //Deploy VM
+        this.getDeployBtn.click()
+
+        //Verify that the vm is deployed from the Details Modal box
+        this.getDeploymentModalBox.should('be.visible')
+
+        //Click outside the modal to close it
+        this.getBody.click(0,0)
+    }
+
+    SelectDeployment(vmName){
+        
+        // Get deployment name from the deployment list
+        this.getDeploymentList.contains(vmName)
+    }
+
+    DeleteVM(){
+
+        //Click on the VM Checkbox
+        this.getDeploymentListCheckBox.click({force:true})
+
+        //Click on the Delete Button
+        this.getDeleteBtn.click({force:true})
+
+        //Verify that the vm was deleted
+        this.getDeploymentNotFoundText.should('be.visible')
+    }
+
+}
+
+export default new Virtualmachine();
