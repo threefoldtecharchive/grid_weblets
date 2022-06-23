@@ -19,14 +19,14 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
+    validateNPCpu,
     validateFlistvalue,
     validateKey,
     validateKeyValue,
-    validateMemory,
+    validateNPMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-
+  
   const tabs: ITab[] = [
     { label: "Config", value: "config" }
   ];
@@ -35,20 +35,19 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
-    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
+    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateNPCpu, invalid: false},
+    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateNPMemory, invalid: false },
     ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Node Pilot Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   // prettier-ignore
   const flists: IFlist[] = [
-    { name: "nodepilot", url: "https://hub.grid.tf/maxux42.3bot/maxux-nodep.flist", entryPoint: "/" },
+    { name: "nodepilot", url: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist", entryPoint: "/" },
     
   ];
 
   $: {
-    data.name = "np" + data.id.split("-")[0],
     data.flist = flists[0].url;
     data.entrypoint = flists[0].entryPoint;
     data.cpu = 8;

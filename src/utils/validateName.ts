@@ -58,6 +58,11 @@ export function validateMemory(value: number): string | void {
   if (value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
 }
 
+export function validateNPMemory(value: number): string | void {
+  if (value < 8192) return "Minimum allowed memory is 8192 MB.";
+  return validateMemory(value);
+}
+
 export function validateKubernetesMemory(value: number): string | void {
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
     return "Memory must be a valid number.";
@@ -83,6 +88,11 @@ export function validateCpu(value: number): string | void {
   if (+value.toFixed(0) !== value) return "CPU cores must be a valid integer.";
   if (value < 1) return "Minimum allowed CPU cores is 1.";
   if (value > 32) return "Maximum allowed CPU cores is 32.";
+}
+
+export function validateNPCpu(value: number): string | void {
+  if (value < 8) return "Minimum allowed CPU cores is 8.";
+  return validateCpu(value);
 }
 
 export function validatePortNumber(value: string): string | void {

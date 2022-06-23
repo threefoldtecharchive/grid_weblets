@@ -383,6 +383,18 @@
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
         },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.publicIP.ip;
+            window.open("https://" + domain.substr(0, domain.indexOf('/')), "_blank").focus();
+          },
+          disabled: (i) => {
+            const publicIP = rows[i].details.publicIP;
+            return !publicIP || !publicIP.ip || removing !== null;
+          },
+        },
       ],
     },
     {
