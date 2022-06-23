@@ -55,8 +55,6 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
     developerEmail,
     threebotPRKey,
     flaskSecretKey,
-    publicIp,
-    planetary,
     domain,
   } = data;
 
@@ -76,8 +74,8 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machine.memory = memory;
   machine.disks = [disk];
   machine.node_id = nodeId;
-  machine.public_ip = publicIp;
-  machine.planetary = planetary;
+  machine.public_ip = false;
+  machine.planetary = true;
   machine.flist =
     "https://hub.grid.tf/tf-official-apps/discourse-v4.0.flist";
   machine.qsfs_disks = [];
