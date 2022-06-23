@@ -48,8 +48,6 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Discourse Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
-    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
   // define this solution packages
@@ -165,7 +163,7 @@
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
-          publicIp={data.publicIp}
+          publicIp={false}
           ssd={data.diskSize + rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
