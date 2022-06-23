@@ -14,8 +14,9 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployTFhubValidator from "../../utils/deployTFhubValidator";
   import validateName, {
-    isInvalid
+    isInvalid, validateStakeAmount, validateBSCAddress, validateBSCPrivateKey
   } from "../../utils/validateName";
+  import { syncValidateMnemonics } from "../../utils/validateMnemonics";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import rootFs from "../../utils/rootFs";
   import Tabs from "../../components/Tabs.svelte";
@@ -41,14 +42,16 @@
       symbol: "mnemonics",
       type: "password",
       placeholder: "For the cosmos account that will stake token.",
+      validator: syncValidateMnemonics,
       invalid: false,
     },
     {
-      label: "Stake Amount",
+      label: "Stake Amount(TFT)",
       symbol: "stakeAmount",
       type: "text",
-      placeholder: "100000000TFT",
+      placeholder: "Please note that 1 is equivalent to 10000000 TFT",
       invalid: false,
+      validator: validateStakeAmount,
     },
     {
       label: "Ethereum Address",
@@ -56,6 +59,7 @@
       type: "text",
       placeholder: "This address will be used in the bridge.",
       invalid: false,
+      validator: validateBSCAddress,
     },
     {
       label: "Ethereum Private Key",
@@ -63,6 +67,7 @@
       type: "password",
       placeholder: "The private key of the previous address.",
       invalid: false,
+      validator: validateBSCPrivateKey
     },
   ];
   // define this solution packages
@@ -86,7 +91,7 @@
   $: disabled =
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, diskField, memoryField, cpuField]);
+    isInvalid([...baseFields, ...valConf, diskField, memoryField, cpuField]);
 
   function onDeployTFhubValidator() {
     loading = true;
