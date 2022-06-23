@@ -109,7 +109,7 @@ function _deployTfHubValidator(
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-threefold_hub-latest.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/threefold_hub-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     MNEMONICS: mnemonics,
