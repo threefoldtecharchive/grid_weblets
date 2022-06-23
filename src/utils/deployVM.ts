@@ -32,7 +32,8 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
   vms.machines = [vm];
 
   return deploy(profile, type, name, async (grid) => {
-    await checkVMExist(grid, type.toLocaleLowerCase(), name);
+    if (type != "VM")
+      await checkVMExist(grid, type.toLocaleLowerCase(), name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
