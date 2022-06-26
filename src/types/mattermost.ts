@@ -43,7 +43,7 @@ export default class Mattermost implements IMattermost {
     port,
     smtpPassword,
   }: Partial<IMattermost> = {}) {
-    this.name = name || "mm" + this.id.split("-")[0];
+    this.name = name || "MM" + this.id.split("-")[0];
     this.username = username || "";
     this.password = password || this.id.split("-")[0];
     this.smtpPassword = smtpPassword || generatePassword(10);
