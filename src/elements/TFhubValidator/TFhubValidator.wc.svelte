@@ -49,10 +49,10 @@
       invalid: false,
     },
     {
-      label: "Stake Amount",
+      label: "Stake Amount(TFT)",
       symbol: "stakeAmount",
       type: "text",
-      placeholder: "Please note that 1 is equivalent to 10000000 TFT",
+      placeholder: "Stake Amount",
       invalid: false,
       validator: validateStakeAmount,
     },
