@@ -49,7 +49,7 @@
       invalid: false,
     },
     {
-      label: "Stake Amount(TFT)",
+      label: "Stake Amount",
       symbol: "stakeAmount",
       type: "text",
       placeholder: "Please note that 1 is equivalent to 10000000 TFT",
