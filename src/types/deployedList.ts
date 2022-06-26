@@ -56,7 +56,8 @@ export default class DeployedList {
             total,
             data,
           };
-        });
+        })
+        .then(DeployedList._sortK8sList);
     } catch {
       return Promise.resolve({
         total,
@@ -112,7 +113,8 @@ export default class DeployedList {
             total,
             data,
           };
-        });
+        })
+        .then(DeployedList._sortVMList);
     } catch {
       return Promise.resolve({
         total,
@@ -144,5 +146,17 @@ export default class DeployedList {
 
   public static __filterNames(names: string[]): string[] {
     return names.filter((name) => !name.startsWith("."));
+  }
+
+  public static _sortVMList(vms: any): any {
+    vms.data.sort((a, b) => a.details.created - b.details.created);
+    return vms;
+  }
+
+  public static _sortK8sList(k8s: any): any {
+    k8s.data.sort(
+      (a, b) => a.details.masters[0].created - b.details.masters[0].created
+    );
+    return k8s;
   }
 }
