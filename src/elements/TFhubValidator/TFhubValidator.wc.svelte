@@ -1,4 +1,4 @@
-<svelte:options tag="tf-vaildator" />
+<svelte:options tag="tf-validator" />
 
 <script lang="ts">
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -14,8 +14,12 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployTFhubValidator from "../../utils/deployTFhubValidator";
   import validateName, {
-    isInvalid
+    isInvalid,
+    validateStakeAmount,
+    validateBSCAddress,
+    validateBSCPrivateKey,
   } from "../../utils/validateName";
+  import { syncValidateMnemonics } from "../../utils/validateMnemonics";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import rootFs from "../../utils/rootFs";
   import Tabs from "../../components/Tabs.svelte";
@@ -41,14 +45,16 @@
       symbol: "mnemonics",
       type: "password",
       placeholder: "For the cosmos account that will stake token.",
+      validator: syncValidateMnemonics,
       invalid: false,
     },
     {
-      label: "Stake Amount",
+      label: "Stake Amount(TFT)",
       symbol: "stakeAmount",
       type: "text",
-      placeholder: "100000000TFT",
+      placeholder: "1 = 1000000TFT in Keplr",
       invalid: false,
+      validator: validateStakeAmount,
     },
     {
       label: "Ethereum Address",
@@ -56,6 +62,7 @@
       type: "text",
       placeholder: "This address will be used in the bridge.",
       invalid: false,
+      validator: validateBSCAddress,
     },
     {
       label: "Ethereum Private Key",
@@ -63,6 +70,7 @@
       type: "password",
       placeholder: "The private key of the previous address.",
       invalid: false,
+      validator: validateBSCPrivateKey,
     },
   ];
   // define this solution packages
@@ -86,7 +94,7 @@
   $: disabled =
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, diskField, memoryField, cpuField]);
+    isInvalid([...baseFields, ...valConf, diskField, memoryField, cpuField]);
 
   function onDeployTFhubValidator() {
     loading = true;
@@ -107,7 +115,6 @@
   }
 
   $: logs = $currentDeployment;
-
 </script>
 
 <SelectProfile
@@ -121,18 +128,18 @@
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployTFhubValidator}>
-  <h4 class="is-size-4">Deploy a TFhub Validator Instance</h4>
-  <p>
-    TFhub Validator A single point of collaboration. Designed specifically for
-    digital operations.
-    <a
-      target="_blank"
-      href="https://library.threefold.me/info/manual/#/manual__weblets_TFhubValidator"
-    >
-      Quick start documentation
-    </a>
-  </p>
-  <hr />
+    <h4 class="is-size-4">Deploy a TFhub Validator Instance</h4>
+    <p>
+      TFhub Validator A single point of collaboration. Designed specifically for
+      digital operations.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_TFhubValidator"
+      >
+        Quick start documentation
+      </a>
+    </p>
+    <hr />
     {#if loading || (logs !== null && logs.type === "VM")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
@@ -149,46 +156,43 @@
         message={message || "Failed to deploy TFhubValidator."}
       />
     {:else}
-      <Tabs {tabs} bind:active />      
+      <Tabs {tabs} bind:active />
       {#if active === "base"}
-      {#each baseFields as field (field.symbol)}
-        <Input
-          bind:data={data[field.symbol]}
-          bind:invalid={field.invalid}
-          {field}
+        {#each baseFields as field (field.symbol)}
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
+        {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
+          {packages}
         />
-      {/each}
-      <SelectCapacity
-        bind:cpu={data.cpu}
-        bind:memory={data.memory}
-        bind:diskSize={data.disks[0].size}
-        bind:diskField
-        bind:cpuField
-        bind:memoryField
-        {packages}
-      />    
-      <SelectNodeId
-        bind:data={data.nodeId}
-        bind:status={data.status}
-        bind:nodeSelection={data.selection.type}
-        {profile}
-        cpu={data.cpu}
-        ssd={data.disks.reduce(
-        (total, disk) => total + disk.size,
-        rootFs(data.cpu, data.memory)
-        )}
-        memory={data.memory}
-        publicIp={data.publicIp}
-        nodes={data.selection.nodes}
-        filters={data.selection.filters}
-        on:fetch={({ detail }) => (data.selection.nodes = detail)}
+        <SelectNodeId
+          bind:data={data.nodeId}
+          bind:status={data.status}
+          bind:nodeSelection={data.selection.type}
+          {profile}
+          cpu={data.cpu}
+          ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            rootFs(data.cpu, data.memory)
+          )}
+          memory={data.memory}
+          publicIp={data.publicIp}
+          nodes={data.selection.nodes}
+          filters={data.selection.filters}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
         />
-
-        {:else if active === "valConf"}
+      {:else if active === "valConf"}
         <div class="notification is-warning is-light">
-          <p>
-            please provide the required values for the validator
-          </p>
+          <p>please provide the required values for the validator</p>
         </div>
         {#each valConf as field (field.symbol)}
           <Input
@@ -206,11 +210,11 @@
       {success}
       on:click={(e) => {
         if (success || failed) {
-        e.preventDefault();
-        success = false;
-        failed = false;
-        loading = false;
-       }
+          e.preventDefault();
+          success = false;
+          failed = false;
+          loading = false;
+        }
       }}
     />
   </form>
@@ -218,8 +222,7 @@
 {#if modalData}
   <Modal data={modalData} on:closed={() => (modalData = null)} />
 {/if}
-      
+
 <style lang="scss" scoped>
-@import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>
-      

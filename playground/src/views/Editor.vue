@@ -6,15 +6,11 @@
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
           <template v-for="(el, idx) in weblets">
-            <li
-              :key="el.name"
-              @click="
-                section === 'coming soon' || idx === active
-                  ? null
-                  : route(el.symbol)
-              "
-              v-if="el.section === section"
-            >
+            <li :key="el.name" @click="
+              section === 'coming soon' || idx === active
+                ? null
+                : route(el.symbol)
+            " v-if="el.section === section">
               <a v-bind:class="{ 'is-active': idx === active }">
                 <span class="icon-text">
                   <span class="icon" v-if="el.img">
@@ -29,8 +25,7 @@
           </template>
         </ul>
       </template>
-      <span
-        style="
+      <span style="
           position: fixed;
           bottom: 15px;
           left: 245px;
@@ -39,9 +34,7 @@
           font-size: 0.9rem;
           background-color: #1982b1;
           color: white;
-        "
-        class="tag is-light"
-      >
+        " class="tag is-light">
         <tf-version></tf-version>
       </span>
     </aside>
@@ -141,13 +134,6 @@ export default class Editor extends Vue {
       "mattermost.png"
     ),
     new Weblet(
-      "TFhub Validator",
-      "vaildator",
-      "tfhubValidator",
-      "deployment",
-      "vm.png"
-    ),
-    new Weblet(
       "Discourse",
       "discourse",
       "discourse",
@@ -177,7 +163,13 @@ export default class Editor extends Vue {
       "deployment",
       "casperlabs.png"
     ),
-
+    new Weblet(
+      "TFhub Validator",
+      "validator",
+      "tfhubValidator",
+      "deployment",
+      "vm.png"
+    ),
     new Weblet(
       "Node Pilot",
       "nodepilot",
@@ -269,17 +261,21 @@ export default class Editor extends Vue {
   width: 185px;
   margin: 15px 15px 30px;
 }
+
 .menu {
   background-color: #333;
 }
+
 .menu-list a,
 .menu-label {
   color: #fff;
 }
+
 .menu-list a {
   margin: 5px 0;
   transition: all 0.35s ease-in-out;
 }
+
 .menu-list a:hover,
 .menu-list a.is-active {
   background-color: #1982b1;

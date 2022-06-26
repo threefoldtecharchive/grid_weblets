@@ -63,12 +63,12 @@ export default class TFHubValidator implements ITFHubValidator {
   }: Partial<ITFHubValidator> = {}) {
     this.name = "VAL" + this.id.split("-")[0];
     this.mnemonics = mnemonics || "";
-    this.keyName = keyName || "";
-    this.stakeAmount = stakeAmount || "10000000TFT";
-    this.moniker = moniker || "";
-    this.chainId = chainId;
+    this.stakeAmount = stakeAmount || "";
     this.ethereumAddress = ethereumAddress || "";
     this.ethereumPrivKey = ethereumPrivKey || "";
+    this.keyName = keyName;
+    this.moniker = moniker;
+    this.chainId = chainId;
     this.gravityAddress = gravityAddress;
     this.ethereumRpc = ethereumRpc;
     this.persistentPeers = persistentPeers;
