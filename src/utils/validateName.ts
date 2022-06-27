@@ -195,20 +195,24 @@ export function validateEntryPoint(value: string): string | void {
 
 export function validateStakeAmount(value: string): string | void {
   if (value === "") return "Stake amount is required";
-  if (+value < 1e-5) return "Amount must be positive"  
-  if (isNaN(+value)) return "Stake amount must be a number.";
+  if (+value < 1e-5 || +value <= 0) return "Amount must be positive";
+  if (isNaN(+value) 
+    || value.startsWith("+") 
+    || value.includes("e")) 
+  return "Stake amount must be a number.";
 }
 
 export function validateBSCAddress(value: string) {
-  if (value.length != 42) return "Address length must be 42"
-  if (!value.startsWith("0x")) return "Address must start with 0x"
+  if (value === "") return "Ethereum address is required";
+  if (value.length != 42) return "Address length must be 42";
+  if (!value.startsWith("0x")) return "Address must start with 0x";
   if (!/^(0x)?[0-9a-f]{40}$/i.test(value)) 
-    return "Address must consist only of valid hex characters after 0x"
+    return "Address must consist only of valid hex characters after 0x";
 }
 
 export function validateBSCPrivateKey(value: string): string | void {
   if (value === "") return "Private key is required";
-  if (value.length != 64) return "Private key length must be 64"
+  if (value.length != 64) return "Private key length must be 64";
   if (!/^[0-9a-f]{64}$/i.test(value)) 
-    return "Private key must consist only of valid hex characters."
+    return "Private key must consist only of valid hex characters.";
 }
