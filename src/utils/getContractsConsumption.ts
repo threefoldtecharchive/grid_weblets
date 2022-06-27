@@ -6,6 +6,7 @@ import getGrid from "./getGrid";
 export interface IContract {
   id: number;
   type: "name" | "node";
+  state: "Created" | "GracePeriod";
 }
 
 function _getConsumption(id: number, grid: GridClient) {

@@ -29,8 +29,8 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID }) => ({ id: contractID, type: "name" } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID }) => ({ id: contractID, type: "node" } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state }) => ({ id: contractID, type: "node", state: state } as IContract)); // prettier-ignore
             contracts = [...names, ...nodes];
           })
           .catch((err) => {
@@ -129,11 +129,12 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "Billing Rate"]}
-        rows={contracts.map(({ id, type }, idx) => [
+        headers={["#", "ID", "Type", "State", "Billing Rate"]}
+        rows={contracts.map(({ id, type, state }, idx) => [
           idx.toString(),
           id.toString(),
           type,
+          state,
           loadingConsumption ? "Loading..." : consumptions[idx],
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
