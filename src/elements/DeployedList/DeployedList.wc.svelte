@@ -14,7 +14,7 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
-    | "tfhub Validator"
+    | "tfhubValidator"
     | "discourse"
     | "taiga"
     | "owncloud"
@@ -36,17 +36,17 @@
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Kubernetes", value: "k8s" },
-    { label: "Virtual Machines", value: "vm" },
-    { label: "Caprover", value: "caprover" },
-    { label: "FunkWhale", value: "funkwhale" },
+    { label: "Virtual Machine", value: "vm" },
+    { label: "CapRover", value: "caprover" },
     { label: "Peertube", value: "peertube" },
+    { label: "Funkwhale", value: "funkwhale" },
     { label: "Mattermost", value: "mattermost" },
-    { label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
     { label: "Presearch", value: "presearch" },
     { label: "Casperlabs", value: "casperlabs" },
+    { label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" }
   ];
   let active: string = "k8s";
@@ -59,6 +59,12 @@
 
   let profile: IProfile;
   let message: string = null;
+
+  function get_solution_label(active: string){
+    return tabs.find(item => {
+        return item.value == active;
+    }).label
+  }
 
   function onConfigHandler() {
     configed = true;
@@ -417,7 +423,7 @@
 <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
-      Deployment List {tab ? `(${tab})` : ""}
+      Deployment List {tab ? `(${get_solution_label(tab)})` : ""}
     </h4>
     <hr />
 
@@ -512,7 +518,7 @@
         {#await list?.loadDeployments(active === "vm" ? undefined : active)}
           <Alert
             type="info"
-            message={`Listing ${active.toLocaleUpperCase()}s...`}
+            message={`Listing ${active == "casperlabs"? "Casperlab" : get_solution_label(active)}s...`}
           />
         {:then rows}
           {#if rows.data.length}
@@ -535,7 +541,7 @@
           {:else}
             <Alert
               type="gray"
-              message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
+              message={`No ${active == "casperlabs"? "Casperlab" : get_solution_label(active)}s found on this profile.`}
             />
           {/if}
         {:catch err}
@@ -543,7 +549,7 @@
             type="danger"
             message={err.message ||
               err ||
-              `Failed to list ${active.toLocaleUpperCase()}s`}
+              `Failed to list ${active == "casperlabs"? "Casperlab" : get_solution_label(active)}s`}
           />
         {/await}
       {/if}

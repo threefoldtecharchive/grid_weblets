@@ -99,7 +99,7 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a casperlabs Instance</h4>
+    <h4 class="is-size-4">Deploy a Casperlabs Instance</h4>
     <p>
       Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.
       <a
