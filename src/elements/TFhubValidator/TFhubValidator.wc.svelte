@@ -49,10 +49,10 @@
       invalid: false,
     },
     {
-      label: "Stake Amount(TFT)",
+      label: "Stake Amount (TFT)",
       symbol: "stakeAmount",
       type: "text",
-      placeholder: "1 = 1000000TFT in Keplr",
+      placeholder: "1 = 10000000TFT in Keplr",
       invalid: false,
       validator: validateStakeAmount,
     },
