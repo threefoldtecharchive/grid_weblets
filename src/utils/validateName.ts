@@ -2,7 +2,7 @@ import type { IFormField } from "../types";
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
-const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
+const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/16$/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 // const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
@@ -144,8 +144,8 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIPRange(value: string): string | void {
-  if (!IP_REGEX.test(value)) return "Invalid IP range.";
-  if (value.length > 15) return "Password must be less than 15 characters";
+  if (!IP_REGEX.test(value)) return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
+  if (value.length > 15) return "IP range must be less than 15 characters";
 }
 
 export function validateMountPoint(value: string): string | void {
