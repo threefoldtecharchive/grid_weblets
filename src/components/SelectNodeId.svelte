@@ -157,9 +157,9 @@
     /* Loading farms & countries */
     const old_farm_label = "Please select a farm";
     const old_countries_label = "Please select a country";
-    
+
     const farmsLabel = _setLabel(0, old_farm_label);
-    const countriesLabel = _setLabel(1, "Please select a country");
+    const countriesLabel = _setLabel(1, old_countries_label);
 
     fetchFarmAndCountries(profile, filters)
       .then(({ farms, countries }) => {
