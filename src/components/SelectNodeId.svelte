@@ -119,8 +119,7 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, label: string = "Loading...") {
-    const oldLabel = filtersFields[index].options[0].label;
+  function _setLabel(index: number, oldLabel: string,  label: string = "Loading...") {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
@@ -156,8 +155,11 @@
 
   function onLoadFarmsHandler(){
     /* Loading farms & countries */
-    const farmsLabel = _setLabel(0);
-    const countriesLabel = _setLabel(1);
+    const old_farm_label = "Please select a farm";
+    const old_countries_label = "Please select a country";
+    
+    const farmsLabel = _setLabel(0, old_farm_label);
+    const countriesLabel = _setLabel(1, "Please select a country");
 
     fetchFarmAndCountries(profile, filters)
       .then(({ farms, countries }) => {
@@ -169,8 +171,8 @@
         console.log("Error", err);
       })
       .finally(() => {
-        _setLabel(0, farmsLabel);
-        _setLabel(1, countriesLabel);
+        _setLabel(0, old_farm_label, farmsLabel);
+        _setLabel(1, old_countries_label, countriesLabel);
       });
   }
 
