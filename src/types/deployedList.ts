@@ -21,11 +21,8 @@ export default class DeployedList {
             return res(null);
           }
 
-          // prettier-ignore
-          const prices = await Promise.all([
-            this.grid.contracts.getConsumption({ id: data.masters[0].contractId }).catch(() => 0),
-            ...data.workers.map(({ contractId }) => this.grid.contracts.getConsumption({ id: contractId }).catch(() => 0))
-          ]);
+          const k8sContracts = Array.from(new Set<any>([data.masters[0].contractId, ...data.workers.map(({ contractId }) => contractId)]));
+          const prices = await Promise.all([...k8sContracts.map(contractId => this.grid.contracts.getConsumption({ id: contractId }).catch(() => 0))]);
 
           const value = prices.reduce((a, b) => a + b, 0);
 
