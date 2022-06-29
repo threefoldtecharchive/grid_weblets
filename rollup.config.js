@@ -9,7 +9,7 @@ import path from 'path';
 import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
-const network = process.env.NETWORK || "dev";
+const network = process.env.NETWORK || "qa";
 const targetWeblets = process.env.TARGET_WEBLETS;
 
 /**
