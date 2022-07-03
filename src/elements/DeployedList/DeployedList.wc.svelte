@@ -60,10 +60,12 @@
   let profile: IProfile;
   let message: string = null;
 
-  function get_solution_label(active: string){
-    return tabs.find(item => {
+  function get_solution_label(active: string) {
+    return (
+      tabs.find((item) => {
         return item.value == active;
-    }).label
+      })?.label ?? "Not Found!"
+    );
   }
 
   function onConfigHandler() {
@@ -394,7 +396,12 @@
           label: "Visit",
           click: (_, i) => {
             const domain = rows[i].details.publicIP.ip;
-            window.open("https://" + domain.substr(0, domain.indexOf('/')), "_blank").focus();
+            window
+              .open(
+                "https://" + domain.substr(0, domain.indexOf("/")),
+                "_blank"
+              )
+              .focus();
           },
           disabled: (i) => {
             const publicIP = rows[i].details.publicIP;
@@ -518,7 +525,9 @@
         {#await list?.loadDeployments(active === "vm" ? undefined : active)}
           <Alert
             type="info"
-            message={`Listing ${active == "casperlabs"? "Casperlab" : get_solution_label(active)}s...`}
+            message={`Listing ${
+              active == "casperlabs" ? "Casperlab" : get_solution_label(active)
+            }s...`}
           />
         {:then rows}
           {#if rows.data.length}
@@ -541,7 +550,11 @@
           {:else}
             <Alert
               type="gray"
-              message={`No ${active == "casperlabs"? "Casperlab" : get_solution_label(active)}s found on this profile.`}
+              message={`No ${
+                active == "casperlabs"
+                  ? "Casperlab"
+                  : get_solution_label(active)
+              }s found on this profile.`}
             />
           {/if}
         {:catch err}
@@ -549,7 +562,11 @@
             type="danger"
             message={err.message ||
               err ||
-              `Failed to list ${active == "casperlabs"? "Casperlab" : get_solution_label(active)}s`}
+              `Failed to list ${
+                active == "casperlabs"
+                  ? "Casperlab"
+                  : get_solution_label(active)
+              }s`}
           />
         {/await}
       {/if}
