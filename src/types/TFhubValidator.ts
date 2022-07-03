@@ -62,9 +62,6 @@ export default class TFHubValidator implements ITFHubValidator {
     ethereumRpc,
     nodeId,
     ssh_key,
-    gas_prices,
-    gas_adjustment,
-    orchestrator_fees,
   }: Partial<ITFHubValidator> = {}) {
     this.name = "VAL" + this.id.split("-")[0];
     this.mnemonics = mnemonics || "";
@@ -83,9 +80,6 @@ export default class TFHubValidator implements ITFHubValidator {
     this.orchestrator_fees = configVariables(getNetwork()).orchestrator_fees;
     this.nodeId = nodeId;
     this.ssh_key = ssh_key;
-    this.gas_prices = gas_prices;
-    this.gas_adjustment = gas_adjustment;
-    this.orchestrator_fees = orchestrator_fees;
   }
 
   get invalid(): boolean {
