@@ -190,8 +190,7 @@
               class="button is-outlined mr-2"
               style={`border-color: #1982b1; color: #1982b1`}
               type="button"
-              disabled={activeProfileId !== activeProfile?.id ||
-                Boolean(validateProfileName(activeProfile.name)) ||
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
                 Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
                 Boolean(validateSSH(activeProfile.sshKey))}
               on:click={() => {
