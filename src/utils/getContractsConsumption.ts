@@ -7,6 +7,7 @@ export interface IContract {
   id: number;
   type: "name" | "node";
   state: "Created" | "GracePeriod";
+  expiration?: string;
 }
 
 function _getConsumption(id: number, grid: GridClient) {

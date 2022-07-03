@@ -33,6 +33,19 @@
             const nodes = nodeContracts.map(({ contractID, state }) => ({ id: contractID, type: "node", state: state } as IContract)); // prettier-ignore
             contracts = [...names, ...nodes];
           })
+          .then(async () => {
+            for (let contract of contracts) {
+              if (contract.state === "GracePeriod") {
+                const res = await grid.contracts.getDeletionTime({
+                  id: +contract.id,
+                });
+                contract.expiration =
+                  res === 0 ? "Active." : new Date(res).toLocaleString();
+              } else {
+                contract.expiration = "Active.";
+              }
+            }
+          })
           .catch((err) => {
             console.log("Error", err);
           })
@@ -129,12 +142,13 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "State", "Billing Rate"]}
-        rows={contracts.map(({ id, type, state }, idx) => [
+        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate"]}
+        rows={contracts.map(({ id, type, state, expiration }, idx) => [
           idx.toString(),
           id.toString(),
           type,
           state,
+          expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
