@@ -18,6 +18,10 @@ interface ITFHubValidator {
   genesisUrl: string;
   ssh_key: string;
   nodeId: number;
+  gas_prices: string;
+  gas_adjustment: string;
+  orchestrator_fees: string;
+
 }
 
 export default class TFHubValidator implements ITFHubValidator {
@@ -40,6 +44,9 @@ export default class TFHubValidator implements ITFHubValidator {
   genesisUrl: string;
   ssh_key: string;
   nodeId: number;
+  gas_prices: string;
+  gas_adjustment: string;
+  orchestrator_fees: string;
 
   public publicIp = true;
   public planetary = true;
@@ -60,6 +67,9 @@ export default class TFHubValidator implements ITFHubValidator {
     genesisUrl,
     nodeId,
     ssh_key,
+    gas_prices,
+    gas_adjustment,
+    orchestrator_fees,
   }: Partial<ITFHubValidator> = {}) {
     this.name = "VAL" + this.id.split("-")[0];
     this.mnemonics = mnemonics || "";
@@ -75,6 +85,9 @@ export default class TFHubValidator implements ITFHubValidator {
     this.genesisUrl = genesisUrl;
     this.nodeId = nodeId;
     this.ssh_key = ssh_key;
+    this.gas_prices = gas_prices;
+    this.gas_adjustment = gas_adjustment;
+    this.orchestrator_fees = orchestrator_fees;
   }
 
   get invalid(): boolean {
