@@ -50,7 +50,6 @@ describe('Weblets', function(){
             - Activate the profile
         **********************************************/
         
-
         profileManager.ActivateProfileManager(this.credentials.Mnemonics ,this.credentials.SSH_KEY,profileSecret,profileName)
     })
 
@@ -67,25 +66,13 @@ describe('Weblets', function(){
             - Select Node (Capacity Filter)
             - Deploy the vm
         **********************************************/
-
-
+        
         //Choose Virtual Machine from the sidebar
         sidebar.SelectFromSidebar(solutionName)
 
-        //Configure the name and resources of the vm
-        vmPage.ConfigureResources(vmName,rootFs,cpu,memory)
-
-        //Configure the Env Vars for them vm
-        vmPage.ConfigureEnvVars(envVarKey,envVarValue)
-
-        //Add a disk and configure it 
-        vmPage.ConfigureDisk(diskName,diskSize)
-
-        //Select Node (Capacity Filter)
-        vmPage.SelectNode(farmName)
-
         //Deploy the vm
-        vmPage.DeployVM()
+        vmPage.DeployVM(vmName,rootFs,cpu,memory,
+            envVarKey,envVarValue,diskName,diskSize,farmName)
     })
 
     it('TC375 - Delete Deployment', function(){
@@ -96,14 +83,10 @@ describe('Weblets', function(){
          Scenario:
             - Select a deployment from the deployment list
             - Delete the deployment
-        *************************************************/
-        
-
-        // Select a deployment from the deployment list
-        vmPage.SelectDeployment(vmName)
+        *************************************************/      
 
         //Delete the deployment
-        vmPage.DeleteVM()
+        vmPage.DeleteVM(vmName)
     })
 
 })

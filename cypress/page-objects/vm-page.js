@@ -143,8 +143,12 @@ class Virtualmachine{
         .contains("No VMs found on this profile.", {timeout:300000})
     }
 
-
-    ConfigureResources(vmName, rootFs, cpu, memory){
+    DeployVM(vmName, rootFs, cpu, memory, envVarKey, envVarValue,
+        diskName,diskSize, farmName){
+        
+        /***********************
+        Configure VM Resources
+        ************************/
 
         //Change the VM Name
         this.getVmNameField.type(vmName,{force: true})
@@ -163,9 +167,10 @@ class Virtualmachine{
 
         //Change the Memory
         this.getMemoryField.type(memory,{force: true})
-    }
-
-    ConfigureEnvVars(envVarKey, envVarValue){
+    
+        /***********************
+        Configure Env Vars
+        ************************/
 
         //Switch to the ENV Vars tab
         this.getConfigTab.contains('Environment Variables').click()
@@ -178,9 +183,10 @@ class Virtualmachine{
 
         //Add Env Var Value
         this.getEnvVarValueField.type(envVarValue, {force:true})
-    }
-
-    ConfigureDisk(diskName,diskSize){
+    
+        /***********************
+        Configure Disks
+        ************************/
 
         //Switch to the Disks tab
         this.getConfigTab.contains('Disks').click()
@@ -196,9 +202,11 @@ class Virtualmachine{
 
         //Return to the config tab
         this.getConfigTab.contains('Config').click()
-    }
 
-    SelectNode(farmName){
+
+        /***********************
+        Node Selection
+        ************************/
 
         //Select Capacity Filter
         this.getNodeSelectionList.select('Capacity Filter',{force: true}).should('have.value','automatic')
@@ -208,9 +216,10 @@ class Virtualmachine{
         
         //Apply Selection
         this.getApplySelectionBtn.click()
-    }
 
-    DeployVM(){
+        /***********************
+        Deployment
+        ************************/
         
         //Deploy VM
         this.getDeployBtn.click()
@@ -222,13 +231,10 @@ class Virtualmachine{
         this.getBody.click(0,0)
     }
 
-    SelectDeployment(vmName){
-        
+    DeleteVM(vmName){
+
         // Get deployment name from the deployment list
         this.getDeploymentList.contains(vmName)
-    }
-
-    DeleteVM(){
 
         //Click on the VM Checkbox
         this.getDeploymentListCheckBox.click({force:true})
