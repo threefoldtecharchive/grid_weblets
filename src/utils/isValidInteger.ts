@@ -1,4 +1,5 @@
 export default function isValidInteger(n: number | string) {
+  // check if n is a vaild number.
   const num = +n;
   return (
     typeof num === "number" &&
