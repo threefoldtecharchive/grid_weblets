@@ -205,6 +205,9 @@
               class="button mr-2"
               style={`background-color: #1982b1; color: #fff`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
