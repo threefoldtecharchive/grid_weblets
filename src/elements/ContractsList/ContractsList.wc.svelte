@@ -40,9 +40,9 @@
                   id: +contract.id,
                 });
                 contract.expiration =
-                  res === 0 ? "Active." : new Date(res).toLocaleString();
+                  res === 0 ? "-" : new Date(res).toLocaleString();
               } else {
-                contract.expiration = "Active.";
+                contract.expiration = "-";
               }
             }
           })
