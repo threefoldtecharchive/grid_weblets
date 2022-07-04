@@ -5855,10 +5855,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.3.5:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.3.5.tgz#0035eea042ed88a261b5f94585a134a161a729e2"
-  integrity sha512-GtdpRuH4CGH0xTlvL4wH1Fy1ZkSeaW25QcZ6KobeP27ilv3Lg+ijMnxlC0S4N6jVw7pDKDeTjxhNlJ6XDDt6bg==
+grid3_client@1.3.6:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.3.6.tgz#4da91850718a513ddb728fb659dbf3c91db482cd"
+  integrity sha512-hgjEAPMT+SfawU7GiEzBdEJepTfBXio3Z8AnBL7TEo6Fv9nlqFCj5nSs66zyigxey8YL7EOwnW10mfnVIdP64Q==
   dependencies:
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -5873,7 +5873,7 @@ grid3_client@1.3.5:
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
-    tfgrid-api-client "^1.13.0"
+    tfgrid-api-client "^1.14.0"
     ts-rmb-client-base "^0.0.1"
     ts-rmb-http-client "^1.0.7"
     ts-rmb-redis-client "^0.0.3"
@@ -10698,10 +10698,10 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-tfgrid-api-client@^1.13.0:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.13.0.tgz#f9d02d013ed822047c418933303374202812c35f"
-  integrity sha512-ahhP0NrThmBPDezBmN+UTxLiEI4ttUW0mkofHO31NVS0nIl8T1PVnY/y9yxMBVaWw7rKsjo8p1qmDNnTt/JuAg==
+tfgrid-api-client@^1.14.0:
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.14.0.tgz#84f0f7cf2beec0fb5522a916e835e1ef25f0c019"
+  integrity sha512-q+X4qTFyiC/Kn3a0Z9enaz3WpjoUlqILu99Gq5a671SZTAQjF48P2Jpv+uGaTZdbtZ480/kuU+yEmavhNf6Rvg==
   dependencies:
     "@polkadot/api" "^8.9.1"
     bip39 "^3.0.3"
