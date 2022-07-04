@@ -15,7 +15,7 @@ describe('Weblets', function(){
     let cpu = utils.generateInt(1,5)
     let memory = utils.generateInt(256,2048)
     let rootFs = utils.generateInt(2,3)
-    let diskSize = utils.generateInt(1,2)
+    let diskSize = utils.generateInt(1,20)
     let farmName = "Freefarm"
     
     before(function(){
