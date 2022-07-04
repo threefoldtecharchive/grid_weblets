@@ -1,3 +1,5 @@
+import sidebar from "./sidebar"
+
 class Virtualmachine{
 
     get getVmNameField(){
@@ -82,6 +84,13 @@ class Virtualmachine{
         .clear({force:true})
     }
 
+    get getMountPointField(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("input[placeholder='Disk Mount Point']")
+        .clear({force:true})
+    }
+
     get getNodeSelectionList(){
         return cy.get('tf-vm')
         .shadow()
@@ -114,6 +123,45 @@ class Virtualmachine{
         .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1)", {timeout:300000})
     }
 
+    get getDeploymentName(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > section:nth-child(2) > div:nth-child(5) > div:nth-child(1)")
+        .find("div")
+        .find("input")
+    }
+
+    get getDeploymentCpu(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > section:nth-child(2) > div:nth-child(13) > div:nth-child(1)")
+        .find("div")
+        .find("input")
+    }
+
+    get getDeploymentMemory(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > section:nth-child(2) > div:nth-child(15) > div:nth-child(1)")
+        .find("div")
+        .find("input")
+    }
+
+    get getDeploymentDiskName(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > section:nth-child(2) > div:nth-child(17) > div:nth-child(1)")
+        .find("p")
+    }
+
+    get getDeploymentDiskSize(){
+        return cy.get('tf-vm')
+        .shadow()
+        .find("div:nth-child(4) > div:nth-child(2) > div:nth-child(1) > section:nth-child(2) > div:nth-child(17) > div:nth-child(1)")
+        .find("div")
+        .find("input")
+    }
+
     get getBody(){
         return cy.get('body')
     }
@@ -143,8 +191,12 @@ class Virtualmachine{
         .contains("No VMs found on this profile.", {timeout:300000})
     }
 
+    Navigate(){
+        sidebar.SelectFromSidebar("Virtual Machine")
+    }
+
     DeployVM(vmName, rootFs, cpu, memory, envVarKey, envVarValue,
-        diskName,diskSize, farmName){
+        diskName, diskSize, mountPoint, farmName){
         
         /***********************
         Configure VM Resources
@@ -200,6 +252,9 @@ class Virtualmachine{
         //Change Disk Size
         this.getDiskSizeField.type(diskSize, {force:true})
 
+        //Change Mount Point
+        this.getMountPointField.type(mountPoint, {force:true})
+
         //Return to the config tab
         this.getConfigTab.contains('Config').click()
 
@@ -226,6 +281,13 @@ class Virtualmachine{
 
         //Verify that the vm is deployed from the Details Modal box
         this.getDeploymentModalBox.should('be.visible')
+
+        //Verify Deployment Details
+        this.getDeploymentName.should('have.value',vmName)
+        this.getDeploymentCpu.should('have.value',cpu)
+        this.getDeploymentMemory.should('have.value',memory)
+        this.getDeploymentDiskSize.should('have.value',diskSize)
+        this.getDeploymentDiskName.contains(mountPoint)
 
         //Click outside the modal to close it
         this.getBody.click(0,0)

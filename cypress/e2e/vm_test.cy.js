@@ -1,5 +1,4 @@
 import profileManager from "../page-objects/profile-manager"
-import sidebar from "../page-objects/sidebar"
 import vmPage from "../page-objects/vm-page"
 import utils from "../utils/utils"
 
@@ -11,15 +10,13 @@ describe('Weblets', function(){
     let envVarKey = "TestKey" + utils.generateString(5)
     let envVarValue = "Value" + utils.generateString(5)
     let diskName = "DISK" + utils.generateString(5)
+    let mountPoint = "/mnt/" + utils.generateString(5)
 
-
-    let cpu = 1
-    let memory = 256
-    let rootFs = 2
-    let diskSize = 10
+    let cpu = utils.generateInt(1,5)
+    let memory = utils.generateInt(256,2048)
+    let rootFs = utils.generateInt(2,3)
+    let diskSize = utils.generateInt(1,2)
     let farmName = "Freefarm"
-    let solutionName = "Virtual Machine"
-
     
     before(function(){
         //Load data from fixtures/credentials.json
@@ -67,12 +64,12 @@ describe('Weblets', function(){
             - Deploy the vm
         **********************************************/
         
-        //Choose Virtual Machine from the sidebar
-        sidebar.SelectFromSidebar(solutionName)
+        //Navigate to the Virtual Machine Tab
+        vmPage.Navigate()
 
         //Deploy the vm
         vmPage.DeployVM(vmName,rootFs,cpu,memory,
-            envVarKey,envVarValue,diskName,diskSize,farmName)
+            envVarKey,envVarValue,diskName,diskSize,mountPoint,farmName)
     })
 
     it('TC375 - Delete Deployment', function(){
