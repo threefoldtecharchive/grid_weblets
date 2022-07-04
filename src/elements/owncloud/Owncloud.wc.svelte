@@ -170,9 +170,9 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
+    <h4 class="is-size-4">Deploy an Owncloud Instance</h4>
     <p>
-      ownCloud develops and provides open-source software for content
+      Owncloud develops and provides open-source software for content
       collaboration, allowing teams to easily share and work on files seamlessly
       regardless of device or location.
       <a

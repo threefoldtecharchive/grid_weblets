@@ -32,6 +32,9 @@ function defaultEnvVars(host: string){
       ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
       persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
       genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
+      orchestrator_fees: "20000000TFT",
+      gas_prices: "80TFT",
+      gas_adjustment: "1.6"
     },
     qa: {
       chainId: "threefold-hub-testnet",
@@ -39,6 +42,10 @@ function defaultEnvVars(host: string){
       ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
       persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
       genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
+      orchestrator_fees: "20000000TFT",
+      gas_prices: "80TFT",
+      gas_adjustment: "1.6"
+
     },
     test: {
       chainId: "threefold-hub-testnet",
@@ -46,6 +53,9 @@ function defaultEnvVars(host: string){
       ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
       persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
       genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
+      orchestrator_fees: "20000000TFT",
+      gas_prices: "80TFT",
+      gas_adjustment: "1.6"
     },
     main: {
       chainId: "",
@@ -53,6 +63,9 @@ function defaultEnvVars(host: string){
       ethereumRpc: "",
       persistentPeers: "",
       genesisUrl: "",
+      orchestrator_fees: "",
+      gas_prices: "",
+      gas_adjustment: ""
     },
   }
   return env[host];
@@ -124,6 +137,10 @@ function _deployTfHubValidator(
     PERSISTENT_PEERS: defaultEnvVars(getNetwork()).persistentPeers,
     GENESIS_URL: defaultEnvVars(getNetwork()).genesisUrl,
     SSH_KEY: profile.sshKey,
+    GAS_PRICES: defaultEnvVars(getNetwork()).gas_prices,
+    GAS_ADJUSTMENT: defaultEnvVars(getNetwork()).gas_adjustment,
+    ORCHESTRATOR_FEES: defaultEnvVars(getNetwork()).orchestrator_fees,
+
   };
 
   const vms = new MachinesModel();

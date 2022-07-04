@@ -38,7 +38,7 @@
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
-        return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
+        return { label: profile.name || `Profile${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
 
       if (currentProfile) {

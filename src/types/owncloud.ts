@@ -4,8 +4,11 @@ import isValidInteger from "../utils/isValidInteger";
 import { validateEmail, validateOptionalEmail } from "../utils/validateName";
 import validateName from "../utils/validateName";
 import validateDomainName from "../utils/validateDomainName";
+import { v4 } from "uuid";
 export default class Owncloud extends VM {
   /* Superuser settings */
+  public id = v4();
+  public name = "OC" +this.id.split("-")[0];
   public adminEmail = "";
   public adminUsername = "admin";
   public adminPassword = generatePassword((length = Math.floor(Math.random() * 5) + 10)); // prettier-ignore

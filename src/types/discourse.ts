@@ -73,7 +73,7 @@ export default class Discourse {
     public id = v4(),
 
     /* Base info */
-    public name = "dc" + id.split("-")[0],
+    public name = "DC" + id.split("-")[0],
     public cpu = 2,
     public memory = 1024 * 4,
     public diskSize = 50,

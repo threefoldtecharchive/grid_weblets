@@ -166,7 +166,7 @@
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
-            style={`border-color: #FF5151; color: #FF5151`}
+            style={`border-color: #FF5151; color: #FF5151;`}
             disabled={!profile ||
               loading ||
               deleting ||
@@ -198,4 +198,8 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  .button.is-danger.is-outlined:hover{
+    background-color: #FF5151 !important;
+    color: #fff !important;
+  }
 </style>

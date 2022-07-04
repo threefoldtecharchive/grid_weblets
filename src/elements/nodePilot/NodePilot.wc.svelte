@@ -1,7 +1,9 @@
 <svelte:options tag="tf-nodepilot" />
 
 <script lang="ts">
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
+  import NodePilot from "../../types/nodepilot";
+
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
@@ -26,12 +28,10 @@
     validateNPMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  
-  const tabs: ITab[] = [
-    { label: "Config", value: "config" }
-  ];
 
-  let data = new VM();
+  const tabs: ITab[] = [{ label: "Config", value: "config" }];
+
+  let data = new NodePilot();
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -56,9 +56,9 @@
     data.publicIp6 = true;
     data.planetary = false;
 
-    let disk1 = new Disk()
+    let disk1 = new Disk();
     disk1.size = 15;
-    let disk2 = new Disk()
+    let disk2 = new Disk();
     disk2.size = 100;
     data.disks = [disk1, disk2];
   }
@@ -163,7 +163,7 @@
   <form on:submit|preventDefault={onDeployNodePilot} class="box">
     <h4 class="is-size-4">Deploy a Node Pilot</h4>
     <p>
-      Deploy a new node pilot on the Threefold Grid
+      Deploy a new Node Pilot on the Threefold Grid
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
@@ -184,7 +184,10 @@
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Node pilot."} />
+      <Alert
+        type="danger"
+        message={message || "Failed to deploy Node pilot."}
+      />
     {:else}
       <Tabs bind:active {tabs} />
 

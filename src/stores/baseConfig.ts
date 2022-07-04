@@ -11,7 +11,7 @@ const createProfile = (name = "", m = "", n = process.env.NETWORK, key = "") => 
 
 function createBaseConfig() {
   const store = writable({
-    profiles: [createProfile("Profile 1")],
+    profiles: [createProfile("Profile1")],
     activeProfile: null,
     twinId: null,
     address: null,

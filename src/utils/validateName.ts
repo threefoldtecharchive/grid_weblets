@@ -2,7 +2,7 @@ import type { IFormField } from "../types";
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
-const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,3}$/;
+const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/16$/;
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 // const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
@@ -144,8 +144,8 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIPRange(value: string): string | void {
-  if (!IP_REGEX.test(value)) return "Invalid IP range.";
-  if (value.length > 15) return "Password must be less than 15 characters";
+  if (!IP_REGEX.test(value)) return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
+  if (value.length > 15) return "IP range must be less than 15 characters";
 }
 
 export function validateMountPoint(value: string): string | void {
@@ -195,20 +195,24 @@ export function validateEntryPoint(value: string): string | void {
 
 export function validateStakeAmount(value: string): string | void {
   if (value === "") return "Stake amount is required";
-  if (+value < 1e-5) return "Amount must be positive"  
-  if (isNaN(+value)) return "Stake amount must be a number.";
+  if (+value < 1e-5 || +value <= 0) return "Amount must be positive";
+  if (isNaN(+value) 
+    || value.startsWith("+") 
+    || value.includes("e")) 
+  return "Stake amount must be a number.";
 }
 
 export function validateBSCAddress(value: string) {
-  if (value.length != 42) return "Address length must be 42"
-  if (!value.startsWith("0x")) return "Address must start with 0x"
+  if (value === "") return "Ethereum address is required";
+  if (value.length != 42) return "Address length must be 42";
+  if (!value.startsWith("0x")) return "Address must start with 0x";
   if (!/^(0x)?[0-9a-f]{40}$/i.test(value)) 
-    return "Address must consist only of valid hex characters after 0x"
+    return "Address must consist only of valid hex characters after 0x";
 }
 
 export function validateBSCPrivateKey(value: string): string | void {
   if (value === "") return "Private key is required";
-  if (value.length != 64) return "Private key length must be 64"
+  if (value.length != 64) return "Private key length must be 64";
   if (!/^[0-9a-f]{64}$/i.test(value)) 
-    return "Private key must consist only of valid hex characters."
+    return "Private key must consist only of valid hex characters.";
 }

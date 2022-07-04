@@ -18,6 +18,7 @@
   import { createEventDispatcher } from "svelte";
   import Table from "./Table.svelte";
   import RootFsSize from "./RootFsSize.svelte";
+  import rootFs from "../utils/rootFs";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -38,7 +39,7 @@
   // prettier-ignore
   const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
@@ -46,7 +47,7 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
-  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid" || worker.rootFs < 2 || !worker.rootFs; // prettier-ignore
+  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid" || worker.rootFs < rootFs(worker.cpu, worker.memory) || !worker.rootFs; // prettier-ignore
   $: logs = $currentDeployment;
 
   function onAddWorker() {
@@ -161,6 +162,9 @@
 `;
   function _createWorkerRows(workers: any[]) {
     // prettier-ignore
+    workers.sort(
+      (a, b) => a.created - b.created
+    )
     return workers.map((worker, i) => {
       const { contractId, name, planetary, capacity: { cpu, memory }, mounts: [ { size } ] } = worker;
       return [i + 1, contractId, name, planetary, cpu, memory, size / (1024 * 1024 * 1024)];
@@ -201,8 +205,8 @@
             "Contract ID",
             "Name",
             "Planetary Network IP",
-            "CPU",
-            "Memory",
+            "CPU(Cores)",
+            "Memory(MB)",
             "Disk(GB)",
           ]}
           rows={_createWorkerRows(workers)}
