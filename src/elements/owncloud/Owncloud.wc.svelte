@@ -20,6 +20,7 @@
   import validateName, {
     isInvalid,
     validateOptionalEmail,
+    validateOptionalPassword,
     validatePortNumber,
     validateRequiredPassword,
   } from "../../utils/validateName";
@@ -109,7 +110,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validateRequiredPassword, invalid: false
+      validator: validateOptionalPassword, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
