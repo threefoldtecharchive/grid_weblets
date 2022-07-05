@@ -122,7 +122,6 @@
       validateFlist.loading = true;
       validateFlist.error = null;
 
-      console.log(await isInvalidFlist(data.flist));
       if (!await isInvalidFlist(data.flist)) {
         validateFlist.loading = false;
         validateFlist.error = "Invalid Flist URL.";
