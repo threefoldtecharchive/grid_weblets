@@ -198,29 +198,31 @@
         </h4>
         <hr />
 
-        <Table
-          rowsData={workers}
-          headers={[
-            "#",
-            "Contract ID",
-            "Name",
-            "Planetary Network IP",
-            "CPU(Cores)",
-            "Memory(MB)",
-            "Disk(GB)",
-          ]}
-          rows={_createWorkerRows(workers)}
-          selectable={false}
-          actions={[
-            {
-              label: "Delete",
-              type: "danger",
-              loading: (i) => loading && removing === workers[i].name,
-              click: (_, i) => onDeleteWorker(i),
-              disabled: () => loading || removing !== null,
-            },
-          ]}
-        />
+        {#if workers.length > 0}
+          <Table
+            rowsData={workers}
+            headers={[
+              "#",
+              "Contract ID",
+              "Name",
+              "Planetary Network IP",
+              "CPU(Cores)",
+              "Memory(MB)",
+              "Disk(GB)",
+            ]}
+            rows={_createWorkerRows(workers)}
+            selectable={false}
+            actions={[
+              {
+                label: "Delete",
+                type: "danger",
+                loading: (i) => loading && removing === workers[i].name,
+                click: (_, i) => onDeleteWorker(i),
+                disabled: () => loading || removing !== null,
+              },
+            ]}
+          />
+        {/if}
 
         <hr />
 
