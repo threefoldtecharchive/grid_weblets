@@ -178,7 +178,7 @@ export function validateKeyValue(value: string): string | void {
 }
 
 export function validateFlistvalue(value: string): string | void {
-  if (!WHITE_SPACE_REGEX.test(value)) return "Please remove from white spaces from flist";
+  if (!WHITE_SPACE_REGEX.test(value)) return "Please remove white spaces from flist";
   if (value === "") return "Flist Value is required";
   if (!URL_REGEX.test(value)) return "Invalid flist";
 }

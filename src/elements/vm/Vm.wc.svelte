@@ -122,7 +122,8 @@
       validateFlist.loading = true;
       validateFlist.error = null;
 
-      if (await isInvalidFlist(data.flist)) {
+      console.log(await isInvalidFlist(data.flist));
+      if (!await isInvalidFlist(data.flist)) {
         validateFlist.loading = false;
         validateFlist.error = "Invalid Flist URL.";
         return;
@@ -243,6 +244,9 @@
               placeholder: "VM Image",
               type: "text",
               ...validateFlist,
+            }}
+            on:input={() => {
+              validateFlist.error = null;
             }}
           />
 
