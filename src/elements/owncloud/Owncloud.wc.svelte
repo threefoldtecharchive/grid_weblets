@@ -21,7 +21,7 @@
     isInvalid,
     validateOptionalEmail,
     validatePortNumber,
-    validateOptionalPassword,
+    validateRequiredPassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
@@ -67,7 +67,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      validator: validateOptionalPassword, invalid: false
+      validator: validateRequiredPassword, invalid: false
     },
   ];
 
@@ -109,7 +109,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validateOptionalPassword, invalid: false
+      validator: validateRequiredPassword, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
