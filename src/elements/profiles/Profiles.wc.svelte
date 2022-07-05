@@ -98,7 +98,7 @@
       _updateError(
         "mnemonics",
         mnIsValid,
-        "Invalid Mnemonics! Could it be that your account is not activated? Are you using the correct network?"
+        "Invalid Mnemonics! ? No twin exists for this account on this network. Are you using the correct network?"
       );
     } catch (err) {
       console.log("Error", err);
