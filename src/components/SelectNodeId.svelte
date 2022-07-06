@@ -5,7 +5,7 @@
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
-  import fetchFarms from "../utils/fetchFarmAndCountries";
+  import fetchFarms from "../utils/fetchFarms";
 
   // components
   import Input from "./Input.svelte";
