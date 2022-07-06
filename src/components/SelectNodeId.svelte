@@ -5,12 +5,13 @@
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
-  import fetchFarmAndCountries from "../utils/fetchFarmAndCountries";
+  import fetchFarms from "../utils/fetchFarmAndCountries";
 
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
   import baseConfig from "../stores/baseConfig";
+import { fetchCountries } from "../utils/fetchCountries";
   const { GridClient } = window.configs?.grid3_client ?? {};
 
   const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
@@ -139,6 +140,19 @@
     );
   }
 
+  function _setCountriesOptions(
+    index: number,
+    items: Map< string, Number >//Array<{ name: string; code?: string }>
+  ) {
+    const [option] = filtersFields[index].options;
+    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
+        const op = { label: name, value: name } as ISelectOption;
+        return op;
+      },
+    );
+    filtersFields[index].options.unshift(option);
+  }
+
   let _network: string;
   $: {
     if (
@@ -153,7 +167,7 @@
     }
   }
 
-  function onLoadFarmsHandler(){
+  async function onLoadFarmsHandler(){
     /* Loading farms & countries */
     const old_farm_label = "Please select a farm";
     const old_countries_label = "Please select a country";
@@ -161,17 +175,26 @@
     const farmsLabel = _setLabel(0, old_farm_label);
     const countriesLabel = _setLabel(1, old_countries_label);
 
-    fetchFarmAndCountries(profile, filters)
-      .then(({ farms, countries }) => {
+    fetchFarms(profile, filters)
+      .then(({ farms }) => {
         farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
         _setOptions(0, farms);
-        _setOptions(1, countries);
       })
       .catch((err) => {
         console.log("Error", err);
       })
       .finally(() => {
         _setLabel(0, old_farm_label, farmsLabel);
+      });
+
+    await fetchCountries(profile)
+      .then(( countries ) => {
+        _setCountriesOptions(1, countries);
+      })
+      .catch((err) => {
+        console.log("Error", err);
+      })
+      .finally(() => {
         _setLabel(1, old_countries_label, countriesLabel);
       });
   }
