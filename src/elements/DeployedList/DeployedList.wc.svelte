@@ -46,7 +46,7 @@
     { label: "Owncloud", value: "owncloud" },
     { label: "Presearch", value: "presearch" },
     { label: "Casperlabs", value: "casperlabs" },
-    { label: "TFhub Validator", value: "tfhubValidator" },
+    //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" }
   ];
   let active: string = "k8s";
