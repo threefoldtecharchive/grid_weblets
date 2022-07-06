@@ -244,6 +244,9 @@
               type: "text",
               ...validateFlist,
             }}
+            on:input={() => {
+              validateFlist.error = null;
+            }}
           />
 
           <Input
