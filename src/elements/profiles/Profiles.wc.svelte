@@ -61,14 +61,14 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", validator: validateProfileName, type: "text" },
     // { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
     // ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", validator: syncValidateMnemonics, type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", validator: validateSSH, type: "text" },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
@@ -274,7 +274,6 @@
                 bind:data={activeProfile.name}
                 field={{
                   ...fields[0],
-                  error: validateProfileName(activeProfile.name),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
@@ -283,7 +282,6 @@
                 bind:data={activeProfile.mnemonics}
                 field={{
                   ...fields[1],
-                  error: syncValidateMnemonics(activeProfile.mnemonics),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
@@ -297,7 +295,6 @@
                 bind:data={activeProfile.sshKey}
                 field={{
                   ...fields[2],
-                  error: validateSSH(activeProfile.sshKey),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
