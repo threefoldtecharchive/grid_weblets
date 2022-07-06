@@ -41,6 +41,10 @@
     { label: "Peertube", value: "peertube" },
     { label: "Funkwhale", value: "funkwhale" },
     { label: "Mattermost", value: "mattermost" },
+<<<<<<< HEAD
+=======
+    //{ label: "TFhub Validator", value: "tfhubValidator" },
+>>>>>>> 2bb08c3... hide TFHub validator
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
