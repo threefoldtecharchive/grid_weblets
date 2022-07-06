@@ -29,9 +29,22 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID }) => ({ id: contractID, type: "name" } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID }) => ({ id: contractID, type: "node" } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state }) => ({ id: contractID, type: "node", state: state } as IContract)); // prettier-ignore
             contracts = [...names, ...nodes];
+          })
+          .then(async () => {
+            for (let contract of contracts) {
+              if (contract.state === "GracePeriod") {
+                const res = await grid.contracts.getDeletionTime({
+                  id: +contract.id,
+                });
+                contract.expiration =
+                  res === 0 ? "-" : new Date(res).toLocaleString();
+              } else {
+                contract.expiration = "-";
+              }
+            }
           })
           .catch((err) => {
             console.log("Error", err);
@@ -129,11 +142,13 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "Billing Rate"]}
-        rows={contracts.map(({ id, type }, idx) => [
+        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate"]}
+        rows={contracts.map(({ id, type, state, expiration }, idx) => [
           idx.toString(),
           id.toString(),
           type,
+          state,
+          expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}

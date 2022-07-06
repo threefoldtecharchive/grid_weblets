@@ -163,13 +163,13 @@ export default class Editor extends Vue {
       "deployment",
       "casperlabs.png"
     ),
-    new Weblet(
+    /*new Weblet(
       "TFhub Validator",
       "validator",
       "tfhubValidator",
       "deployment",
       "vm.png"
-    ),
+    ),*/
     new Weblet(
       "Node Pilot",
       "nodepilot",
