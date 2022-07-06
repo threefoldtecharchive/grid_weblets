@@ -142,7 +142,7 @@ import { fetchCountries } from "../utils/fetchCountries";
 
   function _setCountriesOptions(
     index: number,
-    items: Map< string, Number >//Array<{ name: string; code?: string }>
+    items: Map< string, Number >
   ) {
     const [option] = filtersFields[index].options;
     filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
