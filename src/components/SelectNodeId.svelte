@@ -6,12 +6,12 @@
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
   import fetchFarms from "../utils/fetchFarms";
+  import { fetchCountries } from "../utils/fetchCountries";
 
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
   import baseConfig from "../stores/baseConfig";
-import { fetchCountries } from "../utils/fetchCountries";
   const { GridClient } = window.configs?.grid3_client ?? {};
 
   const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
