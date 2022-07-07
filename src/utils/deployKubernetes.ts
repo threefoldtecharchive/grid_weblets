@@ -1,4 +1,4 @@
-import type { default as Kubernetes, Base } from "../types/kubernetes";
+import { default as Kubernetes, Base, Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
@@ -17,7 +17,7 @@ export default async function deployKubernetes(
   const k8s = new K8SModel();
   k8s.name = name;
   k8s.secret = secret;
-  k8s.network = createNetwork(nw, true);
+  k8s.network = createNetwork(new Network(), true);
   k8s.masters = masterNodes;
   k8s.workers = workerNodes;
   k8s.metadata = metadata;
