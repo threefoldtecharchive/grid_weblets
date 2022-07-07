@@ -68,7 +68,7 @@
     // ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key is used to establish a communication channel between you and your machines over the internet.", type: "text" },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
