@@ -22,38 +22,16 @@ import gqlApi from "../../utils/gqlApi";
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
 
-  async function listContractsByTwinId(profile, twinId) {
-        const body = `query getContracts{
-            nameContracts(where: {twinID_eq: ${twinId}, state_eq: Created}) {
-              contractID
-            }
-            nodeContracts(where: {twinID_eq: ${twinId}, state_eq: Created}) {
-              contractID
-              deploymentData
-            }
-            rentContracts(where: {twinID_eq: ${twinId}, state_eq: Created}) {
-                contractID
-            }
-          }`;
-        const response = await gqlApi(profile, body);
-        console.log("rawda test");
-        console.log(response);
-        return response;
-  }
-
   function onLoadProfile(_profile: IProfile) {
     profile = _profile;
     if (profile) {
       loading = true;
       return getGrid(profile, (grid) => {
-        //grid.contracts
-          //.listMyContracts()
-          listContractsByTwinId(profile, 81)
+        grid.contracts
+          .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            console.log("rawda")
-            console.log(nodeContracts)
-            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: JSON.parse(deploymentData) } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state, deploymentData: {}} as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData) } as IContract)); // prettier-ignore
             contracts = [...names, ...nodes];
           })
           .then(async () => {
@@ -173,8 +151,8 @@ import gqlApi from "../../utils/gqlApi";
           state,
           expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
-          deploymentData.name ?? "",
-          deploymentData.type == "vm" ? deploymentData.projectName == "" ? "Virtual Machine" : deploymentData.projectName : deploymentData.type
+          deploymentData.name ?? "-",
+          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "Virtual Machine" : deploymentData.projectName : deploymentData.type) ?? "-"
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}

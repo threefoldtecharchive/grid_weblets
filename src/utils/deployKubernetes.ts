@@ -24,9 +24,6 @@ export default async function deployKubernetes(
   k8s.description = description;
   k8s.ssh_key = profile.sshKey;
 
-  console.log("rawda metadata k8s")
-  console.log(metadata)
-
   const metadate = {
     "type":  "kubernetes",  
     "name": name,
