@@ -68,7 +68,7 @@
     const pkg = packages[idx];
     let spec = "";
     if (pkg) {
-      spec = " (CPU: " + pkg.cpu + " Cores, Memory: " + pkg.memory + " MB, Disk: " + pkg.diskSize + " GB)";
+      spec = ` (CPU: ${pkg.cpu} Cores, Memory: ${pkg.memory} MB, Disk: ${pkg.diskSize} GB)`
     }
     return spec;
   }
