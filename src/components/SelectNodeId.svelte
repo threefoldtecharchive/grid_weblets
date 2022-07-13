@@ -167,7 +167,7 @@
     }
   }
 
-  async function onLoadFarmsHandler(){
+  function onLoadFarmsHandler(){
     /* Loading farms & countries */
     const old_farm_label = "Please select a farm";
     const old_countries_label = "Please select a country";
@@ -187,7 +187,7 @@
         _setLabel(0, old_farm_label, farmsLabel);
       });
 
-    await fetchCountries(profile)
+    fetchCountries(profile)
       .then(( countries ) => {
         _setCountriesOptions(1, countries);
       })
