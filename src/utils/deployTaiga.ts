@@ -107,6 +107,13 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Taiga"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   return deploy(profile, "Taiga", name, async (grid) => {
     await checkVMExist(grid, "taiga", name);
 

@@ -101,6 +101,14 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machines.network = network;
   machines.description = "discourse machine/node";
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Discourse"
+  };
+  machines.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Discourse", name, async (grid) => {
     await checkVMExist(grid, "discourse", name);
     return grid.machines

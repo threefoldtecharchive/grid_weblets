@@ -30,6 +30,12 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
   vms.name = name;
   vms.network = createNetwork(nw);
   vms.machines = [vm];
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": type == "VM" ? "" : type
+  };
+  vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, type, name, async (grid) => {
     if (type != "VM")

@@ -99,6 +99,14 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Funkwhale"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Funkwhale", name, async (grid) => {
     await checkVMExist(grid, "funkwhale", name);
     return grid.machines

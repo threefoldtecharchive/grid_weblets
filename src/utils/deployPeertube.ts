@@ -99,6 +99,14 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Peertube"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   // deploy
   return deploy(profile, "Peertube", name, async (grid) => {
     await checkVMExist(grid, "peertube", name); // change the project name of the grid to be peertube

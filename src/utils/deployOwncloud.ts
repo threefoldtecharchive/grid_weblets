@@ -126,6 +126,13 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Owncloud"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   // deploy
   return deploy(profile, "Owncloud", name, async (grid) => {
     await checkVMExist(grid, "owncloud", name);

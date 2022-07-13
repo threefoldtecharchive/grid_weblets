@@ -24,6 +24,16 @@ export default async function deployKubernetes(
   k8s.description = description;
   k8s.ssh_key = profile.sshKey;
 
+  console.log("rawda metadata k8s")
+  console.log(metadata)
+
+  const metadate = {
+    "type":  "kubernetes",  
+    "name": name,
+    "projectName": ""
+  };
+  k8s.metadata = JSON.stringify(metadate);
+
   return deploy(profile, "Kubernetes", name, (grid) => {
     return grid.k8s.deploy(k8s).then(() => grid.k8s.getObj(name));
   });

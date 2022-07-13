@@ -95,6 +95,14 @@ function _deployTfHubValidator(
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "TFhubValidator"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "TFhubValidator", name, async (grid) => {
     await checkVMExist(grid, "tfhubValidator", name);
 

@@ -52,6 +52,13 @@ export default async function deployCaprover(
   machines.network = network;
   machines.description = "caprover leader machine/node";
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "CapRover"
+  };
+  machines.metadata = JSON.stringify(metadate);
+
   return deploy(profile, "CapRover", name, async (grid) => {
     await checkVMExist(grid, "caprover", name);
     return grid.machines

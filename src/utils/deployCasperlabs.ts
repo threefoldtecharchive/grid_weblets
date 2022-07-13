@@ -96,6 +96,13 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Casperlabs"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   // deploy
   return deploy(profile, "Casperlabs", name, async (grid) => {
     await checkVMExist(grid, "casperlabs", name);

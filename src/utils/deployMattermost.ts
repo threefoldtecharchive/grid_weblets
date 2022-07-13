@@ -89,6 +89,14 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "gateway",  
+    "name": domain,
+    "projectName": "Mattermost"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Mattermost", name, async (grid) => {
     await checkVMExist(grid, "mattermost", name);
 
