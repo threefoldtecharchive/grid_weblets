@@ -27,7 +27,7 @@ export default async function deployKubernetes(
   const metadate = {
     "type":  "kubernetes",  
     "name": name,
-    "projectName": ""
+    "projectName": "Kubernetes"
   };
   k8s.metadata = JSON.stringify(metadate);
 

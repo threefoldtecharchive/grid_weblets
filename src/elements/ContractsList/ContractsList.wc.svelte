@@ -12,7 +12,6 @@
 
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
-import gqlApi from "../../utils/gqlApi";
 
   let profile: IProfile;
   let contracts: IContract[] = [];
@@ -31,7 +30,7 @@ import gqlApi from "../../utils/gqlApi";
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
             const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state, deploymentData: {}} as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData) } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData) } as IContract));
             contracts = [...names, ...nodes];
           })
           .then(async () => {
@@ -143,7 +142,7 @@ import gqlApi from "../../utils/gqlApi";
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate", "Solution name", "Solution type"]}
+        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate", "Solution type", "Solution name"]}
         rows={contracts.map(({ id, type, state, expiration, deploymentData }, idx) => [
           idx.toString(),
           id.toString(),
@@ -151,8 +150,8 @@ import gqlApi from "../../utils/gqlApi";
           state,
           expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
-          deploymentData.name ?? "-",
-          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "Virtual Machine" : deploymentData.projectName : deploymentData.type) ?? "-"
+          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "Virtual Machine" : deploymentData.projectName : deploymentData.type) ?? "-",
+          deploymentData.name ?? "-"
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
