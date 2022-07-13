@@ -190,6 +190,9 @@
               class="button is-outlined mr-2"
               style={`border-color: #1982b1; color: #1982b1`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={() => {
                 selectedIdx = configs.addProfile();
                 fields.forEach((_, i) => (fields[i].error = null));
@@ -201,6 +204,9 @@
               class="button mr-2"
               style={`background-color: #1982b1; color: #fff`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
