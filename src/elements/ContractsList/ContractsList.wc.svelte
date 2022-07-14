@@ -29,8 +29,8 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state, deploymentData: {}} as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData.replaceAll("'", '"')) } as IContract));
+            const names = nameContracts.map(({ contractID, state, createdAt }) => ({ id: contractID, type: "name", state: state, deploymentData: {}, createdAt: new Date(+createdAt), nodeID: null } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({ id: contractID, type: "node", state: state, createdAt: new Date(+createdAt), nodeID: nodeID, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData.replaceAll("'", '"')) } as IContract));
             contracts = [...names, ...nodes];
           })
           .then(async () => {
@@ -142,15 +142,17 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["ID", "Type", "State", "Expiration", "Billing Rate", "Solution type", "Solution name"]}
-        rows={contracts.map(({ id, type, state, expiration, deploymentData }, idx) => [
+        headers={["ID", "Type", "Node ID", "State", "Expiration", "Billing Rate", "Solution type", "Solution name", "Created at"]}
+        rows={contracts.map(({ id, type, state, expiration, deploymentData, nodeID, createdAt }, idx) => [
           id.toString(),
           type,
+          nodeID ?? "-",
           state,
           expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
           (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "-",
-          deploymentData.name ?? "-"
+          deploymentData.name ?? "-",
+          createdAt.toLocaleString()
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
