@@ -30,7 +30,7 @@
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
             const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state, deploymentData: {}} as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData) } as IContract));
+            const nodes = nodeContracts.map(({ contractID, state, deploymentData }) => ({ id: contractID, type: "node", state: state, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData.replaceAll("'", '"')) } as IContract));
             contracts = [...names, ...nodes];
           })
           .then(async () => {
