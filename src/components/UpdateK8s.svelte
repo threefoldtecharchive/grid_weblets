@@ -196,9 +196,9 @@
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
         </h4>
-        <hr />
 
-        {#if workers.length > 0}
+        {#if workers.length}
+          <hr />
           <Table
             rowsData={workers}
             headers={[
@@ -222,9 +222,10 @@
               },
             ]}
           />
+          <hr />
+        {:else }
+          <hr style="width: 1200px" />
         {/if}
-
-        <hr />
 
         <form on:submit|preventDefault={onAddWorker}>
           {#if loading || (logs !== null && logs.type === "Add Worker")}
