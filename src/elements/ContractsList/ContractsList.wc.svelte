@@ -142,15 +142,14 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate", "Solution type", "Solution name"]}
+        headers={["ID", "Type", "State", "Expiration", "Billing Rate", "Solution type", "Solution name"]}
         rows={contracts.map(({ id, type, state, expiration, deploymentData }, idx) => [
-          idx.toString(),
           id.toString(),
           type,
           state,
           expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
-          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "Virtual Machine" : deploymentData.projectName : deploymentData.type) ?? "-",
+          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "-",
           deploymentData.name ?? "-"
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
