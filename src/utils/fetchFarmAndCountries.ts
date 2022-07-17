@@ -1,6 +1,7 @@
 import type { FilterOptions } from "grid3_client";
 import type { IProfile } from "../types/Profile";
 import gqlApi from "./gqlApi";
+import { getBlockedFarmsIDs } from "./findNodes";
 
 const queryCount = `
 query GetLimits {
@@ -47,36 +48,55 @@ interface IQueryData {
   countries: Array<{ name: string; code: string }>;
 }
 
-export default function fetchFarmAndCountries(profile: IProfile, filters: FilterOptions,) {
+export default function fetchFarmAndCountries(
+  profile: IProfile,
+  filters: FilterOptions,
+  exclusiveFor: string
+) {
   var query = queryCount;
   var queryDataSelect = queryData;
-  if(filters.publicIPs){
+  if (filters.publicIPs) {
     query = queryCountIPFilter;
     queryDataSelect = queryDataIPFilter;
   }
-    
+
   return gqlApi<IQueryCount>(profile, query)
     .then(({ farms: { farms_limit }, countries: { countries_limit } }) => {
       return { farms_limit, countries_limit };
     })
     .then(async (vars) => {
-      let { farms, countries } = await gqlApi<IQueryData>(profile, queryDataSelect, vars);
+      let { farms, countries } = await gqlApi<IQueryData>(
+        profile,
+        queryDataSelect,
+        vars
+      );
 
-      farms = await getOnlineFarms(profile, farms);
+      farms = await getOnlineFarms(profile, farms, exclusiveFor);
 
       return { farms, countries };
     });
 }
 
-export async function getOnlineFarms(profile, farms) {
+export async function getOnlineFarms(profile, farms, exclusiveFor) {
   let onlineFarms = [];
+  let blockedFarms = [];
+
+  if (exclusiveFor) {
+    blockedFarms = await getBlockedFarmsIDs(
+      exclusiveFor,
+      `https://gridproxy.${profile.networkEnv}.grid.tf`,
+      `https://graphql.${profile.networkEnv}.grid.tf/graphql`
+    );
+  }
 
   for (let farm of farms) {
-    let data = await fetch(
-      `https://gridproxy.${profile.networkEnv}.grid.tf/nodes?farm_ids=${farm.farmID}&status=up`
-    ).then((response) => response.json());
+    if (!blockedFarms.includes(farm.farmID)) {
+      let data = await fetch(
+        `https://gridproxy.${profile.networkEnv}.grid.tf/nodes?farm_ids=${farm.farmID}&status=up`
+      ).then((response) => response.json());
 
-    if (data.length > 0) onlineFarms.push(farm);
+      if (data.length > 0) onlineFarms.push(farm);
+    }
   }
 
   return onlineFarms;

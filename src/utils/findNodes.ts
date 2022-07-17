@@ -68,6 +68,30 @@ async function getBlockedNodesIDs(
   // For now, it is only used with presearch.
   const gqlClient = new Graphql(graphql);
 
+  const farmIdsarr = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
+
+  // get all the nodeIds of all the farms
+  let farmNodesIDs = [];
+  for (let farmId of farmIdsarr) {
+    const res = await gqlClient.query(
+      `query MyQuery {
+              nodes(where: {farmID_eq: ${farmId}}) {
+                nodeID
+              }
+            }`
+    );
+    farmNodesIDs.push(...res.data["nodes"]);
+  }
+  return farmNodesIDs;
+}
+
+export async function getBlockedFarmsIDs(
+  exclusiveFor: string,
+  rmbProxy: string,
+  graphql: string
+) {
+  const gqlClient = new Graphql(graphql);
+
   // get the total number of deployment of the same type
   const res1 = (await gqlClient.query(`query MyQuery {
           nodeContractsConnection(orderBy: id_ASC, where: {deploymentData_contains: "${exclusiveFor}", state_eq: Created}) {
@@ -92,19 +116,7 @@ async function getBlockedNodesIDs(
   }
   let farmIdsarr = Array.from(farmIds);
 
-  // get all the nodeIds of all the farms
-  let farmNodesIDs = [];
-  for (let farmId of farmIdsarr) {
-    const res = await gqlClient.query(
-      `query MyQuery {
-              nodes(where: {farmID_eq: ${farmId}}) {
-                nodeID
-              }
-            }`
-    );
-    farmNodesIDs.push(...res.data["nodes"]);
-  }
-  return farmNodesIDs;
+  return farmIdsarr;
 }
 
 function exclude(blocked, all) {

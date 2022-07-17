@@ -161,7 +161,7 @@
     const farmsLabel = _setLabel(0, old_farm_label);
     const countriesLabel = _setLabel(1, old_countries_label);
 
-    fetchFarmAndCountries(profile, filters)
+    fetchFarmAndCountries(profile, filters, exclusiveFor)
       .then(({ farms, countries }) => {
         farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
         _setOptions(0, farms);
