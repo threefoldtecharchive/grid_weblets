@@ -280,8 +280,11 @@
                 bind:data={activeProfile.name}
                 field={{
                   ...fields[0],
-                  error: validateProfileName(activeProfile.name),
+                  error: activeProfile.name == "" ? null : validateProfileName(activeProfile.name),
                   disabled: activeProfileId === activeProfile.id,
+                }}
+                on:input={() => {
+                  fields[0].error = validateProfileName(activeProfile.name);
                 }}
               />
 
@@ -289,7 +292,7 @@
                 bind:data={activeProfile.mnemonics}
                 field={{
                   ...fields[1],
-                  error: syncValidateMnemonics(activeProfile.mnemonics),
+                  error: activeProfile.mnemonics == "" ? null : syncValidateMnemonics(activeProfile.mnemonics),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
@@ -303,7 +306,7 @@
                 bind:data={activeProfile.sshKey}
                 field={{
                   ...fields[2],
-                  error: validateSSH(activeProfile.sshKey),
+                  error: activeProfile.sshKey == "" ? null : validateSSH(activeProfile.sshKey),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
