@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import type { IFormField, ITab } from "../../types";
-  import type { IProfile, IProfileErrors } from "../../types/Profile";
+  import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
   import validateProfileName, {
     isInvalid,
