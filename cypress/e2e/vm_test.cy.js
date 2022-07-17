@@ -68,7 +68,7 @@ describe('Weblets', function(){
         vmPage.Navigate()
 
         //Deploy the vm
-        vmPage.DeployVM(vmName,rootFs,cpu,memory,
+        vmPage.Deploy(vmName,rootFs,cpu,memory,
             envVarKey,envVarValue,diskName,diskSize,mountPoint,farmName)
     })
 
@@ -83,7 +83,7 @@ describe('Weblets', function(){
         *************************************************/      
 
         //Delete the deployment
-        vmPage.DeleteVM(vmName)
+        vmPage.Delete(vmName)
     })
 
 })

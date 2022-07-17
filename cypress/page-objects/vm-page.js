@@ -188,14 +188,14 @@ class Virtualmachine{
     get getDeploymentNotFoundText(){
         return cy.get("tf-deployedlist[tab='vm']")
         .shadow()
-        .contains("No VMs found on this profile.", {timeout:300000})
+        .contains("No Virtual Machines found on this profile.", {timeout:300000})
     }
 
     Navigate(){
         sidebar.SelectFromSidebar("Virtual Machine")
     }
 
-    DeployVM(vmName, rootFs, cpu, memory, envVarKey, envVarValue,
+    Deploy(vmName, rootFs, cpu, memory, envVarKey, envVarValue,
         diskName, diskSize, mountPoint, farmName){
         
         /***********************
@@ -293,7 +293,7 @@ class Virtualmachine{
         this.getBody.click(0,0)
     }
 
-    DeleteVM(vmName){
+    Delete(vmName){
 
         // Get deployment name from the deployment list
         this.getDeploymentList.contains(vmName)
