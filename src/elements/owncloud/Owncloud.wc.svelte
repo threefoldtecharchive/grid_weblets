@@ -22,6 +22,7 @@
     validateOptionalEmail,
     validatePortNumber,
     validateOptionalPassword,
+    validateRequiredPassword
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
@@ -67,7 +68,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      validator: validateOptionalPassword, invalid: false
+      validator: validateRequiredPassword, invalid: false
     },
   ];
 
