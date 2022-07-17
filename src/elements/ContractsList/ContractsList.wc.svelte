@@ -29,7 +29,7 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID, state, createdAt }) => ({ id: contractID, type: "name", state: state, deploymentData: {}, createdAt: new Date(+createdAt), nodeID: null } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state, createdAt }) => ({ id: contractID, type: "name", state: state, deploymentData: {}, createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
             const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({ id: contractID, type: "node", state: state, createdAt: new Date(+createdAt), nodeID: nodeID, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData.replaceAll("'", '"')) } as IContract));
             contracts = [...names, ...nodes];
           })
@@ -143,10 +143,10 @@
       <Table
         rowsData={contracts}
         headers={["ID", "Type", "Node ID", "State", "Expiration", "Billing Rate", "Solution type", "Solution name", "Created at"]}
-        rows={contracts.map(({ id, type, state, expiration, deploymentData, nodeID, createdAt }, idx) => [
+        rows={contracts.map(({ id, type, nodeID, state, expiration, deploymentData, createdAt }, idx) => [
           id.toString(),
           type,
-          nodeID ?? "-",
+          nodeID ?? " - ",
           state,
           expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
