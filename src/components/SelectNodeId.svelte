@@ -5,7 +5,8 @@
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
-  import fetchFarmAndCountries from "../utils/fetchFarmAndCountries";
+  import fetchFarms from "../utils/fetchFarms";
+  import { fetchCountries } from "../utils/fetchCountries";
 
   // components
   import Input from "./Input.svelte";
@@ -139,6 +140,19 @@
     );
   }
 
+  function _setCountriesOptions(
+    index: number,
+    items: Map< string, Number >
+  ) {
+    const [option] = filtersFields[index].options;
+    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
+        const op = { label: name, value: name } as ISelectOption;
+        return op;
+      },
+    );
+    filtersFields[index].options.unshift(option);
+  }
+
   let _network: string;
   $: {
     if (
@@ -161,17 +175,26 @@
     const farmsLabel = _setLabel(0, old_farm_label);
     const countriesLabel = _setLabel(1, old_countries_label);
 
-    fetchFarmAndCountries(profile, filters, exclusiveFor)
-      .then(({ farms, countries }) => {
+    fetchFarms(profile, filters, exclusiveFor)
+      .then(({ farms }) => {
         farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
         _setOptions(0, farms);
-        _setOptions(1, countries);
       })
       .catch((err) => {
         console.log("Error", err);
       })
       .finally(() => {
         _setLabel(0, old_farm_label, farmsLabel);
+      });
+
+    fetchCountries(profile)
+      .then(( countries ) => {
+        _setCountriesOptions(1, countries);
+      })
+      .catch((err) => {
+        console.log("Error", err);
+      })
+      .finally(() => {
         _setLabel(1, old_countries_label, countriesLabel);
       });
   }

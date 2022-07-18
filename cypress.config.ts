@@ -3,7 +3,7 @@ import { defineConfig } from "cypress";
 export default defineConfig({
   e2e: {
 
-    baseUrl:'https://play.dev.grid.tf',
+    baseUrl:'https://play.qa.grid.tf',
     supportFile:false,
 
     setupNodeEvents(on, config) {

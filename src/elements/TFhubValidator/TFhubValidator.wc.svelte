@@ -18,6 +18,7 @@
     validateStakeAmount,
     validateBSCAddress,
     validateBSCPrivateKey,
+    validateethereumRpc,
   } from "../../utils/validateName";
   import { syncValidateMnemonics } from "../../utils/validateMnemonics";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -51,7 +52,7 @@
     {
       label: "Stake Amount (TFT)",
       symbol: "stakeAmount",
-      type: "number",
+      type: "text",
       placeholder: "1 = 10000000TFT in Keplr",
       invalid: false,
       validator: validateStakeAmount,
@@ -71,6 +72,14 @@
       placeholder: "The private key of the previous address.",
       invalid: false,
       validator: validateBSCPrivateKey,
+    },
+    {
+      label: "Ethereum rpc (URL)",
+      symbol: "ethereumRpc",
+      type: "text",
+      placeholder: "You'r full Ethereum node or we will use one of Threefold.",
+      invalid: false,
+      validator: validateethereumRpc,
     },
   ];
   // define this solution packages

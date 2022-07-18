@@ -1,5 +1,4 @@
 import type TFhubValidator from "../types/TFhubValidator";
-import { v4 } from "uuid";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
@@ -7,69 +6,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
-
-function getNetwork() :string {
-  const networks = ['dev', 'qa', 'test', 'main'];
-  const host = window.location.host;
-  let netWork = '';
-  networks.includes(
-    host.split('.')[1])
-    ? netWork = host.split('.')[1]
-    : netWork = 'main';
-  return netWork;
-}
-
-function setStakeAmount(value: string): string {
-  return (+value * 1e7).toString() + 'TFT'
-}
-
-function defaultEnvVars(host: string){
-  // Replace dev with main when you deploying the validator on localhost. 
-  const env = {
-    dev: {
-      chainId: "threefold-hub-testnet",
-      gravityAddress: "0x61fa4C9bBC80B6817F77EB21Bbe8907ED2a24913",
-      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
-      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
-      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
-      orchestrator_fees: "20000000TFT",
-      gas_prices: "80TFT",
-      gas_adjustment: "1.6"
-    },
-    qa: {
-      chainId: "threefold-hub-testnet",
-      gravityAddress: "0x61fa4C9bBC80B6817F77EB21Bbe8907ED2a24913",
-      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
-      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
-      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
-      orchestrator_fees: "20000000TFT",
-      gas_prices: "80TFT",
-      gas_adjustment: "1.6"
-
-    },
-    test: {
-      chainId: "threefold-hub-testnet",
-      gravityAddress: "0x61fa4C9bBC80B6817F77EB21Bbe8907ED2a24913",
-      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
-      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
-      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
-      orchestrator_fees: "20000000TFT",
-      gas_prices: "80TFT",
-      gas_adjustment: "1.6"
-    },
-    main: {
-      chainId: "",
-      gravityAddress: "",
-      ethereumRpc: "",
-      persistentPeers: "",
-      genesisUrl: "",
-      orchestrator_fees: "",
-      gas_prices: "",
-      gas_adjustment: ""
-    },
-  }
-  return env[host];
-}
+import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf"
 
 const {
     DiskModel,
@@ -95,15 +32,26 @@ function _deployTfHubValidator(
     ) {
     const {
         name,
+        nodeId,
+        disks: [{ size }],
+        publicIp,
+        cpu,
+        memory,
+
         mnemonics,
         stakeAmount,
         ethereumAddress,
         ethereumPrivKey,
-        nodeId,
-        cpu,
-        memory,
-        publicIp,
-        disks: [{ size }],
+        keyName,
+        moniker,
+        chainId,
+        gravityAddress,
+        ethereumRpc,
+        persistentPeers,
+        genesisUrl,
+        gas_prices,
+        gas_adjustment,
+        orchestrator_fees,
     } = tfhubValidator;
 
   let randomSuffix = generateString(10).toLowerCase();
@@ -129,18 +77,17 @@ function _deployTfHubValidator(
     STAKE_AMOUNT: setStakeAmount(stakeAmount),
     ETHEREUM_ADDRESS: ethereumAddress,
     ETHEREUM_PRIV_KEY: ethereumPrivKey,
-    KEYNAME: v4().split("-")[0],
-    MONIKER: v4().split("-")[0],
-    CHAIN_ID: defaultEnvVars(getNetwork()).chainId,
-    GRAVITY_ADDRESS: defaultEnvVars(getNetwork()).gravityAddress,
-    ETHEREUM_RPC: defaultEnvVars(getNetwork()).ethereumRpc,
-    PERSISTENT_PEERS: defaultEnvVars(getNetwork()).persistentPeers,
-    GENESIS_URL: defaultEnvVars(getNetwork()).genesisUrl,
+    KEYNAME: keyName,
+    MONIKER: moniker,
+    CHAIN_ID: chainId,
+    GRAVITY_ADDRESS: gravityAddress,
+    ETHEREUM_RPC: ethereumRpc || configVariables(getNetwork()).ethereumRpc,
+    PERSISTENT_PEERS: persistentPeers,
+    GENESIS_URL: genesisUrl,
+    GAS_PRICES: gas_prices,
+    GAS_ADJUSTMENT: gas_adjustment,
+    ORCHESTRATOR_FEES: orchestrator_fees,
     SSH_KEY: profile.sshKey,
-    GAS_PRICES: defaultEnvVars(getNetwork()).gas_prices,
-    GAS_ADJUSTMENT: defaultEnvVars(getNetwork()).gas_adjustment,
-    ORCHESTRATOR_FEES: defaultEnvVars(getNetwork()).orchestrator_fees,
-
   };
 
   const vms = new MachinesModel();

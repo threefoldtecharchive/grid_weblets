@@ -195,9 +195,12 @@ export function validateEntryPoint(value: string): string | void {
 
 export function validateStakeAmount(value: string): string | void {
   if (value === "") return "Stake amount is required";
-  if (+value < 1e-5 || +value <= 0) return "Amount must be positive";
+  if (+value < 1e-5
+    || +value <= 0
+    || value.startsWith("0"))
+  return "Amount must be positive";
   if (isNaN(+value) 
-    || value.startsWith("+") 
+    || value.startsWith("+")
     || value.includes("e")) 
   return "Stake amount must be a number.";
 }
@@ -215,4 +218,8 @@ export function validateBSCPrivateKey(value: string): string | void {
   if (value.length != 64) return "Private key length must be 64";
   if (!/^[0-9a-f]{64}$/i.test(value)) 
     return "Private key must consist only of valid hex characters.";
+}
+
+export function validateethereumRpc(value: string): string | void {
+  if (value != "" && !URL_REGEX.test(value)) return "Invalid url format"
 }
