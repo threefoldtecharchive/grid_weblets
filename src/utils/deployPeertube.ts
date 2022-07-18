@@ -100,12 +100,11 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domain,
+    "type":  "vm",  
+    "name": name,
     "projectName": "Peertube"
   };
   vms.metadata = JSON.stringify(metadate);
-
 
   // deploy
   return deploy(profile, "Peertube", name, async (grid) => {
@@ -129,6 +128,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Peertube"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "peertube");

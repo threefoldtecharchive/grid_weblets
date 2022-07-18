@@ -29,7 +29,7 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID, state, createdAt }) => ({ id: contractID, type: "name", state: state, deploymentData: {}, createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ id: contractID, type: "name", state: state, deploymentData: {name: name}, createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
             const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({ id: contractID, type: "node", state: state, createdAt: new Date(+createdAt), nodeID: nodeID, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData.replaceAll("'", '"')) } as IContract));
             contracts = [...names, ...nodes];
           })

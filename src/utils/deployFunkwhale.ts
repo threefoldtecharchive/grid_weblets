@@ -100,8 +100,8 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domain,
+    "type":  "vm",  
+    "name": name,
     "projectName": "Funkwhale"
   };
   vms.metadata = JSON.stringify(metadate);
@@ -128,6 +128,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Funkwhale"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "funkwhale");

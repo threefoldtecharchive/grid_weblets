@@ -102,8 +102,8 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machines.description = "discourse machine/node";
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domain,
+    "type":  "vm",  
+    "name": name,
     "projectName": "Discourse"
   };
   machines.metadata = JSON.stringify(metadate);
@@ -130,6 +130,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Discourse"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "discourse");

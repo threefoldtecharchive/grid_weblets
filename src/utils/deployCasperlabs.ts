@@ -97,8 +97,8 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domain,
+    "type":  "vm",  
+    "name": name,
     "projectName": "Casperlabs"
   };
   vms.metadata = JSON.stringify(metadate);
@@ -125,6 +125,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Casperlabs"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "casperlabs");
