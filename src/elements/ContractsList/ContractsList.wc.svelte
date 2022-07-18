@@ -21,6 +21,19 @@
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
 
+  function jsonParser(str: string){
+    str = str.replaceAll("'", '"');
+    let parsed = {};
+
+    try {
+      parsed = JSON.parse(str);
+    } catch (err) {
+      parsed = {};
+      console.log(err.message);
+    }
+    return parsed;
+  }
+
   function onLoadProfile(_profile: IProfile) {
     profile = _profile;
     if (profile) {
@@ -29,8 +42,19 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ id: contractID, type: "name", state: state, deploymentData: {name: name}, createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({ id: contractID, type: "node", state: state, createdAt: new Date(+createdAt), nodeID: nodeID, deploymentData: deploymentData == '' ? {} : JSON.parse(deploymentData.replaceAll("'", '"')) } as IContract));
+            const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
+              id: contractID, 
+              type: "name", 
+              state: state, 
+              deploymentData: {name: name}, 
+              createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({
+              id: contractID, 
+              type: "node", 
+              state: state, 
+              createdAt: new Date(+createdAt), 
+              nodeID: nodeID, 
+              deploymentData: jsonParser(deploymentData) } as IContract));
             contracts = [...names, ...nodes];
           })
           .then(async () => {
