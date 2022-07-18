@@ -167,7 +167,7 @@
     )
     return workers.map((worker, i) => {
       const { contractId, name, planetary, capacity: { cpu, memory }, mounts: [ { size } ] } = worker;
-      return [i + 1, contractId, name, planetary, cpu, memory, size / (1024 * 1024 * 1024)];
+      return [`${i + 1} `, contractId, name, planetary, ` ${cpu} `, memory, size / (1024 * 1024 * 1024)];
     });
   }
 </script>
