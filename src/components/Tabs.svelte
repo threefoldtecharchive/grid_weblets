@@ -11,8 +11,14 @@
   export let active: string;
   export let centered: boolean = true;
   export let disabled: boolean = false;
+  export let opened: boolean = false;
+  export let selectedTab: string;
+  export let selectedID: number;
 
-  const onRemove = (idx: number) => () => dispatch("removed", idx);
+  const onRemove = (idx: number) => () => {
+    dispatch("removed", idx);
+    opened = !opened;
+  };
   function onSelectTab(tab: string) {
     if (active !== tab) {
       active = tab;
@@ -38,7 +44,11 @@
             {#if tab.removable}
               <button
                 class="ml-2 is-small delete"
-                on:click|preventDefault|stopPropagation={onRemove(index)}
+                on:click|preventDefault|stopPropagation={() => {
+                  opened = !opened;
+                  selectedID = index;
+                  selectedTab = tab.label;
+                }}
               />
             {/if}
           </a>
@@ -46,6 +56,26 @@
       {/each}
     {/if}
   </ul>
+</div>
+<div class={"modal" + (opened ? " is-active" : "")}>
+  <div class="modal-background" />
+  <div class="modal-card">
+    <section class="modal-card-body">
+      Delete {selectedTab}?
+      <div style="float: right; margin-top: 50px;">
+        <button
+          class="button is-danger"
+          style="background-color: #FF5151; color: #fff"
+          on:click|preventDefault|stopPropagation={onRemove(selectedID)}
+          >Delete</button
+        >
+        <button
+          class="button"
+          on:click|stopPropagation={() => (opened = !opened)}>Cancel</button
+        >
+      </div>
+    </section>
+  </div>
 </div>
 
 <style lang="scss" scoped>
