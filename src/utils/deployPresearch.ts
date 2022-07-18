@@ -76,6 +76,13 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.description = "presearch node";
   machines.metadata = "presearch"
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Presearch"
+  };
+  machines.metadata = JSON.stringify(metadate);
+
   // Deploy
   return deploy(profile, "Presearch", name, async (grid) => {
     await checkVMExist(grid, "presearch", name);

@@ -107,6 +107,13 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Taiga"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   return deploy(profile, "Taiga", name, async (grid) => {
     await checkVMExist(grid, "taiga", name);
 
@@ -128,6 +135,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000/`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Taiga"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "taiga");

@@ -89,6 +89,14 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Mattermost"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Mattermost", name, async (grid) => {
     await checkVMExist(grid, "mattermost", name);
 
@@ -110,6 +118,13 @@ function _deployGateway(
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:8000`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": name,
+    "projectName": "Mattermost"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", name, async (grid) => {
     await checkGW(grid, name, "mattermost");
