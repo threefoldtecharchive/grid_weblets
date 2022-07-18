@@ -190,6 +190,9 @@
               class="button is-outlined mr-2"
               style={`border-color: #1982b1; color: #1982b1`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={() => {
                 selectedIdx = configs.addProfile();
                 fields.forEach((_, i) => (fields[i].error = null));
@@ -201,6 +204,9 @@
               class="button mr-2"
               style={`background-color: #1982b1; color: #fff`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
@@ -274,8 +280,11 @@
                 bind:data={activeProfile.name}
                 field={{
                   ...fields[0],
-                  error: validateProfileName(activeProfile.name),
+                  error: activeProfile.name == "" ? null : validateProfileName(activeProfile.name),
                   disabled: activeProfileId === activeProfile.id,
+                }}
+                on:input={() => {
+                  fields[0].error = validateProfileName(activeProfile.name);
                 }}
               />
 
@@ -283,7 +292,7 @@
                 bind:data={activeProfile.mnemonics}
                 field={{
                   ...fields[1],
-                  error: syncValidateMnemonics(activeProfile.mnemonics),
+                  error: activeProfile.mnemonics == "" ? null : syncValidateMnemonics(activeProfile.mnemonics),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
@@ -297,7 +306,7 @@
                 bind:data={activeProfile.sshKey}
                 field={{
                   ...fields[2],
-                  error: validateSSH(activeProfile.sshKey),
+                  error: activeProfile.sshKey == "" ? null : validateSSH(activeProfile.sshKey),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />

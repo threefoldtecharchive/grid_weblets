@@ -69,7 +69,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   disk.mountpoint = "/var/lib/docker";
 
   const machine = new MachineModel();
-  machine.name = `vm${randomSuffix}`;
+  machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];

@@ -6,6 +6,7 @@ import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 import type { IStore } from "../stores/currentDeployment";
 import checkVMExist from "./prepareDeployment";
+import { Network } from "../types/kubernetes";
 
 export default async function deployVM(data: VM, profile: IProfile, type: IStore["type"]) {
   const { envs, disks, rootFs, ...base } = data;
@@ -28,7 +29,7 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
 
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = createNetwork(nw);
+  vms.network = createNetwork(new Network());
   vms.machines = [vm];
   const metadate = {
     "type":  "vm",  

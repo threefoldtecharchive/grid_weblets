@@ -49,7 +49,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
 
   // Machine specs
   const machine = new MachineModel();
-  machine.name = `vm${randomSuffix}`;
+  machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];

@@ -76,7 +76,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   disk.mountpoint = "/var/lib/docker";
 
   const vm = new MachineModel();
-  vm.name = `vm${randomSuffix}`;
+  vm.name = name; //`vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = publicIp;
