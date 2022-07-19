@@ -20,7 +20,9 @@
     | "owncloud"
     | "presearch"
     | "casperlabs"
-    | "nodepilot";
+    | "nodepilot"
+    | "cloudInit";
+
   export let tab: TabsType = undefined;
 
   // components
@@ -47,7 +49,8 @@
     { label: "Presearch", value: "presearch" },
     { label: "Casperlabs", value: "casperlabs" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
-    { label: "Node Pilot", value: "nodepilot" }
+    { label: "Node Pilot", value: "nodepilot" },
+    { label: "Cloud Init", value: "cloudInit" },
   ];
   let active: string = "vm";
   $: active = tab || active;
@@ -407,6 +410,15 @@
             const publicIP = rows[i].details.publicIP;
             return !publicIP || !publicIP.ip || removing !== null;
           },
+        },
+      ],
+      cloudInit: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
         },
       ],
     },

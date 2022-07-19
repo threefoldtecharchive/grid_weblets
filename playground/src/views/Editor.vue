@@ -177,6 +177,13 @@ export default class Editor extends Vue {
       "deployment",
       "vm.png"
     ),
+    new Weblet(
+      "Cloud Init",
+      "cloudInit",
+      "cloudInit",
+      "deployment",
+      "vm.png"
+    ),
 
     new Weblet("Contracts", "contractslist", "", "my account", ""),
     new Weblet("Deployments", "deployedlist", "", "my account", ""),

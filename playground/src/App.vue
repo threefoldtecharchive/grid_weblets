@@ -52,6 +52,7 @@ export default class App extends Vue {
     "casperlabs",
     "tfhubvalidator",
     "nodepilot",
+    "cloudinit",
   ];
   sidenav: ISidenav | null = null;
 
