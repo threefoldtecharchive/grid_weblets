@@ -15,7 +15,7 @@
 
   let profile: IProfile;
   let contracts: IContract[] = [];
-  let loading: boolean = true;
+  let loading: boolean = false;
   let selectedContracts: IContract[] = [];
   let deleting: boolean = false;
   let deletingType: "all" | "selected" = null;
