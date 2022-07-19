@@ -136,7 +136,7 @@
         {/if}
 
         {#if headers}
-          {#each headers as hd, i (hd)}
+          {#each headers as hd (hd)}
             <th title={hd}>{hd}
               {#if sort}
               <span
