@@ -3,7 +3,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { IAction } from "../types/table-action";
-
+  
   const dispatch = createEventDispatcher<{ selected: any[] }>();
 
   export let rowsData: any[] = [];
@@ -12,8 +12,68 @@
   export let actions: IAction[] = [];
   export let selectable: boolean = true;
   export let selectedRows: number[] = [];
+  export let sort: boolean = false;
 
   $: footer = rows && rows.length > 49;
+
+  $: sortStatus = [];
+  $: sortDirection = 'ascending'
+
+  function updateSortStatus(column){
+    sortBy = column;
+
+    headers.forEach(d => {
+        sortStatus[d] = "none"
+    })
+
+    sortDirection === 'ascending' ? sortDirection = 'descending' : sortDirection = 'ascending'
+    sortStatus[column] = sortDirection
+  }
+
+  function isNumber(str: string | Number): boolean {
+    if (typeof str !== 'string' && typeof str !== 'number') {
+      return false;
+    }
+
+    if (str.toString().replaceAll('-', '').trim() === '') {
+      return false;
+    }
+
+    return !Number.isNaN(Number(str));
+  }
+
+  $: sortIcons = {'none' : {
+      direction: 'n',
+      icon: 'arrows-up-down'
+    }, 'ascending' : {
+      direction: 'w',
+      icon: 'arrow-up'
+    }, 'descending' : {
+      direction: 'e',
+      icon: 'arrow-down'
+    }}
+
+  $: headers?.forEach(d => {
+      sortStatus[d] = "none"
+    })
+
+  $: sortBy = 'none'
+
+  $: sortedRows = rows
+
+  $: if (sortBy !== 'none'){
+    let column_index = headers.indexOf(sortBy);
+    if (sortDirection === 'ascending') sortedRows = rows.sort((a, b) => 
+      isNumber(a[column_index])  
+      ? isNumber(b[column_index]) ? (+a[column_index]) - (+b[column_index]) : a[column_index].toString().localeCompare(b[column_index]) 
+      : isNumber(b[column_index]) ? a[column_index].localeCompare(b[column_index].toString()) : a[column_index].localeCompare(b[column_index])
+      );
+    else sortedRows = rows.sort((a, b) => 
+      isNumber(a[column_index]) 
+      ? isNumber(b[column_index]) ? (+b[column_index]) - (+a[column_index]) : b[column_index].toString().localeCompare(a[column_index]) 
+      : isNumber(b[column_index]) ? b[column_index].localeCompare(a[column_index].toString()) : b[column_index].localeCompare(a[column_index])
+      );
+  }
 
   let _selectedRows: number[] = [];
 
@@ -76,8 +136,17 @@
         {/if}
 
         {#if headers}
-          {#each headers as hd (hd)}
-            <th title={hd}>{hd}</th>
+          {#each headers as hd, i (hd)}
+            <th title={hd}>{hd}
+              {#if sort}
+              <span
+                class="icon "
+                on:click={() => updateSortStatus(hd)}
+              >
+                <i class="fa-solid fa-{sortIcons[sortStatus[hd]].icon}" />
+              </span>
+              {/if}
+            </th>
           {/each}
         {/if}
 
@@ -88,8 +157,8 @@
     </thead>
 
     <tbody>
-      {#if rows}
-        {#each rows as row, idx}
+      {#if sortedRows}
+        {#each sortedRows as row, idx}
           <tr>
             {#if selectable}
               <td>
