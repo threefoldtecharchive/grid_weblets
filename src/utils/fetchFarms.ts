@@ -2,6 +2,7 @@ import type { FilterOptions } from "grid3_client";
 import type { IProfile } from "../types/Profile";
 import gqlApi from "./gqlApi";
 import { getBlockedFarmsIDs } from "./findNodes";
+import paginatedFetcher from "./paginatedFetcher";
 
 const queryCount = `
 query GetLimits {
@@ -38,8 +39,11 @@ interface IQueryData {
   farms: Array<{ name: string }>;
 }
 
-
-export default function fetchFarms(profile: IProfile, filters: FilterOptions, exclusiveFor: string) {
+export default function fetchFarms(
+  profile: IProfile,
+  filters: FilterOptions,
+  exclusiveFor: string
+) {
   var query = queryCount;
   var queryDataSelect = queryData;
   if (filters.publicIPs) {
@@ -48,15 +52,11 @@ export default function fetchFarms(profile: IProfile, filters: FilterOptions, ex
   }
 
   return gqlApi<IQueryCount>(profile, query)
-    .then(({ farms: { farms_limit }}) => {
+    .then(({ farms: { farms_limit } }) => {
       return { farms_limit };
     })
     .then(async (vars) => {
-      let { farms } = await gqlApi<IQueryData>(
-        profile,
-        queryDataSelect,
-        vars
-      );
+      let { farms } = await gqlApi<IQueryData>(profile, queryDataSelect, vars);
 
       farms = await getOnlineFarms(profile, farms, exclusiveFor);
 
@@ -65,8 +65,9 @@ export default function fetchFarms(profile: IProfile, filters: FilterOptions, ex
 }
 
 export async function getOnlineFarms(profile, farms, exclusiveFor) {
-  let onlineFarms = [];
   let blockedFarms = [];
+  let onlineFarmsSet = new Set();
+  let onlineFarmsArr = [];
 
   if (exclusiveFor) {
     blockedFarms = await getBlockedFarmsIDs(
@@ -76,15 +77,23 @@ export async function getOnlineFarms(profile, farms, exclusiveFor) {
     );
   }
 
-  for (let farm of farms) {
-    if (!blockedFarms.includes(farm.farmID)) {
-      let data = await fetch(
-        `https://gridproxy.${profile.networkEnv}.grid.tf/nodes?farm_ids=${farm.farmID}&status=up`
-      ).then((response) => response.json());
+  const upNodes = await paginatedFetcher(
+    `https://gridproxy.${profile.networkEnv}.grid.tf/nodes?&status=up`,
+    0,
+    50
+  );
 
-      if (data.length > 0) onlineFarms.push(farm);
+  for (let node of upNodes) {
+    if (!blockedFarms.includes(node.farmId)) {
+      onlineFarmsSet.add(node.farmId);
     }
   }
+
+  onlineFarmsArr = Array.from(onlineFarmsSet);
+
+  const onlineFarms = farms.filter((farm) =>
+    onlineFarmsArr.includes(farm.farmID)
+  );
 
   return onlineFarms;
 }

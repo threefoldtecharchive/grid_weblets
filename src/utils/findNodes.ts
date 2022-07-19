@@ -71,17 +71,16 @@ async function getBlockedNodesIDs(
   const farmIdsarr = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
 
   // get all the nodeIds of all the farms
-  let farmNodesIDs = [];
-  for (let farmId of farmIdsarr) {
-    const res = await gqlClient.query(
-      `query MyQuery {
-              nodes(where: {farmID_eq: ${farmId}}) {
-                nodeID
-              }
-            }`
-    );
-    farmNodesIDs.push(...res.data["nodes"]);
-  }
+  const res = await gqlClient.query(
+    `query MyQuery {
+      nodes(where: {farmID_in: ${farmIdsarr}}) {
+        nodeID
+      }
+    }`
+  );
+  let farmNodesIDs = [...res.data["nodes"]];
+
+  console.log({farmNodesIDs})
   return farmNodesIDs;
 }
 
