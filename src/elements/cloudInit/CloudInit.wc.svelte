@@ -36,7 +36,7 @@
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
-    { label: "Environment Variables", value: "env" },
+    // { label: "Environment Variables", value: "env" },
     // { label: "Disks", value: "disks" },
   ];
 
@@ -155,7 +155,7 @@
     failed = false;
     message = undefined;
 
-    deployCloudInit(data, profile, "CloudInit")
+    deployCloudInit(data, profile)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
