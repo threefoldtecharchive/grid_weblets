@@ -174,7 +174,7 @@
           state,
           loadingConsumption ? "Loading..." : consumptions[idx],
           (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- ",
-          deploymentData.name ?? "-",
+          deploymentData.name ?? " -",
           createdAt.toLocaleString(),
           expiration,
         ])}

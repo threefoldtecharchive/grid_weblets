@@ -59,20 +59,35 @@
 
   $: sortBy = 'none'
 
-  $: sortedRows = rows
+  $: sortedRows = rows?.slice(0)
 
   $: if (sortBy !== 'none'){
     let column_index = headers.indexOf(sortBy);
-    if (sortDirection === 'ascending') sortedRows = rows.sort((a, b) => 
-      isNumber(a[column_index])  
-      ? isNumber(b[column_index]) ? (+a[column_index]) - (+b[column_index]) : a[column_index].toString().localeCompare(b[column_index]) 
-      : isNumber(b[column_index]) ? a[column_index].localeCompare(b[column_index].toString()) : a[column_index].localeCompare(b[column_index])
-      );
-    else sortedRows = rows.sort((a, b) => 
-      isNumber(a[column_index]) 
+
+    for (let i = 0; i < rows.length; i++) {
+      sortedRows[i] = rows[i].concat([i.toString()]);
+    }
+
+    if (sortDirection === 'ascending') sortedRows = sortedRows.sort((a, b) => isNumber(a[column_index])  
+        ? isNumber(b[column_index]) ? (+a[column_index]) - (+b[column_index]) : a[column_index].toString().localeCompare(b[column_index]) 
+        : isNumber(b[column_index]) ? a[column_index].localeCompare(b[column_index].toString()) : a[column_index].localeCompare(b[column_index])); 
+    
+    else sortedRows = sortedRows.sort((a, b) => isNumber(a[column_index]) 
       ? isNumber(b[column_index]) ? (+b[column_index]) - (+a[column_index]) : b[column_index].toString().localeCompare(a[column_index]) 
-      : isNumber(b[column_index]) ? b[column_index].localeCompare(a[column_index].toString()) : b[column_index].localeCompare(a[column_index])
-      );
+      : isNumber(b[column_index]) ? b[column_index].localeCompare(a[column_index].toString()) : b[column_index].localeCompare(a[column_index]));
+
+    let sortIndices = [];
+    for (let j = 0; j < sortedRows.length; j++) {
+      sortIndices.push(sortedRows[j][+sortedRows[j].length - 1]);
+      sortedRows[j].pop();
+    }
+
+    let rowsDataCopy = [];
+    sortIndices.forEach((i, index) => {
+      rowsDataCopy[index] = rowsData[i]
+    });
+    rowsData = rowsDataCopy;
+    console.log(rowsData)
   }
 
   let _selectedRows: number[] = [];
