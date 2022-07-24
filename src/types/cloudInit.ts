@@ -1,7 +1,7 @@
 import VM, { Disk } from "./vm";
 import { v4 } from "uuid";
 
-export default class Peertube extends VM {
+export default class FullVM extends VM {
   public name = `CI${v4().split("-")[0]}`;
   public cpu = 2;
   public memory = 1024 * 2;
