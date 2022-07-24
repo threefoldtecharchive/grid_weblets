@@ -1,53 +1,39 @@
 import type { default as CloudInit } from "../types/cloudInit";
+import type { Disk, Env } from "../types/vm"
 import createNetwork from "./createNetwork";
-const { DiskModel, MachineModel, MachinesModel, generateString } =
+const { DiskModel, MachineModel, MachinesModel } =
   window.configs?.grid3_client ?? {};
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 import { Network } from "../types/kubernetes";
-import rootFs from "./rootFs";
-
 
 export default async function deployCloudInit(data: CloudInit, profile: IProfile) {
-  const { disks: [{ size }], envs, ...base } = data;
-  const { name, flist, cpu, memory, network: nw } = base;
-  const { publicIp6, planetary, nodeId } = base;
-
-  // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
-
-  // Network Specs
-  const net = new Network();
-  net.name = `net${randomSuffix}`;
-  const network = createNetwork(net);
-
-  // Disk Specs
-  const disk = new DiskModel();
-  disk.name = `disk${randomSuffix}`;
-  disk.size = size;
-  disk.mountpoint = "/data";
+  const { disks, envs, rootFs, ...base } = data;
+  const { name, flist, cpu, memory, entrypoint, network: nw } = base;
+  const { publicIp, publicIp6, planetary, nodeId } = base;
 
   // VM Specs
   const vm = new MachineModel();
   vm.name = name; //`vm${randomSuffix}`;
   vm.node_id = nodeId;
-  vm.disks = [disk];
-  vm.public_ip = publicIp6;
+  vm.disks = disks.map(createDisk);
+  vm.public_ip = publicIp;
+  vm.public_ip6 = publicIp6;
   vm.planetary = planetary;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.rootfs_size = rootFs(cpu, memory);
+  vm.rootfs_size = rootFs;
   vm.flist = flist;
-  vm.entrypoint = "/sbin/zinit init";
-  vm.env = {
-    SSH_KEY: profile.sshKey,
-  };
+  vm.entrypoint = entrypoint;
+  vm.env = createEnvs(envs);
+
+
 
   // VMS Specs
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = network;
+  vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
   const metadate = {
@@ -65,7 +51,20 @@ export default async function deployCloudInit(data: CloudInit, profile: IProfile
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
   });
+}
 
+function createDisk({ name, size, mountpoint }: Disk) {
+  const disk = new DiskModel();
+  disk.name = name;
+  disk.size = size;
+  disk.mountpoint = mountpoint;
+  return disk;
+}
 
+function createEnvs(envs: Env[]): { [key: string]: string } {
+  return envs.reduce((res, env) => {
+    res[env.key] = env.value;
+    return res;
+  }, {});
 }
 

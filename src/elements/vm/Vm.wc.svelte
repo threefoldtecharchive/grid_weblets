@@ -20,7 +20,6 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateEntryPoint,
     validateFlistvalue,
     validateKey,
@@ -28,7 +27,6 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
 
@@ -94,7 +92,6 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
-
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";

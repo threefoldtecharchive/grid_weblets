@@ -3,7 +3,7 @@
 <script lang="ts">
   import { Disk, Env } from "../../types/vm";
   import CloudInit from "../../types/cloudInit";
-  import type { IFlist, IFormField, ITab, IPackage } from "../../types";
+  import type { IFlist, IFormField, ITab } from "../../types";
   import deployCloudInit from "../../utils/deployCloudInit";
   import type { IProfile } from "../../types/Profile";
 
@@ -29,26 +29,22 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
-    // { label: "Environment Variables", value: "env" },
-    // { label: "Disks", value: "disks" },
+    { label: "Environment Variables", value: "env" },
+    { label: "Disks", value: "disks" },
   ];
 
   let data = new CloudInit();
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    // { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
-    // { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
+    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -64,12 +60,6 @@
 
   ];
 
-  // define this solution packages
-    const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
-  ];
 
   // prettier-ignore
   const flistField: IFormField = {
@@ -106,7 +96,6 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
-
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
@@ -120,7 +109,7 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -171,23 +160,23 @@
       });
   }
 
-  // function validateMountPoint({ id, mountpoint }: Disk) {
-  //   const disks = data.disks;
-  //   const valid = disks.reduce((v, disk) => {
-  //     if (disk.id === id) return v;
-  //     return v && disk.mountpoint.replaceAll("/", "") !== mountpoint.replaceAll("/", ""); // prettier-ignore
-  //   }, true);
-  //   return valid ? null : "Disks can't have duplicated mountpoint.";
-  // }
+  function validateMountPoint({ id, mountpoint }: Disk) {
+    const disks = data.disks;
+    const valid = disks.reduce((v, disk) => {
+      if (disk.id === id) return v;
+      return v && disk.mountpoint.replaceAll("/", "") !== mountpoint.replaceAll("/", ""); // prettier-ignore
+    }, true);
+    return valid ? null : "Disks can't have duplicated mountpoint.";
+  }
 
-  // function validateDiskName({ id, name }: Disk) {
-  //   if (!name) return "Disk name is required";
-  //   const valid = data.disks.reduce((v, disk) => {
-  //     if (disk.id === id) return v;
-  //     return v && disk.name.trim() !== name.trim();
-  //   }, true);
-  //   return valid ? null : "Disks can't have duplicated name.";
-  // }
+  function validateDiskName({ id, name }: Disk) {
+    if (!name) return "Disk name is required";
+    const valid = data.disks.reduce((v, disk) => {
+      if (disk.id === id) return v;
+      return v && disk.name.trim() !== name.trim();
+    }, true);
+    return valid ? null : "Disks can't have duplicated name.";
+  }
 
   $: logs = $currentDeployment;
 </script>
@@ -273,14 +262,14 @@
           />
         {/if}
 
-        <!-- <RootFsSize
+        <RootFsSize
           rootFs={data.rootFs}
           editable={data.rootFsEditable}
           cpu={data.cpu}
           memory={data.memory}
           on:update={({ detail }) => (data.rootFs = detail)}
           on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
-        /> -->
+        />
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
@@ -293,16 +282,6 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-
-        <SelectCapacity
-        bind:cpu={data.cpu}
-        bind:memory={data.memory}
-        bind:diskSize={data.disks[0].size}
-        bind:diskField={diskField}
-        bind:cpuField={cpuField}
-        bind:memoryField={memoryField}
-        {packages}
-        />
 
         <SelectNodeId
           publicIp={data.publicIp}
@@ -337,7 +316,7 @@
             </div>
           {/each}
         </div>
-      <!-- {:else if active === "disks"}
+      {:else if active === "disks"}
         <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
@@ -377,7 +356,7 @@
               {/each}
             </div>
           {/each}
-        </div> -->
+        </div>
       {/if}
     {/if}
 
