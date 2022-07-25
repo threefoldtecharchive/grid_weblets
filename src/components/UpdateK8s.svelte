@@ -196,33 +196,36 @@
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
         </h4>
-        <hr />
 
-        <Table
-          rowsData={workers}
-          headers={[
-            "#",
-            "Contract ID",
-            "Name",
-            "Planetary Network IP",
-            "CPU(Cores)",
-            "Memory(MB)",
-            "Disk(GB)",
-          ]}
-          rows={_createWorkerRows(workers)}
-          selectable={false}
-          actions={[
-            {
-              label: "Delete",
-              type: "danger",
-              loading: (i) => loading && removing === workers[i].name,
-              click: (_, i) => onDeleteWorker(i),
-              disabled: () => loading || removing !== null,
-            },
-          ]}
-        />
-
-        <hr />
+        {#if workers.length}
+          <hr />
+          <Table
+            rowsData={workers}
+            headers={[
+              "#",
+              "Contract ID",
+              "Name",
+              "Planetary Network IP",
+              "CPU(Cores)",
+              "Memory(MB)",
+              "Disk(GB)",
+            ]}
+            rows={_createWorkerRows(workers)}
+            selectable={false}
+            actions={[
+              {
+                label: "Delete",
+                type: "danger",
+                loading: (i) => loading && removing === workers[i].name,
+                click: (_, i) => onDeleteWorker(i),
+                disabled: () => loading || removing !== null,
+              },
+            ]}
+          />
+          <hr />
+        {:else }
+          <hr style="width: 1200px" />
+        {/if}
 
         <form on:submit|preventDefault={onAddWorker}>
           {#if loading || (logs !== null && logs.type === "Add Worker")}

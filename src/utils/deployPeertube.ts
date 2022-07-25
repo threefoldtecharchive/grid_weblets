@@ -75,7 +75,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
 
   // VM Specs
   const vm = new MachineModel();
-  vm.name = `vm${randomSuffix}`;
+  vm.name = name; //`vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = publicIp;
@@ -99,6 +99,13 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Peertube"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   // deploy
   return deploy(profile, "Peertube", name, async (grid) => {
     await checkVMExist(grid, "peertube", name); // change the project name of the grid to be peertube
@@ -121,6 +128,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Peertube"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "peertube");

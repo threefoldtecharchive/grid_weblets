@@ -21,6 +21,19 @@
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
 
+  function jsonParser(str: string){
+    str = str.replaceAll("'", '"');
+    let parsed = {};
+
+    try {
+      parsed = JSON.parse(str);
+    } catch (err) {
+      parsed = {};
+      console.log(err.message);
+    }
+    return parsed;
+  }
+
   function onLoadProfile(_profile: IProfile) {
     profile = _profile;
     if (profile) {
@@ -29,8 +42,19 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state }) => ({ id: contractID, type: "node", state: state } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
+              id: contractID, 
+              type: "name", 
+              state: state, 
+              deploymentData: {name: name}, 
+              createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({
+              id: contractID, 
+              type: "node", 
+              state: state, 
+              createdAt: new Date(+createdAt), 
+              nodeID: nodeID, 
+              deploymentData: jsonParser(deploymentData) } as IContract));
             contracts = [...names, ...nodes];
           })
           .then(async () => {
@@ -142,14 +166,17 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate"]}
-        rows={contracts.map(({ id, type, state, expiration }, idx) => [
-          idx.toString(),
+        headers={["ID", "Type", "Node ID", "State", "Expiration", "Billing Rate", "Solution type", "Solution name", "Created at"]}
+        rows={contracts.map(({ id, type, nodeID, state, expiration, deploymentData, createdAt }, idx) => [
           id.toString(),
           type,
+          nodeID ?? " - ",
           state,
           expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
+          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "-",
+          deploymentData.name ?? "-",
+          createdAt.toLocaleString()
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
