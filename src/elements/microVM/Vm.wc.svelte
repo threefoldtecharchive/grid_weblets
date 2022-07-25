@@ -1,10 +1,9 @@
-<svelte:options tag="tf-cloudinit" />
+<svelte:options tag="tf-microvm" />
 
 <script lang="ts">
-  import { Disk, Env } from "../../types/vm";
-  import CloudInit from "../../types/cloudInit";
+  import VM, { Disk, Env } from "../../types/vm";
   import type { IFlist, IFormField, ITab } from "../../types";
-  import deployCloudInit from "../../utils/deployCloudInit";
+  import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -21,7 +20,6 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateEntryPoint,
     validateFlistvalue,
     validateKey,
@@ -38,13 +36,12 @@
     { label: "Disks", value: "disks" },
   ];
 
-  let data = new CloudInit();
+  let data = new VM();
 
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -54,12 +51,11 @@
 
   // prettier-ignore
   const flists: IFlist[] = [
-    { name: "Ubuntu-18.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist", entryPoint: "/init.sh" },
-    { name: "Ubuntu-20.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist", entryPoint: "/init.sh" },
-    { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist", entryPoint: "/init.sh" },
+    { name: "Ubuntu", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-20.04.flist", entryPoint: "/init.sh" },
+    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist", entryPoint: "/entrypoint.sh" },
+    { name: "CentOS", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist", entryPoint: "/entrypoint.sh" },
 
   ];
-
 
   // prettier-ignore
   const flistField: IFormField = {
@@ -67,9 +63,9 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Ubuntu-18.04", value: "0", selected: true },
-      { label: "Ubuntu-20.04", value: "1" },
-      { label: "Ubuntu-22.04", value: "2" },
+      { label: "Ubuntu-20.04", value: "0", selected: true },
+      { label: "Alpine-3", value: "1" },
+      { label: "CentOS-8", value: "2" },
       { label: "Other", value: "other" }
     ]
   };
@@ -118,7 +114,7 @@
     invalid: false,
   };
 
-  async function onDeployCloudInit() {
+  async function onDeployVM() {
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
@@ -144,7 +140,7 @@
     failed = false;
     message = undefined;
 
-    deployCloudInit(data, profile)
+    deployVM(data, profile, "VM")
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -191,10 +187,10 @@
 />
 
 <div style="padding: 15px;">
-  <form on:submit|preventDefault={onDeployCloudInit} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+  <form on:submit|preventDefault={onDeployVM} class="box">
+    <h4 class="is-size-4">Deploy a Micro Virtual Machine</h4>
     <p>
-      Deploy a new virtual machine on the Threefold Grid
+      Deploy a new micro virtual machine on the Threefold Grid
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
@@ -204,18 +200,18 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "CloudInit")}
+    {#if loading || (logs !== null && logs.type === "VM")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully deployed a Cloud Init VM."
+        message="Successfully deployed VM."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy a Cloud Init VM."} />
+      <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -299,7 +295,6 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-        
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">

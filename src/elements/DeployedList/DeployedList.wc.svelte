@@ -8,8 +8,9 @@
   import deleteDeployment from "../../utils/deleteDeployment";
 
   type TabsType =
-    | "k8s"
     | "vm"
+    | "microvm"
+    | "k8s"
     | "caprover"
     | "funkwhale"
     | "peertube"
@@ -20,8 +21,7 @@
     | "owncloud"
     | "presearch"
     | "casperlabs"
-    | "nodepilot"
-    | "cloudInit";
+    | "nodepilot";
 
   export let tab: TabsType = undefined;
 
@@ -38,6 +38,7 @@
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Virtual Machine", value: "vm" },
+    { label: "Micro Virtual Machine", value: "microvm" },
     { label: "Kubernetes", value: "k8s" },
     { label: "CapRover", value: "caprover" },
     { label: "Peertube", value: "peertube" },
@@ -50,7 +51,6 @@
     { label: "Casperlabs", value: "casperlabs" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
-    { label: "Cloud Init", value: "cloudInit" },
   ];
   let active: string = "vm";
   $: active = tab || active;
@@ -412,7 +412,7 @@
           },
         },
       ],
-      cloudInit: (rows) => [
+      microvm: (rows) => [
         {
           type: "info",
           label: "Show Details",

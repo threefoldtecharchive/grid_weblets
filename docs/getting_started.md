@@ -46,7 +46,7 @@ To read about each weblet and how to use it, and also how to config your twin id
 There is a several component in the weblets repo, you can find them in the `/src/elements` directory. and they are:
 
 - Basic Components
-  - [Virtual Machine](/src/elements/vm)
+  - [Micro Virtual Machine](/src/elements/microVM)
   - [Kubernetes Cluster](/src/elements/kubernetes)
 - Comunity Solutions
   - [Caprover](/src/elements/caprover)
@@ -59,7 +59,7 @@ There is a several component in the weblets repo, you can find them in the `/src
   - [Presearch](/src/elements/presearch)
   - [Casperlabs](/src/elements/casperlabs)
   - [Node Pilot](/src/elements/nodePilot)
-  - [Cloud Init](/src/elements/cloudInit)
+  - [Virtual Machine](/src/elements/vm)
 - Utils Components
   - [Base](/src/elements/base)
   - [Profile](/src/elements/profiles)

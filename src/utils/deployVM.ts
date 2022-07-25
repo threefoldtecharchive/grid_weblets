@@ -32,14 +32,14 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
   const metadate = {
-    "type":  "vm",  
+    "type": "vm",
     "name": name,
-    "projectName": type == "VM" ? "" : type
+    "projectName": type == "MicroVM" ? "" : type
   };
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, type, name, async (grid) => {
-    if (type != "VM")
+    if (type != "MicroVM")
       await checkVMExist(grid, type.toLocaleLowerCase(), name);
     return grid.machines
       .deploy(vms)

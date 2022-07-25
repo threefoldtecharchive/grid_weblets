@@ -34,7 +34,7 @@ import { findInitialPage } from "@/utils/sidenav";
 export default class App extends Vue {
   elements = [
     // "profiles",
-    "vm",
+    "microvm",
     "kubernetes",
     "deployedlist",
     "caprover",
@@ -52,7 +52,7 @@ export default class App extends Vue {
     "casperlabs",
     "tfhubvalidator",
     "nodepilot",
-    "cloudinit",
+    "vm",
   ];
   sidenav: ISidenav | null = null;
 

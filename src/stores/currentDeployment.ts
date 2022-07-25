@@ -19,7 +19,7 @@ export interface IStore {
   | "TFhubValidator"
   | "Casperlabs"
   | "NodePilot"
-  | "CloudInit";
+  | "MicroVM";
   name: string;
   message: string;
 }
