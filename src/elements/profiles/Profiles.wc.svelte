@@ -28,6 +28,18 @@
   let currentProfile: IProfile;
   let selectedIdx: string = "0";
   let bridgeAddress: string = "";
+  let editable: boolean = true;
+  $: checked = editable;
+
+  function _updateEditable(e: Event) {
+    const input = e.target as HTMLInputElement;
+
+    checked = input.checked;
+    if (!checked) {
+      const sshIsValid = activeProfile.sshKey == "";
+      _updateError("sshKey", sshIsValid, "");
+    }
+  }
 
   let tabs: ITab[] = [];
   $: {
@@ -68,7 +80,7 @@
     // ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key is used to establish a communication channel between you and your machines over the internet.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Disabling the ssh field means you won't be able to access your deployed solutions.", type: "text" },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
@@ -104,9 +116,11 @@
       console.log("Error", err);
     }
 
-    const sshIsValid = activeProfile.sshKey !== "";
-    invalid = invalid || !sshIsValid;
-    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
+    if (checked) {
+      const sshIsValid = activeProfile.sshKey !== "";
+      invalid = invalid || !sshIsValid;
+      _updateError("sshKey", sshIsValid, "Invalid SSH Key");
+    }
 
     const nameIsValid = activeProfile.name !== "";
     invalid = invalid || !nameIsValid;
@@ -190,6 +204,11 @@
               class="button is-outlined mr-2"
               style={`border-color: #1982b1; color: #1982b1`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+              checked
+                ? Boolean(validateSSH(activeProfile.sshKey))
+                : false}
               on:click={() => {
                 selectedIdx = configs.addProfile();
                 fields.forEach((_, i) => (fields[i].error = null));
@@ -201,6 +220,11 @@
               class="button mr-2"
               style={`background-color: #1982b1; color: #fff`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+              checked
+                ? Boolean(validateSSH(activeProfile.sshKey))
+                : false}
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
@@ -253,10 +277,12 @@
             class={"button" + (activating ? " is-loading" : "")}
             style={`background-color: #1982b1; color: #fff`}
             disabled={activating ||
-              activeProfileId === activeProfile?.id ||
-              Boolean(validateProfileName(activeProfile.name)) ||
-              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-              Boolean(validateSSH(activeProfile.sshKey))}
+            activeProfileId === activeProfile?.id ||
+            Boolean(validateProfileName(activeProfile.name)) ||
+            Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+            checked
+              ? Boolean(validateSSH(activeProfile.sshKey))
+              : false}
             on:click={onActiveProfile}
           >
             {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
@@ -274,8 +300,14 @@
                 bind:data={activeProfile.name}
                 field={{
                   ...fields[0],
-                  error: validateProfileName(activeProfile.name),
+                  error:
+                    activeProfile.name == ""
+                      ? null
+                      : validateProfileName(activeProfile.name),
                   disabled: activeProfileId === activeProfile.id,
+                }}
+                on:input={() => {
+                  fields[0].error = validateProfileName(activeProfile.name);
                 }}
               />
 
@@ -283,7 +315,10 @@
                 bind:data={activeProfile.mnemonics}
                 field={{
                   ...fields[1],
-                  error: syncValidateMnemonics(activeProfile.mnemonics),
+                  error:
+                    activeProfile.mnemonics == ""
+                      ? null
+                      : syncValidateMnemonics(activeProfile.mnemonics),
                   disabled: activeProfileId === activeProfile.id,
                 }}
               />
@@ -292,15 +327,33 @@
                 <Input data={$configs.twinId} field={twinField} />
                 <Input data={$configs.address} field={addressField} />
               {/if}
+              <div style="display: flex; align-items: center;">
+                <div style="margin-right: 15px; width: 100%;">
+                  <Input
+                    bind:data={activeProfile.sshKey}
+                    field={{
+                      ...fields[2],
 
-              <Input
-                bind:data={activeProfile.sshKey}
-                field={{
-                  ...fields[2],
-                  error: validateSSH(activeProfile.sshKey),
-                  disabled: activeProfileId === activeProfile.id,
-                }}
-              />
+                      disabled: !checked,
+                      error:
+                        activeProfile.sshKey != "" && checked
+                          ? validateSSH(activeProfile.sshKey)
+                          : null,
+                    }}
+                  />
+                </div>
+                <div style="margin-top: 30px;">
+                  <Input
+                    data={editable}
+                    field={{
+                      label: "",
+                      symbol: "editable",
+                      type: "checkbox",
+                    }}
+                    on:input={_updateEditable}
+                  />
+                </div>
+              </div>
             </div>
 
             {#if activeProfileId === activeProfile?.id}
