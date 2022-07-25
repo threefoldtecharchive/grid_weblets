@@ -9,7 +9,7 @@ export interface IListReturn<T = any> {
 }
 
 export default class DeployedList {
-  constructor(public readonly grid: GridClient) {}
+  constructor(public readonly grid: GridClient) { }
 
   private _loadK8s(name: string) {
     return new Promise((res) => {
@@ -99,6 +99,10 @@ export default class DeployedList {
 
       return this.grid.machines
         .list()
+        .then((res) => {
+          console.log(res)
+          return res
+        })
         .then(DeployedList.__filterNames)
         .then((names) => {
           total = names.length;

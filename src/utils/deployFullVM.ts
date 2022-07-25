@@ -39,7 +39,7 @@ export default async function deployFullVM(data: FullVM, profile: IProfile) {
   const metadate = {
     "type": "vm",
     "name": name,
-    "projectName": "vm"
+    "projectName": "VM"
   };
   vms.metadata = JSON.stringify(metadate);
 
