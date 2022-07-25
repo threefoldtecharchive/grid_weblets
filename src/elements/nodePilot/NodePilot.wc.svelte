@@ -166,7 +166,7 @@
       Deploy a new Node Pilot on the Threefold Grid
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_nodepilot"
       >
         Quick start documentation</a
       >
