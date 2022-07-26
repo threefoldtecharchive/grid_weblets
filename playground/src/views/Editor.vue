@@ -95,7 +95,14 @@ class Weblet {
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
-    new Weblet("Virtual Machine", "vm", "vm", "deployment", "vm.png"),
+    new Weblet(
+      "Full Virtual Machine",
+      "fullvm",
+      "fullvm",
+      "deployment",
+      "vm.png"
+    ),
+    new Weblet("Micro Virtual Machine", "vm", "vm", "deployment", "vm.png"),
     new Weblet(
       "Kubernetes",
       `kubernetes`,
@@ -174,13 +181,6 @@ export default class Editor extends Vue {
       "Node Pilot",
       "nodepilot",
       "nodepilot",
-      "deployment",
-      "vm.png"
-    ),
-    new Weblet(
-      "Cloud Init",
-      "cloudInit",
-      "cloudInit",
       "deployment",
       "vm.png"
     ),

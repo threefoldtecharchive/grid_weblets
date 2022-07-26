@@ -1,4 +1,4 @@
-import type { default as CloudInit } from "../types/cloudInit";
+import type { default as Fullvm } from "../types/fullvm";
 import type { Disk, Env } from "../types/vm"
 import createNetwork from "./createNetwork";
 const { DiskModel, MachineModel, MachinesModel } =
@@ -8,7 +8,7 @@ import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 import { Network } from "../types/kubernetes";
 
-export default async function deployCloudInit(data: CloudInit, profile: IProfile) {
+export default async function deployFullvm(data: Fullvm, profile: IProfile) {
   const { disks, envs, rootFs, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, publicIp6, planetary, nodeId } = base;
@@ -28,8 +28,6 @@ export default async function deployCloudInit(data: CloudInit, profile: IProfile
   vm.entrypoint = entrypoint;
   vm.env = createEnvs(envs);
 
-
-
   // VMS Specs
   const vms = new MachinesModel();
   vms.name = name;
@@ -39,13 +37,13 @@ export default async function deployCloudInit(data: CloudInit, profile: IProfile
   const metadate = {
     "type": "vm",
     "name": name,
-    "projectName": "cloudInit"
+    "projectName": "Fullvm"
   };
   vms.metadata = JSON.stringify(metadate);
 
 
-  return deploy(profile, "CloudInit", name, async (grid) => {
-    await checkVMExist(grid, "cloudInit", name);
+  return deploy(profile, "Fullvm", name, async (grid) => {
+    await checkVMExist(grid, "fullvm", name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

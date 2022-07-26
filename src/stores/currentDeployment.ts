@@ -19,7 +19,7 @@ export interface IStore {
   | "TFhubValidator"
   | "Casperlabs"
   | "NodePilot"
-  | "CloudInit";
+  | "Fullvm";
   name: string;
   message: string;
 }

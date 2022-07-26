@@ -21,7 +21,7 @@
     | "presearch"
     | "casperlabs"
     | "nodepilot"
-    | "cloudInit";
+    | "fullvm";
 
   export let tab: TabsType = undefined;
 
@@ -50,7 +50,7 @@
     { label: "Casperlabs", value: "casperlabs" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
-    { label: "Cloud Init", value: "cloudInit" },
+    { label: "Full Virtual Machine", value: "fullvm" },
   ];
   let active: string = "vm";
   $: active = tab || active;
@@ -412,7 +412,7 @@
           },
         },
       ],
-      cloudInit: (rows) => [
+      fullvm: (rows) => [
         {
           type: "info",
           label: "Show Details",

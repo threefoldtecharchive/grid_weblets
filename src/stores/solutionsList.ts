@@ -12,5 +12,5 @@ export const solutionList = {
   kubernetes: "k8s",
   machines: "vm",
   nodepilot: "np",
-  cloudinit: "ci",
+  fullvm: "fvm",
 };

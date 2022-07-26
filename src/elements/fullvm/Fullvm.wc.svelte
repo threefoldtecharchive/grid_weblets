@@ -1,10 +1,10 @@
-<svelte:options tag="tf-cloudinit" />
+<svelte:options tag="tf-fullvm" />
 
 <script lang="ts">
   import { Disk, Env } from "../../types/vm";
-  import CloudInit from "../../types/cloudInit";
+  import Fullvm from "../../types/fullvm";
   import type { IFlist, IFormField, ITab } from "../../types";
-  import deployCloudInit from "../../utils/deployCloudInit";
+  import deployFullvm from "../../utils/deployFullvm";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -38,13 +38,13 @@
     { label: "Disks", value: "disks" },
   ];
 
-  let data = new CloudInit();
+  let data = new Fullvm();
 
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
-    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
+    // { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -118,7 +118,7 @@
     invalid: false,
   };
 
-  async function onDeployCloudInit() {
+  async function onDeployFullvm() {
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
@@ -144,7 +144,7 @@
     failed = false;
     message = undefined;
 
-    deployCloudInit(data, profile)
+    deployFullvm(data, profile)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -191,7 +191,7 @@
 />
 
 <div style="padding: 15px;">
-  <form on:submit|preventDefault={onDeployCloudInit} class="box">
+  <form on:submit|preventDefault={onDeployFullvm} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <p>
       Deploy a new virtual machine on the Threefold Grid
@@ -204,18 +204,18 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "CloudInit")}
+    {#if loading || (logs !== null && logs.type === "Fullvm")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully deployed a Cloud Init VM."
+        message="Successfully deployed a VM."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy a Cloud Init VM."} />
+      <Alert type="danger" message={message || "Failed to deploy a VM."} />
     {:else}
       <Tabs bind:active {tabs} />
 
