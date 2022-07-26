@@ -1,7 +1,5 @@
 import VM, { Disk } from "./vm";
 import { v4 } from "uuid";
-import validateName from '../utils/validateName';
-import isValidInteger from '../utils/isValidInteger';
 
 export default class FullVM extends VM {
   public name = `VM${v4().split("-")[0]}`;
@@ -9,11 +7,7 @@ export default class FullVM extends VM {
   public disks = [new Disk(undefined, undefined, this.diskSize, undefined)];
 
   public get valid(): boolean {
-    const { name, diskSize } = this;
-    return (
-      name !== "" &&
-      validateName(name) === undefined &&
-      isValidInteger(diskSize)
-    );
+    const { name } = this;
+    return name !== "";
   }
 }

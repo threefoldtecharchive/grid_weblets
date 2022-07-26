@@ -2,9 +2,9 @@
 
 <script lang="ts">
   import { Disk, Env } from "../../types/vm";
-  import FullVM from "../../types/fullVM";
-  import type { IFlist, IFormField, ITab } from "../../types";
-  import deployFullVM from "../../utils/deployFullVM";
+  import CloudInit from "../../types/cloudInit";
+  import type { IFlist, IFormField, ITab, IPackage } from "../../types";
+  import deployCloudInit from "../../utils/deployCloudInit";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -29,8 +29,10 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -38,13 +40,13 @@
     { label: "Disks", value: "disks" },
   ];
 
-  let data = new FullVM();
+  let data = new CloudInit();
+
 
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
-    // { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -59,7 +61,6 @@
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist", entryPoint: "/init.sh" },
 
   ];
-
 
   // prettier-ignore
   const flistField: IFormField = {
@@ -96,6 +97,7 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
+
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
@@ -109,7 +111,7 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -118,7 +120,7 @@
     invalid: false,
   };
 
-  async function onDeployFullVM() {
+  async function onDeployCloudInit() {
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
@@ -144,7 +146,7 @@
     failed = false;
     message = undefined;
 
-    deployFullVM(data, profile)
+    deployCloudInit(data, profile)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -191,7 +193,7 @@
 />
 
 <div style="padding: 15px;">
-  <form on:submit|preventDefault={onDeployFullVM} class="box">
+  <form on:submit|preventDefault={onDeployCloudInit} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <p>
       Deploy a new virtual machine on the Threefold Grid
@@ -262,14 +264,14 @@
           />
         {/if}
 
-        <RootFsSize
+        <!-- <RootFsSize
           rootFs={data.rootFs}
           editable={data.rootFsEditable}
           cpu={data.cpu}
           memory={data.memory}
           on:update={({ detail }) => (data.rootFs = detail)}
           on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
-        />
+        /> -->
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}

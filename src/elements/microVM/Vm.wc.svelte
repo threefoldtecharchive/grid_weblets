@@ -3,7 +3,7 @@
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
   import type { IFlist, IFormField, ITab } from "../../types";
-  import deployVM from "../../utils/deployVM";
+  import deployVM from "../../utils/deployMicroVM";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -140,7 +140,7 @@
     failed = false;
     message = undefined;
 
-    deployVM(data, profile, "VM")
+    deployVM(data, profile)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -200,7 +200,7 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "VM")}
+    {#if loading || (logs !== null && logs.type === "MicroVM")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
