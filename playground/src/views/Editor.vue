@@ -2,15 +2,21 @@
   <section class="editor">
     <aside class="editor__side menu" style="padding-bottom: 100px">
       <img class="logo" src="/images/logoTF.png" />
+      <div class="network">{{ envs[network] }}</div>
+
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
           <template v-for="(el, idx) in weblets">
-            <li :key="el.name" @click="
-              section === 'coming soon' || idx === active
-                ? null
-                : route(el.symbol)
-            " v-if="el.section === section">
+            <li
+              :key="el.name"
+              @click="
+                section === 'coming soon' || idx === active
+                  ? null
+                  : route(el.symbol)
+              "
+              v-if="el.section === section"
+            >
               <a v-bind:class="{ 'is-active': idx === active }">
                 <span class="icon-text">
                   <span class="icon" v-if="el.img">
@@ -25,7 +31,8 @@
           </template>
         </ul>
       </template>
-      <span style="
+      <span
+        style="
           position: fixed;
           bottom: 15px;
           left: 245px;
@@ -34,7 +41,9 @@
           font-size: 0.9rem;
           background-color: #1982b1;
           color: white;
-        " class="tag is-light">
+        "
+        class="tag is-light"
+      >
         <tf-version></tf-version>
       </span>
     </aside>
@@ -91,6 +100,12 @@ class Weblet {
 
 @Component({
   name: "Editor",
+  data: function () {
+    return {
+      envs: { dev: "DEVNET", test: "TESTNET", qa: "QANET", main: "MAINNET" },
+      network: process.env.NETWORK != "" ? process.env.NETWORK : "DEVNet",
+    };
+  },
 })
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
@@ -170,13 +185,7 @@ export default class Editor extends Vue {
       "deployment",
       "vm.png"
     ),*/
-    new Weblet(
-      "Node Pilot",
-      "nodepilot",
-      "nodepilot",
-      "deployment",
-      "vm.png"
-    ),
+    new Weblet("Node Pilot", "nodepilot", "nodepilot", "deployment", "vm.png"),
 
     new Weblet("Contracts", "contractslist", "", "my account", ""),
     new Weblet("Deployments", "deployedlist", "", "my account", ""),
@@ -261,7 +270,16 @@ export default class Editor extends Vue {
   width: 185px;
   margin: 15px 15px 30px;
 }
-
+.network {
+  font-size: 18px;
+  display: block;
+  color: white;
+  background-color: rgb(25, 130, 177);
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: 400;
+}
 .menu {
   background-color: #333;
 }

@@ -1,4 +1,7 @@
 const { join } = require("path");
+const { DefinePlugin } = require("webpack");
+
+const network = process.env.NETWORK || "dev";
 
 module.exports = {
   transpileDependencies: [
@@ -7,6 +10,11 @@ module.exports = {
   outputDir: join(__dirname, '..', 'dist'),
   publicPath: '/',
   configureWebpack: {
+    plugins: [
+      new DefinePlugin({
+        "process.env.NETWORK": JSON.stringify(network)
+      })
+    ],
     module: {
       rules: [
         {
