@@ -128,7 +128,7 @@ export function validateProfileName(name: string): string | void {
 
 export function validatePassword(value: string): string | void {
   if (value.length < 6) return "Password must be at least 6 characters";
-  if (value.length > 15) return "Password must be at least 15 characters";
+  if (value.length > 15) return "Password must be less than 15 characters";
 }
 
 export function validateRequiredPassword(value: string): string | void {
