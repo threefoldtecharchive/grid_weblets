@@ -4,12 +4,14 @@ import getBalance from "../utils/getBalance";
 interface IStore {
   loading: boolean;
   balance: number | number;
+  locked: number | number;
 }
 
 function createBalanceStore() {
   const store = writable<IStore>({
     loading: false,
     balance: null,
+    locked: null,
   });
   const { subscribe, update } = store;
 
@@ -23,6 +25,13 @@ function createBalanceStore() {
     setBalance(value: number) {
       return update((s) => {
         s.balance = value;
+        return s;
+      });
+    },
+
+    setLockedBalance(value: number) {
+      return update((s) => {
+        s.locked = value;
         return s;
       });
     },
@@ -42,7 +51,8 @@ function createBalanceStore() {
 
       getBalance(profile)
         .then((balance) => {
-          fullStore.setBalance(balance);
+          fullStore.setBalance(balance.free);
+          fullStore.setLockedBalance(balance.feeFrozen);
         })
         .catch((err) => {
           console.log("Balance Error", err);
