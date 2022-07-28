@@ -193,7 +193,7 @@
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
-            style={`border-color: #FF5151; color: #FF5151;`}
+            style={`border-color: #FF5151; color: #FF5151; background: white;`}
             disabled={!profile ||
               loading ||
               deleting ||
