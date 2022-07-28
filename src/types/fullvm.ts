@@ -6,7 +6,7 @@ import isValidInteger from '../utils/isValidInteger';
 export default class FullVM extends VM {
   public name = `VM${v4().split("-")[0]}`;
   public diskSize: number = 50;
-  public disks = [new Disk(undefined, undefined, this.diskSize, undefined)];
+  public disks = [new Disk(undefined, undefined, this.diskSize, "/")];
 
   public get valid(): boolean {
     const { name, diskSize } = this;
