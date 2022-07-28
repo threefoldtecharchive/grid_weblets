@@ -4,7 +4,7 @@
   import { Disk, Env } from "../../types/vm";
   import Fullvm from "../../types/fullvm";
   import type { IFlist, IFormField, ITab } from "../../types";
-  import deployFullvm from "../../utils/deployFullvm";
+  import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -116,7 +116,7 @@
     invalid: false,
   };
 
-  async function onDeployFullvm() {
+  async function onDeployVM() {
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
@@ -142,7 +142,7 @@
     failed = false;
     message = undefined;
 
-    deployFullvm(data, profile)
+    deployVM(data, profile, "Fullvm")
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -189,7 +189,7 @@
 />
 
 <div style="padding: 15px;">
-  <form on:submit|preventDefault={onDeployFullvm} class="box">
+  <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
     <p>
       Deploy a new virtual machine on the Threefold Grid
