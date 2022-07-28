@@ -29,8 +29,8 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractId }) => ({ id: contractId, type: "name" } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractId }) => ({ id: contractId, type: "node" } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID }) => ({ id: contractID, type: "name" } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(({ contractID }) => ({ id: contractID, type: "node" } as IContract)); // prettier-ignore
             contracts = [...names, ...nodes];
           })
           .catch((err) => {
@@ -83,7 +83,7 @@
     return getGrid(profile, async (grid) => {
       for (const contract of selectedContracts) {
         try {
-          await grid.contracts.cancel({ id: contract.id });
+          await grid.contracts.cancel({ id: +contract.id });
         } catch (err) {
           console.log("Error", err);
           message = err.message || err;
@@ -144,13 +144,14 @@
       >
         <div style="flex-grow: 1;" class="mr-2">
           {#if message}
-            <Alert type="danger" {message} />
+            <Alert type="danger" style={`color: #FF5151`} {message} />
           {/if}
         </div>
         <div>
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
+            style={`border-color: #FF5151; color: #FF5151`}
             disabled={!profile ||
               loading ||
               deleting ||
@@ -161,8 +162,9 @@
             Delete Selected
           </button>
           <button
-            class={"button is-danger " +
+            class={"button is-danger" +
               (deleting && deletingType === "all" ? "is-loading" : "")}
+            style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
             on:click={onDeleteHandler}
           >

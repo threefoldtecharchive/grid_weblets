@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { Disk, Env } from "../../types/vm";
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import deployTaiga from "../../utils/deployTaiga";
   import type { IProfile } from "../../types/Profile";
   import Taiga from "../../types/taiga";
@@ -23,11 +23,13 @@
     validateOptionalEmail,
     validateDisk,
     validateMemory,
-validatePortNumber,
-
+    validatePortNumber,
+    validatePassword,
+    validateOptionalPassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Taiga();
 
@@ -42,44 +44,27 @@ validatePortNumber,
     { label: "Base", value: "base" },
     { label: "Mail Server", value: "mail" },
   ];
-  const nameField: IFormField = { label: "Instance Name", placeholder: "Taiga's instance name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Taiga Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-  let baseFields: IFormField[] = [
-    {
-      label: "CPU",
-      symbol: "cpu",
-      placeholder: "CPU Cores",
-      type: "number",
-      validator: validateCpu,
-      invalid: false,
-    },
-    {
-      label: "Memory (MB)",
-      symbol: "memory",
-      placeholder: "Your Memory in MB",
-      type: "number",
-      validator: validateMemory,
-      invalid: false,
-    },
-  ];
   let adminFields: IFormField[] = [
     {
-      label: "Admin User Name",
+      label: "Username",
       symbol: "adminUsername",
-      placeholder: "admin",
+      placeholder: "Admin Username",
       type: "text",
       validator: validateName,
       invalid: false,
     },
     {
-      label: "Admin Password",
+      label: "Password",
       symbol: "adminPassword",
-      placeholder: "password",
+      placeholder: "Admin Password",
       type: "password",
+      validator: validatePassword,
       invalid: false,
     },
     {
-      label: "Admin Email Address",
+      label: "Email",
       symbol: "adminEmail",
       placeholder: "admin@example.com",
       type: "text",
@@ -87,15 +72,6 @@ validatePortNumber,
       invalid: false,
     },
   ];
-
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
 
   let mailFields: IFormField[] = [
     {
@@ -135,10 +111,18 @@ validatePortNumber,
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
+      validator: validateOptionalPassword,
       invalid: false,
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
+  ];
+
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 150 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
   let message: string;
@@ -147,7 +131,11 @@ validatePortNumber,
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields); // prettier-ignore
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField, ]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -169,7 +157,7 @@ validatePortNumber,
       .then((data) => {
         deploymentStore.set(0);
         success = true;
-        modalData = data.deployment;
+        modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
@@ -194,6 +182,17 @@ validatePortNumber,
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Taiga Instance</h4>
+    <p>
+      Taiga is the project management tool for multi-functional agile teams. It
+      has a rich feature set and at the same time it is very simple to start
+      with through its intuitive user interface.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_taiga"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}
@@ -217,19 +216,15 @@ validatePortNumber,
           bind:invalid={nameField.invalid}
           field={nameField}
         />
-        {#each baseFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-
-        <Input bind:data={data.disks[0].size} field={diskField} />
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
+          {packages}
+        />
 
         {#each adminFields as field (field.symbol)}
           {#if field.invalid !== undefined}

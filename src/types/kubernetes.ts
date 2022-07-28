@@ -1,6 +1,8 @@
 import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
+import rootFs from "../utils/rootFs";
 import NodeID from "./nodeId";
+import validateName, { validateIPRange } from '../utils/validateName';
 
 export abstract class Base {
   public constructor(
@@ -15,33 +17,40 @@ export abstract class Base {
     public planetary: boolean = true,
 
     public selection = new NodeID(),
-    public status: "valid" | "invalid" = null
-  ) {}
+    public status: "valid" | "invalid" = null,
+    public rootFs = 2,
+    public rootFsEditable = false
+  ) { }
 
   public get valid(): boolean {
-    const { name, node, cpu, diskSize, memory } = this;
+    const { name, node, cpu, diskSize, memory, rootFs: rFs } = this;
     return (
       name !== "" &&
+      validateName(name) === undefined &&
       isValidInteger(node) &&
       isValidInteger(cpu) &&
       isValidInteger(diskSize) &&
-      isValidInteger(memory)
+      isValidInteger(memory) &&
+      rFs >= rootFs(cpu, memory)
     );
   }
 }
 
-export class Master extends Base {}
-export class Worker extends Base {}
+export class Master extends Base { }
+export class Worker extends Base { }
 
 export class Network {
   constructor(
     public name: string = "NW" + v4().split("-")[0],
     public ipRange: string = "10.20.0.0/16"
-  ) {}
+  ) { }
 
   public get valid(): boolean {
     const { name, ipRange } = this;
-    return name !== "" && ipRange !== "";
+    return name !== "" &&
+      ipRange !== "" &&
+      validateName(name) === undefined &&
+      validateIPRange(ipRange) === undefined
   }
 }
 
@@ -53,16 +62,14 @@ export default class Kubernetes {
     public network = new Network(),
     public name: string = "K8S" + id.split("-")[0],
     public secret: string = v4().split("-")[0],
-    public sshKey: string = "",
     public metadata: string = "",
     public description: string = ""
-  ) {}
+  ) { }
 
   public get valid(): boolean {
-    const { secret, sshKey, master, workers, network } = this;
+    const { secret, master, workers, network } = this;
     return (
       secret !== "" &&
-      sshKey !== "" &&
       master.valid &&
       network.valid &&
       workers.reduce((res, w) => res && w.valid, true)

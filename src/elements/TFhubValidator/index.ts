@@ -1,0 +1,1 @@
+import './TFhubValidator.wc.svelte';

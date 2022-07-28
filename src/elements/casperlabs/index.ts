@@ -1,0 +1,1 @@
+import "./Casperlabs.wc.svelte";

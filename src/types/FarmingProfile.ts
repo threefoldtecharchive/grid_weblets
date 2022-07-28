@@ -1,20 +1,67 @@
-export default class FarmingProfile {
-  public constructor(
-    public name: string = "DIY",
-    public memory: number = 0,
-    public cpu: number = 0,
-    public hdd: number = 0,
-    public ssd: number = 0,
-    public price: number = 0.09,
-    public priceAfter5Years: number = 2,
-    public maximumTokenPrice: number = 2,
-    public powerUtilization: number = 40,
-    public powerCost: number = 0.15,
-    public certified: boolean = false,
-    public publicIp: boolean = false,
-    public investmentCostHW: number = 2200,
-    public nuRequiredPerCu: number = 30
-  ) {}
+export enum ProfileTypes {
+  DIY,
+  TITAN,
+}
+
+export enum Certification {
+  NONE = 0,
+  CERTIFIED = 1,
+  GOLD_CERTIFIED = 2,
+}
+
+export interface FarmingProfileOptions {
+  type: ProfileTypes;
+  name: string;
+  memory: number;
+  cpu: number;
+  hdd: number;
+  ssd: number;
+  price: number;
+  priceAfter5Years: number;
+  maximumTokenPrice: number;
+  powerUtilization: number;
+  powerCost: number;
+  certified: Certification;
+  publicIp: boolean;
+  investmentCostHW: number;
+  nuRequiredPerCu: number;
+}
+
+export default class FarmingProfile implements FarmingProfileOptions {
+  public type: ProfileTypes = ProfileTypes.DIY;
+  public name: string = "DIY";
+  public memory: number = 0;
+  public cpu: number = 0;
+  public hdd: number = 0;
+  public ssd: number = 0;
+  public price: number = 0.09;
+  public priceAfter5Years: number = 2;
+  public maximumTokenPrice: number = 2;
+  public powerUtilization: number = 40;
+  public powerCost: number = 0.15;
+  public certified: Certification = Certification.NONE;
+  public publicIp: boolean = false;
+  public investmentCostHW: number = 2200;
+  public nuRequiredPerCu: number = 30;
+
+  // prettier-ignore
+  constructor(options: Partial<FarmingProfileOptions> = {}) {
+    this.type = options.type || this.type;
+    this.name = options.name || this.name;
+    this.memory = options.memory || this.memory;
+    this.cpu = options.cpu || this.cpu;
+    this.hdd = options.hdd || this.hdd;
+    this.ssd = options.ssd || this.ssd;
+    this.price = options.price || this.price;
+    this.priceAfter5Years = options.priceAfter5Years || this.priceAfter5Years;
+    this.maximumTokenPrice = options.maximumTokenPrice || this.maximumTokenPrice;
+    this.powerUtilization = options.powerUtilization || this.powerUtilization;
+    this.powerCost = options.powerCost || this.powerCost;
+    this.certified = options.certified || this.certified;
+    this.publicIp = options.publicIp || this.publicIp;
+    this.investmentCostHW = options.investmentCostHW || this.investmentCostHW;
+    this.nuRequiredPerCu = options.nuRequiredPerCu || this.nuRequiredPerCu;
+  }
 
   private _max(val: number, max = 0) {
     val = val ?? 0;
@@ -34,7 +81,7 @@ export default class FarmingProfile {
   }
 
   public get su(): number {
-    const { hdd, ssd, cu } = this;
+    const { hdd, ssd } = this;
 
     const x = hdd / 1200;
     const y = ssd * 0.8;
@@ -47,11 +94,17 @@ export default class FarmingProfile {
   }
 
   public get rewardPerCu(): number {
-    return 2.4;
+    const { type, certified } = this;
+
+    if (type === ProfileTypes.DIY) return 2.4;
+    return 2.4 + 2.4 * certified * 0.25;
   }
 
   public get rewardPerSu(): number {
-    return 1;
+    const { type, certified } = this;
+
+    if (type === ProfileTypes.DIY) return 1;
+    return 1 + certified * 0.25;
   }
 
   public get rewardPerNu(): number {

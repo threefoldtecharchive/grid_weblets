@@ -2,7 +2,7 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, ITab, IPackage } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
   import { Disk, Env } from "../../types/vm";
@@ -21,35 +21,30 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateMemory,
     validateEmail,
+    validatePassword
   } from "../../utils/validateName";
+
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
-
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  const nameField: IFormField = { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-  const emailField: IFormField = { label: "Email", placeholder: "Instance Admin Email", symbol: "email", type: "text", validator: validateEmail, invalid: false }; // prettier-ignore
-  const passField: IFormField = { label: "Password", placeholder: "Instance Admin Password", symbol: "password", type: "password", invalid: false }; // prettier-ignore
 
-  // prettier-ignore
-  const baseFields: IFormField[] = [
-    { label: "CPU", symbol: "cpu", placeholder: "CPU Cores", type: "number", validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Your Memory in MB", type: "number", validator: validateMemory, invalid: false },
-    { label: "Public IP", symbol: "publicIp", placeholder: "", type: 'checkbox' },
+  const fields: IFormField[] = [
+    { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }, // prettier-ignore
+    { label: "Email", placeholder: "Admin Email", symbol: "adminEmail", type: "text", validator: validateEmail, invalid: false }, // prettier-ignore
+    { label: "Password", placeholder: "Admin Password", symbol: "adminPassword", type: "password", validator: validatePassword, invalid: false }, // prettier-ignore
   ];
 
-  const diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "disk",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
+  ];
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new Peertube();
@@ -62,8 +57,12 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || nameField.invalid || status !== "valid" || isInvalid(baseFields) || diskField.invalid; // prettier-ignore
-  let domain: string, planetaryIP: string;
+
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -80,11 +79,10 @@
       return;
     }
     deployPeertube(data, profile)
-      .then(({ domain: d, planetaryIP: ip }) => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
-        domain = d;
-        planetaryIP = ip;
+        modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
@@ -111,6 +109,15 @@
   <!-- Container -->
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Peertube Instance</h4>
+    <p>
+      Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     <!-- Status -->
@@ -119,11 +126,9 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed a Peertube instance"
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}
@@ -132,24 +137,7 @@
       <Tabs bind:active {tabs} />
 
       {#if active === "base"}
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
-        <Input
-          bind:data={data.adminEmail}
-          bind:invalid={emailField.invalid}
-          field={emailField}
-        />
-        <Input
-          bind:data={data.adminPassword}
-          bind:invalid={passField.invalid}
-          field={passField}
-        />
-        <Input bind:data={data.disks[0].size} field={diskField} />
-
-        {#each baseFields as field (field.symbol)}
+        {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
               bind:data={data[field.symbol]}
@@ -160,6 +148,16 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
+          {packages}
+        />
 
         <SelectNodeId
           publicIp={data.publicIp}

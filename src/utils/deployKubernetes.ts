@@ -2,7 +2,6 @@ import type { default as Kubernetes, Base } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import rootFs from "./rootFs";
 const { K8SModel, KubernetesNodeModel } = window.configs?.grid3_client ?? {};
 
 export default async function deployKubernetes(
@@ -10,7 +9,7 @@ export default async function deployKubernetes(
   profile: IProfile
 ) {
   const { master, workers, network: nw, ...base } = data;
-  const { secret, sshKey, description, metadata, name } = base;
+  const { secret, description, metadata, name } = base;
 
   const masterNodes = [createNode(master)];
   const workerNodes = workers.map(createNode);
@@ -18,12 +17,12 @@ export default async function deployKubernetes(
   const k8s = new K8SModel();
   k8s.name = name;
   k8s.secret = secret;
-  k8s.network = createNetwork(nw);
+  k8s.network = createNetwork(nw, true);
   k8s.masters = masterNodes;
   k8s.workers = workerNodes;
   k8s.metadata = metadata;
   k8s.description = description;
-  k8s.ssh_key = sshKey;
+  k8s.ssh_key = profile.sshKey;
 
   return deploy(profile, "Kubernetes", name, (grid) => {
     return grid.k8s.deploy(k8s).then(() => grid.k8s.getObj(name));
@@ -39,7 +38,7 @@ function createNode(data: Base) {
   node.memory = data.memory;
   node.public_ip = data.publicIp;
   node.public_ip6 = data.publicIp6;
-  node.rootfs_size = rootFs(data.cpu, data.memory);
+  node.rootfs_size = data.rootFs;
   node.planetary = data.planetary;
   return node;
 }

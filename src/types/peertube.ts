@@ -10,4 +10,10 @@ export default class Peertube extends VM {
   public cpu = 2;
   public memory = 1024 * 2;
   public disks = [new Disk(undefined, undefined, 20, undefined)];
+  public domain = "";
+
+  public get valid(): boolean {
+    const { name, adminEmail, adminPassword } = this;
+    return name !== "" && adminEmail !== "" && adminPassword !== "";
+  }
 }

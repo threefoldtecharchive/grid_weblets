@@ -5,7 +5,7 @@
   import type { IProfile } from "../../types/Profile";
   import type { ITab } from "../../types";
   import DeployedList from "../../types/deployedList";
-  import deleteContracts from "../../utils/deleteContracts";
+  import deleteDeployment from "../../utils/deleteDeployment";
 
   type TabsType =
     | "k8s"
@@ -14,9 +14,12 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
+    | "tfhub Validator"
     | "discourse"
     | "taiga"
-    | "owncloud";
+    | "owncloud"
+    | "presearch"
+    | "casperlabs";
   export let tab: TabsType = undefined;
 
   // components
@@ -27,6 +30,7 @@
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
   import UpdateK8s from "../../components/UpdateK8s.svelte";
+  import type { IAction } from "../../types/table-action";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -36,9 +40,12 @@
     { label: "FunkWhale", value: "funkwhale" },
     { label: "Peertube", value: "peertube" },
     { label: "Mattermost", value: "mattermost" },
+    //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
-    { label: "Owncloud", value: "owncloud" }
+    { label: "Owncloud", value: "owncloud" },
+    { label: "Presearch", value: "presearch" },
+    { label: "Casperlabs", value: "casperlabs" }
   ];
   let active: string = "k8s";
   $: active = tab || active;
@@ -74,10 +81,14 @@
   }
 
   let removing: string = null;
-  function onRemoveHandler(key: "k8s" | "machines", name: string) {
+  function onRemoveHandler(
+    key: "k8s" | "machines",
+    name: string,
+    type: string
+  ) {
     removing = name;
     window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
-    return deleteContracts(profile, key, name)
+    return deleteDeployment(profile, key, name, type)
       .catch((err) => {
         console.log("Error while removing", err);
         message = err.message || err;
@@ -114,7 +125,11 @@
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
       const { name, publicIp, publicIp6, planetary, flist, consumption } = row;
-      return [i + 1, name, publicIp, publicIp6, planetary, flist, consumption];
+      const _flist =
+        typeof flist === "string"
+          ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "")
+          : flist;
+      return [i + 1, name, publicIp, publicIp6, planetary, _flist, consumption];
     });
   }
 
@@ -131,7 +146,7 @@
 
     const key = active === "k8s" ? "k8s" : "machines";
     for (const row of selectedRows) {
-      await onRemoveHandler(key, row.name);
+      await onRemoveHandler(key, row.name, active);
     }
     selectedRows = [];
     _reloadTab();
@@ -146,6 +161,225 @@
     "Flist",
     "Billing Rate",
   ];
+
+  const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = new Proxy(
+    {
+      vm: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+      caprover: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "success",
+          label: "Admin Panel",
+          click: (_, i) => {
+            const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
+            window.open("http://captain." + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.CAPROVER_ROOT_DOMAIN || removing !== null;
+          },
+        },
+      ],
+      peertube: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return (
+              !env || !env.PEERTUBE_WEBSERVER_HOSTNAME || removing !== null
+            );
+          },
+        },
+      ],
+      funkwhale: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.FUNKWHALE_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.FUNKWHALE_HOSTNAME || removing !== null;
+          },
+        },
+      ],
+      taiga: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DOMAIN_NAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
+        },
+        {
+          type: "success",
+          label: "Admin Panel",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DOMAIN_NAME;
+            window.open("http://" + domain + "/admin/", "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
+        },
+      ],
+      mattermost: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.SITE_URL;
+            window.open(domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.SITE_URL || removing !== null;
+          },
+        },
+      ],
+      tfhubValidator: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+      discourse: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DISCOURSE_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DISCOURSE_HOSTNAME || removing !== null;
+          },
+        },
+      ],
+      casperlabs: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.CASPERLABS_HOSTNAME;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.CASPERLABS_HOSTNAME || removing !== null;
+          },
+        },
+      ],
+      owncloud: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.OWNCLOUD_DOMAIN;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.OWNCLOUD_DOMAIN || removing !== null;
+          },
+        },
+      ],
+      presearch: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+    },
+    {
+      get(target, prop) {
+        return prop in target ? target[prop] : () => [];
+      },
+    }
+  );
 </script>
 
 <SelectProfile
@@ -190,6 +424,7 @@
         </div>
         <button
           class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
+          style={`background-color: #FF5151; color: #fff`}
           disabled={selectedRows.length === 0 || removing !== null}
           on:click={onDeleteHandler}
         >
@@ -202,9 +437,18 @@
         {#await list?.loadK8s()}
           <Alert type="info" message="Listing Kubernetes..." />
         {:then rows}
-          {#if rows.length}
+          {#if rows.data.length}
+            {#if rows.data.length !== rows.total}
+              <Alert
+                type="warning"
+                message={`
+                Failed to load 
+                <strong>${rows.total - rows.data.length}</strong> 
+                out of ${rows.total} Deployments`}
+              />
+            {/if}
             <Table
-              rowsData={rows}
+              rowsData={rows.data}
               headers={[
                 "#",
                 "Name",
@@ -214,26 +458,26 @@
                 "Workers",
                 "Billing Rate",
               ]}
-              rows={_createK8sRows(rows)}
+              rows={_createK8sRows(rows.data)}
               actions={[
                 {
                   type: "info",
                   label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
+                  click: (_, i) => (infoToShow = rows.data[i].details),
                   disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
+                  loading: (i) => removing === rows.data[i].name,
                 },
                 {
                   type: "warning",
                   label: "Manage Workers",
-                  click: (_, i) => (k8sToUpdate = rows[i]),
+                  click: (_, i) => (k8sToUpdate = rows.data[i]),
                   disabled: () => removing !== null,
                 },
               ]}
               on:selected={_onSelectRowHandler}
             />
           {:else}
-            <Alert type="info" message="No Kubernetes found on this profile." />
+            <Alert type="gray" message="No Kubernetes found on this profile." />
           {/if}
         {:catch err}
           <Alert
@@ -241,363 +485,42 @@
             message={err.message || err || "Failed to list Kubernetes"}
           />
         {/await}
-
-        <!-- VM -->
-      {:else if active === "vm"}
-        {#await list?.loadVm()}
-          <Alert type="info" message="Listing Virtual Machines..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No VMs found on this profile." />
-          {/if}
-        {:catch err}
+      {:else}
+        {#await list?.loadDeployments(active === "vm" ? undefined : active)}
           <Alert
-            type="danger"
-            message={err.message || err || "Failed to list VMs"}
+            type="info"
+            message={`Listing ${active.toLocaleUpperCase()}s...`}
           />
-        {/await}
-
-        <!-- Caprover -->
-      {:else if active === "caprover"}
-        {#await list?.loadCaprover()}
-          <Alert type="info" message="Listing CapRover..." />
         {:then rows}
-          {#if rows.length}
+          {#if rows.data.length}
+            {#if rows.data.length !== rows.total}
+              <Alert
+                type="warning"
+                message={`
+                Failed to load 
+                <strong>${rows.total - rows.data.length}</strong> 
+                out of ${rows.total} Deployments`}
+              />
+            {/if}
             <Table
-              rowsData={rows}
+              rowsData={rows.data}
               headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Admin Panel",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
-                    window.open("http://captain." + domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return (
-                      !env || !env.CAPROVER_ROOT_DOMAIN || removing !== null
-                    );
-                  },
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No CapRovers found on this profile." />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list CapRover"}
-          />
-        {/await}
-
-        <!-- Peertube -->
-      {:else if active === "peertube"}
-        {#await list?.loadPeertube()}
-          <Alert type="info" message="Listing Peertube..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Visit",
-                  click: (_, i) => {
-                    const domain =
-                      rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
-                    window.open("https://" + domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return (
-                      !env ||
-                      !env.PEERTUBE_WEBSERVER_HOSTNAME ||
-                      removing !== null
-                    );
-                  },
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No Peertubes found on this profile." />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list Peertube"}
-          />
-        {/await}
-
-        <!-- FunkWhale -->
-      {:else if active === "funkwhale"}
-        {#await list?.loadFunkwhale()}
-          <Alert type="info" message="Listing Funkwhale..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Visit",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.FUNKWHALE_HOSTNAME;
-                    window.open("https://" + domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return !env || !env.FUNKWHALE_HOSTNAME || removing !== null;
-                  },
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No Funkwhales found on this profile." />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list Funkwhale"}
-          />
-        {/await}
-
-        <!-- Taiga -->
-      {:else if active === "taiga"}
-        {#await list.loadTaiga()}
-          <Alert type="info" message="Listing Taiga Instances..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Visit",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.DOMAIN_NAME;
-                    window.open("https://" + domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return !env || !env.DOMAIN_NAME || removing !== null;
-                  },
-                },
-                {
-                  type: "warning",
-                  label: "Admin Panel",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.DOMAIN_NAME;
-                    window
-                      .open("http://" + domain + "/admin/", "_blank")
-                      .focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return !env || !env.DOMAIN_NAME || removing !== null;
-                  },
-                },
-              ]}
+              rows={_createVMRow(rows.data)}
+              actions={actions[active](rows.data)}
               on:selected={_onSelectRowHandler}
             />
           {:else}
             <Alert
-              type="info"
-              message="No Taiga instances found on this profile."
+              type="gray"
+              message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
             />
           {/if}
         {:catch err}
           <Alert
             type="danger"
-            message={err.message || err || "Failed to list Taiga instances"}
-          />
-        {/await}
-
-        <!-- Mattermost -->
-      {:else if active === "mattermost"}
-        {#await list?.loadMattermost()}
-          <Alert type="info" message="Listing Mattermost..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Visit",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.SITE_URL;
-                    window.open(domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return !env || !env.SITE_URL || removing !== null;
-                  },
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No Mattermost found on this profile." />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list Mattermost"}
-          />
-        {/await}
-
-        <!-- Discourse -->
-      {:else if active === "discourse"}
-        {#await list?.loadDiscourse()}
-          <Alert type="info" message="Listing Discourse..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Visit",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.DISCOURSE_HOSTNAME;
-                    window.open("https://" + domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return !env || !env.DISCOURSE_HOSTNAME || removing !== null;
-                  },
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert type="info" message="No Discourses found on this profile." />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list Discourse"}
-          />
-        {/await}
-
-        <!-- Owncloud -->
-      {:else if active === "owncloud"}
-        {#await list.loadOwncloud()}
-          <Alert type="info" message="Listing owncloud Instances..." />
-        {:then rows}
-          {#if rows.length}
-            <Table
-              rowsData={rows}
-              headers={_vmHeader}
-              rows={_createVMRow(rows)}
-              actions={[
-                {
-                  type: "info",
-                  label: "Show Details",
-                  click: (_, i) => (infoToShow = rows[i].details),
-                  disabled: () => removing !== null,
-                  loading: (i) => removing === rows[i].name,
-                },
-                {
-                  type: "warning",
-                  label: "Visit",
-                  click: (_, i) => {
-                    const domain = rows[i].details.env.OWNCLOUD_DOMAIN;
-                    window.open("https://" + domain, "_blank").focus();
-                  },
-                  disabled: (i) => {
-                    const env = rows[i].details.env;
-                    return !env || !env.OWNCLOUD_DOMAIN || removing !== null;
-                  },
-                },
-              ]}
-              on:selected={_onSelectRowHandler}
-            />
-          {:else}
-            <Alert
-              type="info"
-              message="No owncloud instances found on this profile."
-            />
-          {/if}
-        {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list owncloud instances"}
+            message={err.message ||
+              err ||
+              `Failed to list ${active.toLocaleUpperCase()}s`}
           />
         {/await}
       {/if}

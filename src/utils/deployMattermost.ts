@@ -1,33 +1,43 @@
-import { Network } from "../types/kubernetes";
 import type Mattermost from "../types/mattermost";
 import type { IProfile } from "../types/Profile";
+import { Network } from "../types/kubernetes";
+
+import { getUniqueDomainName, selectGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import { selectGatewayNode } from "./gatewayHelpers";
-import getGrid from "./getGrid";
 import rootFs from "./rootFs";
-const { MachineModel, MachinesModel, GatewayNameModel } =
-  window.configs?.grid3_client ?? {};
+import destroy from "./destroy";
+import checkVMExist, { checkGW } from "./prepareDeployment";
+
+const {
+  MachineModel,
+  MachinesModel,
+  GatewayNameModel,
+  DiskModel,
+  generateString,
+} = window.configs?.grid3_client ?? {};
 
 export default async function deployMattermost(
   profile: IProfile,
   mattermost: Mattermost
 ) {
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
-  const domain = `${mattermost.name}.${nodeDomain}`;
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(
+    profile,
+    mattermost.name,
+    "mattermost"
+  );
 
-  mattermost.domain = domain;
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  mattermost.domain = `${domainName}.${nodeDomain}`;
 
   const matterMostVm = await _deployMatterMost(profile, mattermost);
-  const ip = matterMostVm.planetary as string;
+  const ip = matterMostVm["planetary"] as string;
 
   try {
-    await _deployGateway(profile, mattermost, ip, publicNodeId);
+    await _deployGateway(profile, domainName, ip, publicNodeId);
   } catch (err) {
-    await getGrid(profile, (grid) => {
-      return grid.machines.delete({ name: mattermost.name });
-    });
-    console.log("Error", err);
+    await destroy(profile, "mattermost", mattermost.name);
     throw err;
   }
 
@@ -35,24 +45,40 @@ export default async function deployMattermost(
 }
 
 function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
-  const { name, username, password, server, domain, port, nodeId } = mattermost;
+  const {
+    name,
+    username,
+    password,
+    server,
+    domain,
+    port,
+    nodeId,
+    cpu,
+    memory,
+    disks,
+    publicIp,
+    smtpPassword
+  } = mattermost;
+
+  let randomSuffix = generateString(10).toLowerCase();
+
 
   const vm = new MachineModel();
   vm.name = name;
   vm.node_id = nodeId;
   vm.disks = [];
-  vm.public_ip = false;
+  vm.public_ip = publicIp;
   vm.planetary = true;
-  vm.cpu = 4;
-  vm.memory = 8 * 1024;
-  vm.rootfs_size = rootFs(4, 8 * 1024);
-  vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-mattermost-latest.flist"; // prettier-ignore
-  vm.entrypoint = "/entrypoint.sh mattermost";
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.rootfs_size = rootFs(cpu, memory);
+  vm.flist = "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist"; // prettier-ignore
+  vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     DB_PASSWORD: password,
     SITE_URL: "https://" + domain,
     SMTPUsername: username,
-    SMTPPassword: password,
+    SMTPPassword: smtpPassword,
     SMTPServer: server,
     SMTPPort: port,
     SSH_KEY: profile.sshKey,
@@ -63,7 +89,9 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
-  return deploy(profile, "VM", name, (grid) => {
+  return deploy(profile, "Mattermost", name, async (grid) => {
+    await checkVMExist(grid, "mattermost", name);
+
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -73,7 +101,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
 
 function _deployGateway(
   profile: IProfile,
-  { name }: Mattermost,
+  name: string,
   ip: string,
   nodeId: number
 ) {
@@ -83,7 +111,8 @@ function _deployGateway(
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:8000`];
 
-  return deploy(profile, "GatewayName", name, (grid) => {
+  return deploy(profile, "GatewayName", name, async (grid) => {
+    await checkGW(grid, name, "mattermost");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(name))

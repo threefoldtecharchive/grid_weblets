@@ -5,26 +5,27 @@
   import type { IProfile } from "../types/Profile";
   import { Worker } from "../types/kubernetes";
   import type { IFormField, ITab } from "../types";
-  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // components
   import Alert from "./Alert.svelte";
   import Input from "./Input.svelte";
-  import Tabs from "./Tabs.svelte";
   import SelectNodeId from "./SelectNodeId.svelte";
   import getGrid from "../utils/getGrid";
   import DeployBtn from "./DeployBtn.svelte";
   import { createEventDispatcher } from "svelte";
   import Table from "./Table.svelte";
-  import rootFs from "../utils/rootFs";
-  import { dataset_dev } from "svelte/internal";
+  import RootFsSize from "./RootFsSize.svelte";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
   export let profile: IProfile;
   export let k8s: any;
+
+  let workers: any[] = [];
+  $: if (k8s) workers = k8s.details.workers;
 
   let shouldBeUpdated: boolean = false;
   let loading: boolean = false;
@@ -36,23 +37,23 @@
   let worker = new Worker();
   // prettier-ignore
   const workerFields: IFormField[] = [ 
-    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
+    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false },
     { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
-  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid"; // prettier-ignore
+  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid" || worker.rootFs < 2 || !worker.rootFs; // prettier-ignore
   $: logs = $currentDeployment;
 
   function onAddWorker() {
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
     getGrid(profile, (grid) => {
-      const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node } = worker; // prettier-ignore
+      const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node, rootFs } = worker; // prettier-ignore
       const workerModel = new AddWorkerModel();
       workerModel.deployment_name = k8s.name;
       workerModel.name = name;
@@ -62,7 +63,7 @@
       workerModel.public_ip = publicIp;
       workerModel.public_ip6 = publicIp6;
       workerModel.planetary = planetary;
-      workerModel.rootfs_size = rootFs(cpu, memory);
+      workerModel.rootfs_size = rootFs;
       workerModel.node_id = node;
       grid.k8s
         .add_worker(workerModel)
@@ -72,9 +73,14 @@
             success = true;
             shouldBeUpdated = true;
             worker = new Worker();
+            return grid.k8s.getObj(k8s.name);
           } else {
             failed = true;
           }
+        })
+        .then((data) => {
+          if (!data) return;
+          workers = data.workers;
         })
         .catch((err) => {
           failed = true;
@@ -89,7 +95,7 @@
   }
 
   function onDeleteWorker(idx: number) {
-    const worker = k8s.details.workers[idx];
+    const worker = workers[idx];
     removing = worker.name;
     loading = true;
     currentDeployment.deploy("Remove Worker", worker.name);
@@ -104,7 +110,7 @@
             shouldBeUpdated = true;
             let r = removing;
             requestAnimationFrame(() => {
-              k8s.details.workers = k8s.details.workers.filter(({ name }) => name !== r); // prettier-ignore
+              workers = workers.filter(({ name }) => name !== r); // prettier-ignore
             });
           } else {
             failed = true;
@@ -177,7 +183,11 @@
   />
 
   {#if k8s}
-    <div class="modal-content" on:click|stopPropagation>
+    <div
+      class="modal-content"
+      style="width: fit-content"
+      on:click|stopPropagation
+    >
       <div class="box">
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
@@ -185,7 +195,7 @@
         <hr />
 
         <Table
-          rowsData={k8s.details.workers}
+          rowsData={workers}
           headers={[
             "#",
             "Contract ID",
@@ -195,14 +205,13 @@
             "Memory",
             "Disk(GB)",
           ]}
-          rows={_createWorkerRows(k8s.details.workers)}
+          rows={_createWorkerRows(workers)}
           selectable={false}
           actions={[
             {
               label: "Delete",
               type: "danger",
-              loading: (i) =>
-                loading && removing === k8s.details.workers[i].name,
+              loading: (i) => loading && removing === workers[i].name,
               click: (_, i) => onDeleteWorker(i),
               disabled: () => loading || removing !== null,
             },
@@ -230,11 +239,22 @@
                 <Input bind:data={worker[field.symbol]} {field} />
               {/if}
             {/each}
+
+            <RootFsSize
+              rootFs={worker.rootFs}
+              editable={worker.rootFsEditable}
+              cpu={worker.cpu}
+              memory={worker.memory}
+              on:update={({ detail }) => (worker.rootFs = detail)}
+              on:editableUpdate={({ detail }) =>
+                (worker.rootFsEditable = detail)}
+            />
+
             <SelectNodeId
               cpu={worker.cpu}
               memory={worker.memory}
               publicIp={worker.publicIp}
-              ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
+              ssd={worker.diskSize + worker.rootFs}
               filters={worker.selection.filters}
               bind:data={worker.node}
               bind:nodeSelection={worker.selection.type}

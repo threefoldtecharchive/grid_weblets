@@ -1,4 +1,5 @@
 const { GridClient, Nodes, randomChoice } = window.configs?.grid3_client ?? {};
+import { solutionList } from "../stores/solutionsList";
 
 export async function selectGatewayNode(): Promise<[number, string]> {
   const nodes = new Nodes(
@@ -14,7 +15,19 @@ export async function selectGatewayNode(): Promise<[number, string]> {
   return [nodeId, nodeDomain];
 }
 
-export async function getUniqueDomainName(client, solution_type, name) {
+export async function getUniqueDomainName(profile, name, solutionType) {
+  const { networkEnv, mnemonics, storeSecret } = profile;
+  const client = new window.configs.grid3_client.GridClient(
+    networkEnv as any,
+    mnemonics,
+    storeSecret,
+    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+    solutionType,
+    window.configs.grid3_client.BackendStorageType.tfkvstore
+  );
+
+  const solutionCode = solutionList[solutionType];
+  await client.connect();
   let twin_id = await client.twins.get_my_twin_id();
-  return `${solution_type}${twin_id}${name.toLowerCase()}`;
+  return `${solutionCode}${twin_id}${name.toLowerCase()}`;
 }

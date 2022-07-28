@@ -2,16 +2,9 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import type { IAction } from "../types/table-action";
 
   const dispatch = createEventDispatcher<{ selected: any[] }>();
-
-  interface IAction {
-    type: "info" | "success" | "warning" | "danger";
-    label: string;
-    click: (e: Event, index: number) => void;
-    disabled?: (index: number) => boolean;
-    loading?: (index: number) => boolean;
-  }
 
   export let rowsData: any[] = [];
   export let headers: string[];
@@ -48,76 +41,40 @@
       selectedRows.map((i) => rowsData[i])
     );
   }
+
+  const style = `
+    <style>
+      @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+      @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+      th, td {
+        white-space: nowrap;
+      }  
+      .icon {
+        color: #454545 !important;
+        cursor: pointer;
+      }
+    </style>
+  `;
 </script>
 
-<table class="table" style="width: 100%;">
-  <thead>
-    <tr>
-      {#if selectable}
-        <th>
-          <input
-            type="checkbox"
-            on:change={onSelectAllHandler}
-            checked={allChecked}
-          />
-        </th>
-      {/if}
+<div>
+  {@html style}
+</div>
 
-      {#if headers}
-        {#each headers as hd (hd)}
-          <th title={hd}>{hd}</th>
-        {/each}
-      {/if}
-
-      {#if actions.length}
-        <th title="Actions">Actions</th>
-      {/if}
-    </tr>
-  </thead>
-
-  <tbody>
-    {#if rows}
-      {#each rows as row, idx}
-        <tr>
-          {#if selectable}
-            <td>
-              <input
-                type="checkbox"
-                on:change={onSelectHandler.bind(undefined, idx)}
-                checked={_selectedRows.includes(idx)}
-              />
-            </td>
-          {/if}
-
-          {#each row as item (item)}
-            <td>{item}</td>
-          {/each}
-
-          {#if actions.length}
-            <td>
-              <div class="buttons">
-                {#each actions as { type, label, click, disabled, loading }}
-                  <button
-                    class={"button is-" +
-                      type +
-                      (loading && loading(idx) ? " is-loading" : "")}
-                    on:click={(e) => click(e, idx)}
-                    disabled={disabled ? disabled(idx) : false}
-                  >
-                    {label}
-                  </button>
-                {/each}
-              </div>
-            </td>
-          {/if}
-        </tr>
-      {/each}
-    {/if}
-  </tbody>
-
-  {#if footer}
-    <tfoot>
+<div style="width: 100%; overflow-x: auto;">
+  <table class="table" style="width: 100%;">
+    <thead>
       <tr>
+        {#if selectable}
+          <th>
+            <input
+              type="checkbox"
+              on:change={onSelectAllHandler}
+              checked={allChecked}
+            />
+          </th>
+        {/if}
+
         {#if headers}
           {#each headers as hd (hd)}
             <th title={hd}>{hd}</th>
@@ -128,6 +85,103 @@
           <th title="Actions">Actions</th>
         {/if}
       </tr>
-    </tfoot>
-  {/if}
-</table>
+    </thead>
+
+    <tbody>
+      {#if rows}
+        {#each rows as row, idx}
+          <tr>
+            {#if selectable}
+              <td>
+                <input
+                  type="checkbox"
+                  on:change={onSelectHandler.bind(undefined, idx)}
+                  checked={_selectedRows.includes(idx)}
+                />
+              </td>
+            {/if}
+
+            {#each row as item (item)}
+              <td>{item}</td>
+            {/each}
+
+            {#if actions.length}
+              <td>
+                {#each actions as { type, label, click, disabled, loading }}
+                  {#if label == "Show Details"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-eye" />
+                    </span>
+                  {:else if label == "Visit"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-globe" />
+                    </span>
+                  {:else if label == "Admin Panel"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-user-gear" />
+                    </span>
+                  {:else if label == "Manage Workers"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-gears" />
+                    </span>
+                  {:else if label == "Delete"}
+                    <span
+                      title={label}
+                      class={"icon " +
+                        type +
+                        (loading && loading(idx) ? " is-loading" : "")}
+                      on:click={(e) => click(e, idx)}
+                      disabled={disabled ? disabled(idx) : false}
+                    >
+                      <i class="fa-solid fa-trash-can" />
+                    </span>
+                  {/if}
+                {/each}
+              </td>
+            {/if}
+          </tr>
+        {/each}
+      {/if}
+    </tbody>
+
+    {#if footer}
+      <tfoot>
+        <tr>
+          {#if headers}
+            {#each headers as hd (hd)}
+              <th title={hd}>{hd}</th>
+            {/each}
+          {/if}
+
+          {#if actions.length}
+            <th title="Actions">Actions</th>
+          {/if}
+        </tr>
+      </tfoot>
+    {/if}
+  </table>
+</div>

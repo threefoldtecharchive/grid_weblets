@@ -10,6 +10,7 @@
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
+  import baseConfig from "../stores/baseConfig";
   const { GridClient } = window.configs?.grid3_client ?? {};
 
   const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
@@ -18,12 +19,16 @@
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number;
-  export let status: "valid" | "invalid";
+  export let status: "valid" | "invalid" | "dedicated";
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
+  export let exclusiveFor: string = "";
+
   export let profile: IProfile;
   let loadingNodes: boolean = false;
+
+  const configs = window.configs?.baseConfig;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
@@ -69,7 +74,7 @@
   function onLoadNodesHandler() {
     loadingNodes = true;
     status = null;
-    const label = nodeIdSelectField.options[0].label;
+    const label = "Please select a node id.";
     nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
       publicIPs: filters.publicIPs,
@@ -78,19 +83,23 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
+      availableFor: $configs.twinId,
     };
 
-    findNodes(_filters, profile)
+    findNodes(_filters, profile, exclusiveFor)
       .then((_nodes) => {
         dispatch("fetch", _nodes);
         if (_nodes.length <= 0) {
           data = null;
           status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-        } else {
+        } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
+          status = "valid";
+        } else {
+          nodeIdSelectField.options[0].label = label;
           status = "valid";
         }
       })
@@ -123,7 +132,7 @@
     const [option] = filtersFields[index].options;
     filtersFields[index].options = items.reduce(
       (res, { name, code }) => {
-        const op = { label: name, value: code || name } as ISelectOption;
+        const op = { label: name, value: name } as ISelectOption;
         res.push(op);
         return res;
       },
@@ -141,24 +150,28 @@
       /* Cache last used network */
       _network = profile.networkEnv;
 
-      /* Loading farms & countries */
-      const farmsLabel = _setLabel(0);
-      const countriesLabel = _setLabel(1);
-
-      fetchFarmAndCountries(profile)
-        .then(({ farms, countries }) => {
-          farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
-          _setOptions(0, farms);
-          _setOptions(1, countries);
-        })
-        .catch((err) => {
-          console.log("Error", err);
-        })
-        .finally(() => {
-          _setLabel(0, farmsLabel);
-          _setLabel(1, countriesLabel);
-        });
+      onLoadFarmsHandler();
     }
+  }
+
+  function onLoadFarmsHandler(){
+    /* Loading farms & countries */
+    const farmsLabel = _setLabel(0);
+    const countriesLabel = _setLabel(1);
+
+    fetchFarmAndCountries(profile, filters)
+      .then(({ farms, countries }) => {
+        farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
+        _setOptions(0, farms);
+        _setOptions(1, countries);
+      })
+      .catch((err) => {
+        console.log("Error", err);
+      })
+      .finally(() => {
+        _setLabel(0, farmsLabel);
+        _setLabel(1, countriesLabel);
+      });
   }
 
   function _update(key: string) {
@@ -214,14 +227,24 @@
             signal: _ctrl.signal,
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
-            .then(({ capacity }) => {
-              const { total_resources: total, used_resources: used } = capacity;
+            .then((node: any) => {
+              if (node.dedicated && node.rentedByTwinId != $configs.twinId) {
+                status = "dedicated";
+                return;
+              }
+
+              if (node.status !== "up") {
+                status = "invalid";
+                return;
+              }
+
+              const { total_resources: total, used_resources: used } =
+                node.capacity;
               // prettier-ignore
-              let valid = (total.cru - used.cru) >= filters.cru &&
+              let hasEnoughResources = (total.cru - used.cru) >= filters.cru &&
                         ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
-
-              if (!valid) {
+              if (!hasEnoughResources) {
                 status = "invalid";
                 return;
               }
@@ -229,11 +252,11 @@
               if (filters.publicIPs) {
                 return gqlApi<{ nodes: { id: number }[] }>(
                   profile,
-                  "query getFarmId($id: Int!) { nodes(where: { nodeId_eq: $id }) { id: farmId }}",
+                  "query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}",
                   { id: data }
                 )
                   .then(({ nodes: [{ id }] }) => {
-                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmId_eq: $id}}) {id}}', { id }); // prettier-ignore
+                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
                   })
                   .then(({ publicIps: ips }) => {
                     status = ips.length > 0 ? "valid" : "invalid";
@@ -264,8 +287,8 @@
     requestAnimationFrame(() => {
       _nodeId = null;
       if (nodeSelection === "automatic") {
-        data = null;
         onLoadNodesHandler();
+        onLoadFarmsHandler();
       }
     });
   };
@@ -304,7 +327,8 @@
   {/each}
 
   <button
-    class={"button is-primary mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
+    class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
+    style={`background-color: #1982b1; color: #fff`}
     disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}
@@ -325,17 +349,24 @@
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
   {#if validating && data}
-    <p class="help is-success">Validating node {data}</p>
+    <p class="help" style={`color: #1982b1`}>
+      Validating node {data}
+    </p>
   {/if}
   {#if !validating && data}
     {#if status == "valid"}
-      <p class="help is-success">
+      <p class="help" style={`color: #1982b1`}>
         Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
     {:else if status === "invalid"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
         resources.
+      </p>
+    {:else if status === "dedicated"}
+      <p class="help is-danger">
+        Node(<strong>{data}</strong>) is dedicated and not reserved for your
+        account, please check the portal.
       </p>
     {/if}
   {/if}

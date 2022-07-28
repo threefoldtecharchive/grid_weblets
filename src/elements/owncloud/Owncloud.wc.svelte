@@ -2,7 +2,7 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import { Disk, Env } from "../../types/vm";
   import Owncloud from "../../types/owncloud";
@@ -16,21 +16,17 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
-  import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
-    validateEmail,
     validateOptionalEmail,
-    validateDisk,
-    validateMemory,
     validatePortNumber,
+    validateOptionalPassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Owncloud();
   let domain: string, planetaryIP: string;
@@ -47,24 +43,31 @@
     { label: "Mail Server", value: "mail" },
   ];
 
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
+    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
+  ];
+
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+
 
   let adminFields: IFormField[] = [
     {
-      label: "Admin User Name",
+      label: "Username",
       symbol: "adminUsername",
-      placeholder: "admin",
+      placeholder: "Admin Username",
       type: "text",
       validator: validateName,
       invalid: false,
     },
     {
-      label:
-        "Admin Password (It's important to save the admin username and password for login)",
+      label: "Password",
       symbol: "adminPassword",
-      placeholder: "password",
+      placeholder: "Admin Password",
       type: "password",
-      invalid: false,
+      validator: validateOptionalPassword, invalid: false
     },
   ];
 
@@ -77,6 +80,14 @@
       validator: validateOptionalEmail,
       invalid: false,
     },
+    {   
+      label: "Port",
+      symbol: "smtpPort",
+      placeholder: "587",
+      type: "text",
+      validator: validatePortNumber,
+      invalid: false, 
+    },
     {
       label: "Host Name",
       symbol: "smtpHost",
@@ -86,15 +97,7 @@
       invalid: false,
     },
     {
-      label: "Port",
-      symbol: "smtpPort",
-      placeholder: "587",
-      type: "text",
-      validator: validatePortNumber,
-      invalid: false,
-    },
-    {
-      label: "User Name",
+      label: "Username",
       symbol: "smtpHostUser",
       placeholder: "user@example.com",
       type: "text",
@@ -106,7 +109,7 @@
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      invalid: false,
+      validator: validateOptionalPassword, invalid: false
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -118,7 +121,11 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid; // prettier-ignore
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -138,9 +145,7 @@
       .then((data) => {
         deploymentStore.set(0);
         success = true;
-        modalData = data.deployment;
-        domain = data.domain;
-        planetaryIP = data.planetaryIP;
+        modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
@@ -165,7 +170,18 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy an owncloud Instance</h4>
+    <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
+    <p>
+      ownCloud develops and provides open-source software for content
+      collaboration, allowing teams to easily share and work on files seamlessly
+      regardless of device or location.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}
@@ -173,11 +189,9 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed owncloud."
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}
@@ -203,6 +217,15 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
+          {packages}
+        />
 
         <SelectNodeId
           publicIp={data.publicIp}
@@ -224,6 +247,7 @@
             know what you’re doing.
           </p>
         </div>
+
         {#each mailFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input

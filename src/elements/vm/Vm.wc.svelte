@@ -21,11 +21,16 @@
     isInvalid,
     validateCpu,
     validateDisk,
+    validateEntryPoint,
+    validateFlistvalue,
+    validateKey,
+    validateKeyValue,
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
+  import RootFsSize from "../../components/RootFsSize.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -37,7 +42,7 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
@@ -79,8 +84,8 @@
 
   // prettier-ignore
   const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text"},
-    { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text" },
+    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
+    { label: 'Value', symbol: 'value', placeholder: "Environment Value", validator: validateKeyValue,type: "text" },
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
@@ -103,9 +108,14 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || nameField.invalid || isInvalid(baseFields) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
-  const validateFlist = { loading: false, error: null };
+  const validateFlist = {
+    loading: false,
+    error: null,
+    validator: validateFlistvalue,
+    invalid: false,
+  };
 
   async function onDeployVM() {
     if (flistSelectValue === "other") {
@@ -182,6 +192,15 @@
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+    <p>
+      Deploy a new virtual machine on the Threefold Grid
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "VM")}
@@ -232,11 +251,21 @@
             field={{
               label: "Entry Point",
               symbol: "entrypoint",
+              validator: validateEntryPoint,
               placeholder: "Entrypoint",
               type: "text",
             }}
           />
         {/if}
+
+        <RootFsSize
+          rootFs={data.rootFs}
+          editable={data.rootFsEditable}
+          cpu={data.cpu}
+          memory={data.memory}
+          on:update={({ detail }) => (data.rootFs = detail)}
+          on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
+        />
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
@@ -256,7 +285,7 @@
           memory={data.memory}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
+            data.rootFs
           )}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}

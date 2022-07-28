@@ -13,7 +13,11 @@ export interface IStore {
     | "Remove Worker"
     | "Deleting Deployment"
     | "Taiga"
-    | "Owncloud";
+    | "Owncloud"
+    | "Presearch"
+    | "Mattermost"
+    | "TFhubValidator"
+    | "Casperlabs";
   name: string;
   message: string;
 }

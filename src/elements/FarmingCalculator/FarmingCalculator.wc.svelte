@@ -1,7 +1,10 @@
 <svelte:options tag="tf-farming-calculator" />
 
 <script lang="ts">
-  import FarmingProfile from "../../types/FarmingProfile";
+  import FarmingProfile, {
+    Certification,
+    ProfileTypes,
+  } from "../../types/FarmingProfile";
   import { onMount } from "svelte";
   import { Chart, registerables } from "chart.js";
   import {
@@ -14,8 +17,27 @@
   import type { IFormField } from "../../types";
 
   const profiles = [
-    new FarmingProfile("DIY", 32, 8, 10000, 1000, 0.08, 1), // prettier-ignore
-    new FarmingProfile("Titan v2.1", 32, 8, 0, 1000, 0.08, 1), // prettier-ignore
+    new FarmingProfile({
+      type: ProfileTypes.DIY,
+      name: "DIY",
+      memory: 32,
+      cpu: 8,
+      hdd: 10000,
+      ssd: 1000,
+      price: 0.08,
+      priceAfter5Years: 1,
+    }),
+    new FarmingProfile({
+      type: ProfileTypes.TITAN,
+      name: "Titan v2.1",
+      memory: 32,
+      cpu: 8,
+      hdd: 0,
+      ssd: 1000,
+      price: 0.08,
+      priceAfter5Years: 1,
+      investmentCostHW: 800,
+    }),
   ];
 
   let profileChoosing: boolean = true;
@@ -62,7 +84,7 @@
 
   // prettier-ignore
   const outputFields = [
-    { label: "Total Farming Reward In TFT", symbol: "totalFarmingRewardInTft", fullWidth: true },
+    { label: "Total Monthly Farming Reward In TFT", symbol: "totalFarmingRewardInTft", fullWidth: true },
     { label: "CU", symbol: "cu" },
     { label: "SU", symbol: "su" },
     { label: "NU", symbol: "nu" },
@@ -179,6 +201,20 @@
       if (val < 0) return "Value must be positive";
     }  
   });
+
+  const certifications = [
+    { id: "nc", name: "No Certification", value: Certification.NONE },
+    { id: "cn", name: "Certified Node", value: Certification.CERTIFIED },
+  ];
+
+  const titanCertification = [
+    ...certifications,
+    {
+      id: "gc",
+      name: "Node Belongs To Gold Certified Farm",
+      value: Certification.GOLD_CERTIFIED,
+    },
+  ];
 </script>
 
 <section class="farming-container">
@@ -194,7 +230,8 @@
       </h4>
       {#if !profileChoosing}
         <button
-          class="button is-primary is-outlined"
+          class="button is-outlined"
+          style={`border-color: #1982b1; color: #1982b1`}
           on:click={onBackProfileChoosing}
         >
           Back
@@ -223,7 +260,8 @@
         <div class="mt-4">
           <button
             disabled={activeProfile === null}
-            class="button is-primary"
+            class="button"
+            style={`background-color: #1982b1; color: #fff`}
             on:click={onProfileChoosing}
           >
             Select Configuration
@@ -254,7 +292,22 @@
               {#if !field.only || field.only === activeProfile.name}
                 <div class="field">
                   <div class="control">
-                    {#if field.type === "checkbox"}
+                    {#if field.symbol === "certified"}
+                      <div>
+                        <p class="label">{field.label}</p>
+                        {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
+                          <label style="display: block;">
+                            <input
+                              type="radio"
+                              name="cert"
+                              value={cert.value}
+                              bind:group={activeProfile[field.symbol]}
+                            />
+                            {cert.name}
+                          </label>
+                        {/each}
+                      </div>
+                    {:else if field.type === "checkbox"}
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
                         <input
@@ -339,7 +392,22 @@
               {#if !field.only || field.only === activeProfile.name}
                 <div class="field">
                   <div class="control">
-                    {#if field.type === "checkbox"}
+                    {#if field.symbol === "certified"}
+                      <div>
+                        <p class="label">{field.label}</p>
+                        {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
+                          <label style="display: block;">
+                            <input
+                              type="radio"
+                              name="cert"
+                              value={cert.value}
+                              bind:group={activeProfile[field.symbol]}
+                            />
+                            {cert.name}
+                          </label>
+                        {/each}
+                      </div>
+                    {:else if field.type === "checkbox"}
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
                         <input
@@ -563,11 +631,11 @@
     }
 
     input:checked + .slider {
-      background-color: #2196f3;
+      background-color: #1982b1;
     }
 
     input:checked + .slider {
-      box-shadow: 0 0 1px #2196f3;
+      box-shadow: 0 0 1px #1982b1;
     }
 
     input:checked + .slider:before {

@@ -4,7 +4,7 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-
+  import validateProfileName from '../../utils/validateName';
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
@@ -39,7 +39,7 @@
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text", validator: validateProfileName, invalid: false  },
     // { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
@@ -76,7 +76,7 @@
       _updateError(
         "mnemonics",
         mnIsValid,
-        "Invalid Mnemonics! Could it be that your account is not activated? Are you using the correct network?"
+        "No twin exists for this account on this network. Are you using the correct network?"
       );
     } catch (err) {
       console.log("Error", err);
@@ -147,11 +147,20 @@
         style="display: flex; justify-content: space-between; align-items: center;"
       >
         <h4 class="is-size-4">Profile Manager</h4>
+        <!-- <p>
+          <a
+            target="_blank"
+            href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
+          >
+            Quick start documentation</a
+          >
+        </p> -->
 
         {#if configured}
           <div>
             <button
-              class="button is-primary is-outlined mr-2"
+              class="button is-outlined mr-2"
+              style={`border-color: #1982b1; color: #1982b1`}
               type="button"
               on:click={() => {
                 selectedIdx = configs.addProfile();
@@ -161,7 +170,8 @@
               + Add Profile
             </button>
             <button
-              class="button is-primary mr-2"
+              class="button mr-2"
+              style={`background-color: #1982b1; color: #fff`}
               type="button"
               on:click={onEventHandler.bind(undefined, "save")}
             >
@@ -169,11 +179,13 @@
             </button>
             <button
               class="button is-danger"
+              style={`background-color: #FF5151; color: #fff`}
               type="button"
               on:click={() => {
                 configured = false;
                 sessionStorage.removeItem("session_password");
                 configs.setActiveProfile(null, password);
+                password = "";
               }}
             >
               Deactivate
@@ -210,7 +222,8 @@
 
         <div class="is-flex is-justify-content-flex-end">
           <button
-            class={"button is-success" + (activating ? " is-loading" : "")}
+            class={"button" + (activating ? " is-loading" : "")}
+            style={`background-color: #1982b1; color: #fff`}
             disabled={activating || activeProfileId === activeProfile?.id}
             on:click={onActiveProfile}
           >
@@ -268,7 +281,8 @@
 
           <div style="display: flex; justify-content: center;">
             <button
-              class="button is-primary"
+              class="button"
+              style={`background-color: #1982b1; color: #fff`}
               type="submit"
               disabled={password === ""}
             >
@@ -292,10 +306,10 @@
     align-items: center;
     padding: 15px;
     background-color: white;
-    border-radius: 50px;
+    border-radius: 6px;
     border: 1px solid #ddd8d8;
     cursor: pointer;
-
+    margin: 10px;
     button {
       height: 60px;
       width: 60px;

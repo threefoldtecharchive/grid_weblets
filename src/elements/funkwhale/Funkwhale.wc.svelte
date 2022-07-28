@@ -1,12 +1,12 @@
 <svelte:options tag="tf-funkwhale" />
 
 <script lang="ts">
-  import type { IFormField, ITab } from "../../types";
+  import type { IFormField, IPackage, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  import VM, { Env } from "../../types/vm";
+  import VM, { Disk, Env } from "../../types/vm";
   import deployFunkwhale from "../../utils/deployFunkwhale";
 
   // Components
@@ -16,38 +16,55 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
     validateEmail,
+validatePassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
-import Funkwhale from "../../types/funkwhale";
+  import Funkwhale from "../../types/funkwhale";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const data = new Funkwhale();
+  data.disks = [new Disk()];
+
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let profile: IProfile;
 
   let active: string = "base";
+  let modalData: Object;
   let loading = false;
   let success = false;
   let failed = false;
   let status: "valid" | "invalid";
 
-  const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+  const nameField: IFormField = { label: "Name", placeholder: "Funkwhale Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: true }; // prettier-ignore
 
-  const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: (value: string) => value.trim().length === 0 ? "Password can't be empty." : undefined, invalid: false}; // prettier-ignore
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField]); // prettier-ignore
+    const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: validatePassword, invalid: false}; // prettier-ignore
+
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+  ];
+
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField, diskField, cpuField, memoryField]) ; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
-
-  let domain: string, planetaryIP: string;
 
   async function onDeployVM() {
     loading = true;
@@ -64,11 +81,10 @@ import Funkwhale from "../../types/funkwhale";
     }
 
     deployFunkwhale(data, profile)
-      .then(({ domain: d, planetaryIP: ip }) => {
+      .then((data) => {
         deploymentStore.set(0);
         success = true;
-        domain = d;
-        planetaryIP = ip;
+        modalData = data.deploymentInfo;
       })
       .catch((err) => {
         failed = true;
@@ -94,6 +110,15 @@ import Funkwhale from "../../types/funkwhale";
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
+    <p>
+      Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_funkwhale"
+      >
+        Quick start documentation</a
+      >
+    </p>
     <hr />
 
     {#if loading || (logs !== null && logs.type === "Funkwhale")}
@@ -101,11 +126,9 @@ import Funkwhale from "../../types/funkwhale";
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <AlertDetailed
+      <Alert
         type="success"
         message="Successfully deployed a Funkwhale instance"
-        {planetaryIP}
-        {domain}
         deployed={true}
       />
     {:else if failed}
@@ -133,6 +156,17 @@ import Funkwhale from "../../types/funkwhale";
           bind:invalid={passwordField.invalid}
           field={passwordField}
         />
+
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
+          {packages}
+        />
+
         <SelectNodeId
           publicIp={false}
           cpu={data.cpu}
@@ -168,6 +202,10 @@ import Funkwhale from "../../types/funkwhale";
     />
   </form>
 </div>
+
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

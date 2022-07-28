@@ -22,10 +22,13 @@
     isInvalid,
     validateCpu,
     validateDisk,
-    validateMemory,
+    validateIPRange,
+    validateKubernetesMemory,
+    validateToken,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
+  import RootFsSize from "../../components/RootFsSize.svelte";
+
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -37,21 +40,21 @@
   // prettier-ignore
   const kubernetesFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Your K8S Name", type: "text", validator: validateName, invalid: false },
-    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Public SSH Key", type: "text" },
+    { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
   ];
 
+  
   // prettier-ignore
   const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text" },
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text" },
+    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "Network IP Range", type: "text", validator: validateIPRange, invalid: false },
   ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text" },
-    { label: "CPU", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
-    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateMemory, invalid: false },
+    { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false},
+    { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
@@ -67,7 +70,11 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid(baseFields) || isInvalid(kubernetesFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid([...baseFields, ...kubernetesFields, ...networkFields]); 
+  
+
+  
+  // prettier-ignore
   let modalData: Object;
 
   async function onDeployKubernetes() {
@@ -115,15 +122,23 @@
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.sshKey = detail.sshKey;
-    }
   }}
 />
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
+    <p>      
+      Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint. It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations (fits e.g. IoT, edge, ARM workloads).
+
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_k8s"
+      >
+        Quick start documentation</a
+      >
+    </p>
+
     <hr />
 
     {#if loading || (logs !== null && logs.type === "Kubernetes")}
@@ -168,12 +183,22 @@
             <Input bind:data={data.master[field.symbol]} {field} />
           {/if}
         {/each}
+
+        <RootFsSize
+          rootFs={data.master.rootFs}
+          editable={data.master.rootFsEditable}
+          cpu={data.master.cpu}
+          memory={data.master.memory}
+          on:update={({ detail }) => (data.master.rootFs = detail)}
+          on:editableUpdate={({ detail }) =>
+            (data.master.rootFsEditable = detail)}
+        />
+
         <SelectNodeId
           cpu={data.master.cpu}
           memory={data.master.memory}
           publicIp={data.master.publicIp}
-          ssd={data.master.diskSize +
-            rootFs(data.master.cpu, data.master.memory)}
+          ssd={data.master.diskSize + data.master.rootFs}
           bind:data={data.master.node}
           bind:nodeSelection={data.master.selection.type}
           filters={data.master.selection.filters}
@@ -205,11 +230,22 @@
                   <Input bind:data={worker[field.symbol]} {field} />
                 {/if}
               {/each}
+
+              <RootFsSize
+                rootFs={worker.rootFs}
+                editable={worker.rootFsEditable}
+                cpu={worker.cpu}
+                memory={worker.memory}
+                on:update={({ detail }) => (worker.rootFs = detail)}
+                on:editableUpdate={({ detail }) =>
+                  (worker.rootFsEditable = detail)}
+              />
+
               <SelectNodeId
                 cpu={worker.cpu}
                 memory={worker.memory}
                 publicIp={worker.publicIp}
-                ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
+                ssd={worker.diskSize + worker.rootFs}
                 filters={worker.selection.filters}
                 bind:data={worker.node}
                 bind:nodeSelection={worker.selection.type}
