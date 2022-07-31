@@ -43,6 +43,7 @@
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
+    // { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -175,7 +176,7 @@
     }, true);
     return valid ? null : "Disks can't have duplicated name.";
   }
-
+  
   $: logs = $currentDeployment;
 </script>
 
@@ -260,14 +261,14 @@
           />
         {/if}
 
-        <RootFsSize
+        <!-- <RootFsSize
           rootFs={data.rootFs}
           editable={data.rootFsEditable}
           cpu={data.cpu}
           memory={data.memory}
           on:update={({ detail }) => (data.rootFs = detail)}
           on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
-        />
+        /> -->
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
@@ -287,7 +288,7 @@
           memory={data.memory}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,
-            data.rootFs
+            data.diskSize
           )}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
