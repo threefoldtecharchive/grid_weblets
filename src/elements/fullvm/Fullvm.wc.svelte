@@ -29,7 +29,6 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
-  import RootFsSize from "../../components/RootFsSize.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -191,9 +190,9 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+    <h4 class="is-size-4">Deploy a Full Virtual Machine</h4>
     <p>
-      Deploy a new virtual machine on the Threefold Grid
+      Deploy a new full virtual machine on the Threefold Grid
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
@@ -261,15 +260,6 @@
           />
         {/if}
 
-        <!-- <RootFsSize
-          rootFs={data.rootFs}
-          editable={data.rootFsEditable}
-          cpu={data.cpu}
-          memory={data.memory}
-          on:update={({ detail }) => (data.rootFs = detail)}
-          on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
-        /> -->
-
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -288,7 +278,7 @@
           memory={data.memory}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,
-            data.diskSize
+            data.rootFs
           )}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
@@ -319,41 +309,43 @@
         <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
-            <div class="box">
-              <DeleteBtn
-                name={disk.name}
-                on:click={() =>
-                  (data.disks = data.disks.filter((_, i) => index !== i))}
-              />
-              {#each disk.diskFields as field (field.symbol)}
-                {#if field.symbol === "mountpoint"}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    field={{
-                      ...field,
-                      error:
-                        !field.invalid && !field.error
-                          ? validateMountPoint(disk)
-                          : null,
-                    }}
-                  />
-                {:else if field.symbol === "name"}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    field={{
-                      ...field,
-                      error: validateDiskName(disk),
-                    }}
-                  />
-                {:else}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    {field}
-                    bind:invalid={field.invalid}
-                  />
-                {/if}
-              {/each}
-            </div>
+            {#if index > 0}
+              <div class="box">
+                <DeleteBtn
+                  name={disk.name}
+                  on:click={() =>
+                    (data.disks = data.disks.filter((_, i) => index !== i))}
+                />
+                {#each disk.diskFields as field (field.symbol)}
+                  {#if field.symbol === "mountpoint"}
+                    <Input
+                      bind:data={disk[field.symbol]}
+                      field={{
+                        ...field,
+                        error:
+                          !field.invalid && !field.error
+                            ? validateMountPoint(disk)
+                            : null,
+                      }}
+                    />
+                  {:else if field.symbol === "name"}
+                    <Input
+                      bind:data={disk[field.symbol]}
+                      field={{
+                        ...field,
+                        error: validateDiskName(disk),
+                      }}
+                    />
+                  {:else}
+                    <Input
+                      bind:data={disk[field.symbol]}
+                      {field}
+                      bind:invalid={field.invalid}
+                    />
+                  {/if}
+                {/each}
+              </div>
+            {/if}
           {/each}
         </div>
       {/if}
