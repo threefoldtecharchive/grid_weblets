@@ -30,6 +30,9 @@
   let bridgeAddress: string = "";
   let editable: boolean = true;
   $: checked = editable;
+  if (configured) {
+    editable = false;
+  }
 
   function _updateEditable(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -80,7 +83,7 @@
     // ] },
     { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Disabling the ssh field means you won't be able to access your deployed solutions.", type: "text" },
+    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
   ];
 
   const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
@@ -107,6 +110,7 @@
     try {
       const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
       invalid = !mnIsValid;
+
       _updateError(
         "mnemonics",
         mnIsValid,
@@ -342,7 +346,10 @@
                     }}
                   />
                 </div>
-                <div style="margin-top: 30px;">
+                <div
+                  style="margin-top: 30px;"
+                  data-my-tooltip="On disable the deployed solutions'll be inaccessible."
+                >
                   <Input
                     data={editable}
                     field={{
@@ -426,7 +433,21 @@
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+  [data-my-tooltip]:before {
+    content: attr(data-my-tooltip);
+    position: absolute;
+    opacity: 0;
+  }
 
+  [data-my-tooltip]:hover:before {
+    opacity: 1;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(51, 51, 51, 0.9);
+    color: white;
+    margin-left: -250px;
+    margin-right: 110px; /*setting it above. to the left. You can play with this */
+  }
   .profile-menu {
     display: flex;
     align-items: center;

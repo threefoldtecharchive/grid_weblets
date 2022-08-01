@@ -144,6 +144,7 @@ function createBaseConfig() {
     },
 
     setActiveProfile(id: string, password: string) {
+      
       update((value) => {
         value.activeProfile = id;
         value.storeSecret = id === null ? null : password;
