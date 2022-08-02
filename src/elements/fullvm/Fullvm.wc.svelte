@@ -26,6 +26,7 @@
     validateKey,
     validateKeyValue,
     validateMemory,
+    validateDisk,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
@@ -42,7 +43,7 @@
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
-    // { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -97,6 +98,8 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
+  
+  data.disks = [...data.disks, new Disk(undefined, undefined, data.diskSize, "/")]
 
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
@@ -142,6 +145,7 @@
     failed = false;
     message = undefined;
 
+    data.disks[0].size = data.diskSize;
     deployVM(data, profile, "Fullvm")
       .then((data) => {
         deploymentStore.set(0);

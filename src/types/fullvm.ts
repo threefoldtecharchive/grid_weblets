@@ -7,7 +7,6 @@ export default class FullVM extends VM {
   public name = `VM${v4().split("-")[0]}`;
   public rootFs = 0;
   public diskSize: number = 50;
-  public disks = [new Disk(undefined, undefined, this.diskSize, "/")];
 
 
 
