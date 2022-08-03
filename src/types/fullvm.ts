@@ -1,4 +1,4 @@
-import VM, { Disk } from "./vm";
+import VM from "./vm";
 import { v4 } from "uuid";
 import validateName from '../utils/validateName';
 import isValidInteger from '../utils/isValidInteger';
@@ -14,6 +14,7 @@ export default class FullVM extends VM {
     const { name, diskSize } = this;
     return (
       name !== "" &&
+      diskSize > 15 &&
       validateName(name) === undefined &&
       isValidInteger(diskSize)
     );
