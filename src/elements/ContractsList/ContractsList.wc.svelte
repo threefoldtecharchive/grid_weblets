@@ -171,37 +171,18 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={[
-          "ID",
-          "Type",
-          "Node ID",
-          "State",
-          "Expiration",
-          "Billing Rate",
-          "Solution type",
-          "Solution name",
-          "Created at",
-        ]}
-        rows={contracts.map(
-          (
-            { id, type, nodeID, state, expiration, deploymentData, createdAt },
-            idx
-          ) => [
-            id.toString(),
-            type,
-            nodeID ?? " - ",
-            state,
-            expiration,
-            loadingConsumption ? "Loading..." : consumptions[idx],
-            (deploymentData.type == "vm"
-              ? deploymentData.projectName == ""
-                ? "virtual machine"
-                : deploymentData.projectName.toLowerCase()
-              : deploymentData.type) ?? "-",
-            deploymentData.name ?? "-",
-            createdAt.toLocaleString(),
-          ]
-        )}
+        headers={["ID", "Type", "Node ID", "State", "Billing Rate", "Solution type", "Solution name", "Created at", "Expiration"]}
+        rows={contracts.map(({ id, type, nodeID, state, expiration, deploymentData, createdAt }, idx) => [
+          id.toString(),
+          type,
+          nodeID ?? " - ",
+          state,
+          loadingConsumption ? "Loading..." : consumptions[idx],
+          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- ",
+          deploymentData.name ?? " -",
+          createdAt.toLocaleString(),
+          expiration,
+        ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
       />
@@ -217,7 +198,7 @@
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
-            style={`border-color: #FF5151; color: #FF5151;`}
+            style={`border-color: #FF5151; color: #FF5151; background: white;`}
             disabled={!profile ||
               loading ||
               deleting ||

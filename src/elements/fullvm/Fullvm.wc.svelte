@@ -1,7 +1,8 @@
-<svelte:options tag="tf-vm" />
+<svelte:options tag="tf-fullvm" />
 
 <script lang="ts">
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
+  import Fullvm from "../../types/fullvm";
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
@@ -25,10 +26,10 @@
     validateKey,
     validateKeyValue,
     validateMemory,
+    validateDisk,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
-  import RootFsSize from "../../components/RootFsSize.svelte";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -36,12 +37,13 @@
     { label: "Disks", value: "disks" },
   ];
 
-  let data = new VM();
+  let data = new Fullvm();
 
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
+    { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk && _isInvalidDefaultDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
@@ -51,11 +53,12 @@
 
   // prettier-ignore
   const flists: IFlist[] = [
-    { name: "Ubuntu", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-20.04.flist", entryPoint: "/init.sh" },
-    { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist", entryPoint: "/entrypoint.sh" },
-    { name: "CentOS", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist", entryPoint: "/entrypoint.sh" },
+    { name: "Ubuntu-18.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist", entryPoint: "/init.sh" },
+    { name: "Ubuntu-20.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist", entryPoint: "/init.sh" },
+    { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist", entryPoint: "/init.sh" },
 
   ];
+
 
   // prettier-ignore
   const flistField: IFormField = {
@@ -63,9 +66,9 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Ubuntu-20.04", value: "0", selected: true },
-      { label: "Alpine-3", value: "1" },
-      { label: "CentOS-8", value: "2" },
+      { label: "Ubuntu-18.04", value: "0", selected: true },
+      { label: "Ubuntu-20.04", value: "1" },
+      { label: "Ubuntu-22.04", value: "2" },
       { label: "Other", value: "other" }
     ]
   };
@@ -95,6 +98,8 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
+  
+  data.disks = [new Disk(undefined, undefined, data.diskSize, "/"), ...data.disks]
 
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
@@ -102,10 +107,19 @@
 
     const names = data.disks.map(({ name }) => name.trim());
     const nameSet = new Set(names);
-    return mounts.length !== mountSet.size || names.length !== nameSet.size;
+
+    return mounts.length !== mountSet.size || names.length !== nameSet.size ;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
+  function _isInvalidDefaultDisk(value: number): string | void {
+    value = +value;
+    if(value < 15){
+      console.log(value, "disk is less than 15");
+      return "Minimum allowed disk size is 15 GB.";
+    }
+  }
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -140,7 +154,8 @@
     failed = false;
     message = undefined;
 
-    deployVM(data, profile, "VM")
+    data.disks[0].size = data.diskSize;
+    deployVM(data, profile, "Fullvm")
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -173,7 +188,7 @@
     }, true);
     return valid ? null : "Disks can't have duplicated name.";
   }
-
+  
   $: logs = $currentDeployment;
 </script>
 
@@ -188,9 +203,9 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Micro Virtual Machine</h4>
+    <h4 class="is-size-4">Deploy a Full Virtual Machine</h4>
     <p>
-      Deploy a new micro virtual machine on the Threefold Grid
+      Deploy a new full virtual machine on the Threefold Grid
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
@@ -200,18 +215,18 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "VM")}
+    {#if loading || (logs !== null && logs.type === "Fullvm")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully deployed VM."
+        message="Successfully deployed a VM."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || "Failed to deploy a VM."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -258,15 +273,6 @@
           />
         {/if}
 
-        <RootFsSize
-          rootFs={data.rootFs}
-          editable={data.rootFsEditable}
-          cpu={data.cpu}
-          memory={data.memory}
-          on:update={({ detail }) => (data.rootFs = detail)}
-          on:editableUpdate={({ detail }) => (data.rootFsEditable = detail)}
-        />
-
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
@@ -295,6 +301,7 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
+        
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
@@ -315,41 +322,43 @@
         <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
-            <div class="box">
-              <DeleteBtn
-                name={disk.name}
-                on:click={() =>
-                  (data.disks = data.disks.filter((_, i) => index !== i))}
-              />
-              {#each disk.diskFields as field (field.symbol)}
-                {#if field.symbol === "mountpoint"}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    field={{
-                      ...field,
-                      error:
-                        !field.invalid && !field.error
-                          ? validateMountPoint(disk)
-                          : null,
-                    }}
-                  />
-                {:else if field.symbol === "name"}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    field={{
-                      ...field,
-                      error: validateDiskName(disk),
-                    }}
-                  />
-                {:else}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    {field}
-                    bind:invalid={field.invalid}
-                  />
-                {/if}
-              {/each}
-            </div>
+            {#if index > 0}
+              <div class="box">
+                <DeleteBtn
+                  name={disk.name}
+                  on:click={() =>
+                    (data.disks = data.disks.filter((_, i) => index !== i))}
+                />
+                {#each disk.diskFields as field (field.symbol)}
+                  {#if field.symbol === "mountpoint"}
+                    <Input
+                      bind:data={disk[field.symbol]}
+                      field={{
+                        ...field,
+                        error:
+                          !field.invalid && !field.error
+                            ? validateMountPoint(disk)
+                            : null,
+                      }}
+                    />
+                  {:else if field.symbol === "name"}
+                    <Input
+                      bind:data={disk[field.symbol]}
+                      field={{
+                        ...field,
+                        error: validateDiskName(disk),
+                      }}
+                    />
+                  {:else}
+                    <Input
+                      bind:data={disk[field.symbol]}
+                      {field}
+                      bind:invalid={field.invalid}
+                    />
+                  {/if}
+                {/each}
+              </div>
+            {/if}
           {/each}
         </div>
       {/if}

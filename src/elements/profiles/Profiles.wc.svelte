@@ -66,7 +66,7 @@
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
     // ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Polkadot Mnemonics or TFChain secret", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
   ];
@@ -155,11 +155,12 @@
   </button>
   {#if currentProfile}
     <div class="profile-active">
-      <p>{currentProfile.name}</p>
+      <p style="margin-bottom: 1%;">{currentProfile.name}</p>
       {#if balanceStore.loading}
         <p>Loading Account Balance</p>
       {:else if balanceStore.balance !== null}
-        <p>Balance: <span>{balanceStore.balance}</span> TFT</p>
+        <p>Balance: <span style="font-weight: bold;">{balanceStore.balance}</span> TFT</p>
+        <p>Locked: <span style="padding-left: 2%;">{balanceStore.locked}</span> TFT</p>
       {/if}
     </div>
   {/if}
