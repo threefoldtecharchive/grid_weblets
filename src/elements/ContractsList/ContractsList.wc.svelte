@@ -21,7 +21,7 @@
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
 
-  function jsonParser(str: string){
+  function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
     let parsed = {};
 
@@ -48,13 +48,17 @@
               state: state, 
               deploymentData: {name: name}, 
               createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state, deploymentData, createdAt, nodeID }) => ({
-              id: contractID, 
-              type: "node", 
-              state: state, 
-              createdAt: new Date(+createdAt), 
-              nodeID: nodeID, 
-              deploymentData: jsonParser(deploymentData) } as IContract));
+            const nodes = nodeContracts.map(
+              ({ contractID, state, deploymentData, createdAt, nodeID }) =>
+                ({
+                  id: contractID,
+                  type: "node",
+                  state: state,
+                  createdAt: new Date(+createdAt),
+                  nodeID: nodeID,
+                  deploymentData: jsonParser(deploymentData),
+                } as IContract)
+            );
             contracts = [...names, ...nodes];
           })
           .then(async () => {
@@ -104,6 +108,7 @@
           selectedRows = [];
           deleting = false;
           deletingType = null;
+          alert("Contracts deleted successfully");
         });
     });
   }
@@ -189,7 +194,7 @@
             <Alert type="danger" style={`color: #FF5151`} {message} />
           {/if}
         </div>
-        <div>
+        <div class="mt-5">
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
@@ -205,7 +210,7 @@
           </button>
           <button
             class={"button is-danger" +
-              (deleting && deletingType === "all" ? "is-loading" : "")}
+              (deleting && deletingType === "all" ? " is-loading" : "")}
             style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
             on:click={onDeleteHandler}
@@ -225,8 +230,8 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  .button.is-danger.is-outlined:hover{
-    background-color: #FF5151 !important;
+  .button.is-danger.is-outlined:hover {
+    background-color: #ff5151 !important;
     color: #fff !important;
   }
 </style>
