@@ -28,7 +28,14 @@
   let currentProfile: IProfile;
   let selectedIdx: string = "0";
   let bridgeAddress: string = "";
-  let editable: boolean = true;
+  let editable: boolean;
+
+  // if (activeProfileId === activeProfile.id) {
+  //   console.log("disabled is true");
+  //   editable = false;
+  // } else {
+  //   editable = true;
+  // }
   $: checked = editable;
   if (configured) {
     editable = false;
@@ -55,6 +62,12 @@
       tabs = profiles.map((profile, i) => {
         return { label: profile.name || `Profile${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
+      if (activeProfileId === activeProfile.id) {
+        console.log("disabled is true");
+        editable = false;
+      } else {
+        editable = true;
+      }
 
       if (currentProfile) {
         if (
@@ -445,8 +458,9 @@
     border-radius: 5px;
     background-color: rgba(51, 51, 51, 0.9);
     color: white;
-    margin-left: -250px;
-    margin-right: 110px; /*setting it above. to the left. You can play with this */
+    margin-top: -70px;
+    margin-left: -120px;
+    // margin-right: 110px; /*setting it above. to the left. You can play with this */
   }
   .profile-menu {
     display: flex;
