@@ -11,7 +11,7 @@ COPY package.json .
 COPY . .
 
 # increase the max memory for node
-RUN export NODE_OPTIONS="--max-old-space-size=8192"
+RUN echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> ~/.bashrc
 
 # install project dependencies
 RUN yarn deps
@@ -24,3 +24,9 @@ FROM nginx:1.19-alpine
 
 # serve the build files using nginx
 COPY --from=build /app/dist /usr/share/nginx/html
+
+WORKDIR /usr/share/nginx/html
+RUN apk add --no-cache bash
+
+# Serve the app
+EXPOSE 80
