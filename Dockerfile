@@ -11,7 +11,7 @@ COPY package.json .
 COPY . .
 
 # increase the max memory for node
-RUN echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> ~/.bashrc
+RUN export NODE_OPTIONS="--max-old-space-size=8192"
 
 # install project dependencies
 RUN yarn deps
