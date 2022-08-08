@@ -23,5 +23,5 @@ RUN yarn run build
 FROM nginx:1.19-alpine
 
 # serve the build files using nginx
-COPY --from=build /app/.build/build/elements /usr/share/nginx/html
+COPY --from=build /app/.build /usr/share/nginx/html
 
