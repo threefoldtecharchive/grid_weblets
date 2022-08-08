@@ -10,18 +10,17 @@ COPY package.json .
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
 
-# install project dependencies
-RUN yarn deps
-
 # increase the max memory for node
 RUN echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> ~/.bashrc
 
+# install project dependencies
+RUN yarn deps
+
 # build project solutions
-RUN yarn run build
+RUN yarn build:app
 
 # install nginx
 FROM nginx:1.19-alpine
 
 # serve the build files using nginx
-COPY --from=build /app/.build /usr/share/nginx/html
-
+COPY --from=build /app/dist /usr/share/nginx/html
