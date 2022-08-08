@@ -68,9 +68,10 @@ async function getBlockedNodesIDs(
   // For now, it is only used with presearch.
   const gqlClient = new Graphql(graphql);
 
-  const farmIdsarr = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
+  let farmIdsarr: any = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
 
   // get all the nodeIds of all the farms
+  farmIdsarr = `[${farmIdsarr.join(", ")}]`;
   const res = await gqlClient.query(
     `query MyQuery {
       nodes(where: {farmID_in: ${farmIdsarr}}) {
