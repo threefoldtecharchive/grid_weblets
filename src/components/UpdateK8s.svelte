@@ -39,7 +39,7 @@
   // prettier-ignore
   const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "CPU (vCores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
@@ -166,8 +166,22 @@
       (a, b) => a.created - b.created
     )
     return workers.map((worker, i) => {
-      const { contractId, name, planetary, capacity: { cpu, memory }, mounts: [ { size } ] } = worker;
-      return [i + 1, contractId, name, planetary, cpu, memory, size / (1024 * 1024 * 1024)];
+      const {
+        contractId,
+        name,
+        planetary,
+        capacity: { cpu, memory },
+        mounts: [{ size }],
+      } = worker;
+      return [
+        i + 1,
+        contractId,
+        name,
+        planetary,
+        cpu,
+        memory,
+        size / (1024 * 1024 * 1024),
+      ];
     });
   }
 </script>
@@ -206,7 +220,7 @@
               "Contract ID",
               "Name",
               "Planetary Network IP",
-              "CPU(Cores)",
+              "CPU(vCores)",
               "Memory(MB)",
               "Disk(GB)",
             ]}
@@ -223,7 +237,7 @@
             ]}
           />
           <hr />
-        {:else }
+        {:else}
           <hr style="width: 1200px" />
         {/if}
 

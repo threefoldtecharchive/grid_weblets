@@ -16,9 +16,9 @@
   export let packages: IPackage[];
 
   export let cpuField: IFormField = {
-    label: "CPU (Cores)",
+    label: "CPU (vCores)",
     symbol: "cpu",
-    placeholder: "CPU Cores",
+    placeholder: "CPU v",
     type: "number",
     validator: validateCpu,
     invalid: false,
@@ -68,7 +68,7 @@
     const pkg = packages[idx];
     let spec = "";
     if (pkg) {
-      spec = ` (CPU: ${pkg.cpu} Cores, Memory: ${pkg.memory} MB, Disk: ${pkg.diskSize} GB)`
+      spec = ` (CPU: ${pkg.cpu} vCores, Memory: ${pkg.memory} MB, Disk: ${pkg.diskSize} GB)`;
     }
     return spec;
   }

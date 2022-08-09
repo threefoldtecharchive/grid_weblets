@@ -29,7 +29,6 @@
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
 
-
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -43,7 +42,6 @@
     { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
   ];
 
-  
   // prettier-ignore
   const networkFields: IFormField[] = [
     { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
@@ -53,7 +51,7 @@
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false},
-    { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "CPU (vCores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
@@ -70,10 +68,16 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || data.master.status !== "valid" || data.workers.reduce((res, { status }) => res || status !== "valid", false) || isInvalid([...baseFields, ...kubernetesFields, ...networkFields]); 
-  
+  $: disabled =
+    ((loading || !data.valid) && !(success || failed)) ||
+    !profile ||
+    data.master.status !== "valid" ||
+    data.workers.reduce(
+      (res, { status }) => res || status !== "valid",
+      false
+    ) ||
+    isInvalid([...baseFields, ...kubernetesFields, ...networkFields]);
 
-  
   // prettier-ignore
   let modalData: Object;
 
@@ -128,8 +132,13 @@
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
-    <p>      
-      Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint. It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations (fits e.g. IoT, edge, ARM workloads).
+    <p>
+      Kubernetes is the standard container orchestration tool. On the TF grid,
+      Kubernetes clusters can be deployed out of the box. We have implemented
+      K3S, a full-blown Kubernetes offering that uses only half of the memory
+      footprint. It is packaged as a single binary and made more lightweight to
+      run workloads in resource-constrained locations (fits e.g. IoT, edge, ARM
+      workloads).
 
       <a
         target="_blank"
