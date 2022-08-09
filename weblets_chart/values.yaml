@@ -50,7 +50,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: https://play.${NETWORK}.grid.tf
+    - host: https://play.dev.grid.tf
       paths:
         - path: /
           pathType: ImplementationSpecific
