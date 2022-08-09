@@ -1,17 +1,22 @@
 # choose the Image which has Node installed already
-FROM node:14 AS build
+FROM node:16 AS build
+
+# add arg for the network
+ARG NETWORK
+
+RUN echo ${NETWORK}
 
 # make the 'app' folder the current working directory
 WORKDIR /app
 
-# copies package.json to cache the np latter on
+# copy package.json to cache the np latter on
 COPY package.json .
 
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
 
 # increase the max memory for node
-RUN echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> ~/.bashrc
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 # install project dependencies
 RUN yarn deps
@@ -28,5 +33,5 @@ COPY --from=build /app/dist /usr/share/nginx/html
 WORKDIR /usr/share/nginx/html
 RUN apk add --no-cache bash
 
-# Serve the app
-EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
