@@ -57,7 +57,7 @@ ingress:
   tls:
     - secretName: chart-example-tls
       hosts:
-        - https://play.dev.grid.tf/
+        - https://play.dev.grid.tf
 
 resources:
   {}
