@@ -14,7 +14,7 @@ export default class FullVM extends VM {
     const { name, diskSize } = this;
     return (
       name !== "" &&
-      diskSize > 15 &&
+      diskSize >= 15 &&
       validateName(name) === undefined &&
       isValidInteger(diskSize)
     );
