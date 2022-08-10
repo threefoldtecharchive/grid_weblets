@@ -1,14 +1,14 @@
-# Default values for weblets_chart.
+# Default values for chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: zaelgohary/grid_weblets:latest
-  pullPolicy: IfNotPresent
+  repository: zaelgohary/grid_weblets
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -21,7 +21,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "weblets_chart"
+  name: "weblets-chart"
 
 podAnnotations: {}
 
@@ -50,14 +50,14 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: https://play.dev.grid.tf
+    - host: chart-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
     - secretName: chart-example-tls
       hosts:
-        - https://play.${NETWORK}.grid.tf
+        - https://play.dev.grid.tf/
 
 resources:
   {}
