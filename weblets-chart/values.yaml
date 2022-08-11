@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: zaelgohary/grid_weblets
+  repository: threefolddev/grid_weblets
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
