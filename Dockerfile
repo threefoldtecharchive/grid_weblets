@@ -4,13 +4,11 @@ FROM node:16 AS build
 # add arg for the network
 ARG NETWORK
 
-RUN echo ${NETWORK}
+# add arg for the version
+ARG VERSION
 
 # make the 'app' folder the current working directory
 WORKDIR /app
-
-# copy package.json to cache the np latter on
-COPY package.json .
 
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
