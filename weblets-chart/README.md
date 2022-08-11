@@ -6,7 +6,7 @@
 #### 1. Deploying the TFGrid Chart 
 
 ```bash
-        helm install <helm_name> ./weblets-chart --values ./tfgrid-stats/values.yaml --set ingress.hosts[0].host=<domain_name>
+        helm install <helm_name> ./weblets-chart --values ./weblets-chart/values.yaml --set ingress.hosts[0].host=<domain_name>
 ```
 
 #### 2. Test it, and check the results
