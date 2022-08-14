@@ -35,7 +35,7 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateNPCpu, invalid: false},
+    { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateNPCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateNPMemory, invalid: false },
     ];
 

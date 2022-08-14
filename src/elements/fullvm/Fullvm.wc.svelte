@@ -41,7 +41,7 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk && _isInvalidDefaultDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
@@ -58,7 +58,6 @@
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist", entryPoint: "/init.sh" },
 
   ];
-
 
   // prettier-ignore
   const flistField: IFormField = {
@@ -98,8 +97,11 @@
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
-  
-  data.disks = [new Disk(undefined, undefined, data.diskSize, "/"), ...data.disks]
+
+  data.disks = [
+    new Disk(undefined, undefined, data.diskSize, "/"),
+    ...data.disks,
+  ];
 
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
@@ -108,12 +110,12 @@
     const names = data.disks.map(({ name }) => name.trim());
     const nameSet = new Set(names);
 
-    return mounts.length !== mountSet.size || names.length !== nameSet.size ;
+    return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
   function _isInvalidDefaultDisk(value: number): string | void {
     value = +value;
-    if(value < 15){
+    if (value < 15) {
       console.log(value, "disk is less than 15");
       return "Minimum allowed disk size is 15 GB.";
     }
@@ -188,7 +190,7 @@
     }, true);
     return valid ? null : "Disks can't have duplicated name.";
   }
-  
+
   $: logs = $currentDeployment;
 </script>
 
@@ -301,7 +303,6 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-        
       {:else if active === "env"}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
