@@ -18,7 +18,7 @@
   export let cpuField: IFormField = {
     label: "CPU (vCores)",
     symbol: "cpu",
-    placeholder: "CPU v",
+    placeholder: "CPU vCores",
     type: "number",
     validator: validateCpu,
     invalid: false,
