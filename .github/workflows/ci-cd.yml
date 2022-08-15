@@ -131,8 +131,6 @@ jobs:
         if: |
           github.event_name == 'release' && 
           github.event.release.prerelease != true
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
         run: docker build -t threefolddev/grid_weblets:${VERSION} --build-arg NETWORK=${NETWORK} --build-arg VERSION=${VERSION} .
         uses: docker/setup-buildx-action@v2
 
