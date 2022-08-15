@@ -21,6 +21,7 @@
     | "presearch"
     | "casperlabs"
     | "nodepilot"
+    | "subsquid"
     | "fullvm";
 
   export let tab: TabsType = undefined;
@@ -47,6 +48,7 @@
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
     { label: "Presearch", value: "presearch" },
+    { label: "Subsquid", value: "subsquid" },
     { label: "Casperlabs", value: "casperlabs" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
@@ -378,6 +380,15 @@
         },
       ],
       presearch: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+      subsquid: (rows) => [
         {
           type: "info",
           label: "Show Details",

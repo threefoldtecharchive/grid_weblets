@@ -15,6 +15,7 @@ export interface IStore {
   | "Taiga"
   | "Owncloud"
   | "Presearch"
+  | "Subsquid"
   | "Mattermost"
   | "TFhubValidator"
   | "Casperlabs"

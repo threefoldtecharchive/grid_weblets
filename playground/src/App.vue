@@ -46,6 +46,7 @@ export default class App extends Vue {
     "owncloud",
     "contractslist",
     "presearch",
+    "subsquid",
     "disclaimer",
     "version",
     "mattermost",

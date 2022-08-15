@@ -13,4 +13,5 @@ export const solutionList = {
   machines: "vm",
   nodepilot: "np",
   fullvm: "fvm",
+  subsquid: "ss",
 };
