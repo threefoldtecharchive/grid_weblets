@@ -18,7 +18,7 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
 
   let data = new Subsquid();
@@ -34,39 +34,19 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // Tabs
-  const tabs: ITab[] = [
-    { label: "Base", value: "base" },
-    // { label: "Restore", value: "restore" },
-  ];
+  const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let active = "base";
 
   // Fields
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Presearch Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "Presearch Endpoint", symbol: "endPoint", placeholder: "Presearch Endpoint", type: "text",  invalid: false },
+    { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
+    { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  const restoreFields: IFormField[] = [
-    {
-      label: "Private Presearch Restore Key",
-      symbol: "privateRestoreKey",
-      placeholder: "Restore Previous Presearch Node",
-      type: "textarea",
-      invalid: false,
-    },
-    {
-      label: "Public Presearch Restore Key",
-      symbol: "publicRestoreKey",
-      placeholder: "Restore Previous Presearch Node",
-      type: "textarea",
-      invalid: false,
-    },
-  ];
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -111,13 +91,11 @@
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deploySubsquidHandler}>
-    <h4 class="is-size-4 mb-4">Deploy a Presearch Instance</h4>
+    <h4 class="is-size-4 mb-4">Deploy a Subsquid Instance</h4>
     <p>
-      Presearch is a community-powered, decentralized search engine that
-      provides better results while protecting your privacy and rewarding you
-      when you search. This weblet deploys a Presearch node. Presearch Nodes are
-      used to process user search requests, and node operators earn Presearch
-      PRE tokens for joining and supporting the network.
+      Subsquid indexer is a piece of software that reads all the blocks from a
+      Substrate based blockchain, decodes and stores them for processing in a
+      later stage.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_presearch"
@@ -135,11 +113,11 @@
     {:else if success}
       <Alert
         type="success"
-        message="Successfully Deployed Presearch."
+        message="Successfully Deployed Subsquid."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Presearch."} />
+      <Alert type="danger" message={message || "Failed to Deploy Subsquid."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -169,71 +147,7 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-
-        <!-- <SelectNodeId
-          cpu={data.cpu}
-          memory={data.memory}
-          publicIp={true}
-          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
-        /> -->
       {/if}
-
-      <!-- {#if active === "base"}
-        {#each fields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-
-        <SelectNodeId
-          cpu={data.cpu}
-          memory={data.memory}
-          publicIp={data.publicIp}
-          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
-          exclusiveFor="subsquid"
-        />
-      {:else if active === "restore"}
-        <div class="notification is-warning is-light">
-          <p>
-            Only configure these Presearch Restore Keys fields if you want to
-            restore previous node. see backup steps <a
-              href="https://docs.presearch.org/nodes/backing-up-and-migrating-nodes"
-              target="_blank">here</a
-            >.
-          </p>
-        </div>
-        {#each restoreFields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-      {/if} -->
     {/if}
 
     <DeployBtn

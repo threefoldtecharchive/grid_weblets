@@ -9,6 +9,8 @@ export default class Subsquid extends VM {
   public diskSize = 10;
   public endPoint = "";
   public publicIp = false;
+  public domain = "";
+
   public get valid(): boolean {
     return this.name !== "" && this.endPoint !== "";
   }

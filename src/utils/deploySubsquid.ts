@@ -1,44 +1,72 @@
-import type Subsquid from "../types/subsquid";
+import type { default as Subsquid } from "../types/subsquid";
 import type { IProfile } from "../types/Profile";
-
 import { Network } from "../types/kubernetes";
+
+import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
-
-import rootFs from "./rootFs";
 import deploy from "./deploy";
-import checkVMExist from "./prepareDeployment";
+import rootFs from "./rootFs";
+import destroy from "./destroy";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 
-const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
-  window.configs?.grid3_client ?? {};
+const {
+  DiskModel,
+  MachineModel,
+  MachinesModel,
+  GatewayNameModel,
+  generateString,
+} = window.configs?.grid3_client ?? {};
 
 export default async function deploySubsquid(
   data: Subsquid,
   profile: IProfile
 ) {
-  const deploymentInfo = await depoloySubsquidVM(data, profile);
+  // gateway model: <solution-type><twin-id><solution_name>
+  let domainName = await getUniqueDomainName(profile, data.name, "subsquid");
+
+  // Dynamically select node to deploy the gateway
+  // let [publicNodeId, nodeDomain] = [14, "gent01.dev.grid.tf"];
+  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+
+  data.domain = `${domainName}.${nodeDomain}`;
+
+  // deploy subsquid
+  const deploymentInfo = await deploySubsquidVM(profile, data);
+
+  const planetaryIP = deploymentInfo["planetary"] as string;
+
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
+  } catch (error) {
+    // rollback subsquid deployment if gateway deployment failed
+    await destroy(profile, "subsquid", data.name);
+    throw error;
+  }
+
   return { deploymentInfo };
 }
 
-async function depoloySubsquidVM(data: Subsquid, profile: IProfile) {
+async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   const {
     name,
     cpu,
     memory,
-    nodeId,
     diskSize,
     publicIp,
-    planetary,
+    nodeId,
     endPoint,
-
+    envs,
+    domain,
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
   let randomSuffix = generateString(10).toLowerCase();
 
-  // Private network
-  const network = createNetwork(
-    new Network(`nw${randomSuffix}`, "10.200.0.0/16")
-  );
+  // Network Specs
+  const net = new Network();
+  net.name = `net${randomSuffix}`;
+  const network = createNetwork(net);
 
   // Docker disk
   const disk = new DiskModel();
@@ -46,51 +74,74 @@ async function depoloySubsquidVM(data: Subsquid, profile: IProfile) {
   disk.size = diskSize;
   disk.mountpoint = "/var/lib/docker";
 
-  // Machine specs
-  const machine = new MachineModel();
-
-  machine.name = name; //`vm${randomSuffix}`;
-  machine.cpu = cpu;
-  machine.memory = memory;
-  machine.disks = [disk];
-  machine.node_id = nodeId;
-  machine.public_ip = publicIp;
-  machine.planetary = planetary;
-  machine.flist =
-    "https://hub.grid.tf/omarabdulaziz.3bot/omarabdul3ziz-sub-latest.flist";
-  machine.qsfs_disks = [];
-  machine.rootfs_size = rootFs(cpu, memory);
-  machine.entrypoint = "/sbin/zinit init";
-  machine.env = {
+  // VM Specs
+  const vm = new MachineModel();
+  vm.name = name; //`vm${randomSuffix}`;
+  vm.node_id = nodeId;
+  vm.disks = [disk];
+  vm.public_ip = publicIp;
+  vm.planetary = true;
+  vm.cpu = cpu;
+  vm.memory = memory;
+  vm.qsfs_disks = [];
+  vm.rootfs_size = rootFs(cpu, memory);
+  vm.flist =
+    "https://hub.grid.tf/omarabdulaziz.3bot/omarabdul3ziz-subsquid-22.08.flist";
+  vm.entrypoint = "/sbin/zinit init";
+  vm.env = {
     SSH_KEY: profile.sshKey,
     CHAIN_ENDPOINT: endPoint,
-
+    SUBSQUID_WEBSERVER_HOSTNAME: domain,
   };
 
-  // Machines specs
-  const machines = new MachinesModel();
-  machines.name = name;
-  machines.machines = [machine];
-  machines.network = network;
-  machines.description = "subsquid node";
-  // machines.metadata = "subsquid"
+  // VMS Specs
+  const vms = new MachinesModel();
+  vms.name = name;
+  vms.network = network;
+  vms.machines = [vm];
 
   const metadate = {
-    type:  "vm",  
+    type: "vm",
     name: name,
     projectName: "Subsquid",
   };
-  machines.metadata = JSON.stringify(metadate);
+  vms.metadata = JSON.stringify(metadate);
 
-  // Deploy
+  // deploy
   return deploy(profile, "Subsquid", name, async (grid) => {
-    await checkVMExist(grid, "subsquid", name);
-    console.log("Machines:", machines);
-
-
+    await checkVMExist(grid, "subsquid", name); // change the project name of the grid to be subsquid
     return grid.machines
-      .deploy(machines)
+      .deploy(vms)
       .then(() => grid.machines.getObj(name))
       .then(([vm]) => vm);
+  });
+}
+
+async function deployPrefixGateway(
+  profile: IProfile,
+  domainName: string,
+  backend: string,
+  publicNodeId: number
+) {
+  // Gateway Specs
+  const gw = new GatewayNameModel();
+  gw.name = domainName;
+  gw.node_id = publicNodeId;
+  gw.tls_passthrough = false;
+  gw.backends = [`http://[${backend}]:4444`];
+
+  const metadate = {
+    type: "gateway",
+    name: domainName,
+    projectName: "Subsquid",
+  };
+  gw.metadata = JSON.stringify(metadate);
+
+  return deploy(profile, "GatewayName", domainName, async (grid) => {
+    await checkGW(grid, domainName, "subsquid");
+    return grid.gateway
+      .deploy_name(gw)
+      .then(() => grid.gateway.getObj(domainName))
+      .then(([gw]) => gw);
   });
 }

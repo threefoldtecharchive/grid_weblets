@@ -396,6 +396,20 @@
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
         },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.SUBSQUID_WEBSERVER_HOSTNAME;
+            window.open("https://" + domain + "/graphql", "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return (
+              !env || !env.SUBSQUID_WEBSERVER_HOSTNAME || removing !== null
+            );
+          },
+        },
       ],
       nodepilot: (rows) => [
         {
