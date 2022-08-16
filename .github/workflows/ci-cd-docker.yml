@@ -1,0 +1,66 @@
+name: Build and push a new docker image based on project release tag.
+on:
+  release:
+    types: [published]
+
+jobs:
+  Build-and-push-docker-image:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096"
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Args in case development
+        if: ${{ github.ref == 'refs/heads/development' }}
+        run: |
+          VERSION=$GITHUB_SHA
+          VERSION=${VERSION:0:7} NETWORK=dev
+
+      - name: Args in case test
+        if: |
+          github.event.release.prerelease == true &&
+          contains(github.event.release.tag_name, 'rc')
+        run: |
+          VERSION=$GITHUB_REF 
+          VERSION=${VERSION:10:12} NETWORK=test
+
+      - name: Args in case qa
+        if: |
+          github.event.release.prerelease == true &&
+          contains(github.event.release.tag_name, 'qa')
+        run: |
+          VERSION=$GITHUB_REF 
+          VERSION=${VERSION:10:12} NETWORK=qa
+
+      - name: Args in case main
+        if: |
+          github.event_name == 'release' &&
+          github.event.release.prerelease != true
+        run: |
+          VERSION=$GITHUB_REF 
+          VERSION=${VERSION:10:12} NETWORK=main
+
+      - name: Get Previous tag
+        id: previoustag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        with:
+          fallback: latest # Optional fallback tag to use when no tag can be found
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/grid_weblets:${{ steps.previoustag.outputs.tag }}
+          build-args: VERSION=${VERSION},NETWORK=${NETWORK}
