@@ -1,5 +1,8 @@
 name: Build and push a new docker image based on project release tag.
 on:
+  push:
+    branches:
+      - development
   release:
     types: [published]
 

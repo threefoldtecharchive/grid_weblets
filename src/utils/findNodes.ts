@@ -68,19 +68,19 @@ async function getBlockedNodesIDs(
   // For now, it is only used with presearch.
   const gqlClient = new Graphql(graphql);
 
-  const farmIdsarr = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
+  let blockedFarmsIDs = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
 
   // get all the nodeIds of all the farms
+  let farmsIDs = `[${blockedFarmsIDs.join(", ")}]`;
   const res = await gqlClient.query(
     `query MyQuery {
-      nodes(where: {farmID_in: ${farmIdsarr}}) {
+      nodes(where: {farmID_in: ${farmsIDs}}) {
         nodeID
       }
     }`
   );
   let farmNodesIDs = [...res.data["nodes"]];
 
-  console.log({farmNodesIDs})
   return farmNodesIDs;
 }
 
@@ -88,7 +88,7 @@ export async function getBlockedFarmsIDs(
   exclusiveFor: string,
   rmbProxy: string,
   graphql: string
-) {
+) : Promise<number[]> {
   const gqlClient = new Graphql(graphql);
 
   // get the total number of deployment of the same type
@@ -108,7 +108,7 @@ export async function getBlockedFarmsIDs(
   const nodeIds = res2.data.nodeContracts.map((n) => n.nodeID);
 
   // get the farmIds of all the used nodes. "in Set to remove duplicates"
-  let farmIds = new Set();
+  let farmIds = new Set<number>();
   for (let nodeId of nodeIds) {
     const res = await fetch(`${rmbProxy}/nodes/${nodeId}`);
     farmIds.add((await res.json())["farmId"]);

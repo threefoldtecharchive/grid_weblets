@@ -82,6 +82,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
           rm: true
+          port: ${{ secrets.PORT }}
           source: "dist/"
           target: "${{ secrets.DEV_REMOTE_DIR }}"
 
@@ -96,6 +97,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
           rm: true
+          port: ${{ secrets.PORT }}
           source: "dist/"
           target: "${{ secrets.TEST_REMOTE_DIR }}"
 
@@ -110,6 +112,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
           rm: true
+          port: ${{ secrets.PORT }}
           source: "dist/"
           target: "${{ secrets.QA_REMOTE_DIR }}"
 
