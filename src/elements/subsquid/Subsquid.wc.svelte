@@ -96,12 +96,12 @@
       Subsquid indexer is a piece of software that reads all the blocks from a
       Substrate based blockchain, decodes and stores them for processing in a
       later stage.
-      <a
+      <!-- <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_presearch"
       >
         Quick start documentation</a
-      >
+      > -->
     </p>
 
     <hr />
