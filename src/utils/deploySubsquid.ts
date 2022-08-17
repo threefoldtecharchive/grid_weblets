@@ -85,8 +85,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   vm.memory = memory;
   vm.qsfs_disks = [];
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist =
-    "https://hub.grid.tf/omarabdulaziz.3bot/omarabdul3ziz-subsquid-22.08.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
