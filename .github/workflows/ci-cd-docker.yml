@@ -23,7 +23,8 @@ jobs:
         if: ${{ github.ref == 'refs/heads/development' }}
         run: |
           VERSION=$GITHUB_SHA
-          VERSION=${VERSION:0:7} NETWORK=dev
+          echo VERSION=${VERSION:0:7} >> $GITHUB_ENV 
+          echo NETWORK=dev >> $GITHUB_ENV
 
       - name: Args in case test
         if: |
@@ -31,7 +32,8 @@ jobs:
           contains(github.event.release.tag_name, 'rc')
         run: |
           VERSION=$GITHUB_REF 
-          VERSION=${VERSION:10:12} NETWORK=test
+          echo VERSION=${VERSION:10:12} >> $GITHUB_ENV
+          echo NETWORK=test >> $GITHUB_ENV
 
       - name: Args in case qa
         if: |
@@ -39,7 +41,8 @@ jobs:
           contains(github.event.release.tag_name, 'qa')
         run: |
           VERSION=$GITHUB_REF 
-          VERSION=${VERSION:10:12} NETWORK=qa
+          echo VERSION=${VERSION:10:12} >> $GITHUB_ENV 
+          echo NETWORK=qa >> $GITHUB_ENV
 
       - name: Args in case main
         if: |
@@ -47,13 +50,12 @@ jobs:
           github.event.release.prerelease != true
         run: |
           VERSION=$GITHUB_REF 
-          VERSION=${VERSION:10:12} NETWORK=main
+          echo VERSION=${VERSION:10:12} >> $GITHUB_ENV
+          echo NETWORK=main >> $GITHUB_ENV
 
       - name: Get Previous tag
         id: previoustag
         uses: actions-ecosystem/action-get-latest-tag@v1
-        with:
-          fallback: latest # Optional fallback tag to use when no tag can be found
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -66,4 +68,6 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/grid_weblets:${{ steps.previoustag.outputs.tag }}
-          build-args: VERSION=${VERSION},NETWORK=${NETWORK}
+          build-args: |
+            VERSION=${{env.VERSION}}
+            NETWORK=${{env.NETWORK}}
