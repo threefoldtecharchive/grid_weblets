@@ -1,7 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to play.dev.grid.tf
-
-name: CI/CD pipeline
-
+name: Build and push a new docker image based on project release tag.
 on:
   push:
     branches:
@@ -9,14 +6,8 @@ on:
   release:
     types: [published]
 
-concurrency:
-  # one instance of runing pipeline allowed per branch.
-  # On master, we want all builds to complete even if merging happens faster for better reliability and to make it easier to discover at which point something broke.
-  # on developmetn, new workflow trigger will cancel the in progress job, and start a new one..
-  group: ${{ format('ci-{0}', github.ref) }}
-  cancel-in-progress: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
 jobs:
-  build-and-deploy:
+  Build-and-push-docker-image:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=4096"
@@ -25,107 +16,58 @@ jobs:
       matrix:
         node-version: [16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
-
-      - name: Install dependencies
-        run: |
-          yarn install
-          cd playground
-          yarn install
-          cd ..
-
-      - name: Build in case development
+      - name: Args in case development
         if: ${{ github.ref == 'refs/heads/development' }}
         run: |
           VERSION=$GITHUB_SHA
-          VERSION=${VERSION:0:7} NETWORK=dev yarn build:app
+          echo VERSION=${VERSION:0:7} >> $GITHUB_ENV 
+          echo NETWORK=dev >> $GITHUB_ENV
 
-      - name: Build in case test
+      - name: Args in case test
         if: |
           github.event.release.prerelease == true &&
           contains(github.event.release.tag_name, 'rc')
         run: |
           VERSION=$GITHUB_REF 
-          VERSION=${VERSION:10:12} NETWORK=test yarn build:app
+          echo VERSION=${VERSION:10:12} >> $GITHUB_ENV
+          echo NETWORK=test >> $GITHUB_ENV
 
-      - name: Build in case qa
+      - name: Args in case qa
         if: |
           github.event.release.prerelease == true &&
           contains(github.event.release.tag_name, 'qa')
         run: |
           VERSION=$GITHUB_REF 
-          VERSION=${VERSION:10:12} NETWORK=qa yarn build:app
+          echo VERSION=${VERSION:10:12} >> $GITHUB_ENV 
+          echo NETWORK=qa >> $GITHUB_ENV
 
-      - name: Build in case main
+      - name: Args in case main
         if: |
           github.event_name == 'release' &&
           github.event.release.prerelease != true
         run: |
           VERSION=$GITHUB_REF 
-          VERSION=${VERSION:10:12} NETWORK=main yarn build:app
+          echo VERSION=${VERSION:10:12} >> $GITHUB_ENV
+          echo NETWORK=main >> $GITHUB_ENV
 
-      - name: Copying files to staging server
-        if: ${{ github.ref == 'refs/heads/development' }}
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.DEV_REMOTE_HOST }}
-          username: ${{ secrets.DEV_REMOTE_USER }}
-          key: ${{ secrets.DEV_SSH_KEY }}
-          passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
-          rm: true
-          port: ${{ secrets.PORT }}
-          source: "dist/"
-          target: "${{ secrets.DEV_REMOTE_DIR }}"
+      - name: Get Previous tag
+        id: previoustag
+        uses: actions-ecosystem/action-get-latest-tag@v1
 
-      - name: Copying files to testing server - Pre-release
-        if: |
-          github.event.release.prerelease == true &&
-          contains(github.event.release.tag_name, 'rc')
-        uses: appleboy/scp-action@master
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
-          host: ${{ secrets.DEV_REMOTE_HOST }}
-          username: ${{ secrets.DEV_REMOTE_USER }}
-          key: ${{ secrets.DEV_SSH_KEY }}
-          passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
-          rm: true
-          port: ${{ secrets.PORT }}
-          source: "dist/"
-          target: "${{ secrets.TEST_REMOTE_DIR }}"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Copying files to qa server - Pre-release
-        if: |
-          github.event.release.prerelease == true &&
-          contains(github.event.release.tag_name, 'qa')
-        uses: appleboy/scp-action@master
+      - name: Build and push
+        uses: docker/build-push-action@v3
         with:
-          host: ${{ secrets.DEV_REMOTE_HOST }}
-          username: ${{ secrets.DEV_REMOTE_USER }}
-          key: ${{ secrets.DEV_SSH_KEY }}
-          passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
-          rm: true
-          port: ${{ secrets.PORT }}
-          source: "dist/"
-          target: "${{ secrets.QA_REMOTE_DIR }}"
-
-      - name: Copying files to production server - Release
-        if: |
-          github.event_name == 'release' && 
-          github.event.release.prerelease != true
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.PROD_REMOTE_HOST }}
-          username: ${{ secrets.PROD_REMOTE_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          passphrase: ${{ secrets.PROD_SSH_KEY_PASSPHRASE }}
-          rm: true
-          source: "dist/"
-          target: "${{ secrets.PROD_REMOTE_DIR }}"
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/grid_weblets:${{ steps.previoustag.outputs.tag }}
+          build-args: |
+            VERSION=${{env.VERSION}}
+            NETWORK=${{env.NETWORK}}
