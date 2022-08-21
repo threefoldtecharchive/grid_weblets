@@ -25,6 +25,13 @@ export default async function deployKubernetes(
   k8s.description = description;
   k8s.ssh_key = profile.sshKey;
 
+  const metadate = {
+    "type":  "kubernetes",  
+    "name": name,
+    "projectName": "Kubernetes"
+  };
+  k8s.metadata = JSON.stringify(metadate);
+
   return deploy(profile, "Kubernetes", name, (grid) => {
     return grid.k8s.deploy(k8s).then(() => grid.k8s.getObj(name));
   });

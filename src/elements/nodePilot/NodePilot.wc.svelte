@@ -35,7 +35,7 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateNPCpu, invalid: false},
+    { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateNPCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateNPMemory, invalid: false },
     ];
 
@@ -166,7 +166,7 @@
       Deploy a new Node Pilot on the Threefold Grid
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_nodepilot"
       >
         Quick start documentation</a
       >

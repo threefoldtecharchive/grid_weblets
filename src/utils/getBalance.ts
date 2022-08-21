@@ -8,6 +8,7 @@ export default async function getBalance(profile: IProfile) {
     // prettier-ignore
     return grid.balance
       .getMyBalance()
-      .then((res) => res.free as number);
+      .then((res) => res);
   });
 }
+

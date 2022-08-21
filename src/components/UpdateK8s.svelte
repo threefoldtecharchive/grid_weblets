@@ -39,7 +39,7 @@
   // prettier-ignore
   const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false },
-    { label: "CPU (Cores)", symbol: "cpu", placeholder: "CPU cores", type: 'number', validator: validateCpu, invalid: false },
+    { label: "CPU (vCores)", symbol: "cpu", placeholder: "CPU vCores", type: 'number', validator: validateCpu, invalid: false },
     { label: "Memory (MB)", symbol: "memory", placeholder: "Memory in MB", type: 'number', validator: validateKubernetesMemory, invalid: false },
     { label: "Disk Size (GB)", symbol: "diskSize", placeholder: "Disk size in GB", type: 'number', validator: validateDisk, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
@@ -166,8 +166,22 @@
       (a, b) => a.created - b.created
     )
     return workers.map((worker, i) => {
-      const { contractId, name, planetary, capacity: { cpu, memory }, mounts: [ { size } ] } = worker;
-      return [i + 1, contractId, name, planetary, cpu, memory, size / (1024 * 1024 * 1024)];
+      const {
+        contractId,
+        name,
+        planetary,
+        capacity: { cpu, memory },
+        mounts: [{ size }],
+      } = worker;
+      return [
+        i + 1,
+        contractId,
+        name,
+        planetary,
+        cpu,
+        memory,
+        size / (1024 * 1024 * 1024),
+      ];
     });
   }
 </script>
@@ -196,33 +210,36 @@
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
         </h4>
-        <hr />
 
-        <Table
-          rowsData={workers}
-          headers={[
-            "#",
-            "Contract ID",
-            "Name",
-            "Planetary Network IP",
-            "CPU(Cores)",
-            "Memory(MB)",
-            "Disk(GB)",
-          ]}
-          rows={_createWorkerRows(workers)}
-          selectable={false}
-          actions={[
-            {
-              label: "Delete",
-              type: "danger",
-              loading: (i) => loading && removing === workers[i].name,
-              click: (_, i) => onDeleteWorker(i),
-              disabled: () => loading || removing !== null,
-            },
-          ]}
-        />
-
-        <hr />
+        {#if workers.length}
+          <hr />
+          <Table
+            rowsData={workers}
+            headers={[
+              "#",
+              "Contract ID",
+              "Name",
+              "Planetary Network IP",
+              "CPU(vCores)",
+              "Memory(MB)",
+              "Disk(GB)",
+            ]}
+            rows={_createWorkerRows(workers)}
+            selectable={false}
+            actions={[
+              {
+                label: "Delete",
+                type: "danger",
+                loading: (i) => loading && removing === workers[i].name,
+                click: (_, i) => onDeleteWorker(i),
+                disabled: () => loading || removing !== null,
+              },
+            ]}
+          />
+          <hr />
+        {:else}
+          <hr style="width: 1200px" />
+        {/if}
 
         <form on:submit|preventDefault={onAddWorker}>
           {#if loading || (logs !== null && logs.type === "Add Worker")}
