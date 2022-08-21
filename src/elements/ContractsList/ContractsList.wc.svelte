@@ -21,6 +21,19 @@
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
 
+  function jsonParser(str: string) {
+    str = str.replaceAll("'", '"');
+    let parsed = {};
+
+    try {
+      parsed = JSON.parse(str);
+    } catch (err) {
+      parsed = {};
+      console.log(err.message);
+    }
+    return parsed;
+  }
+
   function onLoadProfile(_profile: IProfile) {
     profile = _profile;
     if (profile) {
@@ -29,8 +42,23 @@
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts }) => {
-            const names = nameContracts.map(({ contractID, state }) => ({ id: contractID, type: "name", state: state } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(({ contractID, state }) => ({ id: contractID, type: "node", state: state } as IContract)); // prettier-ignore
+            const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
+              id: contractID, 
+              type: "name", 
+              state: state, 
+              deploymentData: {name: name}, 
+              createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
+            const nodes = nodeContracts.map(
+              ({ contractID, state, deploymentData, createdAt, nodeID }) =>
+                ({
+                  id: contractID,
+                  type: "node",
+                  state: state,
+                  createdAt: new Date(+createdAt),
+                  nodeID: nodeID,
+                  deploymentData: jsonParser(deploymentData),
+                } as IContract)
+            );
             contracts = [...names, ...nodes];
           })
           .then(async () => {
@@ -80,6 +108,7 @@
           selectedRows = [];
           deleting = false;
           deletingType = null;
+          alert("Contracts deleted successfully");
         });
     });
   }
@@ -142,14 +171,17 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["#", "ID", "Type", "State", "Expiration", "Billing Rate"]}
-        rows={contracts.map(({ id, type, state, expiration }, idx) => [
-          idx.toString(),
+        headers={["ID", "Type", "Node ID", "State", "Billing Rate", "Solution type", "Solution name", "Created at", "Expiration"]}
+        rows={contracts.map(({ id, type, nodeID, state, expiration, deploymentData, createdAt }, idx) => [
           id.toString(),
           type,
+          nodeID ?? " - ",
           state,
-          expiration,
           loadingConsumption ? "Loading..." : consumptions[idx],
+          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- ",
+          deploymentData.name ?? " -",
+          createdAt.toLocaleString(),
+          expiration,
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
@@ -162,11 +194,11 @@
             <Alert type="danger" style={`color: #FF5151`} {message} />
           {/if}
         </div>
-        <div>
+        <div class="mt-5">
           <button
             class={"button is-danger is-outlined mr-2 " +
               (deleting && deletingType === "selected" ? "is-loading" : "")}
-            style={`border-color: #FF5151; color: #FF5151;`}
+            style={`border-color: #FF5151; color: #FF5151; background: white;`}
             disabled={!profile ||
               loading ||
               deleting ||
@@ -178,7 +210,7 @@
           </button>
           <button
             class={"button is-danger" +
-              (deleting && deletingType === "all" ? "is-loading" : "")}
+              (deleting && deletingType === "all" ? " is-loading" : "")}
             style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
             on:click={onDeleteHandler}
@@ -198,8 +230,8 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  .button.is-danger.is-outlined:hover{
-    background-color: #FF5151 !important;
+  .button.is-danger.is-outlined:hover {
+    background-color: #ff5151 !important;
     color: #fff !important;
   }
 </style>

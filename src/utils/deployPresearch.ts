@@ -49,7 +49,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
 
   // Machine specs
   const machine = new MachineModel();
-  machine.name = `vm${randomSuffix}`;
+  machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];
@@ -74,7 +74,13 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.machines = [machine];
   machines.network = network;
   machines.description = "presearch node";
-  machines.metadata = "presearch"
+
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Presearch"
+  };
+  machines.metadata = JSON.stringify(metadate);
 
   // Deploy
   return deploy(profile, "Presearch", name, async (grid) => {

@@ -75,7 +75,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
 
   // VM Specs
   const vm = new MachineModel();
-  vm.name = `vm${randomSuffix}`;
+  vm.name = name; //`vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = publicIp;
@@ -99,6 +99,14 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Funkwhale"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Funkwhale", name, async (grid) => {
     await checkVMExist(grid, "funkwhale", name);
     return grid.machines
@@ -120,6 +128,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Funkwhale"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "funkwhale");

@@ -69,7 +69,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   disk.mountpoint = "/var/lib/docker";
 
   const machine = new MachineModel();
-  machine.name = `vm${randomSuffix}`;
+  machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
   machine.disks = [disk];
@@ -101,6 +101,14 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machines.network = network;
   machines.description = "discourse machine/node";
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Discourse"
+  };
+  machines.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Discourse", name, async (grid) => {
     await checkVMExist(grid, "discourse", name);
     return grid.machines
@@ -122,6 +130,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Discourse"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "discourse");
