@@ -7,7 +7,23 @@ import type { IProfile } from "../types/Profile";
 import getGrid from "../utils/getGrid";
 
 const PREFIX = "v2.";
-const createProfile = (name = "", m = "", n = process.env.NETWORK, key = "") => ({ id: v4(), name, mnemonics: m, storeSecret: "", networkEnv: n, sshKey: key }); // prettier-ignore
+const createProfile = (
+  name = "",
+  m = "",
+  n = "dev" /* process.env.NETWORK */,
+  key = ""
+) => {
+  const result = {
+    id: v4(),
+    name,
+    mnemonics: m,
+    storeSecret: "",
+    networkEnv: n,
+    sshKey: key,
+  };
+
+  return result;
+};
 
 function createBaseConfig() {
   const store = writable({
@@ -144,7 +160,6 @@ function createBaseConfig() {
     },
 
     setActiveProfile(id: string, password: string) {
-      
       update((value) => {
         value.activeProfile = id;
         value.storeSecret = id === null ? null : password;
