@@ -3,7 +3,6 @@ import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-const { K8SModel, KubernetesNodeModel } = window.configs?.grid3_client ?? {};
 
 export default async function deployKubernetes(
   data: Kubernetes,
@@ -15,7 +14,7 @@ export default async function deployKubernetes(
   const masterNodes = [createNode(master)];
   const workerNodes = workers.map(createNode);
 
-  const k8s = new K8SModel();
+  const k8s = new window.configs.grid3_client.K8SModel();
   k8s.name = name;
   k8s.secret = secret;
   k8s.network = createNetwork(new Network(), true);
@@ -26,9 +25,9 @@ export default async function deployKubernetes(
   k8s.ssh_key = profile.sshKey;
 
   const metadate = {
-    "type":  "kubernetes",  
-    "name": name,
-    "projectName": "Kubernetes"
+    type: "kubernetes",
+    name: name,
+    projectName: "Kubernetes",
   };
   k8s.metadata = JSON.stringify(metadate);
 
@@ -38,7 +37,7 @@ export default async function deployKubernetes(
 }
 
 function createNode(data: Base) {
-  const node = new KubernetesNodeModel();
+  const node = new window.configs.grid3_client.KubernetesNodeModel();
   node.name = data.name;
   node.node_id = data.node;
   node.cpu = data.cpu;

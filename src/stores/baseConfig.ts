@@ -183,7 +183,7 @@ function createBaseConfig() {
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
       const profile = data.profiles[idx] as IProfile;
       profile.storeSecret = data.storeSecret;
-      profile.networkEnv = process.env.NETWORK;
+      profile.networkEnv = "dev" /* process.env.NETWORK */;
       return profile;
     },
   };
