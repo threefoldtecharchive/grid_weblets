@@ -179,6 +179,13 @@ export default class Editor extends Vue {
       "presearch.png"
     ),
     new Weblet(
+      "Subsquid",
+      "subsquid",
+      "subsquid",
+      "deployment",
+      "subsquid.png"
+    ),
+    new Weblet(
       "Casperlabs",
       "casperlabs",
       "casperlabs",
