@@ -18,7 +18,10 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid,
+    validateEndpoint,
+    validateCpu,
+    validateMemory,} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
 
   let data = new Subsquid();
@@ -42,6 +45,8 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
+    { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
