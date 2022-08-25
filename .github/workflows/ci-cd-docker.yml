@@ -53,10 +53,6 @@ jobs:
           echo VERSION=${VERSION:10:12} >> $GITHUB_ENV
           echo NETWORK=main >> $GITHUB_ENV
 
-      - name: Get Previous tag
-        id: previoustag
-        uses: actions-ecosystem/action-get-latest-tag@v1
-
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -67,7 +63,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/grid_weblets:${{ steps.previoustag.outputs.tag }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/grid_weblets:${{env.VERSION}}
           build-args: |
             VERSION=${{env.VERSION}}
             NETWORK=${{env.NETWORK}}
