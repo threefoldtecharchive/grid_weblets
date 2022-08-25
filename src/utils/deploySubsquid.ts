@@ -52,7 +52,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
     name,
     cpu,
     memory,
-    diskSize,
+    disks: [{ size }],
     publicIp,
     nodeId,
     endPoint,
@@ -71,7 +71,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   // Docker disk
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
+  disk.size = size;
   disk.mountpoint = "/var/lib/docker";
 
   // VM Specs
@@ -83,7 +83,6 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   vm.planetary = true;
   vm.cpu = cpu;
   vm.memory = memory;
-  vm.qsfs_disks = [];
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist = "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
