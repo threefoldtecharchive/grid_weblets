@@ -34,11 +34,13 @@
   data.disks = [new Disk()];
 
   // define this solution packages
+
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
-    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
+
 
   let status: "valid" | "invalid";
 
