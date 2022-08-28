@@ -184,6 +184,7 @@
               bind:value={numericData}
               on:input={_onInput}
               disabled={field.disabled}
+              maxlength="15"
               {min}
               {max}
             />
