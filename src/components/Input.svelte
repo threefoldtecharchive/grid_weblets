@@ -28,9 +28,6 @@
   function _onInput(e: Event) {
     const target = e.target as HTMLInputElement;
     const isNum = target.getAttribute("data-type") === "number";
-
-    console.log({ isNum, numericValue: (e as any).target.value, parsedNumericValue: +(e as any).target.value });
-
     if (field.validator) {
       let __err = field.validator(target.value);
       _error = typeof __err === "string" ? __err : undefined;
