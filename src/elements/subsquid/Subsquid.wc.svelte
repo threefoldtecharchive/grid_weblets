@@ -5,7 +5,7 @@
   import type { IProfile } from "../../types/Profile";
   import type { IFormField, IPackage, ITab } from "../../types";
   import deploySubsquid from "../../utils/deploySubsquid";
-  import rootFs from "../../utils/rootFs";
+  import { Disk } from "../../types/vm";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -20,6 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -27,6 +28,19 @@
   let loading = false;
   let success = false;
   let failed = false;
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+  data.disks = [new Disk()];
+
+  // define this solution packages
+
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+  ];
+
 
   let status: "valid" | "invalid";
 
@@ -133,12 +147,21 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.disks[0].size}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
+          {packages}
+        />
 
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
           publicIp={data.publicIp}
-          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status
