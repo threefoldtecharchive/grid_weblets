@@ -10,9 +10,7 @@ let loading = true;
 
 onMount(async () => {
     gateways = await LoadGatewayNodes()
-    console.log("gateways:", gateways);
     loading = false;
-    console.log("loading:", loading);
 
 });
 

@@ -6,12 +6,27 @@ export interface GatewayNodes {
   nodeId: number;
   
 }
+export async function selectGatewayNode(): Promise<[number, string]> {
+  const nodes = new Nodes(
+    GridClient.config.graphqlURL,
+    GridClient.config.rmbClient["proxyURL"]
+  );
+  
 
-export function selectGatewayNode(gateway:GatewayNodes) :[number,string]{
+  const selectedNode = randomChoice(await nodes.filterNodes({ gateway: true }));
 
 
+  const nodeId = selectedNode.nodeId;
+  const nodeDomain = selectedNode.publicConfig.domain;
+  return [nodeId, nodeDomain];
+
+}
+
+export function selectSpecificGatewayNode(gateway:GatewayNodes) :[number,string]{
+  
   const nodeId = gateway.nodeId;
   const nodeDomain = gateway.nodeDomain;
+
 
   return [nodeId, nodeDomain];
 
@@ -32,6 +47,7 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
 
     });
   }
+  console.log("gws:", gws);
 
   return gws;
 }
