@@ -34,14 +34,17 @@
       invalid = !!__err;
       /* Hack for now */
     } else if (isNum) {
-      (e as any).target.value = +(e as any).target.value;
-      let __err = +target.value <= 0 ? "Value must be positive" : null;
+      let __err = +target.value <= 0 || isNaN(+target.value) ? "Value must be positive" : null;
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
     }
 
-    if (isNum && !invalid) {
-      data = +numericData;
+    if (isNum) {
+      if (!invalid) {
+        (e as any).target.value = +(e as any).target.value;
+      }
+      
+      data = !invalid ? +numericData : numericData;
     }
 
     dispatch("input", e);
