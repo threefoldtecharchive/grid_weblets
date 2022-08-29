@@ -25,8 +25,9 @@ $: gateway = data === null ? null : gateways[data]
         type: 'select',
         symbol: 'gateway-selector',
         label: 'Select Gateway Node',
+        invalid: true,
         options: [
-            { label: loading ? "Loading gateways..." : "Please select a node id.", value: null, selected: true, disabled: true },
+            { label: loading ? "Loading gateways..." : "Please select a domain.", value: null, selected: true, disabled: true },
             ...gateways.map(({ nodeDomain }, i) => ({ label: nodeDomain, value: i }))
         ]
     }}    

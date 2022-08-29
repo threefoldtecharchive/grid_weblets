@@ -52,7 +52,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid || invalid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -141,7 +141,8 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
         {/each}
         <SelectGatewayNode
         bind:gateway
-        bind:invalid
+        bind:invalid={invalid}
+
       />
         <SelectNodeId
           cpu={data.cpu}
