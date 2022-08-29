@@ -3,19 +3,21 @@ import type { IFormField } from "../types";
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
 const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/16$/;
-const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+const EMAIL_REGEX =
+  /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 // const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start with digit
 const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
 const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
-const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
+const URL_REGEX =
+  /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
-const SSH_REGEX = /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
-
+const SSH_REGEX =
+  /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
 
 // prettier-ignore
 export default function validateName(name: string): string | void {
@@ -32,6 +34,9 @@ export function validateEmail(email: string): string | void {
 export function validateRequiredEmail(email: string): string | void {
   if (email == "") return "Email is required";
   return validateEmail(email);
+}
+export function validateEndpoint(value: string): string | void {
+  if (value.trim() == "") return "Endpoint is required.";
 }
 
 export function validateOptionalEmail(email: string): string | void {
@@ -144,7 +149,8 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIPRange(value: string): string | void {
-  if (!IP_REGEX.test(value)) return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
+  if (!IP_REGEX.test(value))
+    return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
   if (value.length > 15) return "IP range must be less than 15 characters";
 }
 
@@ -169,16 +175,15 @@ export function validateKey(value: string): string | void {
   if (!ALPHANUMERIC_UNDERSCORE_REGEX.test(value)) return "Invalid key format ";
   if (value.length > 128) return "key must be less than 128 characters";
   if (value === "") return "Key is required";
-
 }
-
 
 export function validateKeyValue(value: string): string | void {
   if (value === "") return "Key Value is required";
 }
 
 export function validateFlistvalue(value: string): string | void {
-  if (!WHITE_SPACE_REGEX.test(value)) return "Please remove white spaces from flist";
+  if (!WHITE_SPACE_REGEX.test(value))
+    return "Please remove white spaces from flist";
   if (value === "") return "Flist Value is required";
   if (!URL_REGEX.test(value)) return "Invalid flist";
 }
@@ -188,38 +193,33 @@ export function validateSSH(value: string): string | void {
   if (value === "") return "SSH Value is required";
 }
 
-
 export function validateEntryPoint(value: string): string | void {
   if (value === "") return "Entry point is required";
 }
 
 export function validateStakeAmount(value: string): string | void {
   if (value === "") return "Stake amount is required";
-  if (+value < 1e-5
-    || +value <= 0
-    || value.startsWith("0"))
-  return "Amount must be positive";
-  if (isNaN(+value) 
-    || value.startsWith("+")
-    || value.includes("e")) 
-  return "Stake amount must be a number.";
+  if (+value < 1e-5 || +value <= 0 || value.startsWith("0"))
+    return "Amount must be positive";
+  if (isNaN(+value) || value.startsWith("+") || value.includes("e"))
+    return "Stake amount must be a number.";
 }
 
 export function validateBSCAddress(value: string) {
   if (value === "") return "Ethereum address is required";
   if (value.length != 42) return "Address length must be 42";
   if (!value.startsWith("0x")) return "Address must start with 0x";
-  if (!/^(0x)?[0-9a-f]{40}$/i.test(value)) 
+  if (!/^(0x)?[0-9a-f]{40}$/i.test(value))
     return "Address must consist only of valid hex characters after 0x";
 }
 
 export function validateBSCPrivateKey(value: string): string | void {
   if (value === "") return "Private key is required";
   if (value.length != 64) return "Private key length must be 64";
-  if (!/^[0-9a-f]{64}$/i.test(value)) 
+  if (!/^[0-9a-f]{64}$/i.test(value))
     return "Private key must consist only of valid hex characters.";
 }
 
 export function validateethereumRpc(value: string): string | void {
-  if (value != "" && !URL_REGEX.test(value)) return "Invalid url format"
+  if (value != "" && !URL_REGEX.test(value)) return "Invalid url format";
 }

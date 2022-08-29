@@ -1,0 +1,1 @@
+import "./Subsquid.wc.svelte";
