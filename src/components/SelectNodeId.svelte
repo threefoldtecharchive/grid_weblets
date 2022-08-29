@@ -217,7 +217,6 @@
     symbol: "nodeId",
     type: "number",
     placeholder: "Your Node ID",
-    // validator: _nodeValidator,
   };
 
   interface IResources { cru: number; sru: number; hru: number; mru: number; ipv4u: number; } // prettier-ignore
