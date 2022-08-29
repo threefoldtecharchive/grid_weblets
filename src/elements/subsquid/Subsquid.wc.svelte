@@ -5,7 +5,7 @@
   import type { IProfile } from "../../types/Profile";
   import type { IFormField, IPackage, ITab } from "../../types";
   import deploySubsquid from "../../utils/deploySubsquid";
-  import rootFs from "../../utils/rootFs";
+  import { Disk } from "../../types/vm";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -48,7 +48,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    // { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
@@ -148,7 +148,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
           cpu={data.cpu}
           memory={data.memory}
           publicIp={data.publicIp}
-          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status
