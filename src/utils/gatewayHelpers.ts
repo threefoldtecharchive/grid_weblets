@@ -37,6 +37,7 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
 
     });
   }
+  console.log("gws:", gws);
 
   return gws;
 }

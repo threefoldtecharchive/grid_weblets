@@ -20,13 +20,19 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   let data = new Subsquid();
   let profile: IProfile;
+  let gateway: GatewayNodes;
+
 
   let loading = false;
   let success = false;
   let failed = false;
+  let invalid = true;
+
 
   let status: "valid" | "invalid";
 
@@ -67,6 +73,7 @@
 
     deploySubsquid(data, profile)
       .then((data) => {
+        console.log("gateway after selection:", gateway)
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;
@@ -133,7 +140,10 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid
+      />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
