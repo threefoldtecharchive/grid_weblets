@@ -71,9 +71,8 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
       return;
     }
 
-    deploySubsquid(data, profile)
+    deploySubsquid(data, profile,gateway)
       .then((data) => {
-        console.log("gateway after selection:", gateway)
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;

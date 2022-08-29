@@ -2,7 +2,7 @@ import type { default as Subsquid } from "../types/subsquid";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
@@ -19,14 +19,16 @@ const {
 
 export default async function deploySubsquid(
   data: Subsquid,
-  profile: IProfile
+  profile: IProfile,
+  gateway: GatewayNodes
 ) {
+  console.log("gateway after selection:", gateway)
+
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "subsquid");
 
   // Dynamically select node to deploy the gateway
-  // let [publicNodeId, nodeDomain] = [14, "gent01.dev.grid.tf"];
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectGatewayNode(gateway);
 
   data.domain = `${domainName}.${nodeDomain}`;
 
