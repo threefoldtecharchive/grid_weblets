@@ -56,7 +56,7 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    // { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
