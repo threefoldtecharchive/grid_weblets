@@ -253,7 +253,7 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
-              if (node.dedicated && node.rentedByTwinId != $configs.twinId) {
+              if (node.rentContractId != 0 && node.rentedByTwinId != $configs.twinId) {
                 status = "dedicated";
                 return;
               }
@@ -391,7 +391,7 @@
     {:else if status === "dedicated"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) is dedicated and not reserved for your
-        account, please check the portal.
+        account, please check the dashboard.
       </p>
     {/if}
   {/if}
