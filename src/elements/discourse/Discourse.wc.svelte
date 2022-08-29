@@ -24,12 +24,16 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const data = new Discourse();
 
   let loading = false;
   let success = false;
   let failed = false;
+  let invalid = true;
+  let gateway: GatewayNodes;
 
   let status: "valid" | "invalid";
   let profile: IProfile;
@@ -61,7 +65,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid|| invalid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -81,7 +85,7 @@
     failed = false;
     message = undefined;
 
-    deployDiscourse(data, profile)
+    deployDiscourse(data, profile,gateway)
       .then((data: any) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
@@ -159,7 +163,11 @@
           bind:memoryField
           {packages}
         />
+ <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
 
+      />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}

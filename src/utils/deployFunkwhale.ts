@@ -2,7 +2,7 @@ import type { default as Funkwhale } from "../types/funkwhale";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
@@ -19,13 +19,15 @@ const {
 
 export default async function deployFunkwhale(
   data: Funkwhale,
-  profile: IProfile
+  profile: IProfile,
+  gateway: GatewayNodes
+
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "funkwhale");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   const deploymentInfo = await deployFunkwhaleVM(profile, data);

@@ -22,7 +22,6 @@ export default async function deploySubsquid(
   profile: IProfile,
   gateway: GatewayNodes
 ) {
-  console.log("gateway after selection:", gateway)
 
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "subsquid");

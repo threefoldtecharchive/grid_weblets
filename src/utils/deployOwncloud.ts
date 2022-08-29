@@ -4,7 +4,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 
 const {
@@ -18,13 +18,15 @@ const {
 
 export default async function deployOwncloud(
   data: Owncloud,
-  profile: IProfile
+  profile: IProfile,
+  gateway: GatewayNodes
+
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "owncloud");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the owncloud

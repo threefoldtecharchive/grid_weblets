@@ -2,7 +2,7 @@ import type { default as Taiga } from "../types/taiga";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
@@ -16,12 +16,12 @@ const {
   generateString,
 } = window.configs?.grid3_client ?? {};
 
-export default async function deployTaiga(data: Taiga, profile: IProfile) {
+export default async function deployTaiga(data: Taiga, profile: IProfile,  gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "taiga");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   const deploymentInfo = await deployTaigaVM(profile, data);

@@ -24,11 +24,15 @@
   import rootFs from "../../utils/rootFs";
   import Tabs from "../../components/Tabs.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
   const data = new Mattermost();
   const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
+  let gateway: GatewayNodes;
+  let invalid = true;
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
@@ -95,13 +99,14 @@
   let modalData: Object;
 
   $: disabled =
+    invalid ||
     data.invalid ||
     data.status !== "valid" ||
     isInvalid([...baseFields, diskField, memoryField, cpuField, ...smtpFields]);
 
   function onDeployMattermost() {
     loading = true;
-    deployMattermost(profile, data)
+    deployMattermost(profile, data,gateway)
       .then((data) => {
         modalData = data;
         deploymentStore.set(0);
@@ -172,6 +177,11 @@
           bind:memoryField
           {packages}
         />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
+
+      />
 
         <SelectNodeId
           bind:data={data.nodeId}
