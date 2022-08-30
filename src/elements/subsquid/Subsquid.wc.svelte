@@ -22,6 +22,7 @@
   import { noActiveProfile } from "../../utils/message";
 import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -38,7 +39,18 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+  data.disks = [new Disk()];
 
+  // define this solution packages
+
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+  ];
   // Tabs
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let active = "base";
@@ -139,6 +151,15 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+        <SelectCapacity
+        bind:cpu={data.cpu}
+        bind:memory={data.memory}
+        bind:diskSize={data.disks[0].size}
+        bind:diskField
+        bind:cpuField
+        bind:memoryField
+        {packages}
+      />
         <SelectGatewayNode
         bind:gateway
         bind:invalid={invalid}
