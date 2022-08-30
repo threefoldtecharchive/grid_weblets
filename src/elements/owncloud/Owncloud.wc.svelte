@@ -28,9 +28,13 @@
 
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   let data = new Owncloud();
   let domain: string, planetaryIP: string;
+  let gateway: GatewayNodes;
+  let invalid = true;
 
   data.disks = [new Disk()];
   let profile: IProfile;
@@ -126,7 +130,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid || invalid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -142,7 +146,7 @@
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployOwncloud(data, profile)
+    deployOwncloud(data, profile,gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -227,6 +231,11 @@
           bind:memoryField
           {packages}
         />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
+
+      />
 
         <SelectNodeId
           publicIp={data.publicIp}
