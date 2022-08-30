@@ -20,14 +20,25 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Subsquid();
   let profile: IProfile;
+  let gateway: GatewayNodes;
+
 
   let loading = false;
   let success = false;
   let failed = false;
+  let invalid = true;
+
+
+  let status: "valid" | "invalid";
+
+  const deploymentStore = window.configs?.deploymentStore;
+  const currentDeployment = window.configs?.currentDeploymentStore;
   let diskField: IFormField;
   let cpuField: IFormField;
   let memoryField: IFormField;
@@ -40,13 +51,6 @@
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
-
-
-  let status: "valid" | "invalid";
-
-  const deploymentStore = window.configs?.deploymentStore;
-  const currentDeployment = window.configs?.currentDeploymentStore;
-
   // Tabs
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let active = "base";
@@ -56,11 +60,11 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    // { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid || invalid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -79,7 +83,7 @@
       return;
     }
 
-    deploySubsquid(data, profile)
+    deploySubsquid(data, profile,gateway)
       .then((data) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
@@ -148,15 +152,19 @@
           {/if}
         {/each}
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
-          {packages}
-        />
+        bind:cpu={data.cpu}
+        bind:memory={data.memory}
+        bind:diskSize={data.disks[0].size}
+        bind:diskField
+        bind:cpuField
+        bind:memoryField
+        {packages}
+      />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
 
+      />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}

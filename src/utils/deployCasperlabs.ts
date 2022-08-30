@@ -3,7 +3,7 @@ import type { default as Casperlabs } from "../types/casperlabs";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
@@ -20,13 +20,15 @@ const {
 
 export default async function deployCasperlabs(
   data: Casperlabs,
-  profile: IProfile
+  profile: IProfile,
+  gateway: GatewayNodes
+
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "casperlabs");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the casper labs
