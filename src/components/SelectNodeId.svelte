@@ -252,7 +252,7 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
-              if (node.rentContractId != 0 && node.rentedByTwinId != $configs.twinId) {
+              if (node.rentedByTwinId != $configs.twinId && (node.dedicated || node.rentContractId != 0)) {
                 status = "dedicated";
                 return;
               }
