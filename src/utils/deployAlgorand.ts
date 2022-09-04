@@ -54,7 +54,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     machine.public_ip = publicIp;
     machine.planetary = planetary;
     machine.flist =
-        "https://hub.grid.tf/mayarosama.3bot/mayarosama-algrorand2.1-latest.flist";
+        "https://hub.grid.tf/mayarosama.3bot/mayarosama-algrorand2.3-latest.flist";
     machine.qsfs_disks = [];
     machine.rootfs_size = rootFs(cpu, memory);
     machine.entrypoint = "/sbin/zinit init";

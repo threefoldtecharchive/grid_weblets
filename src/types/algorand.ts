@@ -6,7 +6,7 @@ export default class Algorand extends VM {
     public name = `AL${this.id}`;
     public cpu = 1;
     public memory = 1024 * 8;
-    public diskSize = 10;
+    public diskSize = 50;
     public publicIp = false;
 
     public get valid(): boolean {
