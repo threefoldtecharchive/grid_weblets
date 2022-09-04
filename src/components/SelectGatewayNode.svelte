@@ -6,16 +6,16 @@ import Input from './Input.svelte';
 
 let gateways: GatewayNodes[] = []
 export let gateway: GatewayNodes;
+export let invalid = true;
 let loading = true;
 
 onMount(async () => {
     gateways = await LoadGatewayNodes()
     loading = false;
-
+    invalid = true;
 });
 
 let data = null;
-export let invalid = true;
 
 $: gateway = data === null ? null : gateways[data]
 </script>
