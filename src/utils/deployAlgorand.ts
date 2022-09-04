@@ -54,13 +54,15 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     machine.public_ip = publicIp;
     machine.planetary = planetary;
     machine.flist =
-        "https://hub.grid.tf/omarabdulaziz.3bot/threefolddev-algorand-0.1.flist";
+        "https://hub.grid.tf/mayarosama.3bot/mayarosama-algrorand2.1-latest.flist";
     machine.qsfs_disks = [];
     machine.rootfs_size = rootFs(cpu, memory);
     machine.entrypoint = "/sbin/zinit init";
     machine.env = {
         SSH_KEY: profile.sshKey,
+        ALGORAND_DATA:"/var/lib/algorand",
     };
+console.log("SSH_key: ", profile.sshKey);
 
     // Machines specs
     const machines = new MachinesModel();
