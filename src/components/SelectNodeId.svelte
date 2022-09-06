@@ -265,8 +265,7 @@
               const { total_resources: total, used_resources: used } =
                 node.capacity;
               // prettier-ignore
-              let hasEnoughResources = (total.cru - used.cru) >= filters.cru &&
-                        ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
+              let hasEnoughResources = ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
               if (!hasEnoughResources) {
                 status = "invalid";
