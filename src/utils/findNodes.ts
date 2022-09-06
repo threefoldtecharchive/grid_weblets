@@ -45,8 +45,6 @@ export default function findNodes(
         }
       }
 
-      avilableNodes = avilableNodes.filter((node) => (node.total_resources.cru - node.used_resources.cru) >= filters.cru);
-
       const resNodes = avilableNodes.map((node) => {
         return {
           label: `NodeID(${node.nodeId})`,
