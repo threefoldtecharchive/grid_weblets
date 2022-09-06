@@ -10,14 +10,21 @@ export let invalid = true;
 let loading = true;
 
 onMount(async () => {
-    gateways = await LoadGatewayNodes()
+    const _gateways = await LoadGatewayNodes()
+    gateways = _gateways.map((gw, idx) => ({ ...gw, idx }))
     loading = false;
     invalid = true;
 });
 
 let data = null;
 
-$: gateway = data === null ? null : gateways[data]
+$: {
+    if (data === null && gateway) {
+        data = gateway.idx;
+    } else if (data !== null && gateways) {
+        gateway = gateways[data];
+    }
+}
 </script>
 
 <Input 
