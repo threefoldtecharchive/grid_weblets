@@ -64,7 +64,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  $: disabled = ((loading || !data.valid || invalid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
