@@ -4,7 +4,7 @@ import { solutionList } from "../stores/solutionsList";
 export interface GatewayNodes {
   nodeDomain: string;
   nodeId: number;
-  
+  idx?: number;
 }
 export async function selectGatewayNode(): Promise<[number, string]> {
   const nodes = new Nodes(
