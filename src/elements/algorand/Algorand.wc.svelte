@@ -96,7 +96,7 @@
   <form class="box" on:submit|preventDefault={deployAlgorandHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Algorand Instance</h4>
     <p>
-      Algorand is a bla bla .
+      Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major payments processor.
       <a
         target="_blank"
         href=""
