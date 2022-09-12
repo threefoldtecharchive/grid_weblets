@@ -191,6 +191,7 @@
         ])}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
+        sort={true}
       />
       <div
         class="is-flex is-justify-content-space-between is-align-items-center"
