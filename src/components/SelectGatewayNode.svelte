@@ -21,8 +21,10 @@ let data = null;
 $: {
     if (data === null && gateway) {
         data = gateway.idx;
+        invalid = false;
     } else if (data !== null && gateways) {
         gateway = gateways[data];
+        invalid = false;
     }
 }
 </script>
