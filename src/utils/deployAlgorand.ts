@@ -28,6 +28,9 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
         diskSize,
         publicIp,
         planetary,
+        nodeNetwork,
+        participantNode,
+        mnemonics
     } = data;
 
     // sub deployments model (vm, disk, net): <type><random_suffix>
@@ -54,15 +57,18 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     machine.public_ip = publicIp;
     machine.planetary = planetary;
     machine.flist =
-        "https://hub.grid.tf/mayarosama.3bot/mayarosama-algrorand2.3-latest.flist";
+        "https://hub.grid.tf/slayerprincessmetal.3bot/threefolddev-algorand-latest.flist";
     machine.qsfs_disks = [];
-    machine.rootfs_size = rootFs(cpu, memory);
+    machine.rootfs_size = 100;
     machine.entrypoint = "/sbin/zinit init";
+
     machine.env = {
         SSH_KEY: profile.sshKey,
-        ALGORAND_DATA:"/var/lib/algorand",
+        NETWORK: nodeNetwork,
+        PARTICIPANT: participantNode ? 'participant' : '',
+        ACCOUNT_MNEMONICS: mnemonics
     };
-console.log("SSH_key: ", profile.sshKey);
+    console.log("SSH_key: ", profile.sshKey);
 
     // Machines specs
     const machines = new MachinesModel();

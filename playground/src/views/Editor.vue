@@ -225,7 +225,7 @@ export default class Editor extends Vue {
       "algorand",
       "algorand",
       "deployment",
-      "casperlabs.png"
+      "algorand.png"
     ),
     /*new Weblet(
       "TFhub Validator",

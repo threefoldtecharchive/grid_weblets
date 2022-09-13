@@ -26,6 +26,10 @@ export default function validateName(name: string): string | void {
   if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
   if (name.length > 15) return "Name must be at most 15 characters.";
 }
+export function validateMnemonics(mnemonics: string): string | void {
+  if (!mnemonics.length) return "Mnemonics required";
+  if (!ALPHA_ONLY_REGEX.test(mnemonics)) return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
+}
 
 export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";

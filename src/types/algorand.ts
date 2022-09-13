@@ -8,6 +8,10 @@ export default class Algorand extends VM {
     public memory = 1024 * 8;
     public diskSize = 50;
     public publicIp = false;
+    public participantNode = false
+    public nodeNetwork = 'mainnet'
+    public mnemonics = ''
+
 
     public get valid(): boolean {
         return this.name !== "";
