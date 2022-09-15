@@ -19,6 +19,8 @@ const NUM_REGEX = /^[1-9](\d?|\d+)$/;
 const SSH_REGEX =
   /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
 
+const ENDPOINT_REGEX = /^(((?:wss):\/\/)[a-z0-9-.]+\.[a-z]{2,4}\/?([\w-])?)/;
+
 // prettier-ignore
 export default function validateName(name: string): string | void {
   if (name.length < 2) return "Name must be at least 2 characters";
@@ -37,6 +39,7 @@ export function validateRequiredEmail(email: string): string | void {
 }
 export function validateEndpoint(value: string): string | void {
   if (value.trim() == "") return "Endpoint is required.";
+  if (!ENDPOINT_REGEX.test(value)) return "Invalid endpoint format";
 }
 
 export function validateOptionalEmail(email: string): string | void {
