@@ -96,6 +96,8 @@
   }
 
   function onDeleteWorker(idx: number) {
+    if (!window.confirm("Are you sure you want to delete your worker?"))
+      return;
     const worker = workers[idx];
     removing = worker.name;
     loading = true;
