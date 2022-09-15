@@ -60,11 +60,10 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
-    // { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  $: disabled = ((loading || !data.valid || invalid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -114,12 +113,12 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
       Subsquid indexer is a piece of software that reads all the blocks from a
       Substrate based blockchain, decodes and stores them for processing in a
       later stage.
-      <!-- <a
+      <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_presearch"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_subsquid"
       >
         Quick start documentation</a
-      > -->
+      >
     </p>
 
     <hr />

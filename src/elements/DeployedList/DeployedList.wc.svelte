@@ -39,7 +39,8 @@
 
   // prettier-ignore
   const tabs: ITab[] = [
-    { label: "Virtual Machine", value: "vm" },
+    { label: "Full Virtual Machine", value: "fullvm" },
+    { label: "Micro Virtual Machine", value: "vm" },
     { label: "Kubernetes", value: "k8s" },
     { label: "CapRover", value: "caprover" },
     { label: "Peertube", value: "peertube" },
@@ -54,7 +55,6 @@
     { label: "Algorand", value: "algorand" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
-    { label: "Full Virtual Machine", value: "fullvm" },
   ];
   let active: string = "vm";
   $: active = tab || active;

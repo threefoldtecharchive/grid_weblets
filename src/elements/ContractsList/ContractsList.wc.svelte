@@ -163,7 +163,13 @@
 
 <div style="padding: 15px;">
   <div class="box">
-    <h4 class="is-size-4 mb-4">Contracts List</h4>
+    <h4 class="is-size-4 mb-4">Contracts List
+    </h4>    <a
+    target="_blank"
+    href="https://library.threefold.me/info/manual/#/manual__tfchain_home"
+  >
+    Quick start documentation</a
+  >
     <hr />
 
     {#if loading}

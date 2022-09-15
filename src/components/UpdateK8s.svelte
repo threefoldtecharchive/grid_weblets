@@ -106,8 +106,8 @@
       workerModel.name = removing;
       grid.k8s
         .delete_worker(workerModel)
-        .then(({ deleted }) => {
-          if (deleted.length > 0) {
+        .then(({ deleted, updated }) => {
+          if (deleted.length > 0 ||updated.length > 0) {
             shouldBeUpdated = true;
             let r = removing;
             requestAnimationFrame(() => {
