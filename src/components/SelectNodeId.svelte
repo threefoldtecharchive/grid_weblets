@@ -20,7 +20,7 @@
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number;
-  export let status: "valid" | "invalid" | "dedicated";
+  export let status: "valid" | "invalid" | "dedicated" | "not found";
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
@@ -252,6 +252,11 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
+              if (node.error){
+                status = "not found";
+                return;
+              }
+
               if (node.rentedByTwinId != $configs.twinId && (node.dedicated || node.rentContractId != 0)) {
                 status = "dedicated";
                 return;
@@ -385,6 +390,10 @@
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
         resources.
+      </p>
+    {:else if status === "not found"}
+      <p class="help is-danger">
+        Node(<strong>{data}</strong>) is not found.
       </p>
     {:else if status === "dedicated"}
       <p class="help is-danger">
