@@ -20,7 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validateMnemonics, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import { getResources } from "../../utils/getAlgoResources";
 
   let data = new Algorand();
   let profile: IProfile;
@@ -33,21 +33,9 @@
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
-
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
   // Tabs
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let active = "base";
-
-  // define this solution packages
-  const packages: IPackage[] = [
-    { name: "Minimum", cpu: 2, memory: 1024 * 4, diskSize: 50 },
-    { name: "Standard", cpu: 4, memory: 1024 * 8, diskSize: 500 },
-    { name: "Recommended", cpu: 8, memory: 1024 * 16, diskSize: 1000 },
-  ];
 
   // Fields
   const fields: IFormField[] = [
@@ -115,6 +103,8 @@
   ];
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+  $: [data.cpu, data.memory, data.rootSize] = getResources(data.nodeNetwork, data.nodeType)
+
   let message: string;
   let modalData: Object;
 
@@ -209,21 +199,11 @@
           {/each}
         {/if}
 
-        <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.diskSize}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
-          {packages}
-        />
-
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
           publicIp={data.publicIp}
-          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
+          ssd={data.rootSize + rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status

@@ -24,7 +24,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     cpu,
     memory,
     nodeId,
-    diskSize,
+    rootSize,
     publicIp,
     planetary,
     nodeNetwork,
@@ -58,7 +58,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   machine.public_ip = publicIp;
   machine.planetary = planetary;
   machine.qsfs_disks = [];
-  machine.rootfs_size = diskSize;
+  machine.rootfs_size = rootSize;
   machine.flist =
     "https://hub.grid.tf/omarabdulaziz.3bot/threefolddev-algorand-v1.0-all.flist";
   machine.entrypoint = "/sbin/zinit init";

@@ -9,7 +9,7 @@ export default class Algorand extends VM {
   // capacity
   public cpu;
   public memory;
-  public diskSize;
+  public rootSize;
 
   // algo nodes config
   public nodeNetwork = "mainnet";
