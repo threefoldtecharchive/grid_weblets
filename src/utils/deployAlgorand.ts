@@ -28,10 +28,10 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     publicIp,
     planetary,
     nodeNetwork,
-    participantNode,
     mnemonics,
     firstRound,
     lastRound,
+    nodeType
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
@@ -42,24 +42,30 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     new Network(`nw${randomSuffix}`, "10.200.0.0/16")
   );
 
+  // Disk Specs
+  const disk = new DiskModel();
+  disk.name = `disk${randomSuffix}`;
+  disk.size = 50;
+  disk.mountpoint = "/var/lib/docker";
+
   // Machine specs
   const machine = new MachineModel();
   machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
-  machine.disks = [];
+  machine.disks = nodeType == "indexer"? [disk]: [];
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = planetary;
   machine.qsfs_disks = [];
   machine.rootfs_size = diskSize;
   machine.flist =
-    "https://hub.grid.tf/omarabdulaziz.3bot/threefolddev-algorand-v1.0-part.flist";
+    "https://hub.grid.tf/omarabdulaziz.3bot/threefolddev-algorand-v1.0-all.flist";
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SSH_KEY: profile.sshKey,
     NETWORK: nodeNetwork,
-    PARTICIPANT: participantNode ? "participant" : "",
+    NODE_TYPE: nodeType,
     ACCOUNT_MNEMONICS: mnemonics,
     FIRST_ROUND: `${firstRound}`,
     LAST_ROUND: `${lastRound}`,

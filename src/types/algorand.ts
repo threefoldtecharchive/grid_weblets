@@ -2,19 +2,28 @@ import { v4 } from "uuid";
 import VM from "./vm";
 
 export default class Algorand extends VM {
-    public id = v4().split("-")[0];
-    public name = `AL${this.id}`;
-    public cpu = 1;
-    public memory = 1024 * 2;
-    public diskSize = 50;
-    public publicIp = false;
-    public participantNode = false
-    public nodeNetwork = 'mainnet'
-    public mnemonics = ''
-    public firstRound: number = 20000000 
-    public lastRound: number = 30000000 
+  public id = v4().split("-")[0];
+  public name = `al${this.id}`;
+  public publicIp = false;
 
-    public get valid(): boolean {
-        return this.name !== "";
-    }
+  // capacity
+  public cpu;
+  public memory;
+  public diskSize;
+
+  // algo nodes config
+  public nodeNetwork = "mainnet";
+  public nodeType: "default" | "participant" | "relay" | "indexer" = "default";
+
+  // the participation fields
+  public mnemonics = "";
+  public firstRound: number = 24000000;
+  public lastRound: number = 26000000;
+
+  // public participantNode = false
+  // public relay: boolean = false
+
+  public get valid(): boolean {
+    return this.name !== "";
+  }
 }

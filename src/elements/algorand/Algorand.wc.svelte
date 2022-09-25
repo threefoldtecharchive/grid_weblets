@@ -20,6 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validateMnemonics, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Algorand();
   let profile: IProfile;
@@ -33,28 +34,59 @@
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
   // Tabs
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let active = "base";
 
+  // define this solution packages
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 2, memory: 1024 * 4, diskSize: 50 },
+    { name: "Standard", cpu: 4, memory: 1024 * 8, diskSize: 500 },
+    { name: "Recommended", cpu: 8, memory: 1024 * 16, diskSize: 1000 },
+  ];
+
   // Fields
-  // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Algorand Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
-    { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
-	{
-		label: "Network",
-		type: "select",
-		symbol: "nodeNetwork",
-		options: [
-		{ label: "Mainnet", value: "mainnet", selected: true},
-		{ label: "Testnet", value: "testnet" },
-		{ label: "Betanet", value: "betanet" },
-		{ label: "Devnet", value: "devnet" },
-		]
-	},
-  	{ label: "Participant Node", symbol: "participantNode", placeholder: "Participant Node", type: 'checkbox' },
+    {
+      label: "Name",
+      symbol: "name",
+      placeholder: "Algorand Instance Name",
+      type: "text",
+      validator: validateName,
+      invalid: false,
+    },
+    {
+      label: "Public IP",
+      symbol: "publicIp",
+      placeholder: "Enable Public Ip",
+      type: "checkbox",
+    },
+    {
+      label: "Network",
+      type: "select",
+      symbol: "nodeNetwork",
+      options: [
+        { label: "Mainnet", value: "mainnet", selected: true },
+        { label: "Testnet", value: "testnet" },
+        { label: "Betanet", value: "betanet" },
+        { label: "Devnet", value: "devnet" },
+      ],
+    },
+    {
+      label: "Node type",
+      type: "select",
+      symbol: "nodeType",
+      options: [
+        { label: "Default", value: "default", selected: true },
+        { label: "Participant", value: "participant" },
+        { label: "Relay", value: "relay" },
+        { label: "Indexer", value: "indexer" },
+      ],
+    },
   ];
 
   const participantFields: IFormField[] = [
@@ -162,7 +194,8 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-        {#if data.participantNode}
+
+        {#if data.nodeType == "participant"}
           {#each participantFields as field (field.symbol)}
             {#if field.invalid !== undefined}
               <Input
@@ -175,6 +208,16 @@
             {/if}
           {/each}
         {/if}
+
+        <SelectCapacity
+          bind:cpu={data.cpu}
+          bind:memory={data.memory}
+          bind:diskSize={data.diskSize}
+          bind:diskField
+          bind:cpuField
+          bind:memoryField
+          {packages}
+        />
 
         <SelectNodeId
           cpu={data.cpu}
