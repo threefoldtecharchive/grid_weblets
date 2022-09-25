@@ -5,7 +5,6 @@
   export let message: string;
   export let domain: string;
   export let planetaryIP: string;
-  export let deployed: boolean = false;
 
   function selectColor(t: typeof type): string {
     switch (t) {
@@ -37,8 +36,3 @@
     <li>Planetary IP: {planetaryIP}</li>
   </ul>
 </div>
-{#if deployed}
-  <div class="notification" style={`background-color: #1982b1; color: white`}>
-    Your solution is now starting. Please be patient
-  </div>
-{/if}
