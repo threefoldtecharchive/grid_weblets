@@ -18,7 +18,7 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateMnemonics, validatePreCode} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonics} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getAlgoResources";
 
@@ -51,6 +51,14 @@
       label: "Public IP",
       symbol: "publicIp",
       placeholder: "Enable Public Ip",
+      type: "checkbox",
+    },
+  ];
+  const nodeFields: IFormField[] = [
+    {
+      label: "Set Custom Capacity",
+      symbol: "customCapacity",
+      placeholder: "",
       type: "checkbox",
     },
     {
@@ -90,20 +98,62 @@
       label: "First Round",
       symbol: "firstRound",
       placeholder: "First Validation Block",
-      type: "text",
+      type: "number",
       invalid: false,
     },
     {
       label: "Last Round",
       symbol: "lastRound",
       placeholder: "Last Validation Block",
-      type: "text",
+      type: "number",
       invalid: false,
     },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
-  $: [data.cpu, data.memory, data.rootSize] = getResources(data.nodeNetwork, data.nodeType)
+  const customCapacityFields: IFormField[] = [
+    {
+      label: "CPU (Cores)",
+      symbol: "cpu",
+      placeholder: "CPU Cores",
+      type: "text",
+      validator: () =>
+        validateAlgoCpu(data.cpu, data.nodeNetwork, data.nodeType),
+      invalid: false,
+    },
+    {
+      label: "Memory (MB)",
+      symbol: "memory",
+      placeholder: "Your Memory in MB",
+      type: "text",
+      validator: () =>
+        validateAlgoMemory(data.memory, data.nodeNetwork, data.nodeType),
+      invalid: false,
+    },
+    {
+      label: "Storage (GB)",
+      symbol: "rootSize",
+      placeholder: "Storage",
+      type: "text",
+      validator: () => {
+        return validateAlgoStorage(
+          data.rootSize,
+          data.nodeNetwork,
+          data.nodeType
+        );
+      },
+      invalid: false,
+    },
+  ];
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields) || isInvalid(customCapacityFields); // prettier-ignore
+
+  const setResouces = () => {
+    console.log("setting resources");
+    [data.cpu, data.memory, data.rootSize] = getResources(
+      data.nodeNetwork,
+      data.nodeType
+    );
+  };
 
   let message: string;
   let modalData: Object;
@@ -152,7 +202,12 @@
     <p>
       Algorand (ALGO) is a blockchain platform and cryptocurrency designed to
       function like a major payments processor.
-      <a target="_blank" href=""> Quick start documentation</a>
+      <a
+        target="_blank"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
+      >
+        Quick start documentation</a
+      >
     </p>
 
     <hr />
@@ -185,8 +240,38 @@
           {/if}
         {/each}
 
+        {#each nodeFields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input
+              bind:data={data[field.symbol]}
+              {field}
+              on:input={setResouces}
+            />
+          {/if}
+        {/each}
+
         {#if data.nodeType == "participant"}
           {#each participantFields as field (field.symbol)}
+            {#if field.invalid !== undefined}
+              <Input
+                bind:data={data[field.symbol]}
+                bind:invalid={field.invalid}
+                {field}
+              />
+            {:else}
+              <Input bind:data={data[field.symbol]} {field} />
+            {/if}
+          {/each}
+        {/if}
+
+        {#if data.customCapacity}
+          {#each customCapacityFields as field (field.symbol)}
             {#if field.invalid !== undefined}
               <Input
                 bind:data={data[field.symbol]}

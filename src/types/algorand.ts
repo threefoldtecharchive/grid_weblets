@@ -11,6 +11,8 @@ export default class Algorand extends VM {
   public memory;
   public rootSize;
 
+  public customCapacity: boolean = false;
+  
   // algo nodes config
   public nodeNetwork = "mainnet";
   public nodeType: "default" | "participant" | "relay" | "indexer" = "default";
