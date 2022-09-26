@@ -60,7 +60,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   machine.qsfs_disks = [];
   machine.rootfs_size = rootSize;
   machine.flist =
-    "https://hub.grid.tf/omarabdulaziz.3bot/threefolddev-algorand-v1.0-all.flist";
+    "https://hub.grid.tf/tf-official-apps/algorand-latest.flist";
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SSH_KEY: profile.sshKey,
