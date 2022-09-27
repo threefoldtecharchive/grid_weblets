@@ -154,6 +154,7 @@
       data.nodeType
     );
   };
+  setResouces(); // initial setting
 
   let message: string;
   let modalData: Object;
