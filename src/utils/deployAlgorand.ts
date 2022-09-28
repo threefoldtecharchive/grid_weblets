@@ -8,7 +8,7 @@ import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 
 const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
-  window.configs?.grid3_client ?? {};
+  window.configs.grid3_client;
 
 export default async function deployAlgorand(
   data: Algorand,
@@ -31,7 +31,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     mnemonics,
     firstRound,
     lastRound,
-    nodeType
+    nodeType,
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
@@ -53,14 +53,13 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
-  machine.disks = nodeType == "indexer"? [disk]: [];
+  machine.disks = nodeType == "indexer" ? [disk] : [];
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = planetary;
   machine.qsfs_disks = [];
   machine.rootfs_size = rootSize;
-  machine.flist =
-    "https://hub.grid.tf/tf-official-apps/algorand-latest.flist";
+  machine.flist = "https://hub.grid.tf/tf-official-apps/algorand-latest.flist";
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SSH_KEY: profile.sshKey,
