@@ -76,7 +76,7 @@
         {/if}
 
         {#if headers}
-          {#each headers as hd (hd)}
+          {#each headers as hd}
             <th title={hd}>{hd}</th>
           {/each}
         {/if}
@@ -101,7 +101,7 @@
               </td>
             {/if}
 
-            {#each row as item (item)}
+            {#each row as item}
               <td>{item}</td>
             {/each}
 
@@ -172,7 +172,7 @@
       <tfoot>
         <tr>
           {#if headers}
-            {#each headers as hd (hd)}
+            {#each headers as hd}
               <th title={hd}>{hd}</th>
             {/each}
           {/if}
