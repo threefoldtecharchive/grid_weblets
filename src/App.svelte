@@ -16,6 +16,8 @@
   import Subsquid from "./elements/subsquid/Subsquid.wc.svelte";
   import Casperlabs from "./elements/casperlabs/Casperlabs.wc.svelte";
   import NodePilot from "./elements/nodePilot/NodePilot.wc.svelte";
+  import DeployedList from "./elements/DeployedList/DeployedList.wc.svelte";
+  import ContractsList from "./elements/ContractsList/ContractsList.wc.svelte";
 
   const weblets = [
     { name: "Full VM", cmp: Fullvm },
@@ -32,14 +34,18 @@
     { name: "Subsquid", cmp: Subsquid },
     { name: "Casperlabs", cmp: Casperlabs },
     { name: "NodePilot", cmp: NodePilot },
+    { name: "Deployed List", cmp: DeployedList },
+    { name: "Contracts List", cmp: ContractsList },
   ];
-  let selectedWebletIndex = weblets.findIndex(({ cmp }) => cmp === Fullvm);
+  let selectedWebletIndex = weblets.findIndex(
+    ({ cmp }) => cmp === DeployedList
+  );
 </script>
 
 <Base />
 <ProfileManager />
 
-<div style="display: flex; justify-content: center;">
+<div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}
     <p
       style={"cursor: pointer; margin: 0 5px;" +
