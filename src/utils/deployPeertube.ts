@@ -2,32 +2,28 @@ import type { default as Peertube } from "../types/peertube";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import { selectGatewayNode, getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
+import {
+  selectGatewayNode,
+  getUniqueDomainName,
+  selectSpecificGatewayNode,
+  GatewayNodes,
+} from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-const {
-  DiskModel,
-  MachineModel,
-  MachinesModel,
-  GatewayNameModel,
-  generateString,
-} = window.configs?.grid3_client ?? {};
-
 export default async function deployPeertube(
   data: Peertube,
   profile: IProfile,
   gateway: GatewayNodes
-
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "peertube");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
+  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy peertube
@@ -48,6 +44,9 @@ export default async function deployPeertube(
 }
 
 async function deployPeertubeVM(profile: IProfile, data: Peertube) {
+  const { DiskModel, MachineModel, MachinesModel, generateString } =
+    window.configs.grid3_client;
+
   const {
     name,
     cpu,
@@ -85,8 +84,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist =
-    "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
@@ -102,9 +100,9 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "Peertube"
+    type: "vm",
+    name: name,
+    projectName: "Peertube",
   };
   vms.metadata = JSON.stringify(metadate);
 
@@ -124,6 +122,8 @@ async function deployPrefixGateway(
   backend: string,
   publicNodeId: number
 ) {
+  const { GatewayNameModel } = window.configs.grid3_client;
+
   // Gateway Specs
   const gw = new GatewayNameModel();
   gw.name = domainName;
@@ -132,9 +132,9 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:9000`];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domainName,
-    "projectName": "Peertube"
+    type: "gateway",
+    name: domainName,
+    projectName: "Peertube",
   };
   gw.metadata = JSON.stringify(metadate);
 
