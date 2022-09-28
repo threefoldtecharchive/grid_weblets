@@ -205,7 +205,7 @@
       function like a major payments processor.
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_algorand"
       >
         Quick start documentation</a
       >
