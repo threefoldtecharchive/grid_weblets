@@ -7,9 +7,6 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 
-const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
-  window.configs.grid3_client;
-
 export default async function deployAlgorand(
   data: Algorand,
   profile: IProfile
@@ -19,6 +16,8 @@ export default async function deployAlgorand(
 }
 
 async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
+  const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
+    window.configs.grid3_client;
   const {
     name,
     cpu,
