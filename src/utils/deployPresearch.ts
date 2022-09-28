@@ -8,9 +8,6 @@ import rootFs from "./rootFs";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 
-const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
-  window.configs?.grid3_client ?? {};
-
 export default async function deployPresearch(
   data: Presearch,
   profile: IProfile
@@ -20,6 +17,9 @@ export default async function deployPresearch(
 }
 
 async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
+  const { MachinesModel, DiskModel, MachineModel, generateString } =
+    window.configs.grid3_client;
+
   const {
     name,
     cpu,
@@ -56,8 +56,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = planetary;
-  machine.flist =
-    "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist";
+  machine.flist = "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist";
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
@@ -76,9 +75,9 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.description = "presearch node";
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "Presearch"
+    type: "vm",
+    name: name,
+    projectName: "Presearch",
   };
   machines.metadata = JSON.stringify(metadate);
 
