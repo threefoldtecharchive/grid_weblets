@@ -10,7 +10,7 @@ const PREFIX = "v2.";
 const createProfile = (
   name = "",
   m = "",
-  n = "dev" /* process.env.NETWORK */,
+  n = process.env.NETWORK,
   key = ""
 ) => {
   const result = {
@@ -183,7 +183,7 @@ function createBaseConfig() {
       const idx = data.profiles.findIndex((p) => p.id === data.activeProfile);
       const profile = data.profiles[idx] as IProfile;
       profile.storeSecret = data.storeSecret;
-      profile.networkEnv = "dev" /* process.env.NETWORK */;
+      profile.networkEnv = process.env.NETWORK;
       return profile;
     },
   };

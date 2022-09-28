@@ -69,6 +69,12 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
     }),
+    new webpack.DefinePlugin({
+      "process.env": {
+        NETWORK: process.env.NETWORK || '"dev"',
+        VERSION: process.env.VERSION || '"no version provided"',
+      },
+    }),
   ],
   devtool: prod ? false : "source-map",
   devServer: {
