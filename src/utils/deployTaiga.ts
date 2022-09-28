@@ -2,26 +2,26 @@ import type { default as Taiga } from "../types/taiga";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import { selectGatewayNode, getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
+import {
+  selectGatewayNode,
+  getUniqueDomainName,
+  selectSpecificGatewayNode,
+  GatewayNodes,
+} from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-const {
-  DiskModel,
-  MachineModel,
-  MachinesModel,
-  GatewayNameModel,
-  NetworkModel,
-  generateString,
-} = window.configs?.grid3_client ?? {};
-
-export default async function deployTaiga(data: Taiga, profile: IProfile,  gateway: GatewayNodes) {
+export default async function deployTaiga(
+  data: Taiga,
+  profile: IProfile,
+  gateway: GatewayNodes
+) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "taiga");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
+  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   const deploymentInfo = await deployTaigaVM(profile, data);
@@ -41,6 +41,14 @@ export default async function deployTaiga(data: Taiga, profile: IProfile,  gatew
 }
 
 async function deployTaigaVM(profile: IProfile, data: Taiga) {
+  const {
+    DiskModel,
+    MachineModel,
+    MachinesModel,
+    NetworkModel,
+    generateString,
+  } = window.configs.grid3_client;
+
   const {
     name,
     envs,
@@ -108,9 +116,9 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "Taiga"
+    type: "vm",
+    name: name,
+    projectName: "Taiga",
   };
   vms.metadata = JSON.stringify(metadate);
 
@@ -130,6 +138,8 @@ async function deployPrefixGateway(
   backend: string,
   publicNodeId: number
 ) {
+  const { GatewayNameModel } = window.configs.grid3_client;
+
   const gw = new GatewayNameModel();
   gw.name = domainName;
   gw.node_id = publicNodeId;
@@ -137,9 +147,9 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:9000/`];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domainName,
-    "projectName": "Taiga"
+    type: "gateway",
+    name: domainName,
+    projectName: "Taiga",
   };
   gw.metadata = JSON.stringify(metadate);
 
