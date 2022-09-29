@@ -19,7 +19,7 @@ export function getResources(network, type) {
   if (type == "indexer" && network == "testnet") {
     cpu = 4;
     memory = 1024 * 8;
-    rootSize = 1700;
+    rootSize = 1300;
   }
   if (type == "indexer" && network == "mainnet") {
     cpu = 4;
