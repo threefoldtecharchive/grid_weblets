@@ -20,7 +20,8 @@ export interface IStore {
   | "TFhubValidator"
   | "Casperlabs"
   | "NodePilot"
-  | "Fullvm";
+  | "Fullvm"
+  | "Algorand";
   name: string;
   message: string;
 }

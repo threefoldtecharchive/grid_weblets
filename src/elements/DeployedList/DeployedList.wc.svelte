@@ -22,7 +22,8 @@
     | "casperlabs"
     | "nodepilot"
     | "subsquid"
-    | "fullvm";
+    | "fullvm"|
+    "algorand";
 
   export let tab: TabsType = undefined;
 
@@ -51,6 +52,8 @@
     { label: "Presearch", value: "presearch" },
     { label: "Subsquid", value: "subsquid" },
     { label: "Casperlabs", value: "casperlabs" },
+    { label: "Algorand", value: "algorand" },
+    //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
   ];
   let active: string = "vm";
@@ -437,6 +440,15 @@
         },
       ],
       fullvm: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+      algorand: (rows) => [
         {
           type: "info",
           label: "Show Details",
