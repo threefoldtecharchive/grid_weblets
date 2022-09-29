@@ -1,7 +1,5 @@
 import { getUniqueDomainName } from "./gatewayHelpers";
 
-const { GridClient } = window.configs?.grid3_client ?? {};
-const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 interface IConfig {
   mnemonics: string;
@@ -14,7 +12,10 @@ export default async function deleteDeployment(
   key: "k8s" | "machines",
   name: string,
   type: string
-) {
+  ) {
+  const { GridClient } = window.configs.grid3_client;
+  const { HTTPMessageBusClient } = window.configs.client;
+  
   const { mnemonics, networkEnv, storeSecret } = configs;
   const http = new HTTPMessageBusClient(0, "", "", "");
   const grid = new GridClient(
