@@ -6,7 +6,7 @@ export function getResources(network, type) {
   if (type == "participant" || type == "default") {
     rootSize = 100;
   }
-  if (type == "relay" && network == "tesnet") {
+  if (type == "relay" && network == "testnet") {
     cpu = 4;
     memory = 1024 * 8;
     rootSize = 400;
