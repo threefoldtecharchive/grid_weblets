@@ -14,4 +14,5 @@ export const solutionList = {
   nodepilot: "np",
   fullvm: "fvm",
   subsquid: "ss",
+  'freeflow': 'ff'
 };

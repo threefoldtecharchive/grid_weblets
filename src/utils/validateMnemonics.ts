@@ -4,7 +4,7 @@ const { HTTPMessageBusClient } = window.configs?.client ?? {};
 
 export default function validateMnemonics(profile: IProfile) {
   const { networkEnv, mnemonics, storeSecret } = profile;
-  const http = new HTTPMessageBusClient(0, "", "", "");
+  const http = new HTTPMessageBusClient(0, "", "https://graph.grid.tf/graphql", "");
   const grid = new GridClient(
     networkEnv as any,
     mnemonics,

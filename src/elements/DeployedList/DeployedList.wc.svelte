@@ -52,6 +52,7 @@
     { label: "Subsquid", value: "subsquid" },
     { label: "Casperlabs", value: "casperlabs" },
     { label: "Node Pilot", value: "nodepilot" },
+    { label: "FreeFlow", value: "freeflow" },
   ];
   let active: string = "vm";
   $: active = tab || active;
@@ -514,8 +515,8 @@
               <Alert
                 type="warning"
                 message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
+                Failed to load
+                <strong>${rows.total - rows.data.length}</strong>
                 out of ${rows.total} Deployments`}
               />
             {/if}
@@ -571,8 +572,8 @@
               <Alert
                 type="warning"
                 message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
+                Failed to load
+                <strong>${rows.total - rows.data.length}</strong>
                 out of ${rows.total} Deployments`}
               />
             {/if}

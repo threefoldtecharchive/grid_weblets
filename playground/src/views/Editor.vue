@@ -199,7 +199,9 @@ export default class Editor extends Vue {
       "deployment",
       "vm.png"
     ),*/
-    new Weblet("Node Pilot", "nodepilot", "nodepilot", "deployment", "vm.png"),
+    new Weblet("  Node Pilot", "nodepilot", "nodepilot", "deployment", "vm.png"),
+
+    new Weblet("FreeFlow", "freeflow", "freeflow", "deployment", "freeflow.png"),
 
     new Weblet("Contracts", "contractslist", "", "my account", ""),
     new Weblet("Deployments", "deployedlist", "", "my account", ""),
