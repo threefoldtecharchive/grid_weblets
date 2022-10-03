@@ -60,6 +60,7 @@ There is a several component in the weblets repo, you can find them in the `/src
   - [Casperlabs](/src/elements/casperlabs)
   - [Node Pilot](/src/elements/nodePilot)
   - [Full Virtual Machine](/src/elements/fullvm)
+  - [FreeFlow](/src/elements/freeflow)
 - Utils Components
   - [Base](/src/elements/base)
   - [Profile](/src/elements/profiles)

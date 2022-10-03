@@ -53,7 +53,8 @@ export default class App extends Vue {
     "tfhubvalidator",
     "nodepilot",
     "fullvm",
-    'freeflow'
+    'freeflow',
+    "algorand",
   ];
   sidenav: ISidenav | null = null;
 

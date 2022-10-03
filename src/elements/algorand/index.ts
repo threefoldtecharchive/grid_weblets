@@ -1,0 +1,1 @@
+import "./Algorand.wc.svelte"

@@ -1,4 +1,5 @@
 import type { IFormField } from "../types";
+import { getResources } from "./getAlgoResources";
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
@@ -27,6 +28,11 @@ export default function validateName(name: string): string | void {
   if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace.";
   if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
   if (name.length > 15) return "Name must be at most 15 characters.";
+}
+export function validateMnemonics(mnemonics: string): string | void {
+  if (!mnemonics.length) return "Mnemonics required";
+  if (!ALPHA_ONLY_REGEX.test(mnemonics))
+    return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
 }
 
 export const  validateThreeBotName = (name: string): string | void => {
@@ -231,4 +237,18 @@ export function validateBSCPrivateKey(value: string): string | void {
 
 export function validateethereumRpc(value: string): string | void {
   if (value != "" && !URL_REGEX.test(value)) return "Invalid url format";
+}
+
+export function validateAlgoCpu(value: string, net, type): string | void {
+  let [cpu, memory, storage] = getResources(net, type);
+  if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}`;
+}
+export function validateAlgoMemory(value: string, net, type): string | void {
+  let [cpu, memory, storage] = getResources(net, type);
+  if (+value < memory) return `Minimum Memory for this deployment is ${memory}`;
+}
+export function validateAlgoStorage(value: string, net, type): string | void {
+  let [cpu, memory, storage] = getResources(net, type);
+  if (+value < storage)
+    return `Minimum Storage for this deployment is ${storage}`;
 }

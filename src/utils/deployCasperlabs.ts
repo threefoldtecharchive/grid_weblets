@@ -3,32 +3,28 @@ import type { default as Casperlabs } from "../types/casperlabs";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
+import {
+  selectGatewayNode,
+  getUniqueDomainName,
+  GatewayNodes,
+  selectSpecificGatewayNode,
+} from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-const {
-  DiskModel,
-  MachineModel,
-  MachinesModel,
-  GatewayNameModel,
-  generateString,
-} = window.configs?.grid3_client ?? {};
-
 export default async function deployCasperlabs(
   data: Casperlabs,
   profile: IProfile,
   gateway: GatewayNodes
-
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "casperlabs");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
+  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the casper labs
@@ -50,6 +46,9 @@ export default async function deployCasperlabs(
 }
 
 async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
+  const { DiskModel, MachineModel, MachinesModel, generateString } =
+    window.configs.grid3_client;
+
   const {
     name,
     cpu,
@@ -84,8 +83,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist =
-    "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
@@ -99,9 +97,9 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "Casperlabs"
+    type: "vm",
+    name: name,
+    projectName: "Casperlabs",
   };
   vms.metadata = JSON.stringify(metadate);
 
@@ -121,6 +119,8 @@ async function deployPrefixGateway(
   backend: string,
   publicNodeId: number
 ) {
+  const { GatewayNameModel } = window.configs.grid3_client;
+
   // define specs
   const gw = new GatewayNameModel();
   gw.name = domainName;
@@ -129,9 +129,9 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:80`];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domainName,
-    "projectName": "Casperlabs"
+    type: "gateway",
+    name: domainName,
+    projectName: "Casperlabs",
   };
   gw.metadata = JSON.stringify(metadate);
 

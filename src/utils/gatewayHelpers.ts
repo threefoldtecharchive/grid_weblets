@@ -1,5 +1,4 @@
-const { GridClient, Nodes, randomChoice } = window.configs?.grid3_client ?? {};
-import {solutionList} from "../stores/solutionsList";
+import { solutionList } from "../stores/solutionsList";
 
 export interface GatewayNodes {
   nodeDomain: string;
@@ -7,42 +6,36 @@ export interface GatewayNodes {
   idx?: number;
 }
 export async function selectGatewayNode(): Promise<[number, string]> {
-  const {GridClient, Nodes, randomChoice} = window.configs.grid3_client;
+  const { GridClient, Nodes, randomChoice } = window.configs.grid3_client;
 
   const nodes = new Nodes(
-      'https://graphql.dev.grid.tf/graphql',
-      'https://gridproxy.dev.grid.tf'
+      GridClient.config.graphqlURL,
+      GridClient.config.rmbClient["proxyURL"]
   );
 
-
-  const selectedNode = randomChoice(await nodes.filterNodes({gateway: true}));
-
+  const selectedNode = randomChoice(await nodes.filterNodes({ gateway: true }));
 
   const nodeId = selectedNode.nodeId;
   const nodeDomain = selectedNode.publicConfig.domain;
   return [nodeId, nodeDomain];
-
 }
 
-export function selectSpecificGatewayNode(gateway:GatewayNodes) :[number,string]{
-
+export function selectSpecificGatewayNode(
+    gateway: GatewayNodes
+): [number, string] {
   const nodeId = gateway.nodeId;
   const nodeDomain = gateway.nodeDomain;
 
-
   return [nodeId, nodeDomain];
-
 }
 
 export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
-  const {GridClient, Nodes, randomChoice} = window.configs.grid3_client;
-
+  const { GridClient, Nodes } = window.configs.grid3_client;
   const nodes = new Nodes(
-      'https://graphql.dev.grid.tf/graphql',
-      'https://gridproxy.dev.grid.tf'
+      GridClient.config.graphqlURL,
+      GridClient.config.rmbClient["proxyURL"]
   );
-
-  const LoadedNodes = await nodes.filterNodes({gateway: true});
+  const LoadedNodes = await nodes.filterNodes({ gateway: true });
   let gws: GatewayNodes[] = [];
 
   for (const node of LoadedNodes) {
@@ -57,12 +50,12 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
 export async function getUniqueDomainName(profile, name, solutionType) {
   const { networkEnv, mnemonics, storeSecret } = profile;
   const client = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
-    solutionType,
-    window.configs.grid3_client.BackendStorageType.tfkvstore
+      networkEnv as any,
+      mnemonics,
+      storeSecret,
+      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+      solutionType,
+      window.configs.grid3_client.BackendStorageType.tfkvstore
   );
 
   const solutionCode = solutionList[solutionType];

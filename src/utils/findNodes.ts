@@ -1,7 +1,6 @@
 import type { ISelectOption } from "../types";
 import type { IProfile } from "../types/Profile";
 import type { FilterOptions } from "grid3_client";
-const { GridClient, Nodes, Graphql } = window.configs?.grid3_client ?? {};
 
 export default function findNodes(
   filters: FilterOptions,
@@ -10,10 +9,15 @@ export default function findNodes(
 ): Promise<ISelectOption[]> {
   return new Promise(async (res) => {
     const { networkEnv } = profile;
-    const grid = new GridClient("" as any, "", "", null);
+    const grid = new window.configs.grid3_client.GridClient(
+      "" as any,
+      "",
+      "",
+      null
+    );
 
     const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
-    const nodes = new Nodes(graphql, rmbProxy);
+    const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy);
 
     try {
       let avilableNodes = await nodes.filterNodes(filters);
@@ -66,9 +70,13 @@ async function getBlockedNodesIDs(
 ): Promise<number[]> {
   // This step for preventing select a node that already has a deployment of the same type.
   // For now, it is only used with presearch.
-  const gqlClient = new Graphql(graphql);
+  const gqlClient = new window.configs.grid3_client.Graphql(graphql);
 
-  let blockedFarmsIDs = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
+  let blockedFarmsIDs = await getBlockedFarmsIDs(
+    exclusiveFor,
+    rmbProxy,
+    graphql
+  );
 
   // get all the nodeIds of all the farms
   let farmsIDs = `[${blockedFarmsIDs.join(", ")}]`;
@@ -88,8 +96,8 @@ export async function getBlockedFarmsIDs(
   exclusiveFor: string,
   rmbProxy: string,
   graphql: string
-) : Promise<number[]> {
-  const gqlClient = new Graphql(graphql);
+): Promise<number[]> {
+  const gqlClient = new window.configs.grid3_client.Graphql(graphql);
 
   // get the total number of deployment of the same type
   const res1 = (await gqlClient.query(`query MyQuery {

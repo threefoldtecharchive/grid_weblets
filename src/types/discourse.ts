@@ -69,7 +69,7 @@ class SMTP {
 }
 
 export default class Discourse {
-    constructor(
+  constructor(
     public id = v4(),
 
     /* Base info */
