@@ -4,18 +4,18 @@ export default function validateMnemonics(profile: IProfile) {
   const { networkEnv, mnemonics, storeSecret } = profile;
   const http = new window.configs.client.HTTPMessageBusClient(0, "", "", "");
   const grid = new window.configs.grid3_client.GridClient(
-      networkEnv as any,
-      mnemonics,
-      storeSecret,
-      http,
-      undefined,
-      "tfkvstore" as any
+    networkEnv as any,
+    mnemonics,
+    storeSecret,
+    http,
+    undefined,
+    "tfkvstore" as any
   );
   return grid
-      .connect()
-      .then(() => grid.disconnect())
-      .then(() => true)
-      .catch(() => false);
+    .connect()
+    .then(() => grid.disconnect())
+    .then(() => true)
+    .catch(() => false);
 }
 
 export function syncValidateMnemonics(mnemonics: string): string | void {

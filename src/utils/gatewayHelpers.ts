@@ -9,8 +9,8 @@ export async function selectGatewayNode(): Promise<[number, string]> {
   const { GridClient, Nodes, randomChoice } = window.configs.grid3_client;
 
   const nodes = new Nodes(
-      GridClient.config.graphqlURL,
-      GridClient.config.rmbClient["proxyURL"]
+    GridClient.config.graphqlURL,
+    GridClient.config.rmbClient["proxyURL"]
   );
 
   const selectedNode = randomChoice(await nodes.filterNodes({ gateway: true }));
@@ -32,8 +32,8 @@ export function selectSpecificGatewayNode(
 export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
   const { GridClient, Nodes } = window.configs.grid3_client;
   const nodes = new Nodes(
-      GridClient.config.graphqlURL,
-      GridClient.config.rmbClient["proxyURL"]
+    GridClient.config.graphqlURL,
+    GridClient.config.rmbClient["proxyURL"]
   );
   const LoadedNodes = await nodes.filterNodes({ gateway: true });
   let gws: GatewayNodes[] = [];
@@ -50,12 +50,12 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
 export async function getUniqueDomainName(profile, name, solutionType) {
   const { networkEnv, mnemonics, storeSecret } = profile;
   const client = new window.configs.grid3_client.GridClient(
-      networkEnv as any,
-      mnemonics,
-      storeSecret,
-      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
-      solutionType,
-      window.configs.grid3_client.BackendStorageType.tfkvstore
+    networkEnv as any,
+    mnemonics,
+    storeSecret,
+    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+    solutionType,
+    window.configs.grid3_client.BackendStorageType.tfkvstore
   );
 
   const solutionCode = solutionList[solutionType];

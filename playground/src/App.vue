@@ -18,11 +18,11 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue, Watch} from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import Sidenav from "@/components/Sidenav.vue";
-import {ISidenav} from "@/types/Sidenav";
-import {Route} from "vue-router";
-import {findInitialPage} from "@/utils/sidenav";
+import { ISidenav } from "@/types/Sidenav";
+import { Route } from "vue-router";
+import { findInitialPage } from "@/utils/sidenav";
 
 @Component({
   name: "App",
