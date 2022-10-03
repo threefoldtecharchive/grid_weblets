@@ -63,6 +63,7 @@
     "front-matter": "^4.0.2",
     "grid3_client": "1.4.2",
     "js-yaml": "^4.1.0",
+    "keypair": "^1.0.4",
     "marked": "^3.0.8",
     "page": "^1.11.6",
     "plotly.js-dist": "^2.6.3",

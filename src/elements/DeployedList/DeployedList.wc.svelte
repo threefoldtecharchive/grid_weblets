@@ -34,6 +34,7 @@
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
   import UpdateK8s from "../../components/UpdateK8s.svelte";
+  import UpdateCapRover from "../../components/UpdateCapRover.svelte";
   import type { IAction } from "../../types/table-action";
 
   // prettier-ignore
@@ -115,6 +116,7 @@
 
   let infoToShow: Object;
   let k8sToUpdate: any;
+  let capRoverToUpdate: any;
 
   let _sub: any;
   onMount(() => {
@@ -194,6 +196,12 @@
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Manage Workers",
+          click: (_, i) => (capRoverToUpdate = rows[i]),
+          disabled: () => removing !== null,
         },
         {
           type: "success",
@@ -620,6 +628,17 @@
     k8s={k8sToUpdate}
     on:closed={({ detail }) => {
       k8sToUpdate = null;
+      if (detail) _reloadTab();
+    }}
+  />
+{/if}
+
+{#if capRoverToUpdate}
+  <UpdateCapRover
+    {profile}
+    capRover={capRoverToUpdate}
+    on:closed={({ detail }) => {
+      capRoverToUpdate = null;
       if (detail) _reloadTab();
     }}
   />

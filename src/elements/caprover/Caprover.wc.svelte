@@ -2,8 +2,8 @@
 
 <script lang="ts">
   import type { IFormField, IPackage, ITab } from "../../types";
-  import { default as Caprover } from "../../types/caprover";
-  import deployCaprover from "../../utils/deployCaprover";
+  import { CapWorker, default as Caprover } from "../../types/caprover";
+  import deployCaprover, { deployWorker } from "../../utils/deployCaprover";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -17,15 +17,14 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
-    validateDisk,
-    validateMemory,
     validatePassword
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+    import AddBtn from "../../components/AddBtn.svelte";
+    import DeleteBtn from "../../components/DeleteBtn.svelte";
 
   const data = new Caprover();
   let loading = false;
@@ -39,12 +38,13 @@
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
+    { label: "Leader", value: "leader" },
+    { label: "Workers", value: "workers" },
   ];
   let active = "config";
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "CapRover Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Domain", symbol: "domain", placeholder: "Domain configured in your name provider.", type: "text", validator: validateDomainName, invalid: false },
     { label: "Password", symbol: "password", placeholder: "Caprover New Password", type: "password", validator: validatePassword, invalid: false },
   ];
@@ -55,11 +55,12 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  // prettier-ignore
+  const baseFields: IFormField[] = [
+    { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text", validator: validateName, invalid: false},
+  ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, cpuField, memoryField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, ...baseFields]); // prettier-ignore
   let message: string;
   let modalData: Object;
   async function deployCaproverHandler() {
@@ -78,10 +79,31 @@
     message = undefined;
 
     deployCaprover(data, profile)
-      .then((data) => {
-        modalData = data;
+      .then(async (vm) => {
+        //modalData = vm;
         deploymentStore.set(0);
-        success = true;
+
+        console.log(new Date().toLocaleString());
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        await delay(240*1000);
+
+        console.log(new Date().toLocaleString());
+
+        for (const worker of data.workers) {
+          deployWorker(data, worker, profile)
+          .then((data) => {
+            console.log("rawda res", data)
+            deploymentStore.set(0);
+            success = true;
+          })
+          .catch((err: string) => {
+            failed = true;
+            message = err;
+          });
+        }
+        modalData = vm;
+        //success = true;
       })
       .catch((err: string) => {
         failed = true;
@@ -131,7 +153,7 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
     {:else}
-      <Tabs bind:active {tabs} />
+      <Tabs bind:active selectedTab={"config"} selectedID={0} {tabs} />
 
       {#if active === "config"}
         {#each fields as field (field.symbol)}
@@ -166,16 +188,22 @@
             </div>
           {/if}
         {/each}
-
+      {:else if active === "leader"}
+        {#each baseFields as field (field.symbol)}
+          <Input
+          bind:data={data[field.symbol]}
+          bind:invalid={field.invalid}
+          {field}
+          />
+        {/each}
+          
         <SelectCapacity
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.diskSize}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
           {packages}
         />
+
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
@@ -189,6 +217,49 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
+      {:else if active === "workers"}
+        <AddBtn
+          on:click={() => {const worker = new CapWorker(); worker.publicKey = data.publicKey; data.workers = [...data.workers, worker]; }}
+        />
+        <div class="nodes-container">
+          {#each data.workers as worker, index (worker.id)}
+            <div class="box">
+              <DeleteBtn
+                name={worker.name}
+                on:click={() =>
+                  (data.workers = data.workers.filter((_, i) => index !== i))}
+              />
+              {#each baseFields as field (field.symbol)}
+                <Input
+                  bind:data={worker[field.symbol]}
+                  bind:invalid={field.invalid}
+                  {field}
+                />
+              {/each}
+
+              <SelectCapacity
+                bind:cpu={worker.cpu}
+                bind:memory={worker.memory}
+                bind:diskSize={worker.diskSize}
+                {packages}
+              />
+
+              <SelectNodeId
+                cpu={worker.cpu}
+                memory={worker.memory}
+                publicIp={true}
+                ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
+                bind:data={worker.nodeId}
+                bind:nodeSelection={worker.selection.type}
+                bind:status
+                filters={worker.selection.filters}
+                {profile}
+                on:fetch={({ detail }) => (worker.selection.nodes = detail)}
+                nodes={worker.selection.nodes}
+              />
+            </div>
+          {/each}
+        </div>
       {/if}
     {/if}
 
@@ -214,4 +285,5 @@
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import "../../assets/global.scss";
 </style>
