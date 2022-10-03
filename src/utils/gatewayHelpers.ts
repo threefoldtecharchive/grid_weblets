@@ -21,7 +21,7 @@ export async function selectGatewayNode(): Promise<[number, string]> {
 }
 
 export function selectSpecificGatewayNode(
-    gateway: GatewayNodes
+  gateway: GatewayNodes
 ): [number, string] {
   const nodeId = gateway.nodeId;
   const nodeDomain = gateway.nodeDomain;
