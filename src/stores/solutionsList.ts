@@ -14,9 +14,6 @@ export const solutionList = {
   nodepilot: "np",
   fullvm: "fvm",
   subsquid: "ss",
-<<<<<<< HEAD
-  'freeflow': 'ff'
-=======
+  freeflow: 'ff',
   algorand: "al",
->>>>>>> d0cf03a8ae23d05e8fd512b5fad2d9f7473ebe21
 };
