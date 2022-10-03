@@ -13,9 +13,13 @@
   export let cpu: number;
   export let memory: number;
   export let diskSize: number;
-  export let packages: IPackage[];
+  export let packages: IPackage[];  
+  export let cpuField: IFormField;
+  export let memoryField: IFormField;
+  export let diskField: IFormField;
 
-  export let cpuField: IFormField = {
+
+  const __cpuField: IFormField = {
     label: "CPU (vCores)",
     symbol: "cpu",
     placeholder: "CPU vCores",
@@ -23,7 +27,7 @@
     validator: validateCpu,
     invalid: false,
   };
-  export let memoryField: IFormField = {
+  const __memoryField: IFormField = {
     label: "Memory (MB)",
     symbol: "memory",
     placeholder: "Your Memory in MB",
@@ -31,7 +35,7 @@
     validator: validateMemory,
     invalid: false,
   };
-  export let diskField: IFormField = {
+  const __diskField: IFormField = {
     label: "Disk (GB)",
     symbol: "diskSize",
     placeholder: "Your Disk size in GB",
@@ -40,7 +44,7 @@
     invalid: false,
   };
 
-  let packageField: IFormField = {
+  const packageField: IFormField = {
     label: "Select Solution Flavor",
     symbol: "pkg",
     type: "select",
@@ -80,6 +84,9 @@
 
   onMount(() => {
     requestAnimationFrame(() => {
+      cpuField = __cpuField;
+      memoryField = __memoryField;
+      diskField = __diskField;
       _applyPackage(0);
       for (var _i = 0; _i < 3; _i++) {
         packageField.options[_i].label += _package_spec(_i);
@@ -89,24 +96,24 @@
 </script>
 
 <Input
-  bind:data={selectedPackage}
-  bind:selected={selectedPackageIndex}
-  field={packageField}
-  on:input={onSelectPackage}
+bind:data={selectedPackage}
+bind:selected={selectedPackageIndex}
+field={packageField}
+on:input={onSelectPackage}
 />
 
 {#if selectedPackage === "cust"}
-  <Input bind:data={cpu} bind:invalid={cpuField.invalid} field={cpuField} />
+  <Input bind:data={cpu} bind:invalid={__cpuField.invalid} field={__cpuField} />
 
   <Input
     bind:data={memory}
-    bind:invalid={memoryField.invalid}
-    field={memoryField}
+    bind:invalid={__memoryField.invalid}
+    field={__memoryField}
   />
 
   <Input
     bind:data={diskSize}
-    bind:invalid={diskField.invalid}
-    field={diskField}
+    bind:invalid={__diskField.invalid}
+    field={__diskField}
   />
 {/if}

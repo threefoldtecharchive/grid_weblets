@@ -1,36 +1,36 @@
-import type Presearch from "../types/presearch";
+import type Algorand from "../types/algorand";
 import type { IProfile } from "../types/Profile";
 
 import { Network } from "../types/kubernetes";
 import createNetwork from "./createNetwork";
 
-import rootFs from "./rootFs";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 
-export default async function deployPresearch(
-  data: Presearch,
+export default async function deployAlgorand(
+  data: Algorand,
   profile: IProfile
 ) {
-  const deploymentInfo = await depoloyPresearchVM(data, profile);
+  const deploymentInfo = await depoloyAlgorandVM(data, profile);
   return { deploymentInfo };
 }
 
-async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
-  const { MachinesModel, DiskModel, MachineModel, generateString } =
+async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
+  const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
     window.configs.grid3_client;
-
   const {
     name,
     cpu,
     memory,
     nodeId,
-    diskSize,
+    rootSize,
     publicIp,
     planetary,
-    preCode,
-    privateRestoreKey,
-    publicRestoreKey,
+    nodeNetwork,
+    mnemonics,
+    firstRound,
+    lastRound,
+    nodeType,
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
@@ -41,10 +41,10 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
     new Network(`nw${randomSuffix}`, "10.200.0.0/16")
   );
 
-  // Docker disk
+  // Disk Specs
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
+  disk.size = 50;
   disk.mountpoint = "/var/lib/docker";
 
   // Machine specs
@@ -52,19 +52,21 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
-  machine.disks = [disk];
+  machine.disks = nodeType == "indexer" ? [disk] : [];
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = planetary;
-  machine.flist = "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist";
   machine.qsfs_disks = [];
-  machine.rootfs_size = rootFs(cpu, memory);
+  machine.rootfs_size = rootSize;
+  machine.flist = "https://hub.grid.tf/tf-official-apps/algorand-latest.flist";
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SSH_KEY: profile.sshKey,
-    PRESEARCH_REGISTRATION_CODE: preCode,
-    PRESEARCH_BACKUP_PRI_KEY: privateRestoreKey,
-    PRESEARCH_BACKUP_PUB_KEY: publicRestoreKey,
+    NETWORK: nodeNetwork,
+    NODE_TYPE: nodeType,
+    ACCOUNT_MNEMONICS: mnemonics,
+    FIRST_ROUND: `${firstRound}`,
+    LAST_ROUND: `${lastRound}`,
   };
 
   // Machines specs
@@ -72,18 +74,18 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.name = name;
   machines.machines = [machine];
   machines.network = network;
-  machines.description = "presearch node";
+  machines.description = "Algorand node";
 
   const metadate = {
     type: "vm",
     name: name,
-    projectName: "Presearch",
+    projectName: "Algorand",
   };
   machines.metadata = JSON.stringify(metadate);
 
   // Deploy
-  return deploy(profile, "Presearch", name, async (grid) => {
-    await checkVMExist(grid, "presearch", name);
+  return deploy(profile, "Algorand", name, async (grid) => {
+    await checkVMExist(grid, "algorand", name);
 
     return grid.machines
       .deploy(machines)
