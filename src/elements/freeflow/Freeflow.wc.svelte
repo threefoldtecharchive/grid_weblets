@@ -8,17 +8,18 @@
     import Tabs from "../../components/Tabs.svelte";
     import DeployBtn from "../../components/DeployBtn.svelte";
     import Alert from "../../components/Alert.svelte";
-    import {noActiveProfile} from "../../utils/message";
     import type {IFormField, ITab} from "../../types";
     import type {IProfile} from "../../types/Profile";
     import type {GatewayNodes} from "../../utils/gatewayHelpers";
-    import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     import FreeFlow from "../../types/freeflow";
-    import {validateKey, validateKeyValue} from "../../utils/validateName";
+    import {validateFlistvalue, validateThreeBotName} from "../../utils/validateName";
     import {Env} from "../../types/vm";
-    import DeleteBtn from "../../components/DeleteBtn.svelte";
-    import AddBtn from "../../components/AddBtn.svelte";
-
+    import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+    import SelectNodeId from "../../components/SelectNodeId.svelte";
+    import {noActiveProfile} from "../../utils/message";
+    import Modal from "../../components/DeploymentModal.svelte";
+    import deployFreeFlow from "../../utils/deployFreeFlow";
+    import hasEnoughBalance from "../../utils/hasEnoughBalance";
 
     const data = new FreeFlow();
 
@@ -27,8 +28,19 @@
     let loading = false;
     let success = false;
     let failed = false;
-    let invalid = true;
+
+    let invalidGateway = true;
+    let status = "valid" | "invalid";
+
     let gateway: GatewayNodes;
+    let modalData: Object;
+
+    const validateFlist = {
+        loading: false,
+        error: null,
+        validator: validateFlistvalue,
+        invalid: false,
+    };
 
     let message: string;
 
@@ -37,36 +49,61 @@
 
     const tabs: ITab[] = [
         {label: "Config", value: "config"},
-        {label: "Environment Variables", value: "env"},
     ];
 
-    const envFields: IFormField[] = [
-        { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
-        { label: 'Value', symbol: 'value', placeholder: "Environment Value", validator: validateKeyValue,type: "text" },
-    ];
 
     let active = "config";
 
 
-    const validateName = (name: string) => {
-        if (name.length > 3) return 'Must be more than 3 characters'
-    }
-
     // prettier-ignore
-    const fields: IFormField[] = [
+    const nameField: IFormField =
         {
             label: "Name",
             symbol: "name",
             placeholder: "Your 3bot name",
             type: "text",
-            validator: validateName,
+            validator: validateThreeBotName,
             invalid: false
-        },
-    ];
+        };
 
+
+    $: disabled = nameField.invalid | invalidGateway | status != 'valid'
 
     const deployFreeFlowHandler = () => {
+        loading = true;
 
+        const gatewayName = (data.threeBotUserId + '.' + gateway.nodeDomain);
+
+        data.envs[1] = new Env(undefined, 'USER_ID', data.threeBotUserId)
+        data.envs[2] = new Env(undefined, 'DIGITALTWIN_APPID', gatewayName)
+        data.envs[3] = new Env(undefined, 'NODE_ENV', 'staging')
+
+        if (!hasEnoughBalance()) {
+            failed = true;
+            loading = false;
+            message =
+                "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+            return;
+        }
+
+        success = false;
+        failed = false;
+        message = undefined;
+
+        deployFreeFlow(data, profile, "VM")
+            .then((data) => {
+                deploymentStore.set(0);
+                success = true;
+                modalData = data;
+            })
+            .catch((err: Error) => {
+                failed = true;
+                message = typeof err === "string" ? err : err.message;
+            })
+            .finally(() => {
+                validateFlist.loading = false;
+                loading = false;
+            });
     }
 
     $: logs = $currentDeployment;
@@ -100,12 +137,14 @@
 
         {#if loading || (logs !== null && logs.type === "FreeFlow")}
             <Alert type="info" message={logs?.message ?? "Loading..."}/>
-        <!--{:else if !profile}-->
-        <!--    <Alert type="info" message={noActiveProfile}/>-->
+
+        {:else if !profile}
+            <Alert type="info" message={noActiveProfile}/>
+
         {:else if success}
             <Alert
                     type="success"
-                    message="Successfully Deployed Discourse."
+                    message="Successfully Deployed FreeFlow."
                     deployed={true}
             />
         {:else if failed}
@@ -113,46 +152,37 @@
         {:else}
             <Tabs bind:active {tabs}/>
 
-            {#if active === "config"}
-                {#each fields as field (field.symbol)}
-                    {#if field.invalid !== undefined}
-                        <Input
-                                bind:data={data[field.symbol]}
-                                bind:invalid={field.invalid}
-                                {field}
-                        />
-                    {:else}
-                        <Input bind:data={data[field.symbol]} {field}/>
-                    {/if}
-                {/each}
+            <Input
+                    bind:data={data.threeBotUserId}
+                    bind:invalid={nameField.invalid}
+                    field={nameField}
+            />
 
+            <SelectGatewayNode
+                    bind:gateway
+                    bind:invalid={invalidGateway}
 
-                <SelectGatewayNode
-                        bind:gateway
-                        bind:invalid={invalid}
-
-                />
-
-            {:else if active === "env"}
-                <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
-                <div class="nodes-container">
-                    {#each data.envs as env, index (env.id)}
-                        <div class="box">
-                            <DeleteBtn
-                                    name={env.key}
-                                    on:click={() =>
-                  (data.envs = data.envs.filter((_, i) => index !== i))}
-                            />
-                            {#each envFields as field (field.symbol)}
-                                <Input bind:data={env[field.symbol]} {field} />
-                            {/each}
-                        </div>
-                    {/each}
-                </div>
-            {/if}
+            />
+            <SelectNodeId
+                    publicIp={data.publicIp}
+                    cpu={data.cpu}
+                    memory={data.memory}
+                    ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            data.rootFs
+          )}
+                    bind:nodeSelection={data.selection.type}
+                    bind:data={data.nodeId}
+                    filters={data.selection.filters}
+                    bind:status
+                    {profile}
+                    on:fetch={({ detail }) => (data.selection.nodes = detail)}
+                    nodes={data.selection.nodes}
+            />
         {/if}
 
         <DeployBtn
+                disabled={disabled}
                 {loading}
                 {success}
                 {failed}
@@ -167,6 +197,10 @@
         />
     </form>
 </div>
+
+{#if modalData}
+    <Modal data={modalData} on:closed={() => (modalData = null)}/>
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

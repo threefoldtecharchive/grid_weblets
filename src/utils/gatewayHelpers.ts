@@ -1,5 +1,5 @@
 const { GridClient, Nodes, randomChoice } = window.configs?.grid3_client ?? {};
-import { solutionList } from "../stores/solutionsList";
+import {solutionList} from "../stores/solutionsList";
 
 export interface GatewayNodes {
   nodeDomain: string;
@@ -7,13 +7,15 @@ export interface GatewayNodes {
   idx?: number;
 }
 export async function selectGatewayNode(): Promise<[number, string]> {
-  const nodes = new Nodes(
-    GridClient.config.graphqlURL,
-    GridClient.config.rmbClient["proxyURL"]
-  );
-  
+  const {GridClient, Nodes, randomChoice} = window.configs.grid3_client;
 
-  const selectedNode = randomChoice(await nodes.filterNodes({ gateway: true }));
+  const nodes = new Nodes(
+      'https://graphql.dev.grid.tf/graphql',
+      'https://gridproxy.dev.grid.tf'
+  );
+
+
+  const selectedNode = randomChoice(await nodes.filterNodes({gateway: true}));
 
 
   const nodeId = selectedNode.nodeId;
@@ -23,7 +25,7 @@ export async function selectGatewayNode(): Promise<[number, string]> {
 }
 
 export function selectSpecificGatewayNode(gateway:GatewayNodes) :[number,string]{
-  
+
   const nodeId = gateway.nodeId;
   const nodeDomain = gateway.nodeDomain;
 
@@ -33,18 +35,20 @@ export function selectSpecificGatewayNode(gateway:GatewayNodes) :[number,string]
 }
 
 export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
+  const {GridClient, Nodes, randomChoice} = window.configs.grid3_client;
+
   const nodes = new Nodes(
-    GridClient.config.graphqlURL,
-    GridClient.config.rmbClient["proxyURL"]
+      'https://graphql.dev.grid.tf/graphql',
+      'https://gridproxy.dev.grid.tf'
   );
-  const LoadedNodes =await nodes.filterNodes({ gateway: true });
+
+  const LoadedNodes = await nodes.filterNodes({gateway: true});
   let gws: GatewayNodes[] = [];
 
-  for(const node of LoadedNodes){
+  for (const node of LoadedNodes) {
     gws.push({
       nodeDomain: node.publicConfig.domain,
       nodeId: node.nodeId,
-
     });
   }
 
