@@ -47,7 +47,7 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
-  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid" || worker.rootFs < rootFs(worker.cpu, worker.memory) || !worker.rootFs; // prettier-ignore
+  $: disabled = loading || isInvalid(workerFields) || !worker || worker.status !== "valid" || worker.rootFs < rootFs(worker.cpu, worker.memory) || !worker.rootFs || !+worker.rootFs; // prettier-ignore
   $: logs = $currentDeployment;
 
   function onAddWorker() {
