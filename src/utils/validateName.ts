@@ -158,9 +158,12 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIPRange(value: string): string | void {
-  if (!IP_REGEX.test(value))
+  const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+  const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
+  const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
+  if (!ipRegex.test(value)) {
     return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
-  if (value.length > 15) return "IP range must be less than 15 characters";
+  }
 }
 
 export function validateMountPoint(value: string): string | void {
