@@ -72,17 +72,19 @@ export default async function deployCaprover(
   });
 }
 
-export async function deployWorker(leader: Caprover, worker: CapWorker, profile: IProfile) {
+export async function deployWorker(publicIP: string, password: string, worker: CapWorker, profile: IProfile) {
+  const { MachinesModel, DiskModel, MachineModel } =
+    window.configs.grid3_client;
 
   const pair =  window.configs.keypair();
   var pub = pair.public;
   var priv = pair.private;
 
   // login
-  const token = await fetch(`http://${leader.publicIP}:3000/api/v2/login`, {
+  const token = await fetch(`http://${publicIP}:3000/api/v2/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-namespace": "captain" },
-    body: JSON.stringify({ "password": leader.password })
+    body: JSON.stringify({ "password": password })
   })
     .then((res) => {console.log(res); return res.status == 100 ? res["data"].token : ""})
     .catch((err) => {throw err;});
@@ -110,7 +112,7 @@ export async function deployWorker(leader: Caprover, worker: CapWorker, profile:
   machine.env = {
     SWM_NODE_MODE: "worker",
     SWMTKN: token,
-    LEADER_PUBLIC_IP: leader.publicIP,
+    LEADER_PUBLIC_IP: publicIP,
     CAPTAIN_IMAGE_VERSION: "v1.4.2",
     PUBLIC_KEY: `${worker.publicKey}\n${pub}`,
     CAPTAIN_IS_DEBUG: "true",
@@ -145,10 +147,10 @@ export async function deployWorker(leader: Caprover, worker: CapWorker, profile:
   const worker_ip = vm["publicIP"].ip.split("/")[0];
 
   // add worker
-  await fetch(`http://${leader.publicIP}:3000/api/v2/user/system/nodes`, {
+  await fetch(`http://${publicIP}:3000/api/v2/user/system/nodes`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-namespace": "captain", "x-captain-auth": token },
-    body: JSON.stringify({ "privateKey": priv, "remoteNodeIpAddress": worker_ip, "captainIpAddress": leader.publicIP, "nodeType": "worker" })
+    body: JSON.stringify({ "privateKey": priv, "remoteNodeIpAddress": worker_ip, "captainIpAddress": publicIP, "nodeType": "worker" })
   })
     .then((res) => {console.log(res); return res})
     .catch((err) => {throw err;});

@@ -3,7 +3,7 @@
 <script lang="ts">
   // libs
   import type { IProfile } from "../types/Profile";
-  import type { IFormField } from "../types";
+  import type { IFormField, IPackage } from "../types";
   import validateName, { isInvalid } from "../utils/validateName"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -17,6 +17,7 @@
   import rootFs from "../utils/rootFs";
   import { deployWorker } from "../utils/deployCaprover";
   import { CapWorker } from "../types/caprover";
+    import SelectCapacity from "./SelectCapacity.svelte";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -24,7 +25,7 @@
   export let capRover: any;
 
   let workers: any[] = [];
-  $: if (capRover) workers = capRover.workers;
+  //$: if (capRover) workers = capRover.workers;
 
   let shouldBeUpdated: boolean = false;
   let loading: boolean = false;
@@ -39,14 +40,24 @@
     { label: "Name", symbol: "name", placeholder: "Worker instance name", type: "text", validator: validateName, invalid: false },
   ];
 
-  $: disabled = loading || isInvalid(workerFields) || !worker; // prettier-ignore
+  const packages: IPackage[] = [
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+  ];
+
+  $: worker.publicKey = profile.sshKey;
+  $: disabled = loading || isInvalid(workerFields) || !worker.valid; // prettier-ignore
   $: logs = $currentDeployment;
 
   function onAddWorker() {
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
 
-    deployWorker(capRover, worker, profile)
+    const publicIP = capRover["publicIp"].split("/")[0];
+    const password = capRover["details"]["env"]["DEFAULT_PASSWORD"];
+
+    deployWorker(publicIP, password, worker, profile)
     .then((data) => {
       if (data) {
         success = true;
@@ -188,6 +199,13 @@
                     {field}
                 />
             {/each}
+
+            <SelectCapacity
+              bind:cpu={worker.cpu}
+              bind:memory={worker.memory}
+              bind:diskSize={worker.diskSize}
+              {packages}
+            />
 
             <SelectNodeId
                 cpu={worker.cpu}

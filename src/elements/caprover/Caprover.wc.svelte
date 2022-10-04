@@ -91,7 +91,7 @@
         console.log(new Date().toLocaleString());
 
         for (const worker of data.workers) {
-          deployWorker(data, worker, profile)
+          deployWorker(data.publicIP, data.password, worker, profile)
           .then((data) => {
             console.log("rawda res", data)
             deploymentStore.set(0);
