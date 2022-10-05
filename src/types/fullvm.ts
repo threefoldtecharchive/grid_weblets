@@ -11,7 +11,6 @@ export default class FullVM extends VM {
   public diskSize: number = 50;
   public get valid(): boolean {
     const { name, diskSize, flist, entrypoint, envs, disks } = this;
-    console.log("Full VM disks", disks);
     return (
       name !== "" &&
       flist !== "" &&
