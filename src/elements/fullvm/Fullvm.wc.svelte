@@ -85,7 +85,7 @@
   // prettier-ignore
   const envFields: IFormField[] = [
     { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
-    { label: 'Value', symbol: 'value', placeholder: "Environment Value", validator: validateKeyValue,type: "text" },
+    { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text", validator: validateKeyValue, invalid:false },
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
@@ -101,7 +101,7 @@
   data.disks = [
     new Disk(undefined, undefined, data.diskSize, "/"),
     ...data.disks,
-  ];
+  ];  
 
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
@@ -114,14 +114,16 @@
   }
 
   function _isInvalidDefaultDisk(value: number): string | void {
+    const NUM_REGEX = /^[1-9](\d?|\d+)$/;
+    if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
+    return "Disk size must be a valid number.";
     value = +value;
-    if (value < 15) {
-      console.log(value, "disk is less than 15");
-      return "Minimum allowed disk size is 15 GB.";
-    }
+    if (+value.toFixed(0) !== value) return "Disk size must be a valid integer.";
+    if (value < 15) return "Minimum allowed disk size is 15 GB.";
+    if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore  
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
