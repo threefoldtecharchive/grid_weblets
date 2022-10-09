@@ -19,6 +19,7 @@
   import Table from "./Table.svelte";
   import RootFsSize from "./RootFsSize.svelte";
   import rootFs from "../utils/rootFs";
+  import DialogueMsg from './DialogueMsg.svelte';
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -34,7 +35,9 @@
   let success: boolean = false;
   let failed: boolean = false;
   let removing: string = null;
-
+  let name: string = null;
+  let opened = false;
+  let workerIndex: number;
   let worker = new Worker();
   // prettier-ignore
   const workerFields: IFormField[] = [ 
@@ -96,8 +99,6 @@
   }
 
   function onDeleteWorker(idx: number) {
-    if (!window.confirm("Are you sure you want to delete your worker?"))
-      return;
     const worker = workers[idx];
     removing = worker.name;
     loading = true;
@@ -233,11 +234,20 @@
                 label: "Delete",
                 type: "danger",
                 loading: (i) => loading && removing === workers[i].name,
-                click: (_, i) => onDeleteWorker(i),
+                click: (_, i) => {
+                  workerIndex = i;
+                  name = `worker ${workers[i].name}`;
+                  opened = !opened;
+                },
                 disabled: () => loading || removing !== null,
               },
             ]}
           />
+          <DialogueMsg 
+          bind:opened 
+          on:removed={onDeleteWorker(workerIndex)}
+          {name}
+        />
           <hr />
         {:else}
           <hr style="width: 1200px" />
