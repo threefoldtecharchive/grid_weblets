@@ -41,7 +41,17 @@
       return getGrid(profile, (grid) => {
         grid.contracts
           .listMyContracts()
-          .then(({ nameContracts, nodeContracts }) => {
+          .then(({ nameContracts, nodeContracts, rentContracts }) => {
+            const rents = rentContracts.map(
+              ({ contractID, nodeID, state, createdAt }) =>
+                ({
+                  id: contractID,
+                  type: "rent",
+                  state: state,
+                  createdAt: new Date(+createdAt),
+                  nodeID: nodeID,
+                } as IContract)
+            );
             const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
               id: contractID, 
               type: "name", 
@@ -59,7 +69,7 @@
                   deploymentData: jsonParser(deploymentData),
                 } as IContract)
             );
-            contracts = [...names, ...nodes];
+              contracts = [...names, ...nodes, ...rents];              
           })
           .then(async () => {
             for (let contract of contracts) {
