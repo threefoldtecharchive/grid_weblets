@@ -69,7 +69,7 @@
                   deploymentData: jsonParser(deploymentData),
                 } as IContract)
             );
-              contracts = [...names, ...nodes, ...rents];              
+              contracts = [...names, ...nodes, ...rents];
           })
           .then(async () => {
             for (let contract of contracts) {
@@ -194,8 +194,8 @@
           nodeID ?? " - ",
           state,
           loadingConsumption ? "Loading..." : consumptions[idx],
-          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- ",
-          deploymentData.name ?? " -",
+          deploymentData? (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- " : "-",
+          deploymentData? deploymentData.name ?? "-" : "-",
           createdAt.toLocaleString(),
           expiration,
         ])}
