@@ -8,20 +8,14 @@ import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
 import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf"
 
-const {
-    DiskModel,
-    MachineModel,
-    MachinesModel,
-    generateString,
-} = window.configs?.grid3_client ?? {};
 
 export default async function deployTFhubValidator(
-    profile: IProfile,
-    tfhubValidator: TFhubValidator
-) {
-
+  profile: IProfile,
+  tfhubValidator: TFhubValidator
+  ) {
+    
   const validatorVm = await _deployTfHubValidator(
-      profile, tfhubValidator
+    profile, tfhubValidator
     );
 
   return validatorVm;
@@ -30,6 +24,14 @@ export default async function deployTFhubValidator(
 function _deployTfHubValidator(
         profile: IProfile, tfhubValidator: TFhubValidator
     ) {
+
+    const {
+        DiskModel,
+        MachineModel,
+        MachinesModel,
+        generateString,
+    } = window.configs.grid3_client;
+
     const {
         name,
         nodeId,

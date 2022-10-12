@@ -4,29 +4,24 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
-import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
+import {
+  selectGatewayNode,
+  getUniqueDomainName,
+  GatewayNodes,
+  selectSpecificGatewayNode,
+} from "./gatewayHelpers";
 import rootFs from "./rootFs";
-
-const {
-  DiskModel,
-  MachineModel,
-  MachinesModel,
-  GatewayNameModel,
-  NetworkModel,
-  generateString,
-} = window.configs?.grid3_client ?? {};
 
 export default async function deployOwncloud(
   data: Owncloud,
   profile: IProfile,
   gateway: GatewayNodes
-
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "owncloud");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
+  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the owncloud
@@ -47,6 +42,14 @@ export default async function deployOwncloud(
 }
 
 async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
+  const {
+    DiskModel,
+    MachineModel,
+    MachinesModel,
+    NetworkModel,
+    generateString,
+  } = window.configs.grid3_client;
+
   const {
     envs,
     adminUsername,
@@ -90,8 +93,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist =
-    "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist";
   vm.entrypoint = "/sbin/zinit init";
 
   let smtp_secure = "none";
@@ -129,9 +131,9 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "Owncloud"
+    type: "vm",
+    name: name,
+    projectName: "Owncloud",
   };
   vms.metadata = JSON.stringify(metadate);
 
@@ -152,6 +154,7 @@ async function deployPrefixGateway(
   backend: string,
   publicNodeId: number
 ) {
+  const { GatewayNameModel } = window.configs.grid3_client;
   // define specs
   const gw = new GatewayNameModel();
   gw.name = domainName;
@@ -160,9 +163,9 @@ async function deployPrefixGateway(
   gw.backends = [`http://[${backend}]:80`];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": domainName,
-    "projectName": "Owncloud"
+    type: "gateway",
+    name: domainName,
+    projectName: "Owncloud",
   };
   gw.metadata = JSON.stringify(metadate);
 

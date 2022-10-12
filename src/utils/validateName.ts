@@ -1,4 +1,5 @@
 import type { IFormField } from "../types";
+import { getResources } from "./getAlgoResources";
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
@@ -19,7 +20,7 @@ const NUM_REGEX = /^[1-9](\d?|\d+)$/;
 const SSH_REGEX =
   /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
 
-const ENDPOINT_REGEX = /^((?:wss):\/\/)(([a-z0-9-]+[.][a-z]){1,3}([a-z-/]?[^\W\s]){1,10})$/;
+const ENDPOINT_REGEX = /^((?:wss):\/\/)(([a-z0-9-]+[.][a-z]){1,3}([a-z-/]?[:^\w\s]){1,10})$/;
 
 // prettier-ignore
 export default function validateName(name: string): string | void {
@@ -27,6 +28,11 @@ export default function validateName(name: string): string | void {
   if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace.";
   if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
   if (name.length > 15) return "Name must be at most 15 characters.";
+}
+export function validateMnemonics(mnemonics: string): string | void {
+  if (!mnemonics.length) return "Mnemonics required";
+  if (!ALPHA_ONLY_REGEX.test(mnemonics))
+    return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
 }
 
 export function validateEmail(email: string): string | void {
@@ -152,9 +158,12 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIPRange(value: string): string | void {
-  if (!IP_REGEX.test(value))
+  const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+  const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
+  const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
+  if (!ipRegex.test(value)) {
     return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
-  if (value.length > 15) return "IP range must be less than 15 characters";
+  }
 }
 
 export function validateMountPoint(value: string): string | void {
@@ -225,4 +234,18 @@ export function validateBSCPrivateKey(value: string): string | void {
 
 export function validateethereumRpc(value: string): string | void {
   if (value != "" && !URL_REGEX.test(value)) return "Invalid url format";
+}
+
+export function validateAlgoCpu(value: string, net, type): string | void {
+  let [cpu, memory, storage] = getResources(net, type);
+  if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}`;
+}
+export function validateAlgoMemory(value: string, net, type): string | void {
+  let [cpu, memory, storage] = getResources(net, type);
+  if (+value < memory) return `Minimum Memory for this deployment is ${memory}`;
+}
+export function validateAlgoStorage(value: string, net, type): string | void {
+  let [cpu, memory, storage] = getResources(net, type);
+  if (+value < storage)
+    return `Minimum Storage for this deployment is ${storage}`;
 }

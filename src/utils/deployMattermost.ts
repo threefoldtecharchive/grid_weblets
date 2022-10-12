@@ -2,26 +2,22 @@ import type Mattermost from "../types/mattermost";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import { GatewayNodes, getUniqueDomainName, selectGatewayNode, selectSpecificGatewayNode } from "./gatewayHelpers";
+import {
+  GatewayNodes,
+  getUniqueDomainName,
+  selectGatewayNode,
+  selectSpecificGatewayNode,
+} from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-const {
-  MachineModel,
-  MachinesModel,
-  GatewayNameModel,
-  DiskModel,
-  generateString,
-} = window.configs?.grid3_client ?? {};
-
 export default async function deployMattermost(
   profile: IProfile,
   mattermost: Mattermost,
   gateway: GatewayNodes
-
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
@@ -30,7 +26,7 @@ export default async function deployMattermost(
     "mattermost"
   );
 
-  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
+  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   mattermost.domain = `${domainName}.${nodeDomain}`;
 
   const matterMostVm = await _deployMatterMost(profile, mattermost);
@@ -47,6 +43,9 @@ export default async function deployMattermost(
 }
 
 function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
+  const { MachineModel, MachinesModel, generateString } =
+    window.configs.grid3_client;
+
   const {
     name,
     username,
@@ -59,11 +58,10 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     memory,
     disks,
     publicIp,
-    smtpPassword
+    smtpPassword,
   } = mattermost;
 
   let randomSuffix = generateString(10).toLowerCase();
-
 
   const vm = new MachineModel();
   vm.name = name;
@@ -92,12 +90,11 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "Mattermost"
+    type: "vm",
+    name: name,
+    projectName: "Mattermost",
   };
   vms.metadata = JSON.stringify(metadate);
-
 
   return deploy(profile, "Mattermost", name, async (grid) => {
     await checkVMExist(grid, "mattermost", name);
@@ -115,6 +112,8 @@ function _deployGateway(
   ip: string,
   nodeId: number
 ) {
+  const { GatewayNameModel } = window.configs.grid3_client;
+
   const gw = new GatewayNameModel();
   gw.name = name;
   gw.node_id = nodeId;
@@ -122,9 +121,9 @@ function _deployGateway(
   gw.backends = [`http://[${ip}]:8000`];
 
   const metadate = {
-    "type":  "gateway",  
-    "name": name,
-    "projectName": "Mattermost"
+    type: "gateway",
+    name: name,
+    projectName: "Mattermost",
   };
   gw.metadata = JSON.stringify(metadate);
 

@@ -12,8 +12,8 @@
   export let centered: boolean = true;
   export let disabled: boolean = false;
   export let opened: boolean = false;
-  export let selectedTab: string;
-  export let selectedID: number;
+  export let selectedTab: string = null;
+  export let selectedID: number = null;
 
   const onRemove = (idx: number) => () => {
     dispatch("removed", idx);
