@@ -59,7 +59,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "Subsquid Endpoint", symbol: "endPoint", placeholder: "Subsquid Endpoint", type: "text",validator: validateEndpoint,  invalid: false },
+    { label: "Websocket Endpoint", symbol: "endPoint", placeholder: "Websocket Endpoint", type: "text",validator: validateEndpoint,  invalid: false , tooltip: "A substrate based chain websocket endpoint"},
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
@@ -108,7 +108,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deploySubsquidHandler}>
-    <h4 class="is-size-4 mb-4">Deploy a Subsquid Instance</h4>
+    <h4 class="is-size-4 mb-4">Deploy a Subsquid Archive(s)</h4>
     <p>
       Subsquid indexer is a piece of software that reads all the blocks from a
       Substrate based blockchain, decodes and stores them for processing in a
