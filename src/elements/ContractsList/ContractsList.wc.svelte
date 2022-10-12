@@ -12,6 +12,7 @@
 
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
+  import DialogueMsg from '../../components/DialogueMsg.svelte';
 
   let profile: IProfile;
   let contracts: IContract[] = [];
@@ -20,6 +21,8 @@
   let deleting: boolean = false;
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
+  let name: string = null;
+  let opened = false;
 
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
@@ -98,8 +101,6 @@
 
   let message: string;
   function onDeleteHandler() {
-    if (!window.confirm("Are you sure you want to delete your contracts?"))
-      return;
 
     message = null;
     deleting = true;
@@ -126,9 +127,7 @@
   function onDeleteSelectedHandler() {
     if (selectedContracts.length === contracts.length) return onDeleteHandler();
 
-    // prettier-ignore
-    if (!window.confirm("Are you sure you want to delete the selected contracts?")) return;
-
+    
     message = null;
     deleting = true;
     deletingType = "selected";
@@ -220,19 +219,35 @@
               deleting ||
               contracts.length === 0 ||
               selectedContracts.length === 0}
-            on:click={onDeleteSelectedHandler}
+            on:click={() => {
+              name = "selected contracts"
+              opened = !opened;
+            }}
           >
             Delete Selected
           </button>
+          <DialogueMsg 
+          bind:opened 
+          on:removed={onDeleteSelectedHandler}
+          {name}
+          />
           <button
             class={"button is-danger" +
               (deleting && deletingType === "all" ? " is-loading" : "")}
             style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
-            on:click={onDeleteHandler}
+            on:click={() => {
+              name = "your contracts"
+              opened = !opened;
+            }}
           >
             Delete All
           </button>
+          <DialogueMsg 
+          bind:opened 
+          on:removed={onDeleteHandler}
+          {name}
+          />
         </div>
       </div>
     {:else}
