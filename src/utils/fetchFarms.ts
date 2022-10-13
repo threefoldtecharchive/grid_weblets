@@ -58,18 +58,24 @@ export default function fetchFarms(
     .then(async (vars) => {
       let { farms } = await gqlApi<IQueryData>(profile, queryDataSelect, vars);
 
-      farms = await getOnlineFarms(profile, farms, exclusiveFor);
+      farms = await getOnlineFarms(
+        profile,
+        farms,
+        exclusiveFor,
+        filters.publicIPs
+      );
 
       return { farms };
     });
 }
 
-export async function getOnlineFarms(profile, farms, exclusiveFor) {
+export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
   let blockedFarms = [];
   let onlineFarmsSet = new Set();
   let onlineFarmsArr = [];
 
-  if (exclusiveFor) {
+  if (exclusiveFor && !publicIp) {
+    // no need for exclusive for if we have an ip
     blockedFarms = await getBlockedFarmsIDs(
       exclusiveFor,
       `https://gridproxy.${profile.networkEnv}.grid.tf`,
