@@ -37,6 +37,7 @@
   import UpdateK8s from "../../components/UpdateK8s.svelte";
   import UpdateCapRover from "../../components/UpdateCapRover.svelte";
   import type { IAction } from "../../types/table-action";
+  import DialogueMsg from '../../components/DialogueMsg.svelte';
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -64,10 +65,10 @@
   let configed = false;
   let list: DeployedList;
   const deployedStore = window.configs?.deploymentStore;
-
   let profile: IProfile;
   let message: string = null;
-
+  let name: string = null;
+  let opened = false;
   function get_solution_label(active: string) {
     return (
       tabs.find((item) => {
@@ -153,15 +154,10 @@
   }
 
   let selectedRows: any[] = [];
-  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
-
+  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore  
+  
   async function onDeleteHandler() {
     message = null;
-    const names = selectedRows.map(({ name }) => name).join(", ");
-    const remove = window.confirm(
-      `Are you sure you want to delete '${names}'?`
-    );
-    if (!remove) return;
 
     const key = active === "k8s" ? "k8s" : "machines";
     for (const row of selectedRows) {
@@ -518,11 +514,20 @@
           class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
           style={`background-color: #FF5151; color: #fff`}
           disabled={selectedRows.length === 0 || removing !== null}
-          on:click={onDeleteHandler}
+          on:select={() => (selectedRows = [])}
+          on:click|preventDefault|stopPropagation={() => {
+            name = selectedRows.map(({ name }) => name).join(", ");
+            opened = !opened;
+          }}
         >
           Delete
         </button>
       </div>
+      <DialogueMsg 
+        bind:opened 
+        on:removed={onDeleteHandler}
+        {name}
+      />
 
       <!-- K8S -->
       {#if active === "k8s"}

@@ -12,6 +12,7 @@
 
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
+  import DialogueMsg from '../../components/DialogueMsg.svelte';
 
   let profile: IProfile;
   let contracts: IContract[] = [];
@@ -20,6 +21,8 @@
   let deleting: boolean = false;
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
+  let name: string = null;
+  let opened = false;
 
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
@@ -41,7 +44,17 @@
       return getGrid(profile, (grid) => {
         grid.contracts
           .listMyContracts()
-          .then(({ nameContracts, nodeContracts }) => {
+          .then(({ nameContracts, nodeContracts, rentContracts }) => {
+            const rents = rentContracts.map(
+              ({ contractID, nodeID, state, createdAt }) =>
+                ({
+                  id: contractID,
+                  type: "rent",
+                  state: state,
+                  createdAt: new Date(+createdAt),
+                  nodeID: nodeID,
+                } as IContract)
+            );
             const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
               id: contractID, 
               type: "name", 
@@ -59,7 +72,7 @@
                   deploymentData: jsonParser(deploymentData),
                 } as IContract)
             );
-            contracts = [...names, ...nodes];
+              contracts = [...names, ...nodes, ...rents];
           })
           .then(async () => {
             for (let contract of contracts) {
@@ -88,8 +101,6 @@
 
   let message: string;
   function onDeleteHandler() {
-    if (!window.confirm("Are you sure you want to delete your contracts?"))
-      return;
 
     message = null;
     deleting = true;
@@ -116,9 +127,7 @@
   function onDeleteSelectedHandler() {
     if (selectedContracts.length === contracts.length) return onDeleteHandler();
 
-    // prettier-ignore
-    if (!window.confirm("Are you sure you want to delete the selected contracts?")) return;
-
+    
     message = null;
     deleting = true;
     deletingType = "selected";
@@ -184,8 +193,8 @@
           nodeID ?? " - ",
           state,
           loadingConsumption ? "Loading..." : consumptions[idx],
-          (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- ",
-          deploymentData.name ?? " -",
+          deploymentData? (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- " : "-",
+          deploymentData? deploymentData.name ?? "-" : "-",
           createdAt.toLocaleString(),
           expiration,
         ])}
@@ -210,19 +219,35 @@
               deleting ||
               contracts.length === 0 ||
               selectedContracts.length === 0}
-            on:click={onDeleteSelectedHandler}
+            on:click={() => {
+              name = "selected contracts"
+              opened = !opened;
+            }}
           >
             Delete Selected
           </button>
+          <DialogueMsg 
+          bind:opened 
+          on:removed={onDeleteSelectedHandler}
+          {name}
+          />
           <button
             class={"button is-danger" +
               (deleting && deletingType === "all" ? " is-loading" : "")}
             style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
-            on:click={onDeleteHandler}
+            on:click={() => {
+              name = "your contracts"
+              opened = !opened;
+            }}
           >
             Delete All
           </button>
+          <DialogueMsg 
+          bind:opened 
+          on:removed={onDeleteHandler}
+          {name}
+          />
         </div>
       </div>
     {:else}
