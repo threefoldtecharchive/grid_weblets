@@ -59,7 +59,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
   // prettier-ignore
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Subsquid Instance Name", type: "text", validator: validateName, invalid: false },
-    { label: "Websocket Endpoint", symbol: "endPoint", placeholder: "Websocket Endpoint", type: "text",validator: validateEndpoint,  invalid: false , tooltip: "A substrate based chain websocket endpoint"},
+    { label: "Websocket Endpoint", symbol: "endPoint", placeholder: "A substrate based chain websocket endpoint", type: "text",validator: validateEndpoint,  invalid: false},
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
