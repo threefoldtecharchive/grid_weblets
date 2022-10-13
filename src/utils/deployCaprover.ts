@@ -8,7 +8,8 @@ import rootFs from "./rootFs";
 import type { CapWorker } from "../types/caprover";
 
 const CAPROVER_FLIST =
-  "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
+  "https://hub.grid.tf/hanafy.3bot/ahmedhanafy725-caprover-flist.flist";
+  //"https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
 export default async function deployCaprover(
   data: Caprover,
@@ -41,7 +42,7 @@ export default async function deployCaprover(
   machine.env = {
     SWM_NODE_MODE: "leader",
     CAPROVER_ROOT_DOMAIN: domain,
-    CAPTAIN_IMAGE_VERSION: "v1.4.2",
+    CAPTAIN_IMAGE_VERSION: "latest",
     PUBLIC_KEY: publicKey,
     DEFAULT_PASSWORD: password,
     CAPTAIN_IS_DEBUG: "true",
@@ -86,7 +87,8 @@ export async function deployWorker(publicIP: string, password: string, worker: C
     headers: { "Content-Type": "application/json", "x-namespace": "captain" },
     body: JSON.stringify({ "password": password })
   })
-    .then((res) => {console.log(res); return res.status == 100 ? res["data"].token : ""})
+    .then((res) => {return res.json();})
+    .then((res) => {return res.data.token;})
     .catch((err) => {throw err;});
 
   console.log("rawda token", token);
@@ -111,9 +113,9 @@ export async function deployWorker(publicIP: string, password: string, worker: C
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
     SWM_NODE_MODE: "worker",
-    SWMTKN: token,
+    //SWMTKN: "",
     LEADER_PUBLIC_IP: publicIP,
-    CAPTAIN_IMAGE_VERSION: "v1.4.2",
+    CAPTAIN_IMAGE_VERSION: "latest",
     PUBLIC_KEY: `${worker.publicKey}\n${pub}`,
     CAPTAIN_IS_DEBUG: "true",
   };
@@ -133,7 +135,7 @@ export async function deployWorker(publicIP: string, password: string, worker: C
   };
   machines.metadata = JSON.stringify(metadate);
 
-  const vm = deploy(profile, "CapRover", worker.name, async (grid) => {
+  const vm = await deploy(profile, "CapRover", worker.name, async (grid) => {
     await checkVMExist(grid, "caprover", worker.name);
     return grid.machines
       .deploy(machines)
@@ -144,7 +146,9 @@ export async function deployWorker(publicIP: string, password: string, worker: C
 
   console.log("rawda vm", vm);
 
-  const worker_ip = vm["publicIP"].ip.split("/")[0];
+  console.log("rawda pub", vm["publicIP"], vm["publicIP"]["ip"]);
+
+  const worker_ip = vm["publicIP"]["ip"].split("/")[0];
 
   // add worker
   await fetch(`http://${publicIP}:3000/api/v2/user/system/nodes`, {
@@ -152,7 +156,8 @@ export async function deployWorker(publicIP: string, password: string, worker: C
     headers: { "Content-Type": "application/json", "x-namespace": "captain", "x-captain-auth": token },
     body: JSON.stringify({ "privateKey": priv, "remoteNodeIpAddress": worker_ip, "captainIpAddress": publicIP, "nodeType": "worker" })
   })
-    .then((res) => {console.log(res); return res})
+    .then((res) => {return res.json();})
+    .then((res) => {console.log(res); return res.data;})
     .catch((err) => {throw err;});
 
   return vm;

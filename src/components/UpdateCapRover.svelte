@@ -46,6 +46,8 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
+  console.log(profile);
+
   $: worker.publicKey = profile.sshKey;
   $: disabled = loading || isInvalid(workerFields) || !worker.valid; // prettier-ignore
   $: logs = $currentDeployment;
