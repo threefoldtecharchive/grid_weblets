@@ -3,7 +3,7 @@
 <script lang="ts">
   import type { IFormField, IPackage, ITab } from "../../types";
   import { CapWorker, default as Caprover } from "../../types/caprover";
-  import deployCaprover, { deployWorker } from "../../utils/deployCaprover";
+  import deployCaprover from "../../utils/deployCaprover";
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -23,8 +23,11 @@
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-    import AddBtn from "../../components/AddBtn.svelte";
-    import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import AddBtn from "../../components/AddBtn.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import { AddMachineModel, DiskModel, GridClient } from "grid3_client";
+  import { onMount } from "svelte";
+  import getGrid from "../../utils/getGrid";
 
   const data = new Caprover();
   let loading = false;
@@ -34,6 +37,13 @@
   let profile: IProfile;
   let status: "valid" | "invalid";
   const currentDeployment = window.configs?.currentDeploymentStore;
+  let grid: GridClient;
+
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  const CAPROVER_FLIST = "https://hub.grid.tf/hanafy.3bot/ahmedhanafy725-caprover-flist.flist";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -60,9 +70,12 @@
     { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text", validator: validateName, invalid: false},
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, ...baseFields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, ...baseFields, memoryField, diskField, cpuField]); // prettier-ignore
   let message: string;
   let modalData: Object;
+  let workerData: boolean = false;
+  let workerIp = "";
+  let domain = "";
   async function deployCaproverHandler() {
     loading = true;
 
@@ -80,30 +93,70 @@
 
     deployCaprover(data, profile)
       .then(async (vm) => {
-        //modalData = vm;
-        deploymentStore.set(0);
 
-        console.log(new Date().toLocaleString());
+        if (data.workers.length > 0) {  
+          const delay = ms => new Promise(res => setTimeout(res, ms));
+          await delay(240*1000);
 
-        const delay = ms => new Promise(res => setTimeout(res, ms));
-        await delay(240*1000);
+          for (const worker of data.workers) {
+            /* Docker disk */
+            const disk = new DiskModel();
+            disk.name = "data0";
+            disk.size = worker.diskSize;
+            disk.mountpoint = "/var/lib/docker";
 
-        console.log(new Date().toLocaleString());
+            const workerModel = new AddMachineModel();
 
-        for (const worker of data.workers) {
-          deployWorker(data.publicIP, data.password, worker, profile)
-          .then((data) => {
-            console.log("rawda res", data)
-            deploymentStore.set(0);
-            success = true;
-          })
-          .catch((err: string) => {
-            failed = true;
-            message = err;
-          });
+            workerModel.deployment_name = data.name;
+            workerModel.cpu = worker.cpu;
+            workerModel.memory = worker.memory;
+            workerModel.disks = [disk];
+            workerModel.node_id = worker.nodeId;
+            workerModel.public_ip = true;
+            workerModel.name = `CRW${worker.name}`;
+            workerModel.planetary = false;
+            workerModel.flist = CAPROVER_FLIST;
+            workerModel.qsfs_disks = [];
+            workerModel.rootfs_size = rootFs(worker.cpu, worker.memory);
+            workerModel.entrypoint = "/sbin/zinit init";
+            workerModel.env = {
+              SWM_NODE_MODE: "worker",
+              LEADER_PUBLIC_IP: data.publicIP,
+              CAPTAIN_IMAGE_VERSION: "latest",
+              PUBLIC_KEY: `${worker.publicKey}`,
+              CAPTAIN_IS_DEBUG: "true",
+            };
+            grid.machines
+            .add_machine(workerModel)
+            .then(({ contracts }) => {
+              const { updated } = contracts;
+              if (updated.length > 0) {
+                return grid.machines.getObj(workerModel.deployment_name);
+              } else {
+                failed = true;
+              }
+            })
+            .then((data) => {
+              if (!data) return;
+              workerIp = data[data.length - 1].publicIP["ip"].split("/")[0];;
+              domain = data.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
+              modalData = data;
+              workerData = true;
+              deploymentStore.set(0);
+            })
+            .catch((err) => {
+              failed = true;
+              console.log("Error", err);
+              message = err.message || err;
+            })
+    
+          }
         }
-        modalData = vm;
-        //success = true;
+        else {
+          success = true;
+          modalData = vm;
+          deploymentStore.set(0);
+        }
       })
       .catch((err: string) => {
         failed = true;
@@ -115,6 +168,17 @@
   }
 
   $: logs = $currentDeployment;
+
+  onMount(async () => {
+    grid = await getGrid(profile, (grid) => grid, false);
+    grid.projectName = "caprover";
+    grid._connect();
+
+    workerData = true;
+    let d = (await grid.machines.getObj("CR334e5ec6"));//CR334e5ec6
+    console.log(d)
+    modalData = (await grid.machines.getObj(data["name"]));
+  });
 </script>
 
 <SelectProfile
@@ -196,11 +260,14 @@
           {field}
           />
         {/each}
-          
+
         <SelectCapacity
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.diskSize}
+          bind:diskField={diskField}
+          bind:cpuField={cpuField}
+          bind:memoryField={memoryField}
           {packages}
         />
 
@@ -241,6 +308,9 @@
                 bind:cpu={worker.cpu}
                 bind:memory={worker.memory}
                 bind:diskSize={worker.diskSize}
+                bind:diskField={diskField}
+                bind:cpuField={cpuField}
+                bind:memoryField={memoryField}
                 {packages}
               />
 
@@ -282,6 +352,34 @@
 {#if modalData}
   <Modal data={modalData} on:closed={() => (modalData = null)} />
 {/if}
+
+<div class={"modal" + (workerData ? " is-active" : "")}>
+  <div class="modal-background" />
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <h2>Add your worker</h2>
+      1- Go to {"http://captain." + domain}<br />
+      2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
+      3- Insert worker node public IP {workerIp} and add your private SSH Key<br />
+      4- Click "Join cluster" button<br />
+      <br />
+      <strong>
+        <a
+          target="_blank"
+          href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker"
+        >
+        Click here for the documentation
+        </a>
+      </strong>
+      <div style="float: right; margin-top: 50px;">
+        <button
+          class="button is-danger"
+          on:click|stopPropagation={() => (workerData = !workerData)}>Close</button
+        >
+      </div>
+    </section>
+  </div>
+</div>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");

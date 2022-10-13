@@ -12,12 +12,13 @@
   import Input from "./Input.svelte";
   import SelectNodeId from "./SelectNodeId.svelte";
   import DeployBtn from "./DeployBtn.svelte";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import Table from "./Table.svelte";
   import rootFs from "../utils/rootFs";
-  import { deployWorker } from "../utils/deployCaprover";
   import { CapWorker } from "../types/caprover";
-    import SelectCapacity from "./SelectCapacity.svelte";
+  import SelectCapacity from "./SelectCapacity.svelte";
+  import getGrid from "../utils/getGrid";
+  import { AddMachineModel, DeleteMachineModel, DiskModel, GridClient } from "grid3_client";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -25,16 +26,24 @@
   export let capRover: any;
 
   let workers: any[] = [];
-  //$: if (capRover) workers = capRover.workers;
 
   let shouldBeUpdated: boolean = false;
   let loading: boolean = false;
+  let workers_loading: boolean = true;
   let message: string;
   let success: boolean = false;
   let failed: boolean = false;
   let removing: string = null;
 
   let worker = new CapWorker();
+  let grid: GridClient;
+
+  let diskField: IFormField;
+  let cpuField: IFormField;
+  let memoryField: IFormField;
+
+  const CAPROVER_FLIST = "https://hub.grid.tf/hanafy.3bot/ahmedhanafy725-caprover-flist.flist";
+  
   // prettier-ignore
   const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Worker instance name", type: "text", validator: validateName, invalid: false },
@@ -46,43 +55,118 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
-  console.log(profile);
-
-  $: worker.publicKey = profile.sshKey;
-  $: disabled = loading || isInvalid(workerFields) || !worker.valid; // prettier-ignore
+  $: worker.publicKey = capRover.details.env["PUBLIC_KEY"];
+  $: workerData = false;
+  $: workerIp = "";
+  $: disabled = loading || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
   $: logs = $currentDeployment;
 
-  function onAddWorker() {
+  onMount(async () => {
+    grid = await getGrid(profile, (grid) => grid, false);
+    grid.projectName = "caprover";
+    grid._connect();
+
+    if (capRover) workers = 
+      (await grid.machines.getObj(capRover["name"])).filter((machine) => machine.env["SWM_NODE_MODE"] == "worker");
+    
+    workers_loading = false;
+  });
+
+  async function onAddWorker() {
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
+    
+    /* Docker disk */
+    const disk = new DiskModel();
+    disk.name = "data0";
+    disk.size = worker.diskSize;
+    disk.mountpoint = "/var/lib/docker";
 
-    const publicIP = capRover["publicIp"].split("/")[0];
-    const password = capRover["details"]["env"]["DEFAULT_PASSWORD"];
-
-    deployWorker(publicIP, password, worker, profile)
-    .then((data) => {
-      if (data) {
+    const workerModel = new AddMachineModel();
+    workerModel.deployment_name = capRover["name"];
+    workerModel.cpu = worker.cpu;
+    workerModel.memory = worker.memory;
+    workerModel.disks = [disk];
+    workerModel.node_id = worker.nodeId;
+    workerModel.public_ip = true;
+    workerModel.name = `CRW${worker.name}`;
+    workerModel.planetary = false;
+    workerModel.flist = CAPROVER_FLIST;
+    workerModel.qsfs_disks = [];
+    workerModel.rootfs_size = rootFs(worker.cpu, worker.memory);
+    workerModel.entrypoint = "/sbin/zinit init";
+    workerModel.env = {
+      SWM_NODE_MODE: "worker",
+      LEADER_PUBLIC_IP: capRover["publicIp"].split("/")[0],
+      CAPTAIN_IMAGE_VERSION: "latest",
+      PUBLIC_KEY: worker.publicKey,
+      CAPTAIN_IS_DEBUG: "true",
+    };
+    grid.machines
+    .add_machine(workerModel)
+    .then(({ contracts }) => {
+      const { updated } = contracts;
+      if (updated.length > 0) {
         success = true;
         shouldBeUpdated = true;
         worker = new CapWorker();
-        return data;
+        return grid.machines.getObj(workerModel.deployment_name);
       } else {
         failed = true;
       }
     })
     .then((data) => {
       if (!data) return;
-      workers = [];//data.workers;
+      workers = data.filter((machine) => machine.env["SWM_NODE_MODE"] == "worker");
+      workerData = true;
+      workerIp = workers[data.length - 1].publicIP["ip"];
     })
     .catch((err) => {
-        failed = true;
-        console.log("Error", err);
-        message = err.message || err;
+      failed = true;
+      console.log("Error", err);
+      message = err.message || err;
     })
     .finally(() => {
-        loading = false;
-        currentDeployment.clear();
+      loading = false;
+      currentDeployment.clear();
     });
+
+  }
+
+
+  function onDeleteWorker(idx: number) {
+    if (!window.confirm("Are you sure you want to delete your worker?"))
+      return;
+    const worker = workers[idx];
+    removing = worker.name;
+    loading = true;
+    currentDeployment.deploy("Remove Worker", worker.name);
+    const workerModel = new DeleteMachineModel();
+    workerModel.deployment_name = capRover.name;
+    workerModel.name = removing;
+    grid.machines
+      .delete_machine(workerModel)
+      .then(({ deleted, updated }) => {
+        if (deleted.length > 0 ||updated.length > 0) {
+          shouldBeUpdated = true;
+          let r = removing;
+          requestAnimationFrame(() => {
+            workers = workers.filter(({ name }) => name !== r); // prettier-ignore
+          });
+        } else {
+          failed = true;
+          message = "Failed to remove worker";
+        }
+      })
+      .catch((err) => {
+        console.log("Error", err);
+        message = err.message || err;
+      })
+      .finally(() => {
+        loading = false;
+        removing = null;
+        currentDeployment.clear();
+      });
   }
 
   const style = `
@@ -124,7 +208,7 @@
       const {
         contractId,
         name,
-        planetary,
+        publicIP: { ip },
         capacity: { cpu, memory },
         mounts: [{ size }],
       } = worker;
@@ -132,7 +216,7 @@
         i + 1,
         contractId,
         name,
-        planetary,
+        ip,
         cpu,
         memory,
         size / (1024 * 1024 * 1024),
@@ -174,14 +258,26 @@
               "#",
               "Contract ID",
               "Name",
-              "Planetary Network IP",
+              "Public IP",
               "CPU(vCores)",
               "Memory(MB)",
               "Disk(GB)",
             ]}
             rows={_createWorkerRows(workers)}
+            selectable={false}
+            actions={[
+              {
+                label: "Delete",
+                type: "danger",
+                loading: (i) => loading && removing === workers[i].name,
+                click: (_, i) => onDeleteWorker(i),
+                disabled: () => loading || removing !== null,
+              },
+            ]}
           />
           <hr />
+        {:else if workers_loading}
+          <Alert type="info" message={logs?.message ?? "Loading..."} />
         {:else}
           <hr style="width: 1200px" />
         {/if}
@@ -206,6 +302,9 @@
               bind:cpu={worker.cpu}
               bind:memory={worker.memory}
               bind:diskSize={worker.diskSize}
+              bind:diskField={diskField}
+              bind:cpuField={cpuField}
+              bind:memoryField={memoryField}
               {packages}
             />
 
@@ -243,6 +342,34 @@
       </div>
     </div>
   {/if}
+</div>
+
+<div class={"modal" + (workerData ? " is-active" : "")}>
+  <div class="modal-background" />
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <h2>Add your worker</h2>
+      1- Go to {"http://captain." + capRover.details.env.CAPROVER_ROOT_DOMAIN}<br />
+      2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
+      3- Insert worker node public IP {workerIp} and add your private SSH Key<br />
+      4- Click "Join cluster" button<br />
+      <br />
+      <strong>
+        <a
+          target="_blank"
+          href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker"
+        >
+        Click here for the documentation
+        </a>
+      </strong>
+      <div style="float: right; margin-top: 50px;">
+        <button
+          class="button is-danger"
+          on:click|stopPropagation={() => (workerData = !workerData)}>Close</button
+        >
+      </div>
+    </section>
+  </div>
 </div>
 
 <style lang="scss" scoped>

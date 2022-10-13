@@ -4,7 +4,6 @@ import * as client from "ts-rmb-http-client";
 import * as grid3_client from "grid3_client";
 import * as buffer from "buffer";
 import * as bip39 from "bip39";
-import keypair from "keypair";
 
 // stores
 import baseConfigStore from "./stores/baseConfig";
@@ -23,7 +22,6 @@ interface AppConfigs {
   balanceStore: typeof balanceStore;
   buffer: typeof buffer;
   bip39: typeof bip39;
-  keypair: typeof keypair;
 }
 
 declare global {
