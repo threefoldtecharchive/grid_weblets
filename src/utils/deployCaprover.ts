@@ -7,8 +7,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 
 const CAPROVER_FLIST =
-  "https://hub.grid.tf/hanafy.3bot/ahmedhanafy725-caprover-flist.flist";
-  //"https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
+  "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
 export default async function deployCaprover(
   data: Caprover,

@@ -43,7 +43,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  const CAPROVER_FLIST = "https://hub.grid.tf/hanafy.3bot/ahmedhanafy725-caprover-flist.flist";
+  const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
   // prettier-ignore
   const tabs: ITab[] = [
