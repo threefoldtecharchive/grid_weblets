@@ -56,8 +56,7 @@ export class CapWorker {
       name !== "" &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
-      isValidInteger(nodeId) &&
-      publicKey !== ""
+      isValidInteger(nodeId)
     );
   }
 }

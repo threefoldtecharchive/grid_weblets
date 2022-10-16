@@ -93,11 +93,18 @@
 
     deployCaprover(data, profile)
       .then(async (vm) => {
-
+        if (data.workers.length == 0) {
+          success = true;
+          modalData = vm;
+          deploymentStore.set(0);
+        }
+      })
+      .catch((err: string) => {
+        failed = true;
+        message = err;
+      })
+      .finally(async () => {
         if (data.workers.length > 0) {  
-          const delay = ms => new Promise(res => setTimeout(res, ms));
-          await delay(240*1000);
-
           for (const worker of data.workers) {
             worker.publicKey = data.publicKey;
 
@@ -142,8 +149,9 @@
               if (!data) return;
               workerIp = data[data.length - 1].publicIP["ip"].split("/")[0];;
               domain = data.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
-              modalData = data;
               workerData = true;
+              modalData = data;
+              success = true;
               deploymentStore.set(0);
             })
             .catch((err) => {
@@ -151,21 +159,12 @@
               console.log("Error", err);
               message = err.message || err;
             })
-    
+            .finally(() => {loading = false;})
           }
         }
         else {
-          success = true;
-          modalData = vm;
-          deploymentStore.set(0);
+          loading = false;
         }
-      })
-      .catch((err: string) => {
-        failed = true;
-        message = err;
-      })
-      .finally(() => {
-        loading = false;
       });
   }
 
@@ -354,7 +353,8 @@
   <div class="modal-background" />
   <div class="modal-card">
     <section class="modal-card-body">
-      <h2>Add your worker</h2>
+      <strong>Add your worker</strong>
+      <br />
       1- Go to {"http://captain." + domain}<br />
       2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
       3- Insert worker node public IP {workerIp} and add your private SSH Key<br />

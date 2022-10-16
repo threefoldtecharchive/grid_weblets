@@ -348,7 +348,8 @@
   <div class="modal-background" />
   <div class="modal-card">
     <section class="modal-card-body">
-      <h2>Add your worker</h2>
+      <strong>Add your worker</strong>
+      <br />
       1- Go to {"http://captain." + capRover.details.env.CAPROVER_ROOT_DOMAIN}<br />
       2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
       3- Insert worker node public IP {workerIp} and add your private SSH Key<br />
