@@ -34,6 +34,7 @@
   let success: boolean = false;
   let failed: boolean = false;
   let removing: string = null;
+  let domain: string = "";
 
   let worker = new CapWorker();
   let grid;
@@ -55,13 +56,15 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
-  $: if (capRover) worker.publicKey = capRover.details.env["PUBLIC_KEY"];
   $: workerData = false;
   $: workerIp = "";
   $: disabled = loading || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
   $: logs = $currentDeployment;
 
   onMount(async () => {
+    worker.publicKey = capRover.details.env.PUBLIC_KEY;
+    domain = capRover.details.env.CAPROVER_ROOT_DOMAIN;
+
     grid = await getGrid(profile, (grid) => grid, false);
     grid.projectName = "caprover";
     grid._connect();
@@ -350,7 +353,7 @@
     <section class="modal-card-body">
       <strong>Add your worker</strong>
       <br />
-      1- Go to {"http://captain." + capRover.details.env.CAPROVER_ROOT_DOMAIN}<br />
+      1- Go to {"http://captain." + domain}<br />
       2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
       3- Insert worker node public IP {workerIp} and add your private SSH Key<br />
       4- Click "Join cluster" button<br />

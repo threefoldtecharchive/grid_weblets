@@ -29,7 +29,7 @@
   import getGrid from "../../utils/getGrid";
   const { AddMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
-  const data = new Caprover();
+  let data = new Caprover();
   let loading = false;
   let success = false;
   let failed = false;
@@ -145,12 +145,12 @@
                 failed = true;
               }
             })
-            .then((data) => {
-              if (!data) return;
-              workerIp = data[data.length - 1].publicIP["ip"].split("/")[0];;
-              domain = data.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
+            .then((workersData) => {
+              if (!workersData) return;
+              workerIp = workersData[workersData.length - 1].publicIP["ip"].split("/")[0];;
+              domain = workersData.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
               workerData = true;
-              modalData = data;
+              modalData = workersData;
               success = true;
               deploymentStore.set(0);
             })
@@ -250,11 +250,15 @@
         {/each}
       {:else if active === "leader"}
         {#each baseFields as field (field.symbol)}
-          <Input
-          bind:data={data[field.symbol]}
-          bind:invalid={field.invalid}
-          {field}
-          />
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={data[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
         {/each}
 
         <SelectCapacity
@@ -293,11 +297,15 @@
                   (data.workers = data.workers.filter((_, i) => index !== i))}
               />
               {#each baseFields as field (field.symbol)}
-                <Input
-                  bind:data={worker[field.symbol]}
-                  bind:invalid={field.invalid}
-                  {field}
-                />
+                {#if field.invalid !== undefined}
+                  <Input
+                    bind:data={worker[field.symbol]}
+                    bind:invalid={field.invalid}
+                    {field}
+                  />
+                {:else}
+                  <Input bind:data={worker[field.symbol]} {field} />
+                {/if}
               {/each}
 
               <SelectCapacity
