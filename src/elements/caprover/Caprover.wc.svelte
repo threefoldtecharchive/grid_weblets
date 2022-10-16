@@ -173,11 +173,6 @@
     grid = await getGrid(profile, (grid) => grid, false);
     grid.projectName = "caprover";
     grid._connect();
-
-    workerData = true;
-    let d = (await grid.machines.getObj("CR334e5ec6"));//CR334e5ec6
-    console.log(d)
-    modalData = (await grid.machines.getObj(data["name"]));
   });
 </script>
 

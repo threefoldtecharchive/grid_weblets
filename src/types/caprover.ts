@@ -46,7 +46,6 @@ export class CapWorker {
     public nodeId: number = null,
     public publicKey = "",
     public diskSize = 100,
-    public password = generatePassword(length=Math.floor(Math.random() * 5) + 10), // password length between 10 and 14
     public selection = new NodeID(),
     public status: "valid" | "invalid" = null,
   ) { }
