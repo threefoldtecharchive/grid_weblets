@@ -27,7 +27,6 @@
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import { onMount } from "svelte";
   import getGrid from "../../utils/getGrid";
-  const { AddMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   let data = new Caprover();
   let loading = false;
@@ -42,8 +41,6 @@
   let diskField: IFormField;
   let cpuField: IFormField;
   let memoryField: IFormField;
-
-  const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -93,78 +90,32 @@
 
     deployCaprover(data, profile)
       .then(async (vm) => {
-        if (data.workers.length == 0) {
-          success = true;
-          modalData = vm;
-          deploymentStore.set(0);
-        }
+        let vms = await grid.machines.getObj(data.name);
+        success = true;
+        modalData = vms;
+        deploymentStore.set(0);
+        
+        vms.forEach((machine) => {
+          let firstWorker = true;
+          if (machine.env["SWM_NODE_MODE"] == "worker") {
+            if (firstWorker) {
+              workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
+              firstWorker = false;
+            }
+            else workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
+          }
+            
+        });
+        domain = vms.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
+
+        if (data.workers.length > 0) workerData = true;
       })
       .catch((err: string) => {
         failed = true;
         message = err;
       })
       .finally(async () => {
-        if (data.workers.length > 0) {  
-          for (const worker of data.workers) {
-            worker.publicKey = data.publicKey;
-
-            /* Docker disk */
-            const disk = new DiskModel();
-            disk.name = "data0";
-            disk.size = worker.diskSize;
-            disk.mountpoint = "/var/lib/docker";
-
-            const workerModel = new AddMachineModel();
-
-            workerModel.deployment_name = data.name;
-            workerModel.cpu = worker.cpu;
-            workerModel.memory = worker.memory;
-            workerModel.disks = [disk];
-            workerModel.node_id = worker.nodeId;
-            workerModel.public_ip = true;
-            workerModel.name = `CRW${worker.name}`;
-            workerModel.planetary = false;
-            workerModel.flist = CAPROVER_FLIST;
-            workerModel.qsfs_disks = [];
-            workerModel.rootfs_size = rootFs(worker.cpu, worker.memory);
-            workerModel.entrypoint = "/sbin/zinit init";
-            workerModel.env = {
-              SWM_NODE_MODE: "worker",
-              LEADER_PUBLIC_IP: data.publicIP,
-              CAPTAIN_IMAGE_VERSION: "latest",
-              PUBLIC_KEY: `${worker.publicKey}`,
-              CAPTAIN_IS_DEBUG: "true",
-            };
-            grid.machines
-            .add_machine(workerModel)
-            .then(({ contracts }) => {
-              const { updated } = contracts;
-              if (updated.length > 0) {
-                return grid.machines.getObj(workerModel.deployment_name);
-              } else {
-                failed = true;
-              }
-            })
-            .then((workersData) => {
-              if (!workersData) return;
-              workerIp = workersData[workersData.length - 1].publicIP["ip"].split("/")[0];;
-              domain = workersData.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
-              workerData = true;
-              modalData = workersData;
-              success = true;
-              deploymentStore.set(0);
-            })
-            .catch((err) => {
-              failed = true;
-              console.log("Error", err);
-              message = err.message || err;
-            })
-            .finally(() => {loading = false;})
-          }
-        }
-        else {
-          loading = false;
-        }
+        loading = false;
       });
   }
 
@@ -361,12 +312,14 @@
   <div class="modal-background" />
   <div class="modal-card">
     <section class="modal-card-body">
-      <strong>Add your worker</strong>
+      <strong style="font-size: larger;">Add your worker</strong>
+      <br />
       <br />
       1- Go to {"http://captain." + domain}<br />
-      2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
-      3- Insert worker node public IP {workerIp} and add your private SSH Key<br />
-      4- Click "Join cluster" button<br />
+      2- Go to the <strong>cluster</strong> tab<br />
+      3- Click <strong>Add Self-Hosted Registry</strong> button then <strong>Enable Self-Hosted Registry</strong><br />
+      4- Insert worker node public IP <strong>{workerIp}</strong> and add your private SSH Key<br />
+      5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
         <a

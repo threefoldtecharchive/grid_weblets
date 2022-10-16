@@ -100,10 +100,7 @@
     workerModel.entrypoint = "/sbin/zinit init";
     workerModel.env = {
       SWM_NODE_MODE: "worker",
-      LEADER_PUBLIC_IP: capRover["publicIp"].split("/")[0],
-      CAPTAIN_IMAGE_VERSION: "latest",
       PUBLIC_KEY: worker.publicKey,
-      CAPTAIN_IS_DEBUG: "true",
     };
     grid.machines
     .add_machine(workerModel)
@@ -351,12 +348,14 @@
   <div class="modal-background" />
   <div class="modal-card">
     <section class="modal-card-body">
-      <strong>Add your worker</strong>
+      <strong style="font-size: larger;">Add your worker</strong>
+      <br />
       <br />
       1- Go to {"http://captain." + domain}<br />
-      2- Click "Add Self-Hosted Registry" button then "Enable Self-Hosted Registry"<br />
-      3- Insert worker node public IP {workerIp} and add your private SSH Key<br />
-      4- Click "Join cluster" button<br />
+      2- Go to the <strong>cluster</strong> tab<br />
+      3- Click <strong>Add Self-Hosted Registry</strong> button then <strong>Enable Self-Hosted Registry</strong><br />
+      4- Insert worker node public IP <strong>{workerIp}</strong> and add your private SSH Key<br />
+      5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
         <a

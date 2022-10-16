@@ -15,7 +15,7 @@ export default async function deployCaprover(
 ) {
   const { MachinesModel, DiskModel, MachineModel } =
     window.configs.grid3_client;
-  const { name, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
+  const { name, workers, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
 
   const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
 
@@ -52,6 +52,34 @@ export default async function deployCaprover(
   machines.network = network;
   machines.description = "caprover leader machine/node";
 
+  for (const worker of workers) {
+    /* Docker disk */
+    const disk = new DiskModel();
+    disk.name = "data0";
+    disk.size = worker.diskSize;
+    disk.mountpoint = "/var/lib/docker";
+
+    const workerModel = new MachineModel();
+
+    workerModel.cpu = worker.cpu;
+    workerModel.memory = worker.memory;
+    workerModel.disks = [disk];
+    workerModel.node_id = worker.nodeId;
+    workerModel.public_ip = true;
+    workerModel.name = `CRW${worker.name}`;
+    workerModel.planetary = false;
+    workerModel.flist = CAPROVER_FLIST;
+    workerModel.qsfs_disks = [];
+    workerModel.rootfs_size = rootFs(worker.cpu, worker.memory);
+    workerModel.entrypoint = "/sbin/zinit init";
+    workerModel.env = {
+      SWM_NODE_MODE: "worker",
+      PUBLIC_KEY: publicKey,
+    };
+
+    machines.machines.push(workerModel);
+  }
+
   const metadate = {
     type: "vm",
     name: name,
@@ -64,9 +92,6 @@ export default async function deployCaprover(
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))
-      .then(([vm]) => {
-        data.publicIP = vm["publicIP"]["ip"].split("/")[0];
-        return vm;
-      });
+      .then(([vm]) => vm);
   });
 }

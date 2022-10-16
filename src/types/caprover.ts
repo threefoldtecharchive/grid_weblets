@@ -18,7 +18,6 @@ export default class Caprover {
     public diskSize = 100,
     public password = generatePassword(length=Math.floor(Math.random() * 5) + 10), // password length between 10 and 14
     public selection = new NodeID(),
-    public publicIP = "",
   ) {}
 
   public get valid(): boolean {
