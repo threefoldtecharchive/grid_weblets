@@ -25,9 +25,9 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import { AddMachineModel, DiskModel, GridClient } from "grid3_client";
   import { onMount } from "svelte";
   import getGrid from "../../utils/getGrid";
+  const { AddMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   const data = new Caprover();
   let loading = false;
@@ -37,7 +37,7 @@
   let profile: IProfile;
   let status: "valid" | "invalid";
   const currentDeployment = window.configs?.currentDeploymentStore;
-  let grid: GridClient;
+  let grid;
 
   let diskField: IFormField;
   let cpuField: IFormField;
@@ -99,6 +99,8 @@
           await delay(240*1000);
 
           for (const worker of data.workers) {
+            worker.publicKey = data.publicKey;
+
             /* Docker disk */
             const disk = new DiskModel();
             disk.name = "data0";
@@ -212,7 +214,7 @@
     {:else if failed}
       <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
     {:else}
-      <Tabs bind:active selectedTab={"config"} selectedID={0} {tabs} />
+      <Tabs bind:active {tabs} />
 
       {#if active === "config"}
         {#each fields as field (field.symbol)}
@@ -281,7 +283,7 @@
         />
       {:else if active === "workers"}
         <AddBtn
-          on:click={() => {const worker = new CapWorker(); worker.publicKey = data.publicKey; data.workers = [...data.workers, worker]; }}
+          on:click={() => (data.workers = [...data.workers, new CapWorker()])}
         />
         <div class="nodes-container">
           {#each data.workers as worker, index (worker.id)}

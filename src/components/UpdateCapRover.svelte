@@ -18,7 +18,7 @@
   import { CapWorker } from "../types/caprover";
   import SelectCapacity from "./SelectCapacity.svelte";
   import getGrid from "../utils/getGrid";
-  import { AddMachineModel, DeleteMachineModel, DiskModel, GridClient } from "grid3_client";
+  const { AddMachineModel, DeleteMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -36,7 +36,7 @@
   let removing: string = null;
 
   let worker = new CapWorker();
-  let grid: GridClient;
+  let grid;
 
   let diskField: IFormField;
   let cpuField: IFormField;
@@ -55,7 +55,7 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
 
-  $: worker.publicKey = capRover.details.env["PUBLIC_KEY"];
+  $: if (capRover) worker.publicKey = capRover.details.env["PUBLIC_KEY"];
   $: workerData = false;
   $: workerIp = "";
   $: disabled = loading || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
