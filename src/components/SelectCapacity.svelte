@@ -4,19 +4,19 @@
   import type { IFormField, IPackage } from "../types";
   import Input from "./Input.svelte";
   import {
+  isInvalid,
     validateCpu,
     validateDisk,
     validateMemory,
   } from "../utils/validateName";
-  import { onMount } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher<{ invalid: boolean }>();
 
   export let cpu: number;
   export let memory: number;
   export let diskSize: number;
-  export let packages: IPackage[];  
-  export let cpuField: IFormField;
-  export let memoryField: IFormField;
-  export let diskField: IFormField;
+  export let packages: IPackage[];
 
 
   const __cpuField: IFormField = {
@@ -84,15 +84,14 @@
 
   onMount(() => {
     requestAnimationFrame(() => {
-      cpuField = __cpuField;
-      memoryField = __memoryField;
-      diskField = __diskField;
       _applyPackage(0);
       for (var _i = 0; _i < 3; _i++) {
         packageField.options[_i].label += _package_spec(_i);
       }
     });
   });
+
+  $: dispatch("invalid", isInvalid([__cpuField, __diskField, __memoryField]))
 </script>
 
 <Input
