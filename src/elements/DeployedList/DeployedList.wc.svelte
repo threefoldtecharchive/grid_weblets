@@ -38,6 +38,7 @@
   import UpdateCapRover from "../../components/UpdateCapRover.svelte";
   import type { IAction } from "../../types/table-action";
   import DialogueMsg from '../../components/DialogueMsg.svelte';
+  import getGrid from "../../utils/getGrid";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -58,6 +59,7 @@
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
   ];
+  let grid;
   let active: string = "vm";
   $: active = tab || active;
 
@@ -123,10 +125,12 @@
   let capRoverToUpdate: any;
 
   let _sub: any;
-  onMount(() => {
+  onMount(async () => {
     _sub = deployedStore.subscribe(() => {
       _reloadTab();
     });
+
+    grid = await getGrid(profile, (grid) => grid, false);
   });
 
   onDestroy(() => {
@@ -192,7 +196,7 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {grid.projectName = active; grid._connect(); infoToShow = (await grid.machines.getObj(rows[i]["name"]))},
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
         },
