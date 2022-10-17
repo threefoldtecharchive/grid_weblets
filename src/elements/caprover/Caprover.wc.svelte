@@ -38,9 +38,7 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
   let grid;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  let capacityInvalid: boolean;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -67,7 +65,7 @@
     { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text", validator: validateName, invalid: false},
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, ...baseFields, memoryField, diskField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || capacityInvalid || isInvalid([...fields, ...baseFields]); // prettier-ignore
   let message: string;
   let modalData: Object;
   let workerData: boolean = false;
@@ -216,9 +214,7 @@
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.diskSize}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
+          on:invalid={({ detail }) => capacityInvalid = detail}
           {packages}
         />
 
@@ -263,9 +259,7 @@
                 bind:cpu={worker.cpu}
                 bind:memory={worker.memory}
                 bind:diskSize={worker.diskSize}
-                bind:diskField={diskField}
-                bind:cpuField={cpuField}
-                bind:memoryField={memoryField}
+                on:invalid={({ detail }) => capacityInvalid = detail}
                 {packages}
               />
 

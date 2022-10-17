@@ -55,11 +55,9 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  let capacityInvalid: boolean;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([nameField, memoryField, diskField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || capacityInvalid || isInvalid([nameField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -145,9 +143,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
+          on:invalid={({ detail }) => capacityInvalid = detail}
           {packages}
         />
         <SelectGatewayNode

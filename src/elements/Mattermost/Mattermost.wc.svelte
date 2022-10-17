@@ -93,16 +93,15 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   let success: boolean = false;
   let message: string;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  let capacityInvalid: boolean;
   let modalData: Object;
 
   $: disabled =
     invalid ||
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, diskField, memoryField, cpuField, ...smtpFields]);
+    capacityInvalid ||
+    isInvalid([...baseFields, ...smtpFields]);
 
   function onDeployMattermost() {
     loading = true;
@@ -172,9 +171,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
+          on:invalid={({ detail }) => capacityInvalid = detail}
           {packages}
         />
         <SelectGatewayNode

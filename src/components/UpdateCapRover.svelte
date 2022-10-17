@@ -39,9 +39,7 @@
   let worker = new CapWorker();
   let grid;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  let capacityInvalid: boolean;
 
   const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
   
@@ -58,7 +56,7 @@
 
   $: workerData = false;
   $: workerIp = "";
-  $: disabled = loading || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
+  $: disabled = loading || capacityInvalid || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
   $: logs = $currentDeployment;
 
   onMount(async () => {
@@ -302,9 +300,7 @@
               bind:cpu={worker.cpu}
               bind:memory={worker.memory}
               bind:diskSize={worker.diskSize}
-              bind:diskField={diskField}
-              bind:cpuField={cpuField}
-              bind:memoryField={memoryField}
+              on:invalid={({ detail }) => capacityInvalid = detail}
               {packages}
             />
 

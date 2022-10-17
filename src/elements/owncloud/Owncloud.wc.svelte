@@ -126,11 +126,9 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  let capacityInvalid: boolean;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || capacityInvalid || isInvalid([...mailFields, ...adminFields, nameField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -226,9 +224,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
+          on:invalid={({ detail }) => capacityInvalid = detail}
           {packages}
         />
         <SelectGatewayNode

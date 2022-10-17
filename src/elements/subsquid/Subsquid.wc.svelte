@@ -39,9 +39,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  let capacityInvalid: boolean;
   data.disks = [new Disk()];
 
   // define this solution packages
@@ -63,7 +61,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...fields, diskField, cpuField, memoryField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || capacityInvalid || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -154,9 +152,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
         bind:cpu={data.cpu}
         bind:memory={data.memory}
         bind:diskSize={data.disks[0].size}
-        bind:diskField
-        bind:cpuField
-        bind:memoryField
+        on:invalid={({ detail }) => capacityInvalid = detail}
         {packages}
       />
         <SelectGatewayNode
