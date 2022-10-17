@@ -61,11 +61,8 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  let capacityInvalid: boolean;
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || capacityInvalid || isInvalid([...data.smtp.fields,...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -158,9 +155,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
           bind:cpu={data.cpu}
           bind:memory={data.memory}
           bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
+          on:invalid={({ detail }) => capacityInvalid = detail}
           {packages}
         />
  <SelectGatewayNode
