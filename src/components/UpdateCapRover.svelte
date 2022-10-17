@@ -105,8 +105,8 @@
     grid.machines
     .add_machine(workerModel)
     .then(({ contracts }) => {
-      const { updated } = contracts;
-      if (updated.length > 0) {
+      const { created, updated } = contracts;
+      if (updated.length > 0 || created.length > 0) {
         success = true;
         shouldBeUpdated = true;
         worker = new CapWorker();
