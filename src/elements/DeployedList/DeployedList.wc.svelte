@@ -35,8 +35,10 @@
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
   import UpdateK8s from "../../components/UpdateK8s.svelte";
+  import UpdateCapRover from "../../components/UpdateCapRover.svelte";
   import type { IAction } from "../../types/table-action";
   import DialogueMsg from '../../components/DialogueMsg.svelte';
+  import getGrid from "../../utils/getGrid";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -57,6 +59,7 @@
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
   ];
+  let grid;
   let active: string = "vm";
   $: active = tab || active;
 
@@ -119,12 +122,15 @@
 
   let infoToShow: Object;
   let k8sToUpdate: any;
+  let capRoverToUpdate: any;
 
   let _sub: any;
-  onMount(() => {
+  onMount(async () => {
     _sub = deployedStore.subscribe(() => {
       _reloadTab();
     });
+
+    grid = await getGrid(profile, (grid) => grid, false);
   });
 
   onDestroy(() => {
@@ -190,9 +196,15 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {grid.projectName = active; grid._connect(); infoToShow = (await grid.machines.getObj(rows[i]["name"]))},
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Manage Workers",
+          click: (_, i) => (capRoverToUpdate = rows[i]),
+          disabled: () => removing !== null,
         },
         {
           type: "success",
@@ -637,6 +649,17 @@
     k8s={k8sToUpdate}
     on:closed={({ detail }) => {
       k8sToUpdate = null;
+      if (detail) _reloadTab();
+    }}
+  />
+{/if}
+
+{#if capRoverToUpdate}
+  <UpdateCapRover
+    {profile}
+    capRover={capRoverToUpdate}
+    on:closed={({ detail }) => {
+      capRoverToUpdate = null;
       if (detail) _reloadTab();
     }}
   />

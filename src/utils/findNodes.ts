@@ -17,7 +17,7 @@ export default function findNodes(
     );
 
     const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
-    const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy);
+    const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy, grid.rmbClient);
 
     try {
       let avilableNodes = await nodes.filterNodes(filters);
