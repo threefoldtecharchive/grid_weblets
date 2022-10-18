@@ -2,7 +2,12 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import { Disk, Env } from "../../types/vm";
   import Casperlabs from "../../types/casperlabs";
@@ -17,19 +22,16 @@
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
 
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   let data = new Casperlabs();
   let invalid = true;
   let gateway: GatewayNodes;
-
 
   // define this solution packages
   const packages: IPackage[] = [
@@ -37,6 +39,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
     { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
     { name: "Recommended", cpu: 4, memory: 1024 * 32, diskSize: 1000 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   data.disks = [new Disk()];
   let profile: IProfile;
@@ -55,11 +58,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([nameField, memoryField, diskField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([nameField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -75,7 +74,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployCasperlabs(data, profile,gateway)
+    deployCasperlabs(data, profile, gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -106,7 +105,8 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Casperlabs Instance</h4>
     <p>
-      Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.
+      Casper Network is a blockchain protocol built from the ground up to remain
+      true to core Web3 principles and adapt to the needs of our evolving world.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_casper"
@@ -142,19 +142,19 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
         />
 
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.diskSize = diskSize;
+            }
+          }}
         />
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
-
-      />
+        <SelectGatewayNode bind:gateway bind:invalid />
 
         <SelectNodeId
           publicIp={data.publicIp}

@@ -3,7 +3,12 @@
 <script lang="ts">
   import Subsquid from "../../types/subsquid";
   import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import deploySubsquid from "../../utils/deploySubsquid";
   import { Disk } from "../../types/vm";
 
@@ -20,28 +25,24 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
-import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Subsquid();
   let profile: IProfile;
   let gateway: GatewayNodes;
-
 
   let loading = false;
   let success = false;
   let failed = false;
   let invalid = true;
 
-
   let status: "valid" | "invalid";
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+
   data.disks = [new Disk()];
 
   // define this solution packages
@@ -51,7 +52,8 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
-  // Tabs
+  let selectCapacity = new SelectCapacityUpdate();
+
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
   let active = "base";
 
@@ -63,7 +65,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
     { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...fields, diskField, cpuField, memoryField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -82,7 +84,7 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
       return;
     }
 
-    deploySubsquid(data, profile,gateway)
+    deploySubsquid(data, profile, gateway)
       .then((data) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
@@ -151,19 +153,19 @@ import SelectCapacity from "../../components/SelectCapacity.svelte";
           {/if}
         {/each}
         <SelectCapacity
-        bind:cpu={data.cpu}
-        bind:memory={data.memory}
-        bind:diskSize={data.disks[0].size}
-        bind:diskField
-        bind:cpuField
-        bind:memoryField
-        {packages}
-      />
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
-
-      />
+          {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
+        />
+        <SelectGatewayNode bind:gateway bind:invalid />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}

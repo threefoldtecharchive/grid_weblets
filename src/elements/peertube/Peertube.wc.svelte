@@ -2,7 +2,12 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, ITab, IPackage } from "../../types";
+  import {
+    IFormField,
+    ITab,
+    IPackage,
+    SelectCapacityUpdate,
+  } from "../../types";
   import type { IProfile } from "../../types/Profile";
   // Modules
   import { Disk, Env } from "../../types/vm";
@@ -23,14 +28,14 @@
     validateCpu,
     validateMemory,
     validateEmail,
-    validatePassword
+    validatePassword,
   } from "../../utils/validateName";
 
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -47,6 +52,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new Peertube();
@@ -60,13 +66,10 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   let modalData: Object;
   let status: "valid" | "invalid";
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
   let gateway: GatewayNodes;
   let invalid = true;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -82,7 +85,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployPeertube(data, profile,gateway)
+    deployPeertube(data, profile, gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -114,7 +117,8 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Peertube Instance</h4>
     <p>
-      Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
+      Peertube aspires to be a decentralized and free/libre alternative to video
+      broadcasting services.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
@@ -154,19 +158,19 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
         {/each}
 
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
         />
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
-
-      />
+        <SelectGatewayNode bind:gateway bind:invalid />
 
         <SelectNodeId
           publicIp={data.publicIp}

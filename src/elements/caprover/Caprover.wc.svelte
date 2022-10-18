@@ -1,7 +1,12 @@
 <svelte:options tag="tf-caprover" />
 
 <script lang="ts">
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import { CapWorker, default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
   import type { IProfile } from "../../types/Profile";
@@ -17,7 +22,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validatePassword
+    validatePassword,
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
@@ -38,10 +43,6 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
   let grid;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
   // prettier-ignore
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -61,13 +62,14 @@
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "CapRover instance name", type: "text", validator: validateName, invalid: false},
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, ...baseFields, memoryField, diskField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || selectCapacity.invalid || data.workers.some(({ selectCapacity }) => selectCapacity.invalid) || isInvalid([...fields, ...baseFields]); // prettier-ignore
   let message: string;
   let modalData: Object;
   let workerData: boolean = false;
@@ -94,19 +96,19 @@
         success = true;
         modalData = vms;
         deploymentStore.set(0);
-        
+
         vms.forEach((machine) => {
           let firstWorker = true;
           if (machine.env["SWM_NODE_MODE"] == "worker") {
             if (firstWorker) {
               workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
               firstWorker = false;
-            }
-            else workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
+            } else workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
           }
-            
         });
-        domain = vms.filter((machine) => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
+        domain = vms.filter(
+          (machine) => machine.env["SWM_NODE_MODE"] == "leader"
+        )[0].env["CAPROVER_ROOT_DOMAIN"];
 
         if (data.workers.length > 0) workerData = true;
       })
@@ -141,7 +143,9 @@
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
     <h4 class="is-size-4 mb-4">CapRover Deployer</h4>
     <p>
-      CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!
+      CapRover is an extremely easy to use app/database deployment & web server
+      manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB,
+      Postgres, WordPress (and etc…) applications!
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
@@ -213,13 +217,17 @@
         {/each}
 
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.diskSize}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.diskSize = diskSize;
+            }
+          }}
         />
 
         <SelectNodeId
@@ -260,13 +268,17 @@
               {/each}
 
               <SelectCapacity
-                bind:cpu={worker.cpu}
-                bind:memory={worker.memory}
-                bind:diskSize={worker.diskSize}
-                bind:diskField={diskField}
-                bind:cpuField={cpuField}
-                bind:memoryField={memoryField}
                 {packages}
+                selectedPackage={worker.selectCapacity.selectedPackage}
+                on:update={({ detail }) => {
+                  worker.selectCapacity = detail;
+                  if (!detail.invalid) {
+                    const { cpu, memory, diskSize } = detail.package;
+                    worker.cpu = cpu;
+                    worker.memory = memory;
+                    worker.diskSize = diskSize;
+                  }
+                }}
               />
 
               <SelectNodeId
@@ -317,8 +329,10 @@
       <br />
       1- Go to {"http://captain." + domain}<br />
       2- Go to the <strong>cluster</strong> tab<br />
-      3- Click <strong>Add Self-Hosted Registry</strong> button then <strong>Enable Self-Hosted Registry</strong><br />
-      4- Insert worker node public IP <strong>{workerIp}</strong> and add your private SSH Key<br />
+      3- Click <strong>Add Self-Hosted Registry</strong> button then
+      <strong>Enable Self-Hosted Registry</strong><br />
+      4- Insert worker node public IP <strong>{workerIp}</strong> and add your
+      private SSH Key<br />
       5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
@@ -326,13 +340,14 @@
           target="_blank"
           href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker"
         >
-        Click here for the documentation
+          Click here for the documentation
         </a>
       </strong>
       <div style="float: right; margin-top: 50px;">
         <button
           class="button is-danger"
-          on:click|stopPropagation={() => (workerData = !workerData)}>Close</button
+          on:click|stopPropagation={() => (workerData = !workerData)}
+          >Close</button
         >
       </div>
     </section>

@@ -4,7 +4,12 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   import Modal from "../../components/DeploymentModal.svelte";
@@ -88,22 +93,20 @@
     { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 100 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 150 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   let profile: IProfile;
   let loading: boolean = false;
   let failed: boolean = false;
   let success: boolean = false;
   let message: string;
-
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
   let modalData: Object;
 
   $: disabled =
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, ...valConf, diskField, memoryField, cpuField]);
+    selectCapacity.invalid ||
+    isInvalid([...baseFields, ...valConf]);
 
   function onDeployTFhubValidator() {
     loading = true;
@@ -175,13 +178,17 @@
           />
         {/each}
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
         />
         <SelectNodeId
           bind:data={data.nodeId}

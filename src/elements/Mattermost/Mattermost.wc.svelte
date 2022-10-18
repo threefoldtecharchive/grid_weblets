@@ -4,7 +4,12 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   import Modal from "../../components/DeploymentModal.svelte";
@@ -24,8 +29,8 @@
   import rootFs from "../../utils/rootFs";
   import Tabs from "../../components/Tabs.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -86,6 +91,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 50 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   let profile: IProfile;
   let loading: boolean = false;
@@ -93,20 +99,18 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   let success: boolean = false;
   let message: string;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
   let modalData: Object;
 
   $: disabled =
     invalid ||
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, diskField, memoryField, cpuField, ...smtpFields]);
+    selectCapacity.invalid ||
+    isInvalid([...baseFields, ...smtpFields]);
 
   function onDeployMattermost() {
     loading = true;
-    deployMattermost(profile, data,gateway)
+    deployMattermost(profile, data, gateway)
       .then((data) => {
         modalData = data;
         deploymentStore.set(0);
@@ -168,20 +172,21 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
             {field}
           />
         {/each}
-        <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
-          {packages}
-        />
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
 
-      />
+        <SelectCapacity
+          {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
+        />
+        <SelectGatewayNode bind:gateway bind:invalid />
 
         <SelectNodeId
           bind:data={data.nodeId}

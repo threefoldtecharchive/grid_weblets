@@ -1,7 +1,12 @@
 <svelte:options tag="tf-discourse" />
 
 <script lang="ts">
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import { default as Discourse } from "../../types/discourse";
   import deployDiscourse from "../../utils/deployDiscourse";
   import type { IProfile } from "../../types/Profile";
@@ -24,8 +29,8 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const data = new Discourse();
 
@@ -60,12 +65,9 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 50 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...data.smtp.fields,...fields]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -85,7 +87,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     failed = false;
     message = undefined;
 
-    deployDiscourse(data, profile,gateway)
+    deployDiscourse(data, profile, gateway)
       .then((data: any) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
@@ -155,19 +157,19 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
         {/each}
 
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
         />
- <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
-
-      />
+        <SelectGatewayNode bind:gateway bind:invalid />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
