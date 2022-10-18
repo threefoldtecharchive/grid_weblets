@@ -1,119 +1,85 @@
 <svelte:options tag="tf-select-capacity" />
 
 <script lang="ts">
-  import type { IFormField, IPackage } from "../types";
+  import { createEventDispatcher, onMount } from "svelte";
+  import type {
+    IFormField,
+    IPackage,
+    Packages,
+    SelectCapacityUpdate,
+  } from "../types";
   import Input from "./Input.svelte";
   import {
+    isInvalid,
     validateCpu,
     validateDisk,
     validateMemory,
   } from "../utils/validateName";
-  import { onMount } from "svelte";
 
-  export let cpu: number;
-  export let memory: number;
-  export let diskSize: number;
-  export let packages: IPackage[];  
-  export let cpuField: IFormField;
-  export let memoryField: IFormField;
-  export let diskField: IFormField;
+  const dispatch = createEventDispatcher<{ update: SelectCapacityUpdate }>();
 
+  export let packages: IPackage[];
+  export let selectedPackage: Packages = "Minimum";
 
-  const __cpuField: IFormField = {
-    label: "CPU (vCores)",
-    symbol: "cpu",
-    placeholder: "CPU vCores",
-    type: "number",
-    validator: validateCpu,
-    invalid: false,
-  };
-  const __memoryField: IFormField = {
-    label: "Memory (MB)",
-    symbol: "memory",
-    placeholder: "Your Memory in MB",
-    type: "number",
-    validator: validateMemory,
-    invalid: false,
-  };
-  const __diskField: IFormField = {
-    label: "Disk (GB)",
-    symbol: "diskSize",
-    placeholder: "Your Disk size in GB",
-    type: "number",
-    validator: validateDisk,
-    invalid: false,
-  };
+  const cpuField: IFormField = {label: "CPU (vCores)",symbol: "cpu",placeholder: "CPU vCores",type: "number",validator: validateCpu,invalid: false }; // prettier-ignore
+  const memoryField: IFormField = {label: "Memory (MB)",symbol: "memory",placeholder: "Your Memory in MB",type: "number",validator: validateMemory,invalid: false }; // prettier-ignore
+  const diskField: IFormField = {label: "Disk (GB)",symbol: "diskSize",placeholder: "Your Disk size in GB",type: "number",validator: validateDisk,invalid: false }; // prettier-ignore
+
+  let cpu: number;
+  let memory: number;
+  let diskSize: number;
 
   const packageField: IFormField = {
     label: "Select Solution Flavor",
     symbol: "pkg",
     type: "select",
     options: [
-      { label: "Minimum", value: "min", selected: true },
-      { label: "Standard", value: "std" },
-      { label: "Recommended", value: "rec" },
-      { label: "Custom", value: "cust" },
+      { label: "Minimum", value: "Minimum", selected: true },
+      { label: "Standard", value: "Standard" },
+      { label: "Recommended", value: "Recommended" },
+      { label: "Custom", value: "Custom" },
     ],
   };
 
-  let selectedPackageIndex: number = 0;
-  let selectedPackage: string = "min";
-
-  function _applyPackage(idx: number) {
-    const pkg = packages[idx];
-    if (pkg) {
-      cpu = pkg.cpu;
-      memory = pkg.memory;
-      diskSize = pkg.diskSize;
+  function notifyListeners() {
+    if (selectedPackage === "Custom") {
+      return dispatch("update", {
+        selectedPackage,
+        package: { name: selectedPackage, cpu, memory, diskSize },
+        invalid: isInvalid([cpuField, memoryField, diskField]),
+      });
     }
-  }
 
-  function _package_spec(idx: number) {
-    const pkg = packages[idx];
-    let spec = "";
-    if (pkg) {
-      spec = ` (CPU: ${pkg.cpu} vCores, Memory: ${pkg.memory} MB, Disk: ${pkg.diskSize} GB)`;
-    }
-    return spec;
-  }
-
-  function onSelectPackage({ detail }: { detail: Event }) {
-    const inp = detail.target as HTMLSelectElement;
-    _applyPackage(inp.selectedIndex);
-  }
-
-  onMount(() => {
-    requestAnimationFrame(() => {
-      cpuField = __cpuField;
-      memoryField = __memoryField;
-      diskField = __diskField;
-      _applyPackage(0);
-      for (var _i = 0; _i < 3; _i++) {
-        packageField.options[_i].label += _package_spec(_i);
-      }
+    const pkg = packages.find(({ name }) => name === selectedPackage);
+    dispatch("update", {
+      selectedPackage,
+      package: pkg,
+      invalid: !pkg,
     });
+  }
+
+  onMount(notifyListeners);
+  onMount(() => {
+    const options = packageField.options;
+    for (const { name, cpu, memory, diskSize } of packages) {
+      const option = options.find(({ value }) => value === name);
+      option.label += ` (CPU: ${cpu} vCores, Memory: ${memory} MB, Disk: ${diskSize} GB)`;
+    }
+    packageField.options = options;
   });
+
+  let __selectedPackage: Packages;
+  $: if (selectedPackage !== __selectedPackage) {
+    __selectedPackage = selectedPackage;
+    notifyListeners();
+  }
 </script>
 
-<Input
-bind:data={selectedPackage}
-bind:selected={selectedPackageIndex}
-field={packageField}
-on:input={onSelectPackage}
-/>
+<Input bind:data={selectedPackage} field={packageField} />
 
-{#if selectedPackage === "cust"}
-  <Input bind:data={cpu} bind:invalid={__cpuField.invalid} field={__cpuField} />
-
-  <Input
-    bind:data={memory}
-    bind:invalid={__memoryField.invalid}
-    field={__memoryField}
-  />
-
-  <Input
-    bind:data={diskSize}
-    bind:invalid={__diskField.invalid}
-    field={__diskField}
-  />
+<!-- prettier-ignore -->
+{#if selectedPackage === "Custom"}
+  <Input bind:data={cpu} bind:invalid={cpuField.invalid} field={cpuField} on:input={notifyListeners} />
+  <Input bind:data={memory} bind:invalid={memoryField.invalid} field={memoryField} on:input={notifyListeners} />
+  <Input bind:data={diskSize} bind:invalid={diskField.invalid} field={diskField} on:input={notifyListeners} />
 {/if}
