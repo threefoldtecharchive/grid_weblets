@@ -458,6 +458,27 @@
           loading: (i) => removing === rows[i].name,
         },
       ],
+      freeflow: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DIGITALTWIN_APPID;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
+        },
+      ],
     },
     {
       get(target, prop) {

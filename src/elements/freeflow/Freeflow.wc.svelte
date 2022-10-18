@@ -9,10 +9,11 @@
     import DeployBtn from "../../components/DeployBtn.svelte";
     import Alert from "../../components/Alert.svelte";
     import type {IFormField, ITab} from "../../types";
+    import {IPackage} from "../../types";
     import type {IProfile} from "../../types/Profile";
     import type {GatewayNodes} from "../../utils/gatewayHelpers";
     import FreeFlow from "../../types/freeflow";
-    import {validateFlistvalue, validateThreeBotName} from "../../utils/validateName";
+    import validateName, {isInvalid, validateFlistvalue, validateThreeBotName} from "../../utils/validateName";
     import {Env} from "../../types/vm";
     import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     import SelectNodeId from "../../components/SelectNodeId.svelte";
@@ -20,6 +21,7 @@
     import Modal from "../../components/DeploymentModal.svelte";
     import deployFreeFlow from "../../utils/deployFreeFlow";
     import hasEnoughBalance from "../../utils/hasEnoughBalance";
+    import SelectCapacity from "../../components/SelectCapacity.svelte";
 
     const data = new FreeFlow();
 
@@ -42,6 +44,11 @@
         invalid: false,
     };
 
+    let diskField: IFormField;
+    let cpuField: IFormField;
+    let memoryField: IFormField;
+
+
     let message: string;
 
     const deploymentStore = window.configs?.deploymentStore;
@@ -54,20 +61,37 @@
 
     let active = "config";
 
+    // define this solution packages
+    const packages: IPackage[] = [
+        {name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 50},
+        {name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 100},
+        {name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 150},
+    ];
 
-    // prettier-ignore
-    const nameField: IFormField =
+    const vmNameField: IFormField =
         {
             label: "Name",
             symbol: "name",
             placeholder: "Your 3bot name",
             type: "text",
-            validator: validateThreeBotName,
+            validator: validateName,
             invalid: false
         };
 
 
-    $: disabled = nameField.invalid | invalidGateway | status != 'valid'
+    // prettier-ignore
+    const threebotNameField: IFormField =
+        {
+            label: "ThreeBot name",
+            symbol: "name",
+            placeholder: "Your 3bot name",
+            type: "text",
+            validator: validateThreeBotName,
+            invalid: true
+        };
+
+
+    $: disabled = threebotNameField.invalid || invalidGateway || status != 'valid' || isInvalid([vmNameField, diskField, cpuField, memoryField])
 
     const deployFreeFlowHandler = () => {
         loading = true;
@@ -154,9 +178,25 @@
             <Tabs bind:active {tabs}/>
 
             <Input
+                    bind:data={data.vmName}
+                    bind:invalid={vmNameField.invalid}
+                    field={vmNameField}
+            />
+
+            <Input
                     bind:data={data.threeBotUserId}
-                    bind:invalid={nameField.invalid}
-                    field={nameField}
+                    bind:invalid={threebotNameField.invalid}
+                    field={threebotNameField}
+            />
+
+            <SelectCapacity
+                    bind:cpu={data.cpu}
+                    bind:memory={data.memory}
+                    bind:diskSize={data.disks[0].size}
+                    bind:diskField={diskField}
+                    bind:cpuField={cpuField}
+                    bind:memoryField={memoryField}
+                    {packages}
             />
 
             <SelectGatewayNode

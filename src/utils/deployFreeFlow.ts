@@ -11,11 +11,11 @@ const {MachineModel, MachinesModel, GatewayNameModel} = window.configs?.grid3_cl
 
 export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, type: IStore["type"]) {
     const {envs, disks, ...base} = data;
-    const {threeBotUserId, flist, cpu, memory, entrypoint, network, rootFs} = base;
+    const {vmName, threeBotUserId, flist, cpu, memory, entrypoint, network, rootFs} = base;
     const {publicIp, planetary, nodeId} = base;
 
     const vm = new MachineModel();
-    vm.name = threeBotUserId;
+    vm.name = vmName;
     vm.node_id = nodeId;
     vm.disks = disks;
     vm.memory = memory;
@@ -26,13 +26,6 @@ export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, 
     vm.planetary = planetary;
     vm.public_ip = publicIp;
 
-
-    // NODE_ENV:  Environment.STAGING,
-    //     SSH_KEY: process.env.PUBLIC_SSH_KEY,
-    //     USER_ID: USER_ID,
-    //     DIGITALTWIN_APPID: DNS,
-    //     THREEBOT_PHRASE: process.env.THREEBOT_PHRASE,
-    //     SECRET: process.env.SECRET,
 
     vm.env = createEnvs(envs);
 
@@ -65,7 +58,9 @@ export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, 
 
                 console.log('vm')
                 console.log(vm)
-                const ip = vm['publicIP']['ip'].split('/')[0]
+
+                const planetary = vm.planetary;
+
 
                 const gw = new GatewayNameModel();
                 gw.name = threeBotUserId
@@ -73,7 +68,7 @@ export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, 
                 gw.node_id = +(await grid.capacity.filterNodes(gatewayQueryOptions))[0].nodeId;
                 gw.tls_passthrough = GATEWAY_TLS_PASS_TROUGH;
 
-                gw.backends = [`http://${ip}:80`];
+                gw.backends = [`http://[${planetary}]`];
 
                 const nameResult = await grid.gateway.deploy_name(gw);
                 console.log('Result of name deploy', nameResult)
