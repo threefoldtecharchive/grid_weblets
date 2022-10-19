@@ -15,15 +15,14 @@
   import deployMattermost from "../../utils/deployMattermost";
   import validateName, {
     isInvalid,
-    validatePortNumber,
-    validateOptionalEmail,
-    validateOptionalPassword,
+    validateRequiredEmail,
+    validatePassword,
+    validateRequiredPortNumber,
   } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import rootFs from "../../utils/rootFs";
-  import Tabs from "../../components/Tabs.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
+import { validateRequiredHostName } from "../../utils/validateDomainName";
+import SelectCapacity from "../../components/SelectCapacity.svelte";
+import rootFs from "../../utils/rootFs";
+import Tabs from "../../components/Tabs.svelte";
 import type { GatewayNodes } from "../../utils/gatewayHelpers";
 import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
@@ -51,14 +50,14 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       symbol: "username",
       type: "text",
       placeholder: "SMTP Username",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "SMTP Password",
       symbol: "smtpPassword",
       type: "password",
-      validator: validateOptionalPassword,
+      validator: validatePassword,
       placeholder: "SMTP Password",
       invalid: false,
     },
@@ -67,7 +66,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       symbol: "server",
       type: "text",
       placeholder: "SMTP server",
-      validator: validateDomainName,
+      validator: validateRequiredHostName,
       invalid: false,
     },
     {
@@ -75,7 +74,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       symbol: "port",
       type: "text",
       placeholder: "SMTP Port",
-      validator: validatePortNumber,
+      validator: validateRequiredPortNumber,
       invalid: false,
     },
   ];
@@ -99,11 +98,12 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   let modalData: Object;
 
   $: disabled =
+    active === "smtp" && isInvalid([...smtpFields]) ||
     invalid ||
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields, diskField, memoryField, cpuField, ...smtpFields]);
-
+    isInvalid([...baseFields, diskField, memoryField, cpuField]);    
+    
   function onDeployMattermost() {
     loading = true;
     deployMattermost(profile, data,gateway)

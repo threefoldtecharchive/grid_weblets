@@ -18,14 +18,11 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
     validateEmail,
-    validateOptionalEmail,
-    validateDisk,
-    validateMemory,
-    validatePortNumber,
     validatePassword,
-    validateOptionalPassword,
+    validateRequiredEmail,
+    validateRequiredPortNumber,
+    validateRequiredPassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
@@ -83,8 +80,8 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
       symbol: "smtpFromEmail",
       placeholder: "support@example.com",
       type: "text",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "Host Name",
@@ -92,31 +89,31 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
       placeholder: "smtp.example.com",
       type: "text",
       validator: validateDomainName,
-      invalid: false,
+      invalid: true,
     },
     {
       label: "Port",
       symbol: "smtpPort",
       placeholder: "587",
       type: "text",
-      validator: validatePortNumber,
-      invalid: false,
+      validator: validateRequiredPortNumber,
+      invalid: true,
     },
     {
       label: "User Name",
       symbol: "smtpHostUser",
       placeholder: "user@example.com",
       type: "text",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "Password",
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validateOptionalPassword,
-      invalid: false,
+      validator: validateRequiredPassword,
+      invalid: true,
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -139,7 +136,13 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField, ]); // prettier-ignore
+  $: disabled = 
+  active === "mail" && isInvalid([...mailFields]) ||
+  ((loading || !data.valid) && !(success || failed)) ||
+  invalid || 
+  !profile || 
+  status !== "valid" || 
+  isInvalid([...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {

@@ -19,12 +19,11 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateOptionalEmail,
-    validatePortNumber,
-    validateOptionalPassword,
-    validateRequiredPassword
+    validateRequiredPassword,
+    validateRequiredEmail,
+    validateRequiredPortNumber
   } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
+  import { validateRequiredHostName } from "../../utils/validateDomainName";
 
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -82,39 +81,40 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       symbol: "smtpFromEmail",
       placeholder: "support@example.com",
       type: "text",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {   
       label: "Port",
       symbol: "smtpPort",
       placeholder: "587",
       type: "text",
-      validator: validatePortNumber,
-      invalid: false, 
+      validator: validateRequiredPortNumber,
+      invalid: true, 
     },
     {
       label: "Host Name",
       symbol: "smtpHost",
       placeholder: "smtp.example.com",
       type: "text",
-      validator: validateDomainName,
-      invalid: false,
+      validator: validateRequiredHostName,
+      invalid: true,
     },
     {
       label: "Username",
       symbol: "smtpHostUser",
       placeholder: "user@example.com",
       type: "text",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "Password",
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validateOptionalPassword, invalid: false
+      validator: validateRequiredPassword, 
+      invalid: true
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -130,7 +130,13 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = 
+  active === "mail" && isInvalid([...mailFields]) ||
+  ((loading || !data.valid) && !(success || failed)) || 
+  invalid || 
+  !profile || 
+  status !== "valid" || 
+  isInvalid([...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
