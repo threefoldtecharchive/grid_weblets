@@ -30,24 +30,24 @@ export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, 
     vm.env = createEnvs(envs);
 
     const vms = new MachinesModel();
-    vms.name = threeBotUserId;
+    vms.name = vmName;
     vms.network = createNetwork(new Network(network.name, network.ipRange));
     vms.machines = [vm];
 
     const meta = {
         "type": "vm",
-        "name": threeBotUserId,
+        "name": vmName,
         "projectName": type == "VM" ? "" : type
     };
 
     vms.metadata = JSON.stringify(meta);
 
-    return deploy(profile, type, threeBotUserId, async (grid) => {
+    return deploy(profile, type, vmName, async (grid) => {
         if (type != "VM")
-            await checkVMExist(grid, type.toLocaleLowerCase(), threeBotUserId);
+            await checkVMExist(grid, type.toLocaleLowerCase(), vmName);
         return grid.machines
             .deploy(vms)
-            .then(() => grid.machines.getObj(threeBotUserId))
+            .then(() => grid.machines.getObj(vmName))
             .then(async ([vm]) => {
                 const GATEWAY_TLS_PASS_TROUGH: boolean = false;
 
@@ -75,6 +75,8 @@ export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, 
 
                 const nameDeploymentResult = await grid.gateway.getObj(gw.name);
                 console.log('Result of name deploy', nameDeploymentResult)
+
+                return vm;
             });
     });
 }
