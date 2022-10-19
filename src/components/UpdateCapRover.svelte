@@ -299,6 +299,9 @@
 
             <SelectCapacity
               {packages}
+              cpu={worker.cpu}
+              memory={worker.memory}
+              diskSize={worker.diskSize}
               selectedPackage={selectCapacity.selectedPackage}
               on:update={({ detail }) => {
                 selectCapacity = detail;

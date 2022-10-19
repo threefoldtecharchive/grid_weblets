@@ -160,6 +160,9 @@
         <SelectCapacity
           {packages}
           selectedPackage={selectCapacity.selectedPackage}
+          cpu={data.cpu}
+          memory={data.memory}
+          diskSize={data.disks[0].size}
           on:update={({ detail }) => {
             selectCapacity = detail;
             if (!detail.invalid) {

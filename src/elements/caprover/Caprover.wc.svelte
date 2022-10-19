@@ -219,6 +219,9 @@
         <SelectCapacity
           {packages}
           selectedPackage={selectCapacity.selectedPackage}
+          cpu={data.cpu}
+          memory={data.memory}
+          diskSize={data.diskSize}
           on:update={({ detail }) => {
             selectCapacity = detail;
             if (!detail.invalid) {
@@ -270,6 +273,9 @@
               <SelectCapacity
                 {packages}
                 selectedPackage={worker.selectCapacity.selectedPackage}
+                cpu={worker.cpu}
+                memory={worker.memory}
+                diskSize={worker.diskSize}
                 on:update={({ detail }) => {
                   worker.selectCapacity = detail;
                   if (!detail.invalid) {
