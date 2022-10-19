@@ -72,8 +72,10 @@
 
   let __selectedPackage: Packages;
   $: if (packages && selectedPackage !== __selectedPackage) {
-    __selectedPackage = selectedPackage;
-    notifyListeners();
+    requestAnimationFrame(() => {
+      __selectedPackage = selectedPackage;
+      notifyListeners();
+    });
   }
 </script>
 
