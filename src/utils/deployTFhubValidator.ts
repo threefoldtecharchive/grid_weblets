@@ -1,5 +1,4 @@
 import type TFhubValidator from "../types/TFhubValidator";
-import { v4 } from "uuid";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
@@ -7,53 +6,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
-import hex from "./hex";
-
-function getNetwork() :string {
-  const networks = ['dev', 'qa', 'test', 'main'];
-  const host = window.location.host;
-  let netWork = '';
-  networks.includes(
-    host.split('.')[1])
-    ? netWork = host.split('.')[1]
-    : netWork = 'main';
-  return netWork;
-}
-
-function defaultEnvVars(host: string){
-  // Replace dev with main when you deploying the validator on localhost. 
-  const env = {
-    dev: {
-      chainId: "threefold-hub-testnet",
-      gravityAddress: "0x7968da29488c498535352b809c158cde2e42497a",
-      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
-      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
-      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
-    },
-    qa: {
-      chainId: "threefold-hub-testnet",
-      gravityAddress: "0x7968da29488c498535352b809c158cde2e42497a",
-      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
-      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
-      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
-    },
-    test: {
-      chainId: "threefold-hub-testnet",
-      gravityAddress: "0x7968da29488c498535352b809c158cde2e42497a",
-      ethereumRpc: "https://data-seed-prebsc-2-s1.binance.org:8545",
-      persistentPeers: "67bd27ada60adce769441d552b420466c2082ecc@185.206.122.141:26656",
-      genesisUrl: "https://gist.githubusercontent.com/OmarElawady/de4b18f77835a86581e5824ca954d646/raw/8b5052408fcd0c7deab06bd4b4b9d0236b5b1e6c/genesis.json",
-    },
-    main: {
-      chainId: "",
-      gravityAddress: "",
-      ethereumRpc: "",
-      persistentPeers: "",
-      genesisUrl: "",
-    },
-  }
-  return env[host];
-}
+import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf"
 
 const {
     DiskModel,
@@ -79,15 +32,26 @@ function _deployTfHubValidator(
     ) {
     const {
         name,
+        nodeId,
+        disks: [{ size }],
+        publicIp,
+        cpu,
+        memory,
+
         mnemonics,
         stakeAmount,
         ethereumAddress,
         ethereumPrivKey,
-        nodeId,
-        cpu,
-        memory,
-        publicIp,
-        disks: [{ size }],
+        keyName,
+        moniker,
+        chainId,
+        gravityAddress,
+        ethereumRpc,
+        persistentPeers,
+        genesisUrl,
+        gas_prices,
+        gas_adjustment,
+        orchestrator_fees,
     } = tfhubValidator;
 
   let randomSuffix = generateString(10).toLowerCase();
@@ -106,20 +70,23 @@ function _deployTfHubValidator(
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist = "https://hub.grid.tf/ashraf.3bot/ashraffouda-threefold_hub-latest.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/threefold_hub-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     MNEMONICS: mnemonics,
-    STAKE_AMOUNT: stakeAmount,
+    STAKE_AMOUNT: setStakeAmount(stakeAmount),
     ETHEREUM_ADDRESS: ethereumAddress,
     ETHEREUM_PRIV_KEY: ethereumPrivKey,
-    KEYNAME: hex(v4().split("-")[0]),
-    MONIKER: v4().split("-")[0],
-    CHAIN_ID: defaultEnvVars(getNetwork()).chainId,
-    GRAVITY_ADDRESS: defaultEnvVars(getNetwork()).gravityAddress,
-    ETHEREUM_RPC: defaultEnvVars(getNetwork()).ethereumRpc,
-    PERSISTENT_PEERS: defaultEnvVars(getNetwork()).persistentPeers,
-    GENESIS_URL: defaultEnvVars(getNetwork()).genesisUrl,
+    KEYNAME: keyName,
+    MONIKER: moniker,
+    CHAIN_ID: chainId,
+    GRAVITY_ADDRESS: gravityAddress,
+    ETHEREUM_RPC: ethereumRpc || configVariables(getNetwork()).ethereumRpc,
+    PERSISTENT_PEERS: persistentPeers,
+    GENESIS_URL: genesisUrl,
+    GAS_PRICES: gas_prices,
+    GAS_ADJUSTMENT: gas_adjustment,
+    ORCHESTRATOR_FEES: orchestrator_fees,
     SSH_KEY: profile.sshKey,
   };
 
@@ -127,6 +94,14 @@ function _deployTfHubValidator(
   vms.name = name;
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
+
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "TFhubValidator"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
 
   return deploy(profile, "TFhubValidator", name, async (grid) => {
     await checkVMExist(grid, "tfhubValidator", name);

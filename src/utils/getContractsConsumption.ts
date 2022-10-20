@@ -6,6 +6,11 @@ import getGrid from "./getGrid";
 export interface IContract {
   id: number;
   type: "name" | "node";
+  state: "Created" | "GracePeriod";
+  expiration?: string;
+  deploymentData: any;
+  createdAt: Date;
+  nodeID: number;
 }
 
 function _getConsumption(id: number, grid: GridClient) {

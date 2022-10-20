@@ -1,0 +1,1 @@
+import "./NodePilot.wc.svelte";

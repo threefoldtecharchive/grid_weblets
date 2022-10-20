@@ -22,14 +22,19 @@
     validateOptionalEmail,
     validatePortNumber,
     validateOptionalPassword,
+    validateRequiredPassword
   } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
 
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   let data = new Owncloud();
   let domain: string, planetaryIP: string;
+  let gateway: GatewayNodes;
+  let invalid = true;
 
   data.disks = [new Disk()];
   let profile: IProfile;
@@ -67,7 +72,7 @@
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      validator: validateOptionalPassword, invalid: false
+      validator: validateRequiredPassword, invalid: false
     },
   ];
 
@@ -125,7 +130,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...mailFields, ...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -141,7 +146,7 @@
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployOwncloud(data, profile)
+    deployOwncloud(data, profile,gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -170,9 +175,9 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy an ownCloud Instance</h4>
+    <h4 class="is-size-4">Deploy an Owncloud Instance</h4>
     <p>
-      ownCloud develops and provides open-source software for content
+      Owncloud develops and provides open-source software for content
       collaboration, allowing teams to easily share and work on files seamlessly
       regardless of device or location.
       <a
@@ -226,6 +231,11 @@
           bind:memoryField
           {packages}
         />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
+
+      />
 
         <SelectNodeId
           publicIp={data.publicIp}

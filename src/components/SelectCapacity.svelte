@@ -16,9 +16,9 @@
   export let packages: IPackage[];
 
   export let cpuField: IFormField = {
-    label: "CPU (Cores)",
+    label: "CPU (vCores)",
     symbol: "cpu",
-    placeholder: "CPU Cores",
+    placeholder: "CPU vCores",
     type: "number",
     validator: validateCpu,
     invalid: false,
@@ -39,8 +39,9 @@
     validator: validateDisk,
     invalid: false,
   };
+
   let packageField: IFormField = {
-    label: "Select Capacity Package",
+    label: "Select Solution Flavor",
     symbol: "pkg",
     type: "select",
     options: [
@@ -63,6 +64,15 @@
     }
   }
 
+  function _package_spec(idx: number) {
+    const pkg = packages[idx];
+    let spec = "";
+    if (pkg) {
+      spec = ` (CPU: ${pkg.cpu} vCores, Memory: ${pkg.memory} MB, Disk: ${pkg.diskSize} GB)`;
+    }
+    return spec;
+  }
+
   function onSelectPackage({ detail }: { detail: Event }) {
     const inp = detail.target as HTMLSelectElement;
     _applyPackage(inp.selectedIndex);
@@ -71,6 +81,9 @@
   onMount(() => {
     requestAnimationFrame(() => {
       _applyPackage(0);
+      for (var _i = 0; _i < 3; _i++) {
+        packageField.options[_i].label += _package_spec(_i);
+      }
     });
   });
 </script>

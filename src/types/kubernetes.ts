@@ -36,7 +36,10 @@ export abstract class Base {
   }
 }
 
-export class Master extends Base { }
+export class Master extends Base { 
+  public id = v4();
+  public name: string = "MR" + this.id.split("-")[0];
+ }
 export class Worker extends Base { }
 
 export class Network {

@@ -4,12 +4,17 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-  import validateProfileName from '../../utils/validateName';
+  import validateProfileName, {
+    isInvalid,
+    validateSSH,
+  } from "../../utils/validateName";
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
+  import QrCode from "../../components/QrCode.svelte";
   import { onDestroy, onMount } from "svelte";
+  import { set_store_value } from "svelte/internal";
 
   const configs = window.configs?.baseConfig;
   const _balanceStore = window.configs?.balanceStore;
@@ -22,6 +27,29 @@
   let opened: boolean = false;
   let currentProfile: IProfile;
   let selectedIdx: string = "0";
+  let bridgeAddress: string = "";
+  let editable: boolean;
+
+  // if (activeProfileId === activeProfile.id) {
+  //   console.log("disabled is true");
+  //   editable = false;
+  // } else {
+  //   editable = true;
+  // }
+  $: checked = editable;
+  if (configured) {
+    editable = false;
+  }
+
+  function _updateEditable(e: Event) {
+    const input = e.target as HTMLInputElement;
+
+    checked = input.checked;
+    if (!checked) {
+      const sshIsValid = activeProfile.sshKey == "";
+      _updateError("sshKey", sshIsValid, "");
+    }
+  }
 
   let tabs: ITab[] = [];
   $: {
@@ -32,19 +60,41 @@
       activeProfileId = s.activeProfile;
       currentProfile = configs.getActiveProfile();
       tabs = profiles.map((profile, i) => {
-        return { label: profile.name || `Profile ${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
+        return { label: profile.name || `Profile${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
+      if (activeProfileId === activeProfile.id) {
+        console.log("disabled is true");
+        editable = false;
+      } else {
+        editable = true;
+      }
+
+      if (currentProfile) {
+        if (
+          currentProfile.networkEnv == "dev" ||
+          currentProfile.networkEnv == "qa"
+        ) {
+          bridgeAddress =
+            "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+        } else if (currentProfile.networkEnv == "test") {
+          bridgeAddress =
+            "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4";
+        } else {
+          bridgeAddress =
+            "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC";
+        }
+      }
     }
   }
 
   // prettier-ignore
   const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text", validator: validateProfileName, invalid: false  },
+    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
     // { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
     // ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Mnemonics", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Polkadot Mnemonics or TFChain secret", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
   ];
@@ -73,6 +123,7 @@
     try {
       const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
       invalid = !mnIsValid;
+
       _updateError(
         "mnemonics",
         mnIsValid,
@@ -82,9 +133,11 @@
       console.log("Error", err);
     }
 
-    const sshIsValid = activeProfile.sshKey !== "";
-    invalid = invalid || !sshIsValid;
-    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
+    if (checked) {
+      const sshIsValid = activeProfile.sshKey !== "";
+      invalid = invalid || !sshIsValid;
+      _updateError("sshKey", sshIsValid, "Invalid SSH Key");
+    }
 
     const nameIsValid = activeProfile.name !== "";
     invalid = invalid || !nameIsValid;
@@ -117,6 +170,12 @@
   let activePassword: string = "load";
 
   $: balanceStore = $_balanceStore;
+
+  function syncValidateMnemonics(mnemonics: string): string | void {
+    if (!window.configs.bip39.validateMnemonic(mnemonics)) {
+      return "Invalid Mnemonics.";
+    }
+  }
 </script>
 
 <div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
@@ -127,11 +186,12 @@
   </button>
   {#if currentProfile}
     <div class="profile-active">
-      <p>{currentProfile.name}</p>
+      <p style="margin-bottom: 1%;">{currentProfile.name}</p>
       {#if balanceStore.loading}
         <p>Loading Account Balance</p>
       {:else if balanceStore.balance !== null}
-        <p>Balance: <span>{balanceStore.balance}</span> TFT</p>
+        <p>Balance: <span style="font-weight: bold;">{balanceStore.balance}</span> TFT</p>
+        <p>Locked: <span style="padding-left: 2%;">{balanceStore.locked}</span> TFT</p>
       {/if}
     </div>
   {/if}
@@ -162,6 +222,11 @@
               class="button is-outlined mr-2"
               style={`border-color: #1982b1; color: #1982b1`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+              checked
+                ? Boolean(validateSSH(activeProfile.sshKey))
+                : false}
               on:click={() => {
                 selectedIdx = configs.addProfile();
                 fields.forEach((_, i) => (fields[i].error = null));
@@ -173,6 +238,11 @@
               class="button mr-2"
               style={`background-color: #1982b1; color: #fff`}
               type="button"
+              disabled={Boolean(validateProfileName(activeProfile.name)) ||
+              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+              checked
+                ? Boolean(validateSSH(activeProfile.sshKey))
+                : false}
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
@@ -224,7 +294,13 @@
           <button
             class={"button" + (activating ? " is-loading" : "")}
             style={`background-color: #1982b1; color: #fff`}
-            disabled={activating || activeProfileId === activeProfile?.id}
+            disabled={activating ||
+            activeProfileId === activeProfile?.id ||
+            Boolean(validateProfileName(activeProfile.name)) ||
+            Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+            checked
+              ? Boolean(validateSSH(activeProfile.sshKey))
+              : false}
             on:click={onActiveProfile}
           >
             {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
@@ -232,21 +308,92 @@
         </div>
 
         {#if activeProfile}
-          {#each fields as field (field.symbol)}
-            <Input
-              bind:data={activeProfile[field.symbol]}
-              field={{
-                ...field,
-                disabled: activeProfileId === activeProfile.id,
-              }}
-            />
-            {#if activeProfileId === activeProfile?.id}
-              {#if field.symbol === "mnemonics"}
+          <div style="display: flex; justify-content: space-between;">
+            <div
+              style={activeProfileId === activeProfile?.id
+                ? "width: 75%;"
+                : "width: 100%;"}
+            >
+              <Input
+                bind:data={activeProfile.name}
+                field={{
+                  ...fields[0],
+                  error:
+                    activeProfile.name == ""
+                      ? null
+                      : validateProfileName(activeProfile.name),
+                  disabled: activeProfileId === activeProfile.id,
+                }}
+                on:input={() => {
+                  fields[0].error = validateProfileName(activeProfile.name);
+                }}
+              />
+
+              <Input
+                bind:data={activeProfile.mnemonics}
+                field={{
+                  ...fields[1],
+                  error:
+                    activeProfile.mnemonics == ""
+                      ? null
+                      : syncValidateMnemonics(activeProfile.mnemonics),
+                  disabled: activeProfileId === activeProfile.id,
+                }}
+              />
+
+              {#if activeProfileId === activeProfile?.id}
                 <Input data={$configs.twinId} field={twinField} />
                 <Input data={$configs.address} field={addressField} />
               {/if}
+              <div style="display: flex; align-items: center;">
+                <div style="margin-right: 15px; width: 100%;">
+                  <Input
+                    bind:data={activeProfile.sshKey}
+                    field={{
+                      ...fields[2],
+
+                      disabled: !checked,
+                      error:
+                        activeProfile.sshKey != "" && checked
+                          ? validateSSH(activeProfile.sshKey)
+                          : null,
+                    }}
+                  />
+                </div>
+                <div
+                  style="margin-top: 30px;"
+                  data-my-tooltip="On disable the deployed solutions'll be inaccessible."
+                >
+                  <Input
+                    data={editable}
+                    field={{
+                      label: "",
+                      symbol: "editable",
+                      type: "checkbox",
+                    }}
+                    on:input={_updateEditable}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {#if activeProfileId === activeProfile?.id}
+              <div style="margin: 10px; border-left: 1px solid #afafaf;" />
+              <div style="width: 25%; padding: 3% 1%; text-align: center;">
+                <p class="label">
+                  Scan code using Threefold connect to send tokens
+                </p>
+                {#if $configs.twinId}
+                  <QrCode
+                    value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100"
+                    size="250"
+                  />
+                {:else}
+                  <p class="label">Loading scan code...</p>
+                {/if}
+              </div>
             {/if}
-          {/each}
+          </div>
         {/if}
       {:else}
         <Tabs
@@ -300,7 +447,22 @@
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+  [data-my-tooltip]:before {
+    content: attr(data-my-tooltip);
+    position: absolute;
+    opacity: 0;
+  }
 
+  [data-my-tooltip]:hover:before {
+    opacity: 1;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(51, 51, 51, 0.9);
+    color: white;
+    margin-top: -70px;
+    margin-left: -120px;
+    // margin-right: 110px; /*setting it above. to the left. You can play with this */
+  }
   .profile-menu {
     display: flex;
     align-items: center;

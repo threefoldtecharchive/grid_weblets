@@ -2,7 +2,7 @@ import type Mattermost from "../types/mattermost";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import { getUniqueDomainName, selectGatewayNode } from "./gatewayHelpers";
+import { GatewayNodes, getUniqueDomainName, selectGatewayNode, selectSpecificGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
@@ -19,7 +19,9 @@ const {
 
 export default async function deployMattermost(
   profile: IProfile,
-  mattermost: Mattermost
+  mattermost: Mattermost,
+  gateway: GatewayNodes
+
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(
@@ -28,7 +30,7 @@ export default async function deployMattermost(
     "mattermost"
   );
 
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   mattermost.domain = `${domainName}.${nodeDomain}`;
 
   const matterMostVm = await _deployMatterMost(profile, mattermost);
@@ -89,6 +91,14 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Mattermost"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
+
   return deploy(profile, "Mattermost", name, async (grid) => {
     await checkVMExist(grid, "mattermost", name);
 
@@ -110,6 +120,13 @@ function _deployGateway(
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:8000`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": name,
+    "projectName": "Mattermost"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", name, async (grid) => {
     await checkGW(grid, name, "mattermost");

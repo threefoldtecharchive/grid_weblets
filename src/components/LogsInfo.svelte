@@ -21,6 +21,7 @@
       case "Kubernetes":
       case "Peertube":
       case "Owncloud":
+      case "Fullvm":
       case "GatewayName":
         return `Logs of Deployment of type ${s(type)} with name ${s(name)}`;
 

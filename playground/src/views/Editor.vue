@@ -2,6 +2,8 @@
   <section class="editor">
     <aside class="editor__side menu" style="padding-bottom: 100px">
       <img class="logo" src="/images/logoTF.png" />
+      <div class="network">{{ envs[network] }}</div>
+
       <template v-for="section in sections">
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
@@ -98,11 +100,24 @@ class Weblet {
 
 @Component({
   name: "Editor",
+  data: function () {
+    return {
+      envs: { dev: "DEVNET", test: "TESTNET", qa: "QANET", main: "MAINNET" },
+      network: process.env.NETWORK != "" ? process.env.NETWORK : "dev",
+    };
+  },
 })
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
-    new Weblet("Virtual Machine", "vm", "vm", "deployment", "vm.png"),
+    new Weblet(
+      "Full Virtual Machine",
+      "fullvm",
+      "fullvm",
+      "deployment",
+      "vm.png"
+    ),
+    new Weblet("Micro Virtual Machine", "vm", "vm", "deployment", "vm.png"),
     new Weblet(
       "Kubernetes",
       `kubernetes`,
@@ -140,14 +155,6 @@ export default class Editor extends Vue {
       "deployment",
       "mattermost.png"
     ),
-    /*
-    new Weblet(
-      "TFhub Validator",
-      "vaildator",
-      "tfhubValidator",
-      "deployment",
-      "vm.png"
-    ),*/
     new Weblet(
       "Discourse",
       "discourse",
@@ -172,12 +179,27 @@ export default class Editor extends Vue {
       "presearch.png"
     ),
     new Weblet(
+      "Subsquid",
+      "subsquid",
+      "subsquid",
+      "deployment",
+      "subsquid.png"
+    ),
+    new Weblet(
       "Casperlabs",
       "casperlabs",
       "casperlabs",
       "deployment",
       "casperlabs.png"
     ),
+    /*new Weblet(
+      "TFhub Validator",
+      "validator",
+      "tfhubValidator",
+      "deployment",
+      "vm.png"
+    ),*/
+    new Weblet("Node Pilot", "nodepilot", "nodepilot", "deployment", "vm.png"),
 
     new Weblet("Contracts", "contractslist", "", "my account", ""),
     new Weblet("Deployments", "deployedlist", "", "my account", ""),
@@ -262,17 +284,30 @@ export default class Editor extends Vue {
   width: 185px;
   margin: 15px 15px 30px;
 }
+.network {
+  font-size: 18px;
+  display: block;
+  color: white;
+  background-color: rgb(25, 130, 177);
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: 400;
+}
 .menu {
   background-color: #333;
 }
+
 .menu-list a,
 .menu-label {
   color: #fff;
 }
+
 .menu-list a {
   margin: 5px 0;
   transition: all 0.35s ease-in-out;
 }
+
 .menu-list a:hover,
 .menu-list a.is-active {
   background-color: #1982b1;

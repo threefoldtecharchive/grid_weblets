@@ -16,6 +16,7 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid } from "../../utils/validateName";
@@ -23,8 +24,12 @@
 
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   let data = new Casperlabs();
+  let invalid = true;
+  let gateway: GatewayNodes;
+
 
   // define this solution packages
   const packages: IPackage[] = [
@@ -54,7 +59,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, memoryField, diskField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([nameField, memoryField, diskField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -70,7 +75,7 @@
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployCasperlabs(data, profile)
+    deployCasperlabs(data, profile,gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -99,7 +104,7 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a casperlabs Instance</h4>
+    <h4 class="is-size-4">Deploy a Casperlabs Instance</h4>
     <p>
       Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.
       <a
@@ -145,6 +150,11 @@
           bind:memoryField={memoryField}
           {packages}
         />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
+
+      />
 
         <SelectNodeId
           publicIp={data.publicIp}

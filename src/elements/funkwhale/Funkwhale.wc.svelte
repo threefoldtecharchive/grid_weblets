@@ -29,6 +29,8 @@ validatePassword,
   import rootFs from "../../utils/rootFs";
   import Funkwhale from "../../types/funkwhale";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   const data = new Funkwhale();
   data.disks = [new Disk()];
@@ -60,8 +62,11 @@ validatePassword,
   let diskField: IFormField;
   let cpuField: IFormField;
   let memoryField: IFormField;
+  let invalid = true;
+  let gateway: GatewayNodes;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField, diskField, cpuField, memoryField]) ; // prettier-ignore
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField, diskField, cpuField, memoryField]) ; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
@@ -80,7 +85,7 @@ validatePassword,
       return;
     }
 
-    deployFunkwhale(data, profile)
+    deployFunkwhale(data, profile,gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -166,6 +171,11 @@ validatePassword,
           bind:memoryField={memoryField}
           {packages}
         />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
+
+      />
 
         <SelectNodeId
           publicIp={false}

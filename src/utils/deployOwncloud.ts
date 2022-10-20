@@ -4,7 +4,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 
 const {
@@ -18,13 +18,15 @@ const {
 
 export default async function deployOwncloud(
   data: Owncloud,
-  profile: IProfile
+  profile: IProfile,
+  gateway: GatewayNodes
+
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "owncloud");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the owncloud
@@ -80,7 +82,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
 
   // vm specs
   const vm = new MachineModel();
-  vm.name = `vm${randomSuffix}`;
+  vm.name = name; //`vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
@@ -126,6 +128,13 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Owncloud"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   // deploy
   return deploy(profile, "Owncloud", name, async (grid) => {
     await checkVMExist(grid, "owncloud", name);
@@ -149,6 +158,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Owncloud"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "owncloud");

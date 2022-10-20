@@ -20,7 +20,6 @@
   import validateName, {
     isInvalid,
     validateCpu,
-    validateDisk,
     validateEntryPoint,
     validateFlistvalue,
     validateKey,
@@ -28,7 +27,6 @@
     validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
 
@@ -42,7 +40,7 @@
 
   // prettier-ignore
   let baseFields: IFormField[] = [
-    { label: "CPU (Cores)", symbol: 'cpu', placeholder: 'CPU Cores', type: 'number', validator: validateCpu, invalid: false},
+    { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
@@ -94,7 +92,6 @@
   let success = false;
   let failed = false;
   let profile: IProfile;
-
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
@@ -108,7 +105,7 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -143,7 +140,7 @@
     failed = false;
     message = undefined;
 
-    deployVM(data, profile)
+    deployVM(data, profile, "VM")
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -191,9 +188,9 @@
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Virtual Machine</h4>
+    <h4 class="is-size-4">Deploy a Micro Virtual Machine</h4>
     <p>
-      Deploy a new virtual machine on the Threefold Grid
+      Deploy a new micro virtual machine on the Threefold Grid
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
@@ -243,6 +240,9 @@
               placeholder: "VM Image",
               type: "text",
               ...validateFlist,
+            }}
+            on:input={() => {
+              validateFlist.error = null;
             }}
           />
 

@@ -24,12 +24,16 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const data = new Discourse();
 
   let loading = false;
   let success = false;
   let failed = false;
+  let invalid = true;
+  let gateway: GatewayNodes;
 
   let status: "valid" | "invalid";
   let profile: IProfile;
@@ -48,8 +52,6 @@
   const fields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Discourse Instance Name", type: "text", validator: validateName, invalid: false },
     { label: "Email", symbol: "developerEmail", placeholder: "Admin Email", type: "text", validator: validateEmail, invalid: false },
-    { label: "Public IP", symbol: "publicIp", type: 'checkbox' },
-    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
   // define this solution packages
@@ -63,7 +65,7 @@
   let cpuField: IFormField;
   let memoryField: IFormField;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...data.smtp.fields,...fields, diskField, memoryField, cpuField]); // prettier-ignore
 
   let message: string;
   let modalData: Object;
@@ -83,7 +85,7 @@
     failed = false;
     message = undefined;
 
-    deployDiscourse(data, profile)
+    deployDiscourse(data, profile,gateway)
       .then((data: any) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
@@ -161,11 +163,15 @@
           bind:memoryField
           {packages}
         />
+ <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
 
+      />
         <SelectNodeId
           cpu={data.cpu}
           memory={data.memory}
-          publicIp={data.publicIp}
+          publicIp={false}
           ssd={data.diskSize + rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}

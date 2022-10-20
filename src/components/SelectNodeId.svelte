@@ -5,7 +5,8 @@
   import type { IFormField, ISelectOption } from "../types";
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
-  import fetchFarmAndCountries from "../utils/fetchFarmAndCountries";
+  import fetchFarms from "../utils/fetchFarms";
+  import { fetchCountries } from "../utils/fetchCountries";
 
   // components
   import Input from "./Input.svelte";
@@ -119,8 +120,7 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, label: string = "Loading...") {
-    const oldLabel = filtersFields[index].options[0].label;
+  function _setLabel(index: number, oldLabel: string,  label: string = "Loading...") {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
@@ -140,6 +140,19 @@
     );
   }
 
+  function _setCountriesOptions(
+    index: number,
+    items: Map< string, Number >
+  ) {
+    const [option] = filtersFields[index].options;
+    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
+        const op = { label: name, value: name } as ISelectOption;
+        return op;
+      },
+    );
+    filtersFields[index].options.unshift(option);
+  }
+
   let _network: string;
   $: {
     if (
@@ -156,21 +169,33 @@
 
   function onLoadFarmsHandler(){
     /* Loading farms & countries */
-    const farmsLabel = _setLabel(0);
-    const countriesLabel = _setLabel(1);
+    const old_farm_label = "Please select a farm";
+    const old_countries_label = "Please select a country";
 
-    fetchFarmAndCountries(profile, filters)
-      .then(({ farms, countries }) => {
+    const farmsLabel = _setLabel(0, old_farm_label);
+    const countriesLabel = _setLabel(1, old_countries_label);
+
+    fetchFarms(profile, filters, exclusiveFor)
+      .then(({ farms }) => {
         farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
         _setOptions(0, farms);
-        _setOptions(1, countries);
       })
       .catch((err) => {
         console.log("Error", err);
       })
       .finally(() => {
-        _setLabel(0, farmsLabel);
-        _setLabel(1, countriesLabel);
+        _setLabel(0, old_farm_label, farmsLabel);
+      });
+
+    fetchCountries(profile)
+      .then(( countries ) => {
+        _setCountriesOptions(1, countries);
+      })
+      .catch((err) => {
+        console.log("Error", err);
+      })
+      .finally(() => {
+        _setLabel(1, old_countries_label, countriesLabel);
       });
   }
 
@@ -192,7 +217,6 @@
     symbol: "nodeId",
     type: "number",
     placeholder: "Your Node ID",
-    validator: _nodeValidator,
   };
 
   interface IResources { cru: number; sru: number; hru: number; mru: number; ipv4u: number; } // prettier-ignore
@@ -228,7 +252,7 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
-              if (node.dedicated && node.rentedByTwinId != $configs.twinId) {
+              if (node.rentedByTwinId != $configs.twinId && (node.dedicated || node.rentContractId != 0)) {
                 status = "dedicated";
                 return;
               }
@@ -241,8 +265,7 @@
               const { total_resources: total, used_resources: used } =
                 node.capacity;
               // prettier-ignore
-              let hasEnoughResources = (total.cru - used.cru) >= filters.cru &&
-                        ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
+              let hasEnoughResources = ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
               if (!hasEnoughResources) {
                 status = "invalid";
@@ -366,7 +389,7 @@
     {:else if status === "dedicated"}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) is dedicated and not reserved for your
-        account, please check the portal.
+        account, please check the dashboard.
       </p>
     {/if}
   {/if}

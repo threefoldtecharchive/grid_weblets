@@ -29,6 +29,8 @@
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -61,8 +63,10 @@
   let diskField: IFormField;
   let cpuField: IFormField;
   let memoryField: IFormField;
+  let gateway: GatewayNodes;
+  let invalid = true;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([...fields, diskField, memoryField, cpuField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -78,7 +82,7 @@
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployPeertube(data, profile)
+    deployPeertube(data, profile,gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -158,6 +162,11 @@
           bind:memoryField={memoryField}
           {packages}
         />
+        <SelectGatewayNode
+        bind:gateway
+        bind:invalid={invalid}
+
+      />
 
         <SelectNodeId
           publicIp={data.publicIp}

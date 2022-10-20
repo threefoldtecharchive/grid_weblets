@@ -19,3 +19,10 @@ export default function validateMnemonics(profile: IProfile) {
     .then(() => true)
     .catch(() => false);
 }
+
+export function syncValidateMnemonics(mnemonics: string): string | void {
+  if (mnemonics === "") return "Mnemonics is required";
+  if (!window.configs.bip39.validateMnemonic(mnemonics)) {
+    return "Invalid Mnemonics.";
+  };
+}

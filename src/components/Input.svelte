@@ -1,7 +1,7 @@
 <svelte:options tag="tf-input" />
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import type { IFormField } from "../types";
   import { v4 } from "uuid";
 
@@ -12,6 +12,8 @@
   export let invalid = false;
   export let min: string | number = undefined;
   export let max: string | number = undefined;
+
+  $: numericData = data?.toString();
 
   const id = v4();
   const _isInput = () => ["text", "number", "password", "textarea"].includes(field.type); // prettier-ignore
@@ -32,13 +34,17 @@
       invalid = !!__err;
       /* Hack for now */
     } else if (isNum) {
-      let __err = +target.value <= 0 ? "Value must be positive" : null;
+      let __err = +target.value <= 0 || isNaN(+target.value) ? "Value must be positive" : null;
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
     }
 
-    if (isNum && !invalid) {
-      data = +target.value;
+    if (isNum) {
+      if (!invalid) {
+        (e as any).target.value = +(e as any).target.value;
+      }
+      
+      data = !invalid ? +numericData : numericData;
     }
 
     dispatch("input", e);
@@ -178,9 +184,10 @@
               data-type="number"
               class={"input" + (field.error || _error ? " is-danger" : "")}
               placeholder={field.placeholder}
-              bind:value={data}
+              bind:value={numericData}
               on:input={_onInput}
               disabled={field.disabled}
+              maxlength="15"
               {min}
               {max}
             />

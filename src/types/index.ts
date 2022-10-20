@@ -34,7 +34,7 @@ export interface IFormField {
   placeholder?: string;
   options?: ISelectOption[];
   disabled?: boolean;
-  error?: string;
+  error?: string | void;
   validator?: (value: string | number | boolean) => string | void;
   invalid?: boolean;
   min?: string | number;

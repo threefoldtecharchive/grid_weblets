@@ -41,7 +41,7 @@ export default async function deployCaprover(
   machine.env = {
     SWM_NODE_MODE: "leader",
     CAPROVER_ROOT_DOMAIN: domain,
-    CAPTAIN_IMAGE_VERSION: "v1.2.1",
+    CAPTAIN_IMAGE_VERSION: "v1.4.2",
     PUBLIC_KEY: publicKey,
     DEFAULT_PASSWORD: password,
   };
@@ -51,6 +51,13 @@ export default async function deployCaprover(
   machines.machines = [machine];
   machines.network = network;
   machines.description = "caprover leader machine/node";
+
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "CapRover"
+  };
+  machines.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "CapRover", name, async (grid) => {
     await checkVMExist(grid, "caprover", name);

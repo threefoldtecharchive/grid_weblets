@@ -2,7 +2,7 @@ import type { default as Peertube } from "../types/peertube";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import { selectGatewayNode, getUniqueDomainName } from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
@@ -19,13 +19,15 @@ const {
 
 export default async function deployPeertube(
   data: Peertube,
-  profile: IProfile
+  profile: IProfile,
+  gateway: GatewayNodes
+
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
   let domainName = await getUniqueDomainName(profile, data.name, "peertube");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = await selectGatewayNode();
+  let [publicNodeId, nodeDomain] =  selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy peertube
@@ -75,7 +77,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
 
   // VM Specs
   const vm = new MachineModel();
-  vm.name = `vm${randomSuffix}`;
+  vm.name = name; //`vm${randomSuffix}`;
   vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = publicIp;
@@ -99,6 +101,13 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.network = network;
   vms.machines = [vm];
 
+  const metadate = {
+    "type":  "vm",  
+    "name": name,
+    "projectName": "Peertube"
+  };
+  vms.metadata = JSON.stringify(metadate);
+
   // deploy
   return deploy(profile, "Peertube", name, async (grid) => {
     await checkVMExist(grid, "peertube", name); // change the project name of the grid to be peertube
@@ -121,6 +130,13 @@ async function deployPrefixGateway(
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
+
+  const metadate = {
+    "type":  "gateway",  
+    "name": domainName,
+    "projectName": "Peertube"
+  };
+  gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async (grid) => {
     await checkGW(grid, domainName, "peertube");

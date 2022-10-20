@@ -14,12 +14,16 @@
     | "funkwhale"
     | "peertube"
     | "mattermost"
-    | "tfhub Validator"
+    | "tfhubValidator"
     | "discourse"
     | "taiga"
     | "owncloud"
     | "presearch"
-    | "casperlabs";
+    | "casperlabs"
+    | "nodepilot"
+    | "subsquid"
+    | "fullvm";
+
   export let tab: TabsType = undefined;
 
   // components
@@ -34,20 +38,22 @@
 
   // prettier-ignore
   const tabs: ITab[] = [
+    { label: "Full Virtual Machine", value: "fullvm" },
+    { label: "Micro Virtual Machine", value: "vm" },
     { label: "Kubernetes", value: "k8s" },
-    { label: "Virtual Machines", value: "vm" },
-    { label: "Caprover", value: "caprover" },
-    { label: "FunkWhale", value: "funkwhale" },
+    { label: "CapRover", value: "caprover" },
     { label: "Peertube", value: "peertube" },
+    { label: "Funkwhale", value: "funkwhale" },
     { label: "Mattermost", value: "mattermost" },
-    //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Discourse", value: "discourse" },
     { label: "Taiga", value: "taiga" },
     { label: "Owncloud", value: "owncloud" },
     { label: "Presearch", value: "presearch" },
-    { label: "Casperlabs", value: "casperlabs" }
+    { label: "Subsquid", value: "subsquid" },
+    { label: "Casperlabs", value: "casperlabs" },
+    { label: "Node Pilot", value: "nodepilot" },
   ];
-  let active: string = "k8s";
+  let active: string = "vm";
   $: active = tab || active;
 
   let loading = false;
@@ -57,6 +63,14 @@
 
   let profile: IProfile;
   let message: string = null;
+
+  function get_solution_label(active: string) {
+    return (
+      tabs.find((item) => {
+        return item.value == active;
+      })?.label ?? "Not Found!"
+    );
+  }
 
   function onConfigHandler() {
     configed = true;
@@ -373,6 +387,64 @@
           loading: (i) => removing === rows[i].name,
         },
       ],
+      subsquid: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.SUBSQUID_WEBSERVER_HOSTNAME;
+            window.open("https://" + domain + "/graphql", "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return (
+              !env || !env.SUBSQUID_WEBSERVER_HOSTNAME || removing !== null
+            );
+          },
+        },
+      ],
+      nodepilot: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.publicIP.ip;
+            window
+              .open(
+                "https://" + domain.substr(0, domain.indexOf("/")),
+                "_blank"
+              )
+              .focus();
+          },
+          disabled: (i) => {
+            const publicIP = rows[i].details.publicIP;
+            return !publicIP || !publicIP.ip || removing !== null;
+          },
+        },
+      ],
+      fullvm: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
     },
     {
       get(target, prop) {
@@ -394,7 +466,7 @@
 <div style="padding: 15px;">
   <section class="box">
     <h4 class="is-size-4 mb-4">
-      Deployment List {tab ? `(${tab})` : ""}
+      Deployment List {tab ? `(${get_solution_label(tab)})` : ""}
     </h4>
     <hr />
 
@@ -489,7 +561,9 @@
         {#await list?.loadDeployments(active === "vm" ? undefined : active)}
           <Alert
             type="info"
-            message={`Listing ${active.toLocaleUpperCase()}s...`}
+            message={`Listing ${
+              active == "casperlabs" ? "Casperlab" : get_solution_label(active)
+            }s...`}
           />
         {:then rows}
           {#if rows.data.length}
@@ -512,7 +586,11 @@
           {:else}
             <Alert
               type="gray"
-              message={`No ${active.toLocaleUpperCase()}s found on this profile.`}
+              message={`No ${
+                active == "casperlabs"
+                  ? "Casperlab"
+                  : get_solution_label(active)
+              }s found on this profile.`}
             />
           {/if}
         {:catch err}
@@ -520,7 +598,11 @@
             type="danger"
             message={err.message ||
               err ||
-              `Failed to list ${active.toLocaleUpperCase()}s`}
+              `Failed to list ${
+                active == "casperlabs"
+                  ? "Casperlab"
+                  : get_solution_label(active)
+              }s`}
           />
         {/await}
       {/if}

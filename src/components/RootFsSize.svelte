@@ -50,7 +50,6 @@
             ? `RootFs value can't be less than ${rootFsUtil(cpu, memory)}`
             : undefined,
         disabled: !editable,
-        validator() {},
       }}
     />
   </div>
