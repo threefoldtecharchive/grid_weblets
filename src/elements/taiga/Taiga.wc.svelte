@@ -2,7 +2,12 @@
 
 <script lang="ts">
   import { Disk, Env } from "../../types/vm";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import deployTaiga from "../../utils/deployTaiga";
   import type { IProfile } from "../../types/Profile";
   import Taiga from "../../types/taiga";
@@ -27,8 +32,8 @@
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   let data = new Taiga();
   let gateway: GatewayNodes;
@@ -125,6 +130,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
     { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 150 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   let message: string;
   let modalData: Object;
@@ -132,17 +138,13 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
   $: disabled = 
   active === "mail" && isInvalid([...mailFields]) ||
   ((loading || !data.valid) && !(success || failed)) ||
   invalid || 
   !profile || 
   status !== "valid" || 
-  isInvalid([...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  isInvalid([...adminFields, nameField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -160,7 +162,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
     failed = false;
     message = undefined;
 
-    deployTaiga(data, profile,gateway)
+    deployTaiga(data, profile, gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -224,13 +226,20 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
           field={nameField}
         />
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          cpu={data.cpu}
+          memory={data.memory}
+          diskSize={data.disks[0].size}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
         />
 
         {#each adminFields as field (field.symbol)}
@@ -244,11 +253,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
-
-      />
+        <SelectGatewayNode bind:gateway bind:invalid />
 
         <SelectNodeId
           publicIp={data.publicIp}

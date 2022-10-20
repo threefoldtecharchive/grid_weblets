@@ -2,7 +2,12 @@
 
 <script lang="ts">
   // Types
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import { Disk, Env } from "../../types/vm";
   import Owncloud from "../../types/owncloud";
@@ -27,8 +32,8 @@
 
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   let data = new Owncloud();
   let domain: string, planetaryIP: string;
@@ -53,9 +58,9 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
     { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
     { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
-
 
   let adminFields: IFormField[] = [
     {
@@ -71,7 +76,8 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       symbol: "adminPassword",
       placeholder: "Admin Password",
       type: "password",
-      validator: validateRequiredPassword, invalid: false
+      validator: validateRequiredPassword,
+      invalid: false,
     },
   ];
 
@@ -84,7 +90,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       validator: validateRequiredEmail,
       invalid: true,
     },
-    {   
+    {
       label: "Port",
       symbol: "smtpPort",
       placeholder: "587",
@@ -152,7 +158,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
         "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployOwncloud(data, profile,gateway)
+    deployOwncloud(data, profile, gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -228,20 +234,24 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-        <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField
-          bind:cpuField
-          bind:memoryField
-          {packages}
-        />
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
 
-      />
+        <SelectCapacity
+          {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          cpu={data.cpu}
+          memory={data.memory}
+          diskSize={data.disks[0].size}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
+        />
+        <SelectGatewayNode bind:gateway bind:invalid />
 
         <SelectNodeId
           publicIp={data.publicIp}
