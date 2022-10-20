@@ -1,7 +1,12 @@
 <svelte:options tag="tf-funkwhale" />
 
 <script lang="ts">
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import {
+    IFormField,
+    IPackage,
+    ITab,
+    SelectCapacityUpdate,
+  } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   const deploymentStore = window.configs?.deploymentStore;
@@ -23,14 +28,14 @@
   import validateName, {
     isInvalid,
     validateEmail,
-validatePassword,
+    validatePassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
   import Funkwhale from "../../types/funkwhale";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
-import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   const data = new Funkwhale();
   data.disks = [new Disk()];
@@ -49,8 +54,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
   const userNameField: IFormField = { label: "Username", placeholder: "Username will be used to access your profile", symbol: "username", type: "text", validator: validateName, invalid: false }; // prettier-ignore
   const emailField: IFormField = { label: "Email", placeholder: "This email will be used to login to your instance", symbol: "email", type: "text", validator: validateEmail, invalid: true }; // prettier-ignore
 
-
-    const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: validatePassword, invalid: false}; // prettier-ignore
+  const passwordField: IFormField = { label: "Password", placeholder: "Password", symbol: "password", type: "password", validator: validatePassword, invalid: false}; // prettier-ignore
 
   // define this solution packages
   const packages: IPackage[] = [
@@ -58,15 +62,12 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
   let invalid = true;
   let gateway: GatewayNodes;
 
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || isInvalid([nameField, userNameField, emailField, passwordField, diskField, cpuField, memoryField]) ; // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([nameField, userNameField, emailField, passwordField]) ; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   let message: string;
@@ -85,7 +86,7 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
       return;
     }
 
-    deployFunkwhale(data, profile,gateway)
+    deployFunkwhale(data, profile, gateway)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -116,7 +117,9 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Funkwhale Instance</h4>
     <p>
-      Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.
+      Funkwhale is social platform to enjoy and share music. Funkwhale is a
+      community-driven project that lets you listen and share music and audio
+      within a decentralized, open network.
       <a
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_funkwhale"
@@ -163,19 +166,22 @@ import type { GatewayNodes } from "../../utils/gatewayHelpers";
         />
 
         <SelectCapacity
-          bind:cpu={data.cpu}
-          bind:memory={data.memory}
-          bind:diskSize={data.disks[0].size}
-          bind:diskField={diskField}
-          bind:cpuField={cpuField}
-          bind:memoryField={memoryField}
           {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          cpu={data.cpu}
+          memory={data.memory}
+          diskSize={data.disks[0].size}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
         />
-        <SelectGatewayNode
-        bind:gateway
-        bind:invalid={invalid}
-
-      />
+        <SelectGatewayNode bind:gateway bind:invalid />
 
         <SelectNodeId
           publicIp={false}

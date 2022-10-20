@@ -3,7 +3,7 @@
 <script lang="ts">
   // libs
   import type { IProfile } from "../types/Profile";
-  import type { IFormField, IPackage } from "../types";
+  import { IFormField, IPackage, SelectCapacityUpdate } from "../types";
   import validateName, { isInvalid } from "../utils/validateName"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
@@ -39,12 +39,9 @@
   let worker = new CapWorker();
   let grid;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
+  const CAPROVER_FLIST =
+    "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
-  const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
-  
   // prettier-ignore
   const workerFields: IFormField[] = [ 
     { label: "Name", symbol: "name", placeholder: "Worker instance name", type: "text", validator: validateName, invalid: false },
@@ -55,10 +52,11 @@
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
 
   $: workerData = false;
   $: workerIp = "";
-  $: disabled = loading || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
+  $: disabled = loading || selectCapacity.invalid || isInvalid([...workerFields]) || !worker.valid; // prettier-ignore
   $: logs = $currentDeployment;
 
   onMount(async () => {
@@ -69,16 +67,18 @@
     grid.projectName = "caprover";
     grid._connect();
 
-    if (capRover) workers = 
-      (await grid.machines.getObj(capRover["name"])).filter((machine) => machine.env["SWM_NODE_MODE"] == "worker");
-    
+    if (capRover)
+      workers = (await grid.machines.getObj(capRover["name"])).filter(
+        (machine) => machine.env["SWM_NODE_MODE"] == "worker"
+      );
+
     workers_loading = false;
   });
 
   async function onAddWorker() {
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
-    
+
     /* Docker disk */
     const disk = new DiskModel();
     disk.name = "data0";
@@ -103,40 +103,39 @@
       PUBLIC_KEY: worker.publicKey,
     };
     grid.machines
-    .add_machine(workerModel)
-    .then(({ contracts }) => {
-      const { created, updated } = contracts;
-      if (updated.length > 0 || created.length > 0) {
-        success = true;
-        shouldBeUpdated = true;
-        worker = new CapWorker();
-        return grid.machines.getObj(workerModel.deployment_name);
-      } else {
+      .add_machine(workerModel)
+      .then(({ contracts }) => {
+        const { created, updated } = contracts;
+        if (updated.length > 0 || created.length > 0) {
+          success = true;
+          shouldBeUpdated = true;
+          worker = new CapWorker();
+          return grid.machines.getObj(workerModel.deployment_name);
+        } else {
+          failed = true;
+        }
+      })
+      .then((data) => {
+        if (!data) return;
+        workers = data.filter(
+          (machine) => machine.env["SWM_NODE_MODE"] == "worker"
+        );
+        workerData = true;
+        workerIp = workers[data.length - 1].publicIP["ip"];
+      })
+      .catch((err) => {
         failed = true;
-      }
-    })
-    .then((data) => {
-      if (!data) return;
-      workers = data.filter((machine) => machine.env["SWM_NODE_MODE"] == "worker");
-      workerData = true;
-      workerIp = workers[data.length - 1].publicIP["ip"];
-    })
-    .catch((err) => {
-      failed = true;
-      console.log("Error", err);
-      message = err.message || err;
-    })
-    .finally(() => {
-      loading = false;
-      currentDeployment.clear();
-    });
-
+        console.log("Error", err);
+        message = err.message || err;
+      })
+      .finally(() => {
+        loading = false;
+        currentDeployment.clear();
+      });
   }
 
-
   function onDeleteWorker(idx: number) {
-    if (!window.confirm("Are you sure you want to delete your worker?"))
-      return;
+    if (!window.confirm("Are you sure you want to delete your worker?")) return;
     const worker = workers[idx];
     removing = worker.name;
     loading = true;
@@ -147,7 +146,7 @@
     grid.machines
       .delete_machine(workerModel)
       .then(({ deleted, updated }) => {
-        if (deleted.length > 0 ||updated.length > 0) {
+        if (deleted.length > 0 || updated.length > 0) {
           shouldBeUpdated = true;
           let r = removing;
           requestAnimationFrame(() => {
@@ -291,36 +290,43 @@
             <Alert type="danger" message={message || "Failed to Add Worker."} />
           {:else}
             {#each workerFields as field (field.symbol)}
-                <Input
-                    bind:data={worker[field.symbol]}
-                    bind:invalid={field.invalid}
-                    {field}
-                />
+              <Input
+                bind:data={worker[field.symbol]}
+                bind:invalid={field.invalid}
+                {field}
+              />
             {/each}
 
             <SelectCapacity
-              bind:cpu={worker.cpu}
-              bind:memory={worker.memory}
-              bind:diskSize={worker.diskSize}
-              bind:diskField={diskField}
-              bind:cpuField={cpuField}
-              bind:memoryField={memoryField}
               {packages}
+              cpu={worker.cpu}
+              memory={worker.memory}
+              diskSize={worker.diskSize}
+              selectedPackage={selectCapacity.selectedPackage}
+              on:update={({ detail }) => {
+                selectCapacity = detail;
+                if (!detail.invalid) {
+                  const { cpu, memory, diskSize } = detail.package;
+                  worker.cpu = cpu;
+                  worker.memory = memory;
+                  worker.diskSize = diskSize;
+                }
+              }}
             />
 
             <SelectNodeId
-                cpu={worker.cpu}
-                memory={worker.memory}
-                publicIp={true}
-                ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
-                bind:data={worker.nodeId}
-                bind:nodeSelection={worker.selection.type}
-                bind:status={worker.status}
-                filters={worker.selection.filters}
-                {profile}
-                on:fetch={({ detail }) => (worker.selection.nodes = detail)}
-                nodes={worker.selection.nodes}
-              />
+              cpu={worker.cpu}
+              memory={worker.memory}
+              publicIp={true}
+              ssd={worker.diskSize + rootFs(worker.cpu, worker.memory)}
+              bind:data={worker.nodeId}
+              bind:nodeSelection={worker.selection.type}
+              bind:status={worker.status}
+              filters={worker.selection.filters}
+              {profile}
+              on:fetch={({ detail }) => (worker.selection.nodes = detail)}
+              nodes={worker.selection.nodes}
+            />
           {/if}
           <DeployBtn
             label="Add Worker"
@@ -353,8 +359,10 @@
       <br />
       1- Go to {"http://captain." + domain}<br />
       2- Go to the <strong>cluster</strong> tab<br />
-      3- Click <strong>Add Self-Hosted Registry</strong> button then <strong>Enable Self-Hosted Registry</strong><br />
-      4- Insert worker node public IP <strong>{workerIp}</strong> and add your private SSH Key<br />
+      3- Click <strong>Add Self-Hosted Registry</strong> button then
+      <strong>Enable Self-Hosted Registry</strong><br />
+      4- Insert worker node public IP <strong>{workerIp}</strong> and add your
+      private SSH Key<br />
       5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
@@ -362,13 +370,14 @@
           target="_blank"
           href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker"
         >
-        Click here for the documentation
+          Click here for the documentation
         </a>
       </strong>
       <div style="float: right; margin-top: 50px;">
         <button
           class="button is-danger"
-          on:click|stopPropagation={() => (workerData = !workerData)}>Close</button
+          on:click|stopPropagation={() => (workerData = !workerData)}
+          >Close</button
         >
       </div>
     </section>
