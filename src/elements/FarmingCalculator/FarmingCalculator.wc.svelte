@@ -15,6 +15,8 @@
   // Components
   import Input from "../../components/Input.svelte";
   import type { IFormField } from "../../types";
+    import AddBtn from "../../components/AddBtn.svelte";
+    import Alert from "../../components/Alert.svelte";
 
   const profiles = [
     new FarmingProfile({
@@ -45,41 +47,43 @@
 
   function onSelectProfile(e: Event) {
     activeProfile = profiles[e.target["selectedIndex"] - 1];
+
   }
 
   const tabFields = ["Basic", "Advanced"];
   let active: string = tabFields[0];
+  $: disabled = activeProfile && activeProfile.type === ProfileTypes.TITAN;
 
   // prettier-ignore
-  const inputFields = [
-    { label: "Memory (GB)", symbol: "memory" },
-    { label: "vCPU (Threads)", symbol: "cpu" },
-    { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
-    { label: "SSD (GB)", symbol: "ssd" },
-    { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
-    { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
-    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
+  $: inputFields = [
+    { label: "Memory (GBss)", symbol: "memory", disabled },
+    { label: "vCPU (Threads)", symbol: "cpu" ,disabled},
+    { label: "HDD (GB)", symbol: "hdd", only: "DIY" ,disabled},
+    { label: "SSD (GB)", symbol: "ssd" ,disabled},
+    { label: "NU Required Per CU", symbol: "nuRequiredPerCu",disabled },
+    { label: "Hardware Cost (USD)", symbol: "investmentCostHW" ,disabled},
+    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price",disabled },
     // { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
-    { label: "Power Utilization (Watt)", symbol: "powerUtilization" },
-    { label: "Power Cost (USD)", symbol: "powerCost" },
-    { label: "Public IP", symbol: "publicIp", type: "checkbox" },
-    { label: "Certified", symbol: "certified", type: "checkbox" },
+    { label: "Power Utilization (Watt)", symbol: "powerUtilization",disabled },
+    { label: "Power Cost (USD)", symbol: "powerCost" ,disabled},
+    { label: "Public IP", symbol: "publicIp", type: "checkbox" ,disabled},
+    { label: "Certified", symbol: "certified", type: "checkbox" ,disabled},
   ];
 
   // prettier-ignore
-  const basicInputFields = [
-    { label: "Memory (GB)", symbol: "memory" },
-    { label: "vCPU (Threads)", symbol: "cpu" },
-    { label: "HDD (GB)", symbol: "hdd", only: "DIY" },
-    { label: "SSD (GB)", symbol: "ssd" },
-    { label: "NU Required Per CU", symbol: "nuRequiredPerCu" },
-    { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
-    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
-    { label: "Maximum Token Price", symbol: "maximumTokenPrice" },
-    { label: "Power Utilization (Watt)", symbol: "powerUtilization" },
-    { label: "Power Cost (USD)", symbol: "powerCost" },
-    { label: "Public IP", symbol: "publicIp", type: "checkbox" },
-    { label: "Certified", symbol: "certified", type: "checkbox" },
+  $: basicInputFields = [
+    { label: "Memory (GB)", symbol: "memory",disabled},
+    { label: "vCPU (Threads)", symbol: "cpu" ,disabled},
+    { label: "HDD (GB)", symbol: "hdd", only: "DIY" ,disabled},
+    { label: "SSD (GB)", symbol: "ssd" ,disabled},
+    { label: "NU Required Per CU", symbol: "nuRequiredPerCu" ,disabled},
+    { label: "Hardware Cost (USD)", symbol: "investmentCostHW" ,disabled},
+    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" ,disabled},
+    { label: "Maximum Token Price", symbol: "maximumTokenPrice" ,disabled},
+    { label: "Power Utilization (Watt)", symbol: "powerUtilization" ,disabled},
+    { label: "Power Cost (USD)", symbol: "powerCost",disabled},
+    { label: "Public IP", symbol: "publicIp", type: "checkbox",disabled },
+    { label: "Certified", symbol: "certified", type: "checkbox" ,disabled},
   ];
 
   // prettier-ignore
@@ -190,8 +194,9 @@
   }
 
   // prettier-ignore
-  const createNumberField = ({ label, symbol }: any): IFormField => ({ 
+  const createNumberField = ({ label, symbol,disabled }: any): IFormField => ({ 
     label, 
+    disabled,
     symbol, 
     type: "number", 
     min: 0,
@@ -215,6 +220,7 @@
       value: Certification.GOLD_CERTIFIED,
     },
   ];
+
 </script>
 
 <section class="farming-container">
@@ -301,6 +307,7 @@
                         {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
                           <label style="display: block;">
                             <input
+                              {disabled}
                               type="radio"
                               name="cert"
                               value={cert.value}
@@ -314,6 +321,7 @@
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
                         <input
+                          {disabled}
                           type="checkbox"
                           bind:checked={activeProfile[field.symbol]}
                         />
@@ -322,7 +330,7 @@
                     {:else}
                       <Input
                         bind:data={activeProfile[field.symbol]}
-                        field={createNumberField(field)}
+                        field={{...createNumberField(field)}}
                       />
                     {/if}
                   </div>
@@ -401,6 +409,7 @@
                         {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
                           <label style="display: block;">
                             <input
+                              {disabled}
                               type="radio"
                               name="cert"
                               value={cert.value}
@@ -414,6 +423,7 @@
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
                         <input
+                          {disabled}
                           type="checkbox"
                           bind:checked={activeProfile[field.symbol]}
                         />
@@ -421,8 +431,9 @@
                       </label>
                     {:else}
                       <Input
+                     
                         bind:data={activeProfile[field.symbol]}
-                        field={createNumberField(field)}
+                        field={{...createNumberField(field)}}
                       />
                     {/if}
                   </div>
