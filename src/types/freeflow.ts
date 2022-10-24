@@ -3,7 +3,8 @@ import {validateKey, validateKeyValue} from "../utils/validateName";
 import {Network} from "./kubernetes";
 import NodeID from "./nodeId";
 import {Disk} from "./vm";
-import {generateString} from "grid3_client";
+
+const {generateString} = window.configs.grid3_client;
 
 const randomSuffix: string = generateString(10).toLowerCase();
 
