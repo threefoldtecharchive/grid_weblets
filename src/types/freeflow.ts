@@ -3,8 +3,11 @@ import {validateKey, validateKeyValue} from "../utils/validateName";
 import {Network} from "./kubernetes";
 import NodeID from "./nodeId";
 import {Disk} from "./vm";
+import {generateString} from "grid3_client";
 
-const NETWORK_NAME: string = 'TFNet'
+const randomSuffix: string = generateString(10).toLowerCase();
+
+const NETWORK_NAME: string = `net${randomSuffix}`;
 const IP_RANGE: string = '10.249.0.0/16'
 
 const DISK_NAME: string = 'disk'
