@@ -5,7 +5,7 @@ import getGrid from "./getGrid";
 
 export interface IContract {
   id: number;
-  type: "name" | "node";
+  type: "name" | "node" | "rent";
   state: "Created" | "GracePeriod";
   expiration?: string;
   deploymentData: any;

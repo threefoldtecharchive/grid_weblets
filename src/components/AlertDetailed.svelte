@@ -19,6 +19,10 @@
         return "";
     }
   }
+
+  if(deployed){
+    setTimeout(() => { deployed = false; }, 120000);
+  }
 </script>
 
 <div
@@ -38,7 +42,10 @@
   </ul>
 </div>
 {#if deployed}
-  <div class="notification" style={`background-color: #1982b1; color: white`}>
+  <div
+    class={"notification"}
+    style={`background-color: ${selectColor(type)}; color: white`}
+  >
     Your solution is now starting. Please be patient
   </div>
 {/if}

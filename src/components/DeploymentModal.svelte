@@ -53,7 +53,7 @@
 `;
 
   let vms: Array<any> = [];
-  $: if (data) vms = data.masters ? [data.masters[0], ...data.workers] : [data];
+  $: if (data) vms = data.masters ? [data.masters[0], ...data.workers] : Array.isArray(data)? data : [data];
 
   let vmTabs: ITab[] = [];
   $: if (data && vms.length) vmTabs = vms.map(({ name }, i) => ({ label: name, value: i.toString() } as ITab)); // prettier-ignore

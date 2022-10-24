@@ -25,7 +25,6 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
     cpu,
     memory,
     nodeId,
-    diskSize,
     publicIp,
     planetary,
     preCode,
@@ -41,18 +40,13 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
     new Network(`nw${randomSuffix}`, "10.200.0.0/16")
   );
 
-  // Docker disk
-  const disk = new DiskModel();
-  disk.name = `disk${randomSuffix}`;
-  disk.size = diskSize;
-  disk.mountpoint = "/var/lib/docker";
 
   // Machine specs
   const machine = new MachineModel();
   machine.name = name; //`vm${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
-  machine.disks = [disk];
+  machine.disks = [];
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = planetary;

@@ -10,7 +10,8 @@ export async function selectGatewayNode(): Promise<[number, string]> {
 
   const nodes = new Nodes(
     GridClient.config.graphqlURL,
-    GridClient.config.rmbClient["proxyURL"]
+    GridClient.config.rmbClient["proxyURL"],
+    GridClient.config.rmbClient
   );
 
   const selectedNode = randomChoice(await nodes.filterNodes({ gateway: true }));
@@ -33,7 +34,8 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
   const { GridClient, Nodes } = window.configs.grid3_client;
   const nodes = new Nodes(
     GridClient.config.graphqlURL,
-    GridClient.config.rmbClient["proxyURL"]
+    GridClient.config.rmbClient["proxyURL"],
+    GridClient.config.rmbClient
   );
   const LoadedNodes = await nodes.filterNodes({ gateway: true });
   let gws: GatewayNodes[] = [];

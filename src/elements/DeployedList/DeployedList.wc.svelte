@@ -35,7 +35,10 @@
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
   import UpdateK8s from "../../components/UpdateK8s.svelte";
+  import UpdateCapRover from "../../components/UpdateCapRover.svelte";
   import type { IAction } from "../../types/table-action";
+  import DialogueMsg from '../../components/DialogueMsg.svelte';
+  import getGrid from "../../utils/getGrid";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -57,6 +60,7 @@
     { label: "Node Pilot", value: "nodepilot" },
     { label: "FreeFlow", value: "freeflow" },
   ];
+  let grid;
   let active: string = "vm";
   $: active = tab || active;
 
@@ -64,10 +68,10 @@
   let configed = false;
   let list: DeployedList;
   const deployedStore = window.configs?.deploymentStore;
-
   let profile: IProfile;
   let message: string = null;
-
+  let name: string = null;
+  let opened = false;
   function get_solution_label(active: string) {
     return (
       tabs.find((item) => {
@@ -119,12 +123,15 @@
 
   let infoToShow: Object;
   let k8sToUpdate: any;
+  let capRoverToUpdate: any;
 
   let _sub: any;
-  onMount(() => {
+  onMount(async () => {
     _sub = deployedStore.subscribe(() => {
       _reloadTab();
     });
+
+    grid = await getGrid(profile, (grid) => grid, false);
   });
 
   onDestroy(() => {
@@ -152,15 +159,10 @@
   }
 
   let selectedRows: any[] = [];
-  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
-
+  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore  
+  
   async function onDeleteHandler() {
     message = null;
-    const names = selectedRows.map(({ name }) => name).join(", ");
-    const remove = window.confirm(
-      `Are you sure you want to delete '${names}'?`
-    );
-    if (!remove) return;
 
     const key = active === "k8s" ? "k8s" : "machines";
     for (const row of selectedRows) {
@@ -195,9 +197,15 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {grid.projectName = active; grid._connect(); infoToShow = (await grid.machines.getObj(rows[i]["name"]))},
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Manage Workers",
+          click: (_, i) => (capRoverToUpdate = rows[i]),
+          disabled: () => removing !== null,
         },
         {
           type: "success",
@@ -532,11 +540,20 @@
           class={"ml-2 button is-danger " + (removing ? "is-loading" : "")}
           style={`background-color: #FF5151; color: #fff`}
           disabled={selectedRows.length === 0 || removing !== null}
-          on:click={onDeleteHandler}
+          on:select={() => (selectedRows = [])}
+          on:click|preventDefault|stopPropagation={() => {
+            name = selectedRows.map(({ name }) => name).join(", ");
+            opened = !opened;
+          }}
         >
           Delete
         </button>
       </div>
+      <DialogueMsg 
+        bind:opened 
+        on:removed={onDeleteHandler}
+        {name}
+      />
 
       <!-- K8S -->
       {#if active === "k8s"}
@@ -654,6 +671,17 @@
     k8s={k8sToUpdate}
     on:closed={({ detail }) => {
       k8sToUpdate = null;
+      if (detail) _reloadTab();
+    }}
+  />
+{/if}
+
+{#if capRoverToUpdate}
+  <UpdateCapRover
+    {profile}
+    capRover={capRoverToUpdate}
+    on:closed={({ detail }) => {
+      capRoverToUpdate = null;
       if (detail) _reloadTab();
     }}
   />

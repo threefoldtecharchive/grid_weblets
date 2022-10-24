@@ -288,6 +288,9 @@
       {#if active === "Basic"}
         <div class="farming-content">
           <div class="farming-content--left">
+            <div class="mb-2">
+              <p><strong>Note:</strong> Make sure to use base 1024 while filling in the simulator, otherwise there might be a different payout.</p>
+            </div>
             {#each basicInputFields as field (field.symbol)}
               {#if !field.only || field.only === activeProfile.name}
                 <div class="field">

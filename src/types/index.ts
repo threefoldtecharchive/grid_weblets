@@ -54,9 +54,16 @@ export interface ITab {
   removable?: boolean;
 }
 
+export type Packages = "Minimum" | "Standard" | "Recommended" | "Custom";
 export interface IPackage {
-  name: string;
+  name: Packages;
   cpu: number;
   memory: number;
   diskSize: number;
+}
+
+export class SelectCapacityUpdate {
+  selectedPackage: Packages = "Minimum";
+  package: IPackage = undefined;
+  invalid: boolean = true;
 }
