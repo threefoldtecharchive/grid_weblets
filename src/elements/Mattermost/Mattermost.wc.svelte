@@ -21,8 +21,8 @@
   import validateName, {
     isInvalid,
     validateRequiredEmail,
-    validatePassword,
     validateRequiredPortNumber,
+    validateRequiredPassword,
   } from "../../utils/validateName";
 import { validateRequiredHostName } from "../../utils/validateDomainName";
 import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -37,6 +37,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
   let gateway: GatewayNodes;
   let invalid = true;
+  let editable= false;
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
@@ -62,7 +63,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
       label: "SMTP Password",
       symbol: "smtpPassword",
       type: "password",
-      validator: validatePassword,
+      validator: validateRequiredPassword,
       placeholder: "SMTP Password",
       invalid: false,
     },
@@ -101,12 +102,13 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   let modalData: Object;
 
   $: disabled =
-    active === "smtp" && isInvalid([...smtpFields]) ||
+    editable && isInvalid([...smtpFields]) ||
     invalid ||
     data.invalid ||
     data.status !== "valid" ||
-    isInvalid([...baseFields]);    
-    
+    selectCapacity.invalid ||
+    isInvalid([...baseFields]);
+
   function onDeployMattermost() {
     loading = true;
     deployMattermost(profile, data, gateway)
@@ -124,7 +126,7 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
         loading = false;
       });
   }
-
+  
   $: logs = $currentDeployment;
 </script>
 
@@ -213,11 +215,23 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
             SMTP server, you can configure it.
           </p>
         </div>
+        <div class="is-flex is-justify-content-flex-end">
+          <div style="display: inline-block;">
+            <Input
+            bind:data={editable}
+            field={{
+              label: "",
+              symbol: "editable",
+              type: "checkbox",
+            }}
+          />
+          </div>
+        </div>
         {#each smtpFields as field (field.symbol)}
           <Input
             bind:data={data[field.symbol]}
             bind:invalid={field.invalid}
-            {field}
+            field={{...field, disabled: !editable}}
           />
         {/each}
       {/if}

@@ -38,7 +38,7 @@
   let data = new Taiga();
   let gateway: GatewayNodes;
   let invalid = true;
-
+  let editable:boolean;
   data.disks = [new Disk()];
   let profile: IProfile;
   let active: string = "base";
@@ -139,7 +139,7 @@
   const deploymentStore = window.configs?.deploymentStore;
 
   $: disabled = 
-  active === "mail" && isInvalid([...mailFields]) ||
+  editable && isInvalid([...mailFields]) ||
   ((loading || !data.valid) && !(success || failed)) ||
   invalid || 
   !profile || 
@@ -275,15 +275,27 @@
             know what you’re doing.
           </p>
         </div>
+        <div class="is-flex is-justify-content-flex-end">
+          <div style="display: inline-block;">
+            <Input
+            bind:data={editable}
+            field={{
+              label: "",
+              symbol: "editable",
+              type: "checkbox",
+            }}
+          />
+          </div>
+        </div>
         {#each mailFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
               bind:data={data[field.symbol]}
               bind:invalid={field.invalid}
-              {field}
+              field={{...field, disabled: !editable}}
             />
           {:else}
-            <Input bind:data={data[field.symbol]} {field} />
+            <Input bind:data={data[field.symbol]} field={{...field, disabled: !editable}} />
           {/if}
         {/each}
       {/if}
