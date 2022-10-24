@@ -9,7 +9,7 @@
     import DeployBtn from "../../components/DeployBtn.svelte";
     import Alert from "../../components/Alert.svelte";
     import type {IFormField, ITab} from "../../types";
-    import {IPackage} from "../../types";
+    import {IPackage, SelectCapacityUpdate} from "../../types";
     import type {IProfile} from "../../types/Profile";
     import type {GatewayNodes} from "../../utils/gatewayHelpers";
     import FreeFlow from "../../types/freeflow";
@@ -44,10 +44,8 @@
         invalid: false,
     };
 
-    let diskField: IFormField;
-    let cpuField: IFormField;
-    let memoryField: IFormField;
 
+    let selectCapacity = new SelectCapacityUpdate();
 
     let message: string;
 
@@ -91,7 +89,7 @@
         };
 
 
-    $: disabled = threebotNameField.invalid || invalidGateway || status != 'valid' || isInvalid([vmNameField, diskField, cpuField, memoryField])
+    $: disabled = threebotNameField.invalid || invalidGateway || status != 'valid' || selectCapacity.invalid ||isInvalid([vmNameField])
 
     const deployFreeFlowHandler = () => {
         loading = true;
@@ -190,15 +188,21 @@
             />
 
             <SelectCapacity
-                    bind:cpu={data.cpu}
-                    bind:memory={data.memory}
-                    bind:diskSize={data.disks[0].size}
-                    bind:diskField={diskField}
-                    bind:cpuField={cpuField}
-                    bind:memoryField={memoryField}
                     {packages}
+                    selectedPackage={selectCapacity.selectedPackage}
+                    cpu={data.cpu}
+                    memory={data.memory}
+                    diskSize={data.disks[0].size}
+                    on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
             />
-
             <SelectGatewayNode
                     bind:gateway
                     bind:invalid={invalidGateway}
