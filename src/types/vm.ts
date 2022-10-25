@@ -31,7 +31,46 @@ export class Disk {
     { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator: validateMountPoint, invalid: false},
   ]
+ 
+  
+  constructor(
+    public id = v4(),
+    public name = "DISK" + id.split("-")[0],
+    public size = 50,
+    public mountpoint = `/mnt/${id.split("-")[0]}`
+  ) {}
 
+  get _diskFieldsValid(): boolean {
+    return this.diskFields.reduce((res, field) => {
+      if (field.invalid === undefined) return res;
+      return res && !field.invalid;
+    }, true);
+  }
+
+  public get valid(): boolean {
+    const { name, size, mountpoint } = this;
+    let point = mountpoint.trim();
+
+    return (
+      name !== "" &&
+      isValidInteger(size) &&
+      point !== "" &&
+      point !== "/" &&
+      point.startsWith("/") &&
+      validateDiskName(name) === undefined &&
+      validateMountPoint(point) === undefined &&
+      this._diskFieldsValid
+    );
+  }
+}
+export class DiskFullVm {
+  // prettier-ignore
+  public diskFields: IFormField[] = [
+    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
+    { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
+  ]
+ 
+  
   constructor(
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
@@ -80,7 +119,7 @@ export default class VM {
     public network = new Network(),
 
     public envs: Env[] = [],
-    public disks: Disk[] = [],
+    public disks: DiskFullVm[] = [],
     public publicIp = false,
     public publicIp6 = false,
 

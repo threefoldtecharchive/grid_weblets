@@ -1,7 +1,7 @@
 <svelte:options tag="tf-fullvm" />
 
 <script lang="ts">
-  import { Disk, Env } from "../../types/vm";
+  import { DiskFullVm, Env } from "../../types/vm";
   import Fullvm from "../../types/fullvm";
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
@@ -33,7 +33,7 @@
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
-    { label: "Environment Variables", value: "env" },
+    // { label: "Environment Variables", value: "env" },
     { label: "Disks", value: "disks" },
   ];
 
@@ -83,10 +83,10 @@
   }
 
   // prettier-ignore
-  const envFields: IFormField[] = [
-    { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
-    { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text", validator: validateKeyValue, invalid:false },
-  ];
+  // const envFields: IFormField[] = [
+  //   { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
+  //   { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text", validator: validateKeyValue, invalid:false },
+  // ];
 
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";
@@ -99,18 +99,15 @@
   let status: "valid" | "invalid";
 
   data.disks = [
-    new Disk(undefined, undefined, data.diskSize, "/"),
+    new DiskFullVm(undefined, undefined, data.diskSize, "/"),
     ...data.disks,
   ];  
 
   function _isInvalidDisks() {
-    const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
-    const mountSet = new Set(mounts);
 
     const names = data.disks.map(({ name }) => name.trim());
     const nameSet = new Set(names);
-
-    return mounts.length !== mountSet.size || names.length !== nameSet.size;
+    return names.length !== nameSet.size;
   }
 
   function _isInvalidDefaultDisk(value: number): string | void {
@@ -123,7 +120,7 @@
     if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore  
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields]) || _isInvalidDisks(); // prettier-ignore  
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -175,16 +172,8 @@
       });
   }
 
-  function validateMountPoint({ id, mountpoint }: Disk) {
-    const disks = data.disks;
-    const valid = disks.reduce((v, disk) => {
-      if (disk.id === id) return v;
-      return v && disk.mountpoint.replaceAll("/", "") !== mountpoint.replaceAll("/", ""); // prettier-ignore
-    }, true);
-    return valid ? null : "Disks can't have duplicated mountpoint.";
-  }
-
-  function validateDiskName({ id, name }: Disk) {
+ 
+  function validateDiskName({ id, name }: DiskFullVm) {
     if (!name) return "Disk name is required";
     const valid = data.disks.reduce((v, disk) => {
       if (disk.id === id) return v;
@@ -200,6 +189,8 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
+      console.log("data.envs[0]",data.envs[0]);
+      
       data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
     }
   }}
@@ -305,24 +296,9 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "env"}
-        <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
-        <div class="nodes-container">
-          {#each data.envs as env, index (env.id)}
-            <div class="box">
-              <DeleteBtn
-                name={env.key}
-                on:click={() =>
-                  (data.envs = data.envs.filter((_, i) => index !== i))}
-              />
-              {#each envFields as field (field.symbol)}
-                <Input bind:data={env[field.symbol]} {field} />
-              {/each}
-            </div>
-          {/each}
-        </div>
+     
       {:else if active === "disks"}
-        <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
+        <AddBtn on:click={() => (data.disks = [...data.disks, new DiskFullVm()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
             {#if index > 0}
@@ -333,18 +309,8 @@
                     (data.disks = data.disks.filter((_, i) => index !== i))}
                 />
                 {#each disk.diskFields as field (field.symbol)}
-                  {#if field.symbol === "mountpoint"}
-                    <Input
-                      bind:data={disk[field.symbol]}
-                      field={{
-                        ...field,
-                        error:
-                          !field.invalid && !field.error
-                            ? validateMountPoint(disk)
-                            : null,
-                      }}
-                    />
-                  {:else if field.symbol === "name"}
+  
+                  {#if field.symbol === "name"}
                     <Input
                       bind:data={disk[field.symbol]}
                       field={{

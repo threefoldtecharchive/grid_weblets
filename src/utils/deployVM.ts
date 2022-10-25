@@ -29,7 +29,7 @@ export default async function deployVM(
   vm.rootfs_size = rootFs;
   vm.flist = flist;
   vm.entrypoint = entrypoint;
-  vm.env = createEnvs(envs);
+  vm.env = type == "VM" ?createEnvs(envs) :{SSH_KEY: profile.sshKey,};
 
   const vms = new MachinesModel();
   vms.name = name;
@@ -57,12 +57,14 @@ function createDisk({ name, size, mountpoint }: Disk) {
   disk.name = name;
   disk.size = size;
   disk.mountpoint = mountpoint;
+
   return disk;
 }
 
 function createEnvs(envs: Env[]): { [key: string]: string } {
   return envs.reduce((res, env) => {
     res[env.key] = env.value;
+    console.log("res[env.key]",res[env.key])
     return res;
   }, {});
 }
