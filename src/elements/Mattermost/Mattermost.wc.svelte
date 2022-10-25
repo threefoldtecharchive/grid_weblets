@@ -20,17 +20,16 @@
   import deployMattermost from "../../utils/deployMattermost";
   import validateName, {
     isInvalid,
-    validatePortNumber,
-    validateOptionalEmail,
-    validateOptionalPassword,
+    validateRequiredEmail,
+    validateRequiredPortNumber,
+    validateRequiredPassword,
   } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import rootFs from "../../utils/rootFs";
-  import Tabs from "../../components/Tabs.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+import { validateRequiredHostName } from "../../utils/validateDomainName";
+import SelectCapacity from "../../components/SelectCapacity.svelte";
+import rootFs from "../../utils/rootFs";
+import Tabs from "../../components/Tabs.svelte";
+import type { GatewayNodes } from "../../utils/gatewayHelpers";
+import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -38,6 +37,7 @@
   const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
   let gateway: GatewayNodes;
   let invalid = true;
+  let editable= false;
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
@@ -56,14 +56,14 @@
       symbol: "username",
       type: "text",
       placeholder: "SMTP Username",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "SMTP Password",
       symbol: "smtpPassword",
       type: "password",
-      validator: validateOptionalPassword,
+      validator: validateRequiredPassword,
       placeholder: "SMTP Password",
       invalid: false,
     },
@@ -72,7 +72,7 @@
       symbol: "server",
       type: "text",
       placeholder: "SMTP server",
-      validator: validateDomainName,
+      validator: validateRequiredHostName,
       invalid: false,
     },
     {
@@ -80,7 +80,7 @@
       symbol: "port",
       type: "text",
       placeholder: "SMTP Port",
-      validator: validatePortNumber,
+      validator: validateRequiredPortNumber,
       invalid: false,
     },
   ];
@@ -102,11 +102,12 @@
   let modalData: Object;
 
   $: disabled =
+    editable && isInvalid([...smtpFields]) ||
     invalid ||
     data.invalid ||
     data.status !== "valid" ||
     selectCapacity.invalid ||
-    isInvalid([...baseFields, ...smtpFields]);
+    isInvalid([...baseFields]);
 
   function onDeployMattermost() {
     loading = true;
@@ -125,7 +126,7 @@
         loading = false;
       });
   }
-
+  
   $: logs = $currentDeployment;
 </script>
 
@@ -214,11 +215,23 @@
             SMTP server, you can configure it.
           </p>
         </div>
+        <div class="is-flex is-justify-content-flex-end">
+          <div style="display: inline-block;">
+            <Input
+            bind:data={editable}
+            field={{
+              label: "",
+              symbol: "editable",
+              type: "checkbox",
+            }}
+          />
+          </div>
+        </div>
         {#each smtpFields as field (field.symbol)}
           <Input
             bind:data={data[field.symbol]}
             bind:invalid={field.invalid}
-            {field}
+            field={{...field, disabled: !editable}}
           />
         {/each}
       {/if}

@@ -163,7 +163,7 @@
         >
           {#if field.type === "textarea"}
             <textarea
-              class={"textarea" + (field.error || _error ? " is-danger" : "")}
+              class={"textarea" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input={_onInput}
@@ -172,7 +172,7 @@
           {:else if field.type === "text"}
             <input
               type="text"
-              class={"input" + (field.error || _error ? " is-danger" : "")}
+              class={"input" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input={_onInput}
@@ -182,7 +182,7 @@
             <input
               type="text"
               data-type="number"
-              class={"input" + (field.error || _error ? " is-danger" : "")}
+              class={"input" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={numericData}
               on:input={_onInput}
@@ -194,7 +194,7 @@
           {:else if field.type === "password"}
             <input
               type="password"
-              class={"input" + (field.error || _error ? " is-danger" : "")}
+              class={"input" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
               on:input={_onInput}
@@ -214,7 +214,7 @@
             </span>
           {/if}
         </div>
-        {#if field.error || _error}
+        {#if !field.disabled && (field.error || _error)}
           <p class="help is-danger">
             {field.error || _error}
           </p>
@@ -242,7 +242,7 @@
         <p class="label">{field.label}</p>
       {/if}
       <div
-        class={"select mb-2" + (field.error || _error ? " is-danger" : "")}
+        class={"select mb-2" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
         style="width: 100%;"
         {id}
       >
@@ -262,7 +262,7 @@
             </option>
           {/each}
         </select>
-        {#if field.error || _error}
+        {#if !field.disabled && (field.error || _error)}
           <p class="help is-danger">
             {field.error || _error}
           </p>

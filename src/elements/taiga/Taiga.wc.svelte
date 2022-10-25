@@ -23,14 +23,11 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
     validateEmail,
-    validateOptionalEmail,
-    validateDisk,
-    validateMemory,
-    validatePortNumber,
     validatePassword,
-    validateOptionalPassword,
+    validateRequiredEmail,
+    validateRequiredPortNumber,
+    validateRequiredPassword,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import validateDomainName from "../../utils/validateDomainName";
@@ -41,7 +38,7 @@
   let data = new Taiga();
   let gateway: GatewayNodes;
   let invalid = true;
-
+  let editable:boolean;
   data.disks = [new Disk()];
   let profile: IProfile;
   let active: string = "base";
@@ -88,8 +85,8 @@
       symbol: "smtpFromEmail",
       placeholder: "support@example.com",
       type: "text",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "Host Name",
@@ -97,31 +94,31 @@
       placeholder: "smtp.example.com",
       type: "text",
       validator: validateDomainName,
-      invalid: false,
+      invalid: true,
     },
     {
       label: "Port",
       symbol: "smtpPort",
       placeholder: "587",
       type: "text",
-      validator: validatePortNumber,
-      invalid: false,
+      validator: validateRequiredPortNumber,
+      invalid: true,
     },
     {
       label: "User Name",
       symbol: "smtpHostUser",
       placeholder: "user@example.com",
       type: "text",
-      validator: validateOptionalEmail,
-      invalid: false,
+      validator: validateRequiredEmail,
+      invalid: true,
     },
     {
       label: "Password",
       symbol: "smtpHostPassword",
       placeholder: "password",
       type: "password",
-      validator: validateOptionalPassword,
-      invalid: false,
+      validator: validateRequiredPassword,
+      invalid: true,
     },
     { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
     { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
@@ -141,7 +138,13 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...mailFields, ...adminFields, nameField]); // prettier-ignore
+  $: disabled = 
+  editable && isInvalid([...mailFields]) ||
+  ((loading || !data.valid) && !(success || failed)) ||
+  invalid || 
+  !profile || 
+  status !== "valid" || 
+  isInvalid([...adminFields, nameField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
@@ -272,15 +275,27 @@
             know what you’re doing.
           </p>
         </div>
+        <div class="is-flex is-justify-content-flex-end">
+          <div style="display: inline-block;">
+            <Input
+            bind:data={editable}
+            field={{
+              label: "",
+              symbol: "editable",
+              type: "checkbox",
+            }}
+          />
+          </div>
+        </div>
         {#each mailFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input
               bind:data={data[field.symbol]}
               bind:invalid={field.invalid}
-              {field}
+              field={{...field, disabled: !editable}}
             />
           {:else}
-            <Input bind:data={data[field.symbol]} {field} />
+            <Input bind:data={data[field.symbol]} field={{...field, disabled: !editable}} />
           {/if}
         {/each}
       {/if}
