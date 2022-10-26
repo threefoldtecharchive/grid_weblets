@@ -18,7 +18,7 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonics} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonics, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getAlgoResources";
 
@@ -91,7 +91,7 @@
       symbol: "mnemonics",
       placeholder: "Algorand Account Mnemonics",
       type: "text",
-      validator: validateMnemonics,
+      validator: validateMnemonicsAlgorand,
       invalid: false,
     },
     {
