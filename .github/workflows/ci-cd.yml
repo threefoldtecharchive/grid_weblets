@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - development
-  release:
-    types: [published]
 
 concurrency:
   # one instance of runing pipeline allowed per branch.
