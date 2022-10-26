@@ -3,7 +3,7 @@ import createNetwork from "./createNetwork";
 import type {IProfile} from "../types/Profile";
 import deploy from "./deploy";
 import type {IStore} from "../stores/currentDeployment";
-import checkVMExist from "./prepareDeployment";
+import checkVMExist, {checkGW} from "./prepareDeployment";
 import {Network} from "../types/kubernetes";
 import type FreeFlow from "../types/freeflow";
 
@@ -49,35 +49,44 @@ export default async function deployFreeFlow(data: FreeFlow, profile: IProfile, 
             .deploy(vms)
             .then(() => grid.machines.getObj(vmName))
             .then(async ([vm]) => {
-                const GATEWAY_TLS_PASS_TROUGH: boolean = false;
+                const planetary = vm.planetary.toString();
+                const nodeId = parseInt(vm.nodeId.toString());
 
-                const gatewayQueryOptions = {
-                    gateway: true,
-                    farmId: 1,
-                };
-
-                console.log('vm')
-                console.log(vm)
-
-                const planetary = vm.planetary;
-
-
-                const gw = new GatewayNameModel();
-                gw.name = threeBotUserId
-
-                gw.node_id = +(await grid.capacity.filterNodes(gatewayQueryOptions))[0].nodeId;
-                gw.tls_passthrough = GATEWAY_TLS_PASS_TROUGH;
-
-                gw.backends = [`http://[${planetary}]`];
-
-                const nameResult = await grid.gateway.deploy_name(gw);
-                console.log('Result of name deploy', nameResult)
-
-                const nameDeploymentResult = await grid.gateway.getObj(gw.name);
-                console.log('Result of name deploy', nameDeploymentResult)
+                await deployPrefixGateway(profile, threeBotUserId, planetary, nodeId)
 
                 return vm;
             });
+    });
+}
+
+async function deployPrefixGateway(
+    profile: IProfile,
+    domainName: string,
+    backendPlanetaryIp: string,
+    publicNodeId: number
+) {
+    const { GatewayNameModel } = window.configs.grid3_client;
+
+    // Gateway Specs
+    const gw = new GatewayNameModel();
+    gw.name = domainName;
+    gw.node_id = publicNodeId;
+    gw.tls_passthrough = false;
+    gw.backends = [`http://[${backendPlanetaryIp}]`];
+
+    const metadata = {
+        type: "gateway",
+        name: domainName,
+        projectName: "FreeFlow",
+    };
+    gw.metadata = JSON.stringify(metadata);
+
+    return deploy(profile, "GatewayName", domainName, async (grid) => {
+        await checkGW(grid, domainName, "freeflow");
+        return grid.gateway
+            .deploy_name(gw)
+            .then(() => grid.gateway.getObj(domainName))
+            .then(([gw]) => gw);
     });
 }
 
