@@ -33,7 +33,6 @@
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
-    // { label: "Environment Variables", value: "env" },
     { label: "Disks", value: "disks" },
   ];
 
@@ -81,12 +80,6 @@
       data.entrypoint = flist?.entryPoint;
     }
   }
-
-  // prettier-ignore
-  // const envFields: IFormField[] = [
-  //   { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
-  //   { label: 'Value', symbol: 'value', placeholder: "Environment Value", type: "text", validator: validateKeyValue, invalid:false },
-  // ];
 
   const deploymentStore = window.configs?.deploymentStore;
   let active: string = "config";

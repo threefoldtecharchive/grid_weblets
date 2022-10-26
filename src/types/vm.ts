@@ -70,7 +70,6 @@ export class DiskFullVm {
     { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
   ]
  
-  
   constructor(
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
@@ -92,11 +91,7 @@ export class DiskFullVm {
     return (
       name !== "" &&
       isValidInteger(size) &&
-      point !== "" &&
-      point !== "/" &&
-      point.startsWith("/") &&
       validateDiskName(name) === undefined &&
-      validateMountPoint(point) === undefined &&
       this._diskFieldsValid
     );
   }

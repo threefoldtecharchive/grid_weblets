@@ -64,7 +64,6 @@ function createDisk({ name, size, mountpoint }: Disk) {
 function createEnvs(envs: Env[]): { [key: string]: string } {
   return envs.reduce((res, env) => {
     res[env.key] = env.value;
-    console.log("res[env.key]",res[env.key])
     return res;
   }, {});
 }
