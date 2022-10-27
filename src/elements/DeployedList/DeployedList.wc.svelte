@@ -640,7 +640,6 @@
 
 {#if k8sToUpdate}
   <UpdateK8s
-    {profile}
     k8s={k8sToUpdate}
     on:closed={({ detail }) => {
       k8sToUpdate = null;
@@ -651,7 +650,6 @@
 
 {#if capRoverToUpdate}
   <UpdateCapRover
-    {profile}
     capRover={capRoverToUpdate}
     on:closed={({ detail }) => {
       capRoverToUpdate = null;
