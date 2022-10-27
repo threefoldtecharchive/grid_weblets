@@ -1,7 +1,7 @@
 <svelte:options tag="tf-taiga" />
 
 <script lang="ts">
-  import { Disk, Env } from "../../types/vm";
+  import { Disk } from "../../types/vm";
   import {
     IFormField,
     IPackage,
@@ -9,11 +9,9 @@
     SelectCapacityUpdate,
   } from "../../types";
   import deployTaiga from "../../utils/deployTaiga";
-  import type { IProfile } from "../../types/Profile";
   import Taiga from "../../types/taiga";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
@@ -35,16 +33,17 @@
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
+  const activeProfile = window.configs?.activeProfileStore;
   let data = new Taiga();
   let gateway: GatewayNodes;
   let invalid = true;
   let editable:boolean;
   data.disks = [new Disk()];
-  let profile: IProfile;
   let active: string = "base";
   let loading = false;
   let success = false;
   let failed = false;
+  $: profile = $activeProfile;
 
   const tabs: ITab[] = [
     { label: "Base", value: "base" },
@@ -179,15 +178,6 @@
   $: logs = $currentDeployment;
 </script>
 
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-    }
-  }}
-/>
-
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Taiga Instance</h4>
@@ -264,7 +254,6 @@
           bind:data={data.nodeId}
           filters={data.selection.filters}
           bind:status
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />

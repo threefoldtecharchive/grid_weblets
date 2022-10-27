@@ -1,23 +1,21 @@
 <svelte:options tag="tf-fullvm" />
 
 <script lang="ts">
-  import { Disk, Env } from "../../types/vm";
-  import Fullvm from "../../types/fullvm";
-  import type { IFlist, IFormField, ITab } from "../../types";
-  import deployVM from "../../utils/deployVM";
-  import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from '../../types/vm';
+  import Fullvm from '../../types/fullvm';
+  import type { IFlist, IFormField, ITab } from '../../types';
+  import deployVM from '../../utils/deployVM';
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import Input from '../../components/Input.svelte';
+  import Tabs from '../../components/Tabs.svelte';
+  import SelectNodeId from '../../components/SelectNodeId.svelte';
+  import DeleteBtn from '../../components/DeleteBtn.svelte';
+  import AddBtn from '../../components/AddBtn.svelte';
+  import DeployBtn from '../../components/DeployBtn.svelte';
+  import Alert from '../../components/Alert.svelte';
+  import Modal from '../../components/DeploymentModal.svelte';
+  import hasEnoughBalance from '../../utils/hasEnoughBalance';
   import validateName, {
     isInvalid,
     validateCpu,
@@ -27,14 +25,14 @@
     validateKeyValue,
     validateMemory,
     validateDisk,
-  } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import isInvalidFlist from "../../utils/isInvalidFlist";
+  } from '../../utils/validateName';
+  import { noActiveProfile } from '../../utils/message';
+  import isInvalidFlist from '../../utils/isInvalidFlist';
 
   const tabs: ITab[] = [
-    { label: "Config", value: "config" },
-    { label: "Environment Variables", value: "env" },
-    { label: "Disks", value: "disks" },
+    { label: 'Config', value: 'config' },
+    { label: 'Environment Variables', value: 'env' },
+    { label: 'Disks', value: 'disks' },
   ];
 
   let data = new Fullvm();
@@ -72,10 +70,10 @@
     ]
   };
   let selectedFlist: number = 0;
-  let flistSelectValue: string = "0";
+  let flistSelectValue: string = '0';
   $: {
     const option = flistField.options[selectedFlist];
-    if (option.value !== "other") {
+    if (option.value !== 'other') {
       const flist = flists[selectedFlist];
       data.flist = flist?.url;
       data.entrypoint = flist?.entryPoint;
@@ -89,19 +87,20 @@
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
-  let active: string = "config";
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
+  let active: string = 'config';
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
   let message: string;
   let modalData: Object;
-  let status: "valid" | "invalid";
+  let status: 'valid' | 'invalid';
 
   data.disks = [
-    new Disk(undefined, undefined, data.diskSize, "/"),
+    new Disk(undefined, undefined, data.diskSize, '/'),
     ...data.disks,
-  ];  
+  ];
 
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
@@ -116,14 +115,15 @@
   function _isInvalidDefaultDisk(value: number): string | void {
     const NUM_REGEX = /^[1-9](\d?|\d+)$/;
     if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Disk size must be a valid number.";
+      return 'Disk size must be a valid number.';
     value = +value;
-    if (+value.toFixed(0) !== value) return "Disk size must be a valid integer.";
-    if (value < 15) return "Minimum allowed disk size is 15 GB.";
-    if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
+    if (+value.toFixed(0) !== value)
+      return 'Disk size must be a valid integer.';
+    if (value < 15) return 'Minimum allowed disk size is 15 GB.';
+    if (value > 10000) return 'Maximum allowed disk size is 10000 GB.';
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore  
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -133,13 +133,13 @@
   };
 
   async function onDeployVM() {
-    if (flistSelectValue === "other") {
+    if (flistSelectValue === 'other') {
       validateFlist.loading = true;
       validateFlist.error = null;
 
       if (await isInvalidFlist(data.flist)) {
         validateFlist.loading = false;
-        validateFlist.error = "Invalid Flist URL.";
+        validateFlist.error = 'Invalid Flist URL.';
         return;
       }
     }
@@ -150,7 +150,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+        'No enough balance to execute transaction requires 2 TFT at least in your wallet.';
       return;
     }
 
@@ -159,7 +159,7 @@
     message = undefined;
 
     data.disks[0].size = data.diskSize;
-    deployVM(data, profile, "Fullvm")
+    deployVM(data, profile, 'Fullvm')
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -167,7 +167,7 @@
       })
       .catch((err: Error) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = typeof err === 'string' ? err : err.message;
       })
       .finally(() => {
         validateFlist.loading = false;
@@ -185,7 +185,7 @@
   }
 
   function validateDiskName({ id, name }: Disk) {
-    if (!name) return "Disk name is required";
+    if (!name) return 'Disk name is required';
     const valid = data.disks.reduce((v, disk) => {
       if (disk.id === id) return v;
       return v && disk.name.trim() !== name.trim();
@@ -195,15 +195,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-    }
-  }}
-/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
@@ -219,8 +210,8 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "Fullvm")}
-      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {#if loading || (logs !== null && logs.type === 'Fullvm')}
+      <Alert type="info" message={logs?.message ?? 'Loading...'} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
@@ -230,11 +221,11 @@
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy a VM."} />
+      <Alert type="danger" message={message || 'Failed to deploy a VM.'} />
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "config"}
+      {#if active === 'config'}
         <Input
           bind:data={data.name}
           bind:invalid={nameField.invalid}
@@ -250,14 +241,14 @@
           }}
         />
 
-        {#if flistSelectValue === "other"}
+        {#if flistSelectValue === 'other'}
           <Input
             bind:data={data.flist}
             field={{
-              label: "FList",
-              symbol: "flist",
-              placeholder: "VM Image",
-              type: "text",
+              label: 'FList',
+              symbol: 'flist',
+              placeholder: 'VM Image',
+              type: 'text',
               ...validateFlist,
             }}
             on:input={() => {
@@ -268,11 +259,11 @@
           <Input
             bind:data={data.entrypoint}
             field={{
-              label: "Entry Point",
-              symbol: "entrypoint",
+              label: 'Entry Point',
+              symbol: 'entrypoint',
               validator: validateEntryPoint,
-              placeholder: "Entrypoint",
-              type: "text",
+              placeholder: 'Entrypoint',
+              type: 'text',
             }}
           />
         {/if}
@@ -301,11 +292,10 @@
           bind:data={data.nodeId}
           filters={data.selection.filters}
           bind:status
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "env"}
+      {:else if active === 'env'}
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
@@ -321,7 +311,7 @@
             </div>
           {/each}
         </div>
-      {:else if active === "disks"}
+      {:else if active === 'disks'}
         <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
@@ -333,7 +323,7 @@
                     (data.disks = data.disks.filter((_, i) => index !== i))}
                 />
                 {#each disk.diskFields as field (field.symbol)}
-                  {#if field.symbol === "mountpoint"}
+                  {#if field.symbol === 'mountpoint'}
                     <Input
                       bind:data={disk[field.symbol]}
                       field={{
@@ -344,7 +334,7 @@
                             : null,
                       }}
                     />
-                  {:else if field.symbol === "name"}
+                  {:else if field.symbol === 'name'}
                     <Input
                       bind:data={disk[field.symbol]}
                       field={{
@@ -388,6 +378,6 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
-  @import "../../assets/global.scss";
+  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
+  @import '../../assets/global.scss';
 </style>

@@ -3,7 +3,7 @@
 <script lang="ts">
   import type { IStore } from "../stores/currentDeployment";
 
-  const currentDeployment = window.configs.currentDeploymentStore;
+  const currentDeployment = window.configs?.currentDeploymentStore;
   $: logs = $currentDeployment;
 
   function getMessage({ type, name }: IStore): string {

@@ -1,18 +1,15 @@
 <svelte:options tag="tf-select-node-id" />
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import type { IFormField, ISelectOption } from "../types";
-  import type { IProfile } from "../types/Profile";
-  import findNodes from "../utils/findNodes";
-  import fetchFarms from "../utils/fetchFarms";
-  import { fetchCountries } from "../utils/fetchCountries";
+  import { createEventDispatcher } from 'svelte';
+  import type { IFormField, ISelectOption } from '../types';
+  import findNodes from '../utils/findNodes';
+  import fetchFarms from '../utils/fetchFarms';
+  import { fetchCountries } from '../utils/fetchCountries';
 
   // components
-  import Input from "./Input.svelte";
-  import gqlApi from "../utils/gqlApi";
-  import baseConfig from "../stores/baseConfig";
-  const { GridClient } = window.configs?.grid3_client ?? {};
+  import Input from './Input.svelte';
+  import gqlApi from '../utils/gqlApi';
 
   const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
   export let cpu: number;
@@ -20,16 +17,11 @@
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number;
-  export let status: "valid" | "invalid" | "dedicated" | "not found";
+  export let status: 'valid' | 'invalid' | 'dedicated' | 'not found';
   export let nodes: ISelectOption[] = [];
-  // export let error: string = null;
 
-  export let exclusiveFor: string = "";
-
-  export let profile: IProfile;
+  export let exclusiveFor: string = '';
   let loadingNodes: boolean = false;
-
-  const configs = window.configs?.baseConfig;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
@@ -62,21 +54,23 @@
   export let nodeSelection: string;
 
   export let filters: any;
+  const activeProfile = window.configs.activeProfileStore;
+  $: profile = $activeProfile;
 
   $: {
     if (filters) {
-      if (cpu) filters.update("cru", cpu);
-      if (memory) filters.update("mru", Math.round(memory / 1024));
-      if (ssd) filters.update("sru", ssd);
-      filters.update("publicIPs", publicIp);
+      if (cpu) filters.update('cru', cpu);
+      if (memory) filters.update('mru', Math.round(memory / 1024));
+      if (ssd) filters.update('sru', ssd);
+      filters.update('publicIPs', publicIp);
     }
   }
 
   function onLoadNodesHandler() {
     loadingNodes = true;
     status = null;
-    const label = "Please select a node id.";
-    nodeIdSelectField.options[0].label = "Loading...";
+    const label = 'Please select a node id.';
+    nodeIdSelectField.options[0].label = 'Loading...';
     const _filters = {
       publicIPs: filters.publicIPs,
       country: filters.country,
@@ -84,31 +78,31 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
-      availableFor: $configs.twinId,
+      availableFor: profile.twinId,
     };
 
     findNodes(_filters, profile, exclusiveFor)
       .then((_nodes) => {
-        dispatch("fetch", _nodes);
+        dispatch('fetch', _nodes);
         if (_nodes.length <= 0) {
           data = null;
           status = null;
-          nodeIdSelectField.options[0].label = "No nodes available";
+          nodeIdSelectField.options[0].label = 'No nodes available';
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
-          status = "valid";
+          status = 'valid';
         } else {
           nodeIdSelectField.options[0].label = label;
-          status = "valid";
+          status = 'valid';
         }
       })
       .catch((err) => {
-        console.log("Error", err);
+        console.log('Error', err);
         data = null;
         status = null;
-        nodeIdSelectField.options[0].label = "No nodes available";
+        nodeIdSelectField.options[0].label = 'No nodes available';
       })
       .finally(() => {
         loadingNodes = false;
@@ -120,7 +114,11 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, oldLabel: string,  label: string = "Loading...") {
+  function _setLabel(
+    index: number,
+    oldLabel: string,
+    label: string = 'Loading...'
+  ) {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
@@ -140,37 +138,36 @@
     );
   }
 
-  function _setCountriesOptions(
-    index: number,
-    items: Map< string, Number >
-  ) {
+  function _setCountriesOptions(index: number, items: Map<string, Number>) {
     const [option] = filtersFields[index].options;
-    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
-        const op = { label: name, value: name } as ISelectOption;
-        return op;
-      },
-    );
+    filtersFields[index].options = Object.entries(items).map(function ([
+      name,
+      code,
+    ]) {
+      const op = { label: name, value: name } as ISelectOption;
+      return op;
+    });
     filtersFields[index].options.unshift(option);
   }
 
   let _network: string;
   $: {
     if (
-      nodeSelection === "automatic" &&
+      nodeSelection === 'automatic' &&
       profile &&
-      profile.networkEnv !== _network
+      profile.network !== _network
     ) {
       /* Cache last used network */
-      _network = profile.networkEnv;
+      _network = profile.network;
 
       onLoadFarmsHandler();
     }
   }
 
-  function onLoadFarmsHandler(){
+  function onLoadFarmsHandler() {
     /* Loading farms & countries */
-    const old_farm_label = "Please select a farm";
-    const old_countries_label = "Please select a country";
+    const old_farm_label = 'Please select a farm';
+    const old_countries_label = 'Please select a country';
 
     const farmsLabel = _setLabel(0, old_farm_label);
     const countriesLabel = _setLabel(1, old_countries_label);
@@ -181,18 +178,18 @@
         _setOptions(0, farms);
       })
       .catch((err) => {
-        console.log("Error", err);
+        console.log('Error', err);
       })
       .finally(() => {
         _setLabel(0, old_farm_label, farmsLabel);
       });
 
     fetchCountries(profile)
-      .then(( countries ) => {
+      .then((countries) => {
         _setCountriesOptions(1, countries);
       })
       .catch((err) => {
-        console.log("Error", err);
+        console.log('Error', err);
       })
       .finally(() => {
         _setLabel(1, old_countries_label, countriesLabel);
@@ -208,15 +205,15 @@
 
   function _nodeValidator(value: number) {
     value = +value;
-    if (typeof value !== "number") return "Please select a node.";
-    if (value < 1) return "Please select a valid node";
+    if (typeof value !== 'number') return 'Please select a node.';
+    if (value < 1) return 'Please select a valid node';
   }
 
   const nodeIdField: IFormField = {
-    label: "Node ID",
-    symbol: "nodeId",
-    type: "number",
-    placeholder: "Your Node ID",
+    label: 'Node ID',
+    symbol: 'nodeId',
+    type: 'number',
+    placeholder: 'Your Node ID',
   };
 
   interface IResources { cru: number; sru: number; hru: number; mru: number; ipv4u: number; } // prettier-ignore
@@ -226,7 +223,7 @@
   let _nodeId: number;
   let validating: boolean = false;
   $: {
-    if (nodeSelection === "manual")
+    if (nodeSelection === 'manual')
       if (profile && _nodeId !== data) {
         if (!data || !!_nodeValidator(data)) {
           if (_ctrl) {
@@ -240,30 +237,38 @@
           if (_ctrl) _ctrl.abort();
           _ctrl = new AbortController();
 
-          const { networkEnv } = profile;
-          const grid = new GridClient("" as any, "", "", null);
-          const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
+          const { network } = profile;
+          const grid = new window.configs.grid3_client.GridClient(
+            '' as any,
+            '',
+            '',
+            null
+          );
+          const { rmbProxy } = grid.getDefaultUrls(network);
 
           validating = true;
           status = null;
           fetch(`${rmbProxy}/nodes/${data}`, {
-            method: "GET",
+            method: 'GET',
             signal: _ctrl.signal,
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
-              if (node.error){
-                status = "not found";
+              if (node.error) {
+                status = 'not found';
                 return;
               }
 
-              if (node.rentedByTwinId != $configs.twinId && (node.dedicated || node.rentContractId != 0)) {
-                status = "dedicated";
+              if (
+                node.rentedByTwinId != profile.twinId &&
+                (node.dedicated || node.rentContractId != 0)
+              ) {
+                status = 'dedicated';
                 return;
               }
 
-              if (node.status !== "up") {
-                status = "invalid";
+              if (node.status !== 'up') {
+                status = 'invalid';
                 return;
               }
 
@@ -273,30 +278,30 @@
               let hasEnoughResources = ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
               if (!hasEnoughResources) {
-                status = "invalid";
+                status = 'invalid';
                 return;
               }
 
               if (filters.publicIPs) {
                 return gqlApi<{ nodes: { id: number }[] }>(
                   profile,
-                  "query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}",
+                  'query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}',
                   { id: data }
                 )
                   .then(({ nodes: [{ id }] }) => {
                     return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
                   })
                   .then(({ publicIps: ips }) => {
-                    status = ips.length > 0 ? "valid" : "invalid";
+                    status = ips.length > 0 ? 'valid' : 'invalid';
                   });
               } else {
-                status = "valid";
+                status = 'valid';
               }
             })
             .catch((err: Error) => {
-              console.log("Error", err);
-              if (err.message.includes("aborted a request")) return;
-              status = "invalid";
+              console.log('Error', err);
+              if (err.message.includes('aborted a request')) return;
+              status = 'invalid';
             })
             .finally(() => {
               validating = false;
@@ -314,7 +319,7 @@
   const _reset = () => {
     requestAnimationFrame(() => {
       _nodeId = null;
-      if (nodeSelection === "automatic") {
+      if (nodeSelection === 'automatic') {
         onLoadNodesHandler();
         onLoadFarmsHandler();
       }
@@ -338,13 +343,13 @@
   bind:data={nodeSelection}
   field={nodeSelectionField}
   on:input={() => {
-    if (nodeSelection === "manual") return (status = null);
+    if (nodeSelection === 'manual') return (status = null);
     if (data !== null && nodes.length > 0) {
-      status = "valid";
+      status = 'valid';
     }
   }}
 />
-{#if nodeSelection === "automatic"}
+{#if nodeSelection === 'automatic'}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     <Input
@@ -355,7 +360,7 @@
   {/each}
 
   <button
-    class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
+    class={'button mt-2 mb-2 ' + (loadingNodes ? 'is-loading' : '')}
     style={`background-color: #1982b1; color: #fff`}
     disabled={loadingNodes || !profile}
     type="button"
@@ -368,13 +373,13 @@
     bind:data
     field={{
       label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
-      type: "select",
-      symbol: "nodeId",
+      type: 'select',
+      symbol: 'nodeId',
       options: nodeIdSelectField.options,
     }}
-    on:input={() => (status = "valid")}
+    on:input={() => (status = 'valid')}
   />
-{:else if nodeSelection === "manual"}
+{:else if nodeSelection === 'manual'}
   <Input bind:data field={nodeIdField} />
   {#if validating && data}
     <p class="help" style={`color: #1982b1`}>
@@ -382,20 +387,20 @@
     </p>
   {/if}
   {#if !validating && data}
-    {#if status == "valid"}
+    {#if status == 'valid'}
       <p class="help" style={`color: #1982b1`}>
         Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
-    {:else if status === "invalid"}
+    {:else if status === 'invalid'}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) might be down or doesn't have enough
         resources.
       </p>
-    {:else if status === "not found"}
+    {:else if status === 'not found'}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) is not found.
       </p>
-    {:else if status === "dedicated"}
+    {:else if status === 'dedicated'}
       <p class="help is-danger">
         Node(<strong>{data}</strong>) is dedicated and not reserved for your
         account, please check the dashboard.

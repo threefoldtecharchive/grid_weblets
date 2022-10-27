@@ -1,5 +1,4 @@
 import type TFhubValidator from "../types/TFhubValidator";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
 import createNetwork from "./createNetwork";
@@ -7,10 +6,11 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
 import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf"
+import type { ActiveProfile } from "../stores/activeProfile";
 
 
 export default async function deployTFhubValidator(
-  profile: IProfile,
+  profile: ActiveProfile,
   tfhubValidator: TFhubValidator
   ) {
     
@@ -22,7 +22,7 @@ export default async function deployTFhubValidator(
 }
 
 function _deployTfHubValidator(
-        profile: IProfile, tfhubValidator: TFhubValidator
+        profile: ActiveProfile, tfhubValidator: TFhubValidator
     ) {
 
     const {
@@ -89,7 +89,7 @@ function _deployTfHubValidator(
     GAS_PRICES: gas_prices,
     GAS_ADJUSTMENT: gas_adjustment,
     ORCHESTRATOR_FEES: orchestrator_fees,
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
   };
 
   const vms = new MachinesModel();

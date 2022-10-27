@@ -1,21 +1,22 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
-import type { IProfile } from "../types/Profile";
 import checkVMExist from "./prepareDeployment";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
+import type { ActiveProfile } from "../stores/activeProfile";
+import { get } from "svelte/store";
 
 const CAPROVER_FLIST =
   "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
 export default async function deployCaprover(
   data: Caprover,
-  profile: IProfile
+  profile: ActiveProfile
 ) {
   const { MachinesModel, DiskModel, MachineModel } =
     window.configs.grid3_client;
-  const { name, workers, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
+  const { name, workers, memory, nodeId, cpu, domain, diskSize, password } = data; // prettier-ignore
 
   const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
 
@@ -41,9 +42,8 @@ export default async function deployCaprover(
     SWM_NODE_MODE: "leader",
     CAPROVER_ROOT_DOMAIN: domain,
     CAPTAIN_IMAGE_VERSION: "latest",
-    PUBLIC_KEY: publicKey,
+    PUBLIC_KEY: get(window.configs.activeProfileStore).ssh,
     DEFAULT_PASSWORD: password,
-    CAPTAIN_IS_DEBUG: "true",
   };
 
   const machines = new MachinesModel();
@@ -74,7 +74,7 @@ export default async function deployCaprover(
     workerModel.entrypoint = "/sbin/zinit init";
     workerModel.env = {
       SWM_NODE_MODE: "worker",
-      PUBLIC_KEY: publicKey,
+      PUBLIC_KEY: get(window.configs.activeProfileStore).ssh,
     };
 
     machines.machines.push(workerModel);

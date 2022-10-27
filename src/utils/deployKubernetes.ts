@@ -1,12 +1,12 @@
+import type { ActiveProfile } from "../stores/activeProfile";
 import type { default as Kubernetes, Base } from "../types/kubernetes";
 import { Network } from "../types/kubernetes";
-import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 
 export default async function deployKubernetes(
   data: Kubernetes,
-  profile: IProfile
+  profile: ActiveProfile
 ) {
   const { master, workers, network: nw, ...base } = data;
   const { secret, description, metadata, name } = base;
@@ -22,7 +22,7 @@ export default async function deployKubernetes(
   k8s.workers = workerNodes;
   k8s.metadata = metadata;
   k8s.description = description;
-  k8s.ssh_key = profile.sshKey;
+  k8s.ssh_key = profile.ssh;
 
   const metadate = {
     type: "kubernetes",

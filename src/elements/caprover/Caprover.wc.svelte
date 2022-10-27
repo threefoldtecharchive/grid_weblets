@@ -9,10 +9,8 @@
   } from "../../types";
   import { CapWorker, default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
-  import type { IProfile } from "../../types/Profile";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -30,18 +28,19 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import { onMount } from "svelte";
   import getGrid from "../../utils/getGrid";
+
+  const activeProfile = window.configs?.activeProfileStore;
 
   let data = new Caprover();
   let loading = false;
   let success = false;
   let failed = false;
   const deploymentStore = window.configs?.deploymentStore;
-  let profile: IProfile;
+  $: profile = $activeProfile;
   let status: "valid" | "invalid";
   const currentDeployment = window.configs?.currentDeploymentStore;
-  let grid;
+  // let grid;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -92,6 +91,10 @@
 
     deployCaprover(data, profile)
       .then(async (vm) => {
+        const grid = await getGrid(profile, _ => _);
+        grid.projectName = "caprover";
+        grid._connect();
+
         let vms = await grid.machines.getObj(data.name);
         success = true;
         modalData = vms;
@@ -122,22 +125,7 @@
   }
 
   $: logs = $currentDeployment;
-
-  onMount(async () => {
-    grid = await getGrid(profile, (grid) => grid, false);
-    grid.projectName = "caprover";
-    grid._connect();
-  });
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.publicKey = detail.sshKey;
-    }
-  }}
-/>
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
@@ -242,7 +230,6 @@
           bind:nodeSelection={data.selection.type}
           bind:status
           filters={data.selection.filters}
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
@@ -296,7 +283,6 @@
                 bind:nodeSelection={worker.selection.type}
                 bind:status
                 filters={worker.selection.filters}
-                {profile}
                 on:fetch={({ detail }) => (worker.selection.nodes = detail)}
                 nodes={worker.selection.nodes}
               />

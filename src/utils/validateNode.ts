@@ -1,8 +1,8 @@
-import type { IProfile } from "../types/Profile";
+import type { ActiveProfile } from "../stores/activeProfile";
 import findNodes from "./findNodes";
 
 export default function validateNode(
-  profile: IProfile,
+  profile: ActiveProfile,
   cru: number,
   mru: number,
   sru: number,

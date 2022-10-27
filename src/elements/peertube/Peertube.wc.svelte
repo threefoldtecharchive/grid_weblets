@@ -8,25 +8,19 @@
     IPackage,
     SelectCapacityUpdate,
   } from "../../types";
-  import type { IProfile } from "../../types/Profile";
   // Modules
-  import { Disk, Env } from "../../types/vm";
   import Peertube from "../../types/peertube";
   import deployPeertube from "../../utils/deployPeertube";
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
-  import AlertDetailed from "../../components/AlertDetailed.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
-    validateMemory,
     validateEmail,
     validatePassword,
   } from "../../utils/validateName";
@@ -56,12 +50,13 @@
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new Peertube();
+  const activeProfile = window.configs?.activeProfileStore;
 
+  $: profile = $activeProfile;
   let active: string = "base";
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
@@ -102,15 +97,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
-    }
-  }}
-/>
 
 <div style="padding: 15px;">
   <!-- Container -->
@@ -187,7 +173,6 @@
           bind:nodeSelection={data.selection.type}
           bind:status
           filters={data.selection.filters}
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />

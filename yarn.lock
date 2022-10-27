@@ -8098,6 +8098,11 @@ terser@^5.0.0, terser@^5.14.1:
     commander "^2.20.0"
     source-map-support "~0.5.20"
 
+tf-profile-manager@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tf-profile-manager/-/tf-profile-manager-1.0.0.tgz#dc35184787f75803921f8e3dfaec582984e9e04a"
+  integrity sha512-NgvZnFxiUUx06AkQH6UAq9meDd1ypFmkqdnjsPV0TAMcJuxtf6uKo002aLFbxf1u7XrxV/qzYMWpXw+akBonPQ==
+
 tfgrid-api-client@1.16.4:
   version "1.16.4"
   resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.16.4.tgz#04301a465ff148083884cd64bd5bcb4696a9aa04"

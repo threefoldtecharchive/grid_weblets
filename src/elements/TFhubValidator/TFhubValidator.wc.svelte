@@ -3,14 +3,12 @@
 <script lang="ts">
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import {
     IFormField,
     IPackage,
     ITab,
     SelectCapacityUpdate,
   } from "../../types";
-  import type { IProfile } from "../../types/Profile";
 
   import Modal from "../../components/DeploymentModal.svelte";
   import TFhubValidator from "../../types/TFhubValidator";
@@ -94,8 +92,8 @@
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 150 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
-
-  let profile: IProfile;
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
   let loading: boolean = false;
   let failed: boolean = false;
   let success: boolean = false;
@@ -128,15 +126,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.ssh_key = detail?.sshKey;
-    }
-  }}
-/>
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployTFhubValidator}>
@@ -197,7 +186,6 @@
           bind:data={data.nodeId}
           bind:status={data.status}
           bind:nodeSelection={data.selection.type}
-          {profile}
           cpu={data.cpu}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,

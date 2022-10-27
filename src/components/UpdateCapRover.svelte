@@ -2,7 +2,6 @@
 
 <script lang="ts">
   // libs
-  import type { IProfile } from "../types/Profile";
   import { IFormField, IPackage, SelectCapacityUpdate } from "../types";
   import validateName, { isInvalid } from "../utils/validateName"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -22,7 +21,8 @@
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
-  export let profile: IProfile;
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
   export let capRover: any;
 
   let workers: any[] = [];
@@ -63,7 +63,7 @@
     worker.publicKey = capRover.details.env.PUBLIC_KEY;
     domain = capRover.details.env.CAPROVER_ROOT_DOMAIN;
 
-    grid = await getGrid(profile, (grid) => grid, false);
+    grid = await getGrid(profile, (grid) => grid);
     grid.projectName = "caprover";
     grid._connect();
 
@@ -323,7 +323,6 @@
               bind:nodeSelection={worker.selection.type}
               bind:status={worker.status}
               filters={worker.selection.filters}
-              {profile}
               on:fetch={({ detail }) => (worker.selection.nodes = detail)}
               nodes={worker.selection.nodes}
             />

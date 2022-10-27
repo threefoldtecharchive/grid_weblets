@@ -1,16 +1,16 @@
-import type { default as VM, Disk, Env } from "../types/vm";
-import createNetwork from "./createNetwork";
+import type { default as VM, Disk, Env } from '../types/vm';
+import createNetwork from './createNetwork';
 
-import type { IProfile } from "../types/Profile";
-import deploy from "./deploy";
-import type { IStore } from "../stores/currentDeployment";
-import checkVMExist from "./prepareDeployment";
-import { Network } from "../types/kubernetes";
+import deploy from './deploy';
+import type { IStore } from '../stores/currentDeployment';
+import checkVMExist from './prepareDeployment';
+import { Network } from '../types/kubernetes';
+import type { ActiveProfile } from '../stores/activeProfile';
 
 export default async function deployVM(
   data: VM,
-  profile: IProfile,
-  type: IStore["type"]
+  profile: ActiveProfile,
+  type: IStore['type']
 ) {
   const { MachineModel, MachinesModel } = window.configs.grid3_client;
   const { envs, disks, rootFs, ...base } = data;
@@ -36,14 +36,14 @@ export default async function deployVM(
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
   const metadate = {
-    type: "vm",
+    type: 'vm',
     name: name,
-    projectName: type == "VM" ? "" : type,
+    projectName: type == 'VM' ? '' : type,
   };
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, type, name, async (grid) => {
-    if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
+    if (type != 'VM') await checkVMExist(grid, type.toLocaleLowerCase(), name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

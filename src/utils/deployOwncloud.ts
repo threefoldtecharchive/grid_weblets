@@ -1,5 +1,4 @@
 import type { default as Owncloud } from "../types/owncloud";
-import type { IProfile } from "../types/Profile";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
@@ -11,10 +10,11 @@ import {
   selectSpecificGatewayNode,
 } from "./gatewayHelpers";
 import rootFs from "./rootFs";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployOwncloud(
   data: Owncloud,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -41,7 +41,7 @@ export default async function deployOwncloud(
   return { deploymentInfo };
 }
 
-async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
+async function deployOwncloudVM(profile: ActiveProfile, data: Owncloud) {
   const {
     DiskModel,
     MachineModel,
@@ -111,7 +111,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
     emailDomain = email[1];
   }
   vm.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     OWNCLOUD_DOMAIN: domain,
     OWNCLOUD_ADMIN_USERNAME: adminUsername,
     OWNCLOUD_ADMIN_PASSWORD: adminPassword,
@@ -149,7 +149,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number

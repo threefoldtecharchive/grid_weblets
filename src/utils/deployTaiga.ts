@@ -1,9 +1,7 @@
 import type { default as Taiga } from "../types/taiga";
-import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
 import {
-  selectGatewayNode,
   getUniqueDomainName,
   selectSpecificGatewayNode,
   GatewayNodes,
@@ -11,10 +9,11 @@ import {
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployTaiga(
   data: Taiga,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -40,7 +39,7 @@ export default async function deployTaiga(
   return { deploymentInfo };
 }
 
-async function deployTaigaVM(profile: IProfile, data: Taiga) {
+async function deployTaigaVM(profile: ActiveProfile, data: Taiga) {
   const {
     DiskModel,
     MachineModel,
@@ -96,7 +95,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
     "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     DOMAIN_NAME: domain,
     ADMIN_USERNAME: adminUsername,
     ADMIN_PASSWORD: adminPassword,
@@ -133,7 +132,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number

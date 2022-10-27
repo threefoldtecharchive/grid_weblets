@@ -1,14 +1,9 @@
+import type { ActiveProfile } from "../stores/activeProfile";
 import { getUniqueDomainName } from "./gatewayHelpers";
 
 
-interface IConfig {
-  mnemonics: string;
-  storeSecret: string;
-  networkEnv: string;
-}
-
 export default async function deleteDeployment(
-  configs: IConfig,
+  configs: ActiveProfile,
   key: "k8s" | "machines",
   name: string,
   type: string
@@ -16,12 +11,12 @@ export default async function deleteDeployment(
   const { GridClient } = window.configs.grid3_client;
   const { HTTPMessageBusClient } = window.configs.client;
   
-  const { mnemonics, networkEnv, storeSecret } = configs;
+  const { mnemonics, network, secret } = configs;
   const http = new HTTPMessageBusClient(0, "", "", "");
   const grid = new GridClient(
-    networkEnv as any,
+    network,
     mnemonics,
-    storeSecret,
+    secret,
     http,
     type,
     "tfkvstore" as any

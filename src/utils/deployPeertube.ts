@@ -1,9 +1,7 @@
 import type { default as Peertube } from "../types/peertube";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
 import {
-  selectGatewayNode,
   getUniqueDomainName,
   selectSpecificGatewayNode,
   GatewayNodes,
@@ -13,10 +11,11 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployPeertube(
   data: Peertube,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -43,7 +42,7 @@ export default async function deployPeertube(
   return { deploymentInfo };
 }
 
-async function deployPeertubeVM(profile: IProfile, data: Peertube) {
+async function deployPeertubeVM(profile: ActiveProfile, data: Peertube) {
   const { DiskModel, MachineModel, MachinesModel, generateString } =
     window.configs.grid3_client;
 
@@ -87,7 +86,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vm.flist = "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     PEERTUBE_ADMIN_EMAIL: adminEmail,
     PT_INITIAL_ROOT_PASSWORD: adminPassword,
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
@@ -117,7 +116,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number

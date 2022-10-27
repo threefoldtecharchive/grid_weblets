@@ -1,25 +1,24 @@
-import type { IProfile } from "../types/Profile";
+import type { ActiveProfile } from '../stores/activeProfile';
 
 export default function gqlApi<T>(
-  profile: IProfile,
-  // name: string,
+  profile: ActiveProfile,
   query: string,
   variables: Object = {}
 ): Promise<T> {
-  const { networkEnv } = profile;
+  const { network } = profile;
   const grid = new window.configs.grid3_client.GridClient(
-    "" as any,
-    "",
-    "",
+    '' as any,
+    '',
+    '',
     null
   );
 
-  const { graphql } = grid.getDefaultUrls(networkEnv as any);
+  const { graphql } = grid.getDefaultUrls(network);
 
   return fetch(graphql, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ query, variables }),
   })

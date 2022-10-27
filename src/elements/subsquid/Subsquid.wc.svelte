@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import Subsquid from "../../types/subsquid";
-  import type { IProfile } from "../../types/Profile";
   import {
     IFormField,
     IPackage,
@@ -13,7 +12,6 @@
   import { Disk } from "../../types/vm";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -30,7 +28,8 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Subsquid();
-  let profile: IProfile;
+  const activeProfile = window.configs.activeProfileStore;
+  $: profile = $activeProfile;
   let gateway: GatewayNodes;
 
   let loading = false;
@@ -102,12 +101,6 @@
   $: logs = $currentDeployment;
 </script>
 
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-  }}
-/>
-
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deploySubsquidHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Subsquid Archive(s)</h4>
@@ -178,7 +171,6 @@
           bind:nodeSelection={data.selection.type}
           bind:status
           filters={data.selection.filters}
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />

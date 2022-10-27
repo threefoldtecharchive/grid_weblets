@@ -2,9 +2,8 @@
 
 <script lang="ts">
   // libs
-  import type { IProfile } from "../types/Profile";
   import { Worker } from "../types/kubernetes";
-  import type { IFormField, ITab } from "../types";
+  import type { IFormField } from "../types";
   import validateName, { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -23,7 +22,8 @@
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
-  export let profile: IProfile;
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
   export let k8s: any;
 
   let workers: any[] = [];
@@ -245,7 +245,7 @@
           />
           <DialogueMsg 
           bind:opened 
-          on:removed={onDeleteWorker(workerIndex)}
+          on:removed={({ detail }) => onDeleteWorker(detail)}
           {name}
         />
           <hr />
@@ -292,7 +292,6 @@
               bind:data={worker.node}
               bind:nodeSelection={worker.selection.type}
               bind:status={worker.status}
-              {profile}
               on:fetch={({ detail }) => (worker.selection.nodes = detail)}
               nodes={worker.selection.nodes}
             />

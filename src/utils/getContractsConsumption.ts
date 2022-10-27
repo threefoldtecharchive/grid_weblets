@@ -1,5 +1,5 @@
 import type { GridClient } from "grid3_client";
-import type { IProfile } from "../types/Profile";
+import type { ActiveProfile } from "../stores/activeProfile";
 import formatConsumption from "./formatConsumption";
 import getGrid from "./getGrid";
 
@@ -21,7 +21,7 @@ function _getConsumption(id: number, grid: GridClient) {
 }
 
 export default function getContractsConsumption(
-  profile: IProfile,
+  profile: ActiveProfile,
   contracts: { id: number }[]
 ) {
   return getGrid(profile, (grid) => {
