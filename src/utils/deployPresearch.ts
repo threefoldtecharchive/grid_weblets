@@ -1,5 +1,4 @@
 import type Presearch from "../types/presearch";
-import type { IProfile } from "../types/Profile";
 
 import { Network } from "../types/kubernetes";
 import createNetwork from "./createNetwork";
@@ -7,17 +6,18 @@ import createNetwork from "./createNetwork";
 import rootFs from "./rootFs";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployPresearch(
   data: Presearch,
-  profile: IProfile
+  profile: ActiveProfile
 ) {
   const deploymentInfo = await depoloyPresearchVM(data, profile);
   return { deploymentInfo };
 }
 
-async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
-  const { MachinesModel, DiskModel, MachineModel, generateString } =
+async function depoloyPresearchVM(data: Presearch, profile: ActiveProfile) {
+  const { MachinesModel, MachineModel, generateString } =
     window.configs.grid3_client;
 
   const {
@@ -55,7 +55,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     PRESEARCH_REGISTRATION_CODE: preCode,
     PRESEARCH_BACKUP_PRI_KEY: privateRestoreKey,
     PRESEARCH_BACKUP_PUB_KEY: publicRestoreKey,

@@ -11,8 +11,8 @@
   // import Mattermost from './elements/Mattermost/Mattermost.wc.svelte';
   // import Discourse from './elements/discourse/Discourse.wc.svelte';
   // import Taiga from './elements/taiga/Taiga.wc.svelte';
-  import Owncloud from './elements/owncloud/Owncloud.wc.svelte';
-  // import Presearch from "./elements/presearch/Presearch.wc.svelte";
+  // import Owncloud from './elements/owncloud/Owncloud.wc.svelte';
+  import Presearch from './elements/presearch/Presearch.wc.svelte';
   // import Subsquid from "./elements/subsquid/Subsquid.wc.svelte";
   // import Casperlabs from "./elements/casperlabs/Casperlabs.wc.svelte";
   // import NodePilot from "./elements/nodePilot/NodePilot.wc.svelte";
@@ -45,7 +45,7 @@
 <Base />
 <ProfileManager />
 
-<Owncloud />
+<Presearch />
 
 <!-- <div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}

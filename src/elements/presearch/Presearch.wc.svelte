@@ -2,13 +2,11 @@
 
 <script lang="ts">
   import Presearch from "../../types/presearch";
-  import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployPresearch from "../../utils/deployPresearch";
   import rootFs from "../../utils/rootFs";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -21,8 +19,9 @@
   import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
 
+  const activeProfile = window.configs.activeProfileStore;
   let data = new Presearch();
-  let profile: IProfile;
+  $: profile = $activeProfile;
 
   let loading = false;
   let success = false;
@@ -103,12 +102,6 @@
   $: logs = $currentDeployment;
 </script>
 
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-  }}
-/>
-
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployPresearchHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Presearch Instance</h4>
@@ -156,12 +149,11 @@
           cpu={data.cpu}
           memory={data.memory}
           publicIp={data.publicIp}
-          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
+          ssd={rootFs(data.cpu, data.memory)}
           bind:data={data.nodeId}
           bind:nodeSelection={data.selection.type}
           bind:status
           filters={data.selection.filters}
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
           exclusiveFor="research"
