@@ -8,8 +8,8 @@
   // import Caprover from './elements/caprover/Caprover.wc.svelte';
   // import Peertube from './elements/peertube/Peertube.wc.svelte';
   // import Funkwhale from './elements/funkwhale/Funkwhale.wc.svelte';
-  import Mattermost from './elements/Mattermost/Mattermost.wc.svelte';
-  // import Discourse from "./elements/discourse/Discourse.wc.svelte";
+  // import Mattermost from './elements/Mattermost/Mattermost.wc.svelte';
+  import Discourse from './elements/discourse/Discourse.wc.svelte';
   // import Taiga from "./elements/taiga/Taiga.wc.svelte";
   // import Owncloud from "./elements/owncloud/Owncloud.wc.svelte";
   // import Presearch from "./elements/presearch/Presearch.wc.svelte";
@@ -45,7 +45,7 @@
 <Base />
 <ProfileManager />
 
-<Mattermost />
+<Discourse />
 
 <!-- <div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}

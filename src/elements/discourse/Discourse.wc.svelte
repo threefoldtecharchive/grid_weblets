@@ -9,10 +9,8 @@
   } from "../../types";
   import { default as Discourse } from "../../types/discourse";
   import deployDiscourse from "../../utils/deployDiscourse";
-  import type { IProfile } from "../../types/Profile";
   import rootFs from "../../utils/rootFs";
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -22,10 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
-    validateCpu,
-    validateDisk,
     validateEmail,
-    validateMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -41,7 +36,9 @@
   let gateway: GatewayNodes;
 
   let status: "valid" | "invalid";
-  let profile: IProfile;
+  
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -104,12 +101,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-  }}
-/>
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployDiscourseHandler}>
@@ -182,7 +173,6 @@
           bind:nodeSelection={data.selection.type}
           bind:status
           filters={data.selection.filters}
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />

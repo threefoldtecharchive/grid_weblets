@@ -1,21 +1,20 @@
 import type Discourse from "../types/discourse";
 import {
-  selectGatewayNode,
   getUniqueDomainName,
   GatewayNodes,
   selectSpecificGatewayNode,
 } from "./gatewayHelpers";
 import { Network } from "../types/kubernetes";
-import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployDiscourse(
   data: Discourse,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   let domainName = await getUniqueDomainName(profile, data.name, "discourse");
@@ -26,10 +25,6 @@ export default async function deployDiscourse(
   const deploymentInfo = await depoloyDiscourseVM(data, profile);
 
   const planetaryIP = deploymentInfo["planetary"] as string;
-
-  // const publicIP = deploymentInfo[0]["publicIP"]
-  //   ? deploymentInfo[0]["publicIP"]["ip"].split("/")[0]
-  //   : "";
 
   try {
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
@@ -42,7 +37,7 @@ export default async function deployDiscourse(
   return { deploymentInfo };
 }
 
-async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
+async function depoloyDiscourseVM(data: Discourse, profile: ActiveProfile) {
   const { generateString, MachinesModel, DiskModel, MachineModel } =
     window.configs.grid3_client;
 
@@ -82,7 +77,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/.start_discourse.sh";
   machine.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     DISCOURSE_HOSTNAME: domain,
     DISCOURSE_DEVELOPER_EMAILS: developerEmail,
 
@@ -118,7 +113,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number
