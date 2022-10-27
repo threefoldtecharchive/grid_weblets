@@ -2,8 +2,8 @@
   import Base from './elements/base/Base.wc.svelte';
   import ProfileManager from './elements/ProfileManager/ProfileManager.wc.svelte';
 
-  import Fullvm from './elements/fullvm/Fullvm.wc.svelte';
-  // import Vm from "./elements/vm/Vm.wc.svelte";
+  // import Fullvm from './elements/fullvm/Fullvm.wc.svelte';
+  import Vm from './elements/vm/Vm.wc.svelte';
   // import Kubernetes from "./elements/kubernetes/Kubernetes.wc.svelte";
   // import Caprover from "./elements/caprover/Caprover.wc.svelte";
   // import Peertube from "./elements/peertube/Peertube.wc.svelte";
@@ -45,7 +45,7 @@
 <Base />
 <ProfileManager />
 
-<Fullvm />
+<Vm />
 
 <!-- <div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}

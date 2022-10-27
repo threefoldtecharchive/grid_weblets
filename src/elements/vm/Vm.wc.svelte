@@ -4,10 +4,8 @@
   import VM, { Disk, Env } from "../../types/vm";
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
-  import type { IProfile } from "../../types/Profile";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
@@ -87,11 +85,13 @@
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
+  const activeProfile = window.configs?.activeProfileStore;
+
+  $: profile = $activeProfile;
   let active: string = "config";
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
   let message: string;
   let modalData: Object;
   let status: "valid" | "invalid";
@@ -176,15 +176,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-    }
-  }}
-/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
@@ -291,7 +282,6 @@
           bind:data={data.nodeId}
           filters={data.selection.filters}
           bind:status
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
