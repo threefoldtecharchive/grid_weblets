@@ -5,12 +5,10 @@
   import Kubernetes, { Worker } from "../../types/kubernetes";
   import deployKubernetes from "../../utils/deployKubernetes";
   import type { IFormField, ITab } from "../../types";
-  import type { IProfile } from "../../types/Profile";
 
   // Components
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
@@ -61,12 +59,13 @@
 
   let data = new Kubernetes();
   const currentDeployment = window.configs?.currentDeploymentStore;
+  const activeProfile = window.configs?.activeProfileStore;
 
+  $: profile = $activeProfile;
   let active: string = "config";
   let loading = false;
   let success = false;
   let failed = false;
-  let profile: IProfile;
   let message: string;
   $: disabled =
     ((loading || !data.valid) && !(success || failed)) ||
@@ -122,12 +121,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-  }}
-/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
@@ -212,7 +205,6 @@
           bind:nodeSelection={data.master.selection.type}
           filters={data.master.selection.filters}
           bind:status={data.master.status}
-          {profile}
           on:fetch={({ detail }) => (data.master.selection.nodes = detail)}
           nodes={data.master.selection.nodes}
         />
@@ -259,7 +251,6 @@
                 bind:data={worker.node}
                 bind:nodeSelection={worker.selection.type}
                 bind:status={worker.status}
-                {profile}
                 on:fetch={({ detail }) => (worker.selection.nodes = detail)}
                 nodes={worker.selection.nodes}
               />
