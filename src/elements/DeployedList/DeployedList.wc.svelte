@@ -22,7 +22,8 @@
     | "casperlabs"
     | "nodepilot"
     | "subsquid"
-    | "fullvm"|
+    | "fullvm"
+    | "freeflow" |
     "algorand";
 
   export let tab: TabsType = undefined;
@@ -58,7 +59,7 @@
     { label: "Algorand", value: "algorand" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
-    { label: "FreeFlow", value: "freeflow" },
+    { label: "freeflow", value: "freeflow" },
   ];
   let grid;
   let active: string = "vm";
@@ -159,8 +160,8 @@
   }
 
   let selectedRows: any[] = [];
-  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore  
-  
+  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
+
   async function onDeleteHandler() {
     message = null;
 
@@ -549,8 +550,8 @@
           Delete
         </button>
       </div>
-      <DialogueMsg 
-        bind:opened 
+      <DialogueMsg
+        bind:opened
         on:removed={onDeleteHandler}
         {name}
       />
@@ -641,7 +642,7 @@
                 active == "casperlabs"
                   ? "Casperlab"
                   : get_solution_label(active)
-              }s found on this profile.`}
+              }s found on this profile 222.`}
             />
           {/if}
         {:catch err}

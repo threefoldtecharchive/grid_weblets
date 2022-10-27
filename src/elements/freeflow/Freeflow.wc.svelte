@@ -112,11 +112,11 @@
         failed = false;
         message = undefined;
 
-        deployFreeFlow(data, profile, "VM")
+        deployFreeFlow(data, profile, gateway)
             .then((data) => {
                 deploymentStore.set(0);
                 success = true;
-                modalData = data;
+                modalData = data.deploymentInfo;
             })
             .catch((err: Error) => {
                 failed = true;
@@ -158,7 +158,7 @@
 
         <hr/>
 
-        {#if loading || (logs !== null && logs.type === "FreeFlow")}
+        {#if loading || (logs !== null && logs.type === "freeflow")}
             <Alert type="info" message={logs?.message ?? "Loading..."}/>
 
         {:else if !profile}

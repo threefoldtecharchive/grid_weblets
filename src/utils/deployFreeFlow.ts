@@ -1,31 +1,41 @@
-import type { default as VM, Env as Env } from "../types/vm";
+import type { Env as Env } from "../types/vm";
 import createNetwork from "./createNetwork";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
-import type { IStore } from "../stores/currentDeployment";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 import { Network } from "../types/kubernetes";
 import type FreeFlow from "../types/freeflow";
+import destroy from "./destroy";
+import { GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 
-const { MachineModel, MachinesModel, GatewayNameModel } =
-  window.configs?.grid3_client ?? {};
+const { MachineModel, MachinesModel } = window.configs?.grid3_client ?? {};
 
 export default async function deployFreeFlow(
   data: FreeFlow,
   profile: IProfile,
-  type: IStore["type"]
+  gateway: GatewayNodes
 ) {
+  const deploymentInfo = await deployFreeFlowVm(profile, data);
+  const domainName = data.threeBotUserId;
+
+  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  data.domain = `${domainName}.${nodeDomain}`;
+
+  const yggdrasilIp = <string>deploymentInfo["planetary"];
+
+  try {
+    await deployPrefixGateway(profile, domainName, yggdrasilIp, publicNodeId);
+  } catch (error) {
+    await destroy(profile, "freeflow", data.vmName);
+    throw error;
+  }
+
+  return { deploymentInfo };
+}
+
+async function deployFreeFlowVm(profile: IProfile, data: FreeFlow) {
   const { envs, disks, ...base } = data;
-  const {
-    vmName,
-    threeBotUserId,
-    flist,
-    cpu,
-    memory,
-    entrypoint,
-    network,
-    rootFs,
-  } = base;
+  const { vmName, flist, cpu, memory, entrypoint, network, rootFs } = base;
   const { publicIp, planetary, nodeId } = base;
 
   const vm = new MachineModel();
@@ -50,25 +60,18 @@ export default async function deployFreeFlow(
   const meta = {
     type: "vm",
     name: vmName,
-    projectName: type == "VM" ? "" : type,
+    projectName: "freeflow",
   };
 
   vms.metadata = JSON.stringify(meta);
 
-  return deploy(profile, type, vmName, async (grid) => {
-    if (type != "VM")
-      await checkVMExist(grid, type.toLocaleLowerCase(), vmName);
+  // deploy
+  return deploy(profile, "freeflow", vmName, async (grid) => {
+    await checkVMExist(grid, "freeflow", vmName);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(vmName))
-      .then(async ([vm]) => {
-        const planetary = vm.planetary.toString();
-        const nodeId = parseInt(vm.nodeId.toString());
-
-        await deployPrefixGateway(profile, threeBotUserId, planetary, nodeId);
-
-        return vm;
-      });
+      .then(([vm]) => vm);
   });
 }
 
@@ -90,7 +93,7 @@ async function deployPrefixGateway(
   const metadata = {
     type: "gateway",
     name: domainName,
-    projectName: "FreeFlow",
+    projectName: "freeflow",
   };
   gw.metadata = JSON.stringify(metadata);
 

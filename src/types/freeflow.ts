@@ -48,6 +48,7 @@ export default class FreeFlow {
     public flist = VM_FLIST,
     public pkg = "",
     public cpu = VM_CPU_COUNT,
+    public domain = "",
     public disks: Disk[] = [
       new Disk(v4(), DISK_NAME, DISK_SIZE, DISK_MOUNT_POINT),
     ],
