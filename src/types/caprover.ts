@@ -15,7 +15,6 @@ export default class Caprover {
     public memory = 1024 * 8,
     public nodeId: number = null,
     public domain = "",
-    public publicKey = "",
     public diskSize = 100,
     public password = generatePassword(
       (length = Math.floor(Math.random() * 5) + 10)
@@ -24,14 +23,13 @@ export default class Caprover {
   ) {}
 
   public get valid(): boolean {
-    const { name, workers, cpu, memory, nodeId, domain, publicKey } = this;
+    const { name, workers, cpu, memory, nodeId, domain } = this;
     return (
       name !== "" &&
       isValidInteger(cpu) &&
       isValidInteger(memory) &&
       isValidInteger(nodeId) &&
       domain !== "" &&
-      publicKey !== "" &&
       workers.every((worker) => worker.valid)
     );
   }
