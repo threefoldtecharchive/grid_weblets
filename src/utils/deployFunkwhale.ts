@@ -1,9 +1,7 @@
 import type { default as Funkwhale } from "../types/funkwhale";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
 import {
-  selectGatewayNode,
   getUniqueDomainName,
   GatewayNodes,
   selectSpecificGatewayNode,
@@ -13,10 +11,11 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployFunkwhale(
   data: Funkwhale,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -42,7 +41,7 @@ export default async function deployFunkwhale(
   return { deploymentInfo };
 }
 
-async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
+async function deployFunkwhaleVM(profile: ActiveProfile, data: Funkwhale) {
   const { DiskModel, MachineModel, MachinesModel, generateString } =
     window.configs.grid3_client;
 
@@ -116,7 +115,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number
