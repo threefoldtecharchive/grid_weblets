@@ -1,5 +1,5 @@
+import type { ActiveProfile } from "../stores/activeProfile";
 import type Algorand from "../types/algorand";
-import type { IProfile } from "../types/Profile";
 
 import { Network } from "../types/kubernetes";
 import createNetwork from "./createNetwork";
@@ -9,14 +9,14 @@ import checkVMExist from "./prepareDeployment";
 
 export default async function deployAlgorand(
   data: Algorand,
-  profile: IProfile
+  profile: ActiveProfile
 ) {
   const deploymentInfo = await depoloyAlgorandVM(data, profile);
   return { deploymentInfo };
 }
 
-async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
-  const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
+async function depoloyAlgorandVM(data: Algorand, profile: ActiveProfile) {
+  const { MachinesModel, DiskModel, MachineModel, generateString } =
     window.configs.grid3_client;
   const {
     name,
@@ -61,7 +61,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   machine.flist = "https://hub.grid.tf/tf-official-apps/algorand-latest.flist";
   machine.entrypoint = "/sbin/zinit init";
   machine.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     NETWORK: nodeNetwork,
     NODE_TYPE: nodeType,
     ACCOUNT_MNEMONICS: mnemonics,

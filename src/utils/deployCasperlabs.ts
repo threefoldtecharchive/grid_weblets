@@ -1,10 +1,8 @@
 import type { default as Casperlabs } from "../types/casperlabs";
 
-import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
 import {
-  selectGatewayNode,
   getUniqueDomainName,
   GatewayNodes,
   selectSpecificGatewayNode,
@@ -14,10 +12,11 @@ import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployCasperlabs(
   data: Casperlabs,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -45,7 +44,7 @@ export default async function deployCasperlabs(
   return { deploymentInfo };
 }
 
-async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
+async function deployCasperlabsVM(profile: ActiveProfile, data: Casperlabs) {
   const { DiskModel, MachineModel, MachinesModel, generateString } =
     window.configs.grid3_client;
 
@@ -54,9 +53,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
     cpu,
     memory,
     disks: [{ size }],
-    publicIp,
     nodeId,
-    envs,
     domain,
   } = data;
 
@@ -86,7 +83,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vm.flist = "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     CASPERLABS_HOSTNAME: domain,
   };
 
@@ -114,7 +111,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number

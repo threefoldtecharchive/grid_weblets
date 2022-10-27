@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import type { IProfile } from "../../types/Profile";
   import type { ITab } from "../../types";
   import DeployedList from "../../types/deployedList";
   import deleteDeployment from "../../utils/deleteDeployment";
@@ -28,7 +27,6 @@
   export let tab: TabsType = undefined;
 
   // components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Table from "../../components/Table.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
@@ -59,7 +57,7 @@
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
   ];
-  let grid;
+
   let active: string = "vm";
   $: active = tab || active;
 
@@ -67,7 +65,8 @@
   let configed = false;
   let list: DeployedList;
   const deployedStore = window.configs?.deploymentStore;
-  let profile: IProfile;
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
   let message: string = null;
   let name: string = null;
   let opened = false;
@@ -129,8 +128,6 @@
     _sub = deployedStore.subscribe(() => {
       _reloadTab();
     });
-
-    grid = await getGrid(profile, (grid) => grid, false);
   });
 
   onDestroy(() => {
@@ -196,7 +193,12 @@
         {
           type: "info",
           label: "Show Details",
-          click: async (_, i) => {grid.projectName = active; grid._connect(); infoToShow = (await grid.machines.getObj(rows[i]["name"]))},
+          click: async (_, i) => {
+            const grid = await getGrid(profile, _ => _);
+            grid.projectName = active;
+            grid._connect();
+            infoToShow = (await grid.machines.getObj(rows[i]["name"]));
+          },
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
         },
@@ -472,16 +474,9 @@
       },
     }
   );
-</script>
 
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      onConfigHandler();
-    }
-  }}
-/>
+  $: if (profile) onConfigHandler()
+</script>
 
 <div style="padding: 15px;">
   <section class="box">

@@ -1,9 +1,7 @@
 import type { default as Subsquid } from "../types/subsquid";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
 import {
-  selectGatewayNode,
   getUniqueDomainName,
   GatewayNodes,
   selectSpecificGatewayNode,
@@ -13,10 +11,11 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deploySubsquid(
   data: Subsquid,
-  profile: IProfile,
+  profile: ActiveProfile,
   gateway: GatewayNodes
 ) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -44,7 +43,7 @@ export default async function deploySubsquid(
   return { deploymentInfo };
 }
 
-async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
+async function deploySubsquidVM(profile: ActiveProfile, data: Subsquid) {
   const { DiskModel, MachineModel, MachinesModel, generateString } =
     window.configs.grid3_client;
 
@@ -87,7 +86,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   vm.flist = "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
     CHAIN_ENDPOINT: endPoint,
     SUBSQUID_WEBSERVER_HOSTNAME: domain,
   };
@@ -116,7 +115,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
 }
 
 async function deployPrefixGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   domainName: string,
   backend: string,
   publicNodeId: number

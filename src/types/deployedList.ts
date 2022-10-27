@@ -1,7 +1,7 @@
 import getGrid from "../utils/getGrid";
-import type { IProfile } from "./Profile";
 import type { GridClient } from "grid3_client";
 import formatConsumption from "../utils/formatConsumption";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export interface IListReturn<T = any> {
   total: number;
@@ -137,8 +137,8 @@ export default class DeployedList {
     };
   }
 
-  public static async init(profile: IProfile): Promise<DeployedList> {
-    return new DeployedList(await getGrid(profile, (grid) => grid, false));
+  public static async init(profile: ActiveProfile): Promise<DeployedList> {
+    return new DeployedList(await getGrid(profile, (grid) => grid));
   }
 
   public static __filterNames(names: string[]): string[] {

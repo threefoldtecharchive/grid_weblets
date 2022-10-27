@@ -8,13 +8,11 @@
     ITab,
     SelectCapacityUpdate,
   } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-  import { Disk, Env } from "../../types/vm";
+  import { Disk } from "../../types/vm";
   import Casperlabs from "../../types/casperlabs";
   // Modules
   import deployCasperlabs from "../../utils/deployCasperlabs";
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
@@ -42,7 +40,8 @@
   let selectCapacity = new SelectCapacityUpdate();
 
   data.disks = [new Disk()];
-  let profile: IProfile;
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
   let active: string = "base";
   let loading = false;
   let success = false;
@@ -91,15 +90,6 @@
 
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-    }
-  }}
-/>
 
 <div style="padding: 15px;">
   <form on:submit|preventDefault={onDeployVM} class="box">
@@ -168,7 +158,6 @@
           bind:data={data.nodeId}
           filters={data.selection.filters}
           bind:status
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />

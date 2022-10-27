@@ -2,10 +2,8 @@
 
 <script lang="ts">
   import getGrid from "../../utils/getGrid";
-  import type { IProfile } from "../../types/Profile";
 
   // components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Alert from "../../components/Alert.svelte";
   import Table from "../../components/Table.svelte";
   import { noActiveProfile } from "../../utils/message";
@@ -13,8 +11,8 @@
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
   import DialogueMsg from "../../components/DialogueMsg.svelte";
+  import type { ActiveProfile } from "../../stores/activeProfile";
 
-  let profile: IProfile;
   let contracts: IContract[] = [];
   let loading: boolean = false;
   let selectedContracts: IContract[] = [];
@@ -38,14 +36,13 @@
     return parsed;
   }
 
-  function onLoadProfile(_profile: IProfile) {
-    profile = _profile;
+  function onLoadProfile(profile: ActiveProfile) {
     if (profile) {
       loading = true;
       return getGrid(profile, (grid) => {
         grid.contracts
           .listMyContracts()
-          .then(({ nameContracts, nodeContracts, rentContracts }) => {
+          .then(({ nameContracts, nodeContracts, rentContracts }: any) => {
             const rents = rentContracts.map(
               ({ contractID, nodeID, state, createdAt }) =>
                 ({
@@ -99,6 +96,9 @@
       contracts = [];
     }
   }
+
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
 
   let message: string;
   function onDeleteHandler() {
@@ -165,9 +165,9 @@
         });
     }
   }
-</script>
 
-<SelectProfile on:profile={({ detail }) => onLoadProfile(detail)} />
+  $: onLoadProfile(profile)
+</script>
 
 <div style="padding: 15px;">
   <div class="box">
@@ -226,7 +226,7 @@
       >
         <div style="flex-grow: 1;" class="mr-2">
           {#if message}
-            <Alert type="danger" style={`color: #FF5151`} {message} />
+            <Alert type="danger" {message} />
           {/if}
         </div>
         <div class="mt-5">

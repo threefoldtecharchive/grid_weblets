@@ -2,13 +2,11 @@
 
 <script lang="ts">
   import Algorand from "../../types/algorand";
-  import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployAlgorand from "../../utils/deployAlgorand";
   import rootFs from "../../utils/rootFs";
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
@@ -23,7 +21,8 @@
   import { getResources } from "../../utils/getAlgoResources";
 
   let data = new Algorand();
-  let profile: IProfile;
+  const activeProfile = window.configs?.activeProfileStore;
+  $: profile = $activeProfile;
 
   let loading = false;
   let success = false;
@@ -191,12 +190,6 @@
   $: logs = $currentDeployment;
 </script>
 
-<SelectProfile
-  on:profile={({ detail }) => {
-    profile = detail;
-  }}
-/>
-
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={deployAlgorandHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Algorand Instance</h4>
@@ -294,7 +287,6 @@
           bind:nodeSelection={data.selection.type}
           bind:status
           filters={data.selection.filters}
-          {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
