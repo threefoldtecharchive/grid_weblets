@@ -3,14 +3,12 @@
 <script lang="ts">
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
-  import SelectProfile from "../../components/SelectProfile.svelte";
   import {
     IFormField,
     IPackage,
     ITab,
     SelectCapacityUpdate,
   } from "../../types";
-  import type { IProfile } from "../../types/Profile";
 
   import Modal from "../../components/DeploymentModal.svelte";
   import Mattermost from "../../types/mattermost";
@@ -34,7 +32,6 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
   const data = new Mattermost();
-  const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
   let gateway: GatewayNodes;
   let invalid = true;
   let editable= false;
@@ -93,7 +90,9 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
-  let profile: IProfile;
+  const activeProfile = window.configs.activeProfileStore;
+  $: profile = $activeProfile;
+
   let loading: boolean = false;
   let failed: boolean = false;
   let success: boolean = false;
@@ -129,8 +128,6 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   
   $: logs = $currentDeployment;
 </script>
-
-<SelectProfile on:profile={({ detail }) => (profile = detail)} />
 
 <div style="padding: 15px;">
   <form class="box" on:submit|preventDefault={onDeployMattermost}>
@@ -196,7 +193,6 @@ import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
           bind:data={data.nodeId}
           bind:status={data.status}
           bind:nodeSelection={data.selection.type}
-          {profile}
           cpu={data.cpu}
           ssd={data.disks.reduce(
             (total, disk) => total + disk.size,

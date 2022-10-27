@@ -1,11 +1,9 @@
 import type Mattermost from "../types/mattermost";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
 import {
   GatewayNodes,
   getUniqueDomainName,
-  selectGatewayNode,
   selectSpecificGatewayNode,
 } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
@@ -13,9 +11,10 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 export default async function deployMattermost(
-  profile: IProfile,
+  profile: ActiveProfile,
   mattermost: Mattermost,
   gateway: GatewayNodes
 ) {
@@ -42,9 +41,8 @@ export default async function deployMattermost(
   return matterMostVm;
 }
 
-function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
-  const { MachineModel, MachinesModel, generateString } =
-    window.configs.grid3_client;
+function _deployMatterMost(profile: ActiveProfile, mattermost: Mattermost) {
+  const { MachineModel, MachinesModel } = window.configs.grid3_client;
 
   const {
     name,
@@ -56,12 +54,9 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     nodeId,
     cpu,
     memory,
-    disks,
     publicIp,
     smtpPassword,
   } = mattermost;
-
-  let randomSuffix = generateString(10).toLowerCase();
 
   const vm = new MachineModel();
   vm.name = name;
@@ -81,7 +76,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     SMTPPassword: smtpPassword,
     SMTPServer: server,
     SMTPPort: port,
-    SSH_KEY: profile.sshKey,
+    SSH_KEY: profile.ssh,
   };
 
   const vms = new MachinesModel();
@@ -107,7 +102,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
 }
 
 function _deployGateway(
-  profile: IProfile,
+  profile: ActiveProfile,
   name: string,
   ip: string,
   nodeId: number
