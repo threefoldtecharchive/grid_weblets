@@ -5,8 +5,8 @@
   // import Fullvm from './elements/fullvm/Fullvm.wc.svelte';
   // import Vm from './elements/vm/Vm.wc.svelte';
   // import Kubernetes from './elements/kubernetes/Kubernetes.wc.svelte';
-  import Caprover from './elements/caprover/Caprover.wc.svelte';
-  // import Peertube from "./elements/peertube/Peertube.wc.svelte";
+  // import Caprover from './elements/caprover/Caprover.wc.svelte';
+  import Peertube from './elements/peertube/Peertube.wc.svelte';
   // import Funkwhale from "./elements/funkwhale/Funkwhale.wc.svelte";
   // import Mattermost from "./elements/Mattermost/Mattermost.wc.svelte";
   // import Discourse from "./elements/discourse/Discourse.wc.svelte";
@@ -45,7 +45,7 @@
 <Base />
 <ProfileManager />
 
-<Caprover />
+<Peertube />
 
 <!-- <div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}

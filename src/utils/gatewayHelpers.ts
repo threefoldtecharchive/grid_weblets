@@ -1,11 +1,26 @@
+import { get } from "svelte/store";
+import type { ActiveProfile } from "../stores/activeProfile";
 import { solutionList } from "../stores/solutionsList";
+import getGrid from "./getGrid";
 
 export interface GatewayNodes {
   nodeDomain: string;
   nodeId: number;
   idx?: number;
 }
+
+async function _checkGrid() {
+  const { GridClient } = window.configs.grid3_client;
+
+  if (!GridClient.config) {
+    const grid = await getGrid(get(window.configs.activeProfileStore), _ => _);
+    await grid.connect();
+  }
+}
+
 export async function selectGatewayNode(): Promise<[number, string]> {
+  await _checkGrid();
+
   const { GridClient, Nodes, randomChoice } = window.configs.grid3_client;
 
   const nodes = new Nodes(
@@ -31,6 +46,8 @@ export function selectSpecificGatewayNode(
 }
 
 export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
+  await _checkGrid();
+
   const { GridClient, Nodes } = window.configs.grid3_client;
   const nodes = new Nodes(
     GridClient.config.graphqlURL,
@@ -49,12 +66,14 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
 
   return gws;
 }
-export async function getUniqueDomainName(profile, name, solutionType) {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+export async function getUniqueDomainName(profile: ActiveProfile, name, solutionType) {
+  await _checkGrid();
+
+  const { network, mnemonics, secret } = profile;
   const client = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
+    network,
     mnemonics,
-    storeSecret,
+    secret,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     solutionType,
     window.configs.grid3_client.BackendStorageType.tfkvstore
