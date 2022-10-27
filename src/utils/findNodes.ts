@@ -1,28 +1,32 @@
-import type { ISelectOption } from "../types";
-import type { IProfile } from "../types/Profile";
-import type { FilterOptions } from "grid3_client";
+import type { ISelectOption } from '../types';
+import type { FilterOptions } from 'grid3_client';
+import type { ActiveProfile } from '../stores/activeProfile';
 
 export default function findNodes(
   filters: FilterOptions,
-  profile: IProfile,
-  exclusiveFor = ""
+  profile: ActiveProfile,
+  exclusiveFor = ''
 ): Promise<ISelectOption[]> {
   return new Promise(async (res) => {
-    const { networkEnv } = profile;
+    const { network } = profile;
     const grid = new window.configs.grid3_client.GridClient(
-      "" as any,
-      "",
-      "",
+      '' as any,
+      '',
+      '',
       null
     );
 
-    const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
-    const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy, grid.rmbClient);
+    const { graphql, rmbProxy } = grid.getDefaultUrls(network);
+    const nodes = new window.configs.grid3_client.Nodes(
+      graphql,
+      rmbProxy,
+      grid.rmbClient
+    );
 
     try {
       let avilableNodes = await nodes.filterNodes(filters);
 
-      if (!filters.publicIPs && exclusiveFor != "") {
+      if (!filters.publicIPs && exclusiveFor != '') {
         const blockedNodes = await getBlockedNodesIDs(
           exclusiveFor,
           rmbProxy,
@@ -43,7 +47,7 @@ export default function findNodes(
             });
             avilableNodes = exclude(blockedNodes, avilableNodes);
           } catch (err) {
-            console.log("End of the pages.");
+            console.log('End of the pages.');
             break;
           }
         }
@@ -57,7 +61,7 @@ export default function findNodes(
       });
       res(resNodes);
     } catch (err) {
-      console.log("Error findNodes", err);
+      console.log('Error findNodes', err);
       res([]);
     }
   });
@@ -79,7 +83,7 @@ async function getBlockedNodesIDs(
   );
 
   // get all the nodeIds of all the farms
-  let farmsIDs = `[${blockedFarmsIDs.join(", ")}]`;
+  let farmsIDs = `[${blockedFarmsIDs.join(', ')}]`;
   const res = await gqlClient.query(
     `query MyQuery {
       nodes(where: {farmID_in: ${farmsIDs}}) {
@@ -87,7 +91,7 @@ async function getBlockedNodesIDs(
       }
     }`
   );
-  let farmNodesIDs = [...res.data["nodes"]];
+  let farmNodesIDs = [...res.data['nodes']];
 
   return farmNodesIDs;
 }
@@ -119,7 +123,7 @@ export async function getBlockedFarmsIDs(
   let farmIds = new Set<number>();
   for (let nodeId of nodeIds) {
     const res = await fetch(`${rmbProxy}/nodes/${nodeId}`);
-    farmIds.add((await res.json())["farmId"]);
+    farmIds.add((await res.json())['farmId']);
   }
   let farmIdsarr = Array.from(farmIds);
 

@@ -1,7 +1,7 @@
-import type { IProfile } from "../types/Profile";
+import { get } from 'svelte/store';
 
 export default function hasEnoughBalance(amount = 2) {
-  // const { balance } = profile;
-  const balance = window.configs.balanceStore.getBalance();
-  return balance && balance >= amount;
+  const activeProfile = get(window.configs.activeProfileStore);
+  const value = get(activeProfile.balance);
+  return value && value.balance && value.balance >= amount;
 }

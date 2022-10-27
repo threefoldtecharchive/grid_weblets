@@ -1,8 +1,8 @@
 import type { FilterOptions } from "grid3_client";
-import type { IProfile } from "../types/Profile";
 import gqlApi from "./gqlApi";
 import { getBlockedFarmsIDs } from "./findNodes";
 import paginatedFetcher from "./paginatedFetcher";
+import type { ActiveProfile } from "../stores/activeProfile";
 
 const queryCount = `
 query GetLimits {
@@ -40,7 +40,7 @@ interface IQueryData {
 }
 
 export default function fetchFarms(
-  profile: IProfile,
+  profile: ActiveProfile,
   filters: FilterOptions,
   exclusiveFor: string
 ) {
@@ -69,7 +69,7 @@ export default function fetchFarms(
     });
 }
 
-export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
+export async function getOnlineFarms(profile: ActiveProfile, farms, exclusiveFor, publicIp) {
   let blockedFarms = [];
   let onlineFarmsSet = new Set();
   let onlineFarmsArr = [];
@@ -78,13 +78,13 @@ export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
     // no need for exclusive for if we have an ip
     blockedFarms = await getBlockedFarmsIDs(
       exclusiveFor,
-      `https://gridproxy.${profile.networkEnv}.grid.tf`,
-      `https://graphql.${profile.networkEnv}.grid.tf/graphql`
+      `https://gridproxy.${profile.network}.grid.tf`,
+      `https://graphql.${profile.network}.grid.tf/graphql`
     );
   }
 
   const upNodes = await paginatedFetcher(
-    `https://gridproxy.${profile.networkEnv}.grid.tf/nodes?&status=up`,
+    `https://gridproxy.${profile.network}.grid.tf/nodes?&status=up`,
     0,
     50
   );

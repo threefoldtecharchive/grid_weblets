@@ -1,5 +1,5 @@
-import type { Profile } from 'tf-profile-manager';
 import type { GridClient, NetworkEnv } from 'grid3_client';
+import type { Profile } from 'tf-profile-manager';
 
 export default async function getGrid<T>(
   profile: Profile,

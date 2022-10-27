@@ -1,6 +1,7 @@
 import ProfileManager, { Profile, Listener } from 'tf-profile-manager';
 import { writable, Writable } from 'svelte/store';
 import getGrid from '../utils/getGrid';
+import type { NetworkEnv } from 'grid3_client';
 
 async function _createActiveProfileStore(cb: Listener) {
   if (await ProfileManager.isInstalled) {
@@ -24,6 +25,7 @@ function _createBalanceStore(profile: Profile) {
 }
 
 export interface ActiveProfile extends Profile {
+  network: NetworkEnv;
   balance: Writable<{
     balance: number;
     locked: number;
@@ -38,6 +40,7 @@ function createActiveProfileStore() {
     set({
       ...profile,
       balance: _createBalanceStore(profile),
+      network: profile.network as unknown as NetworkEnv,
     });
   });
 

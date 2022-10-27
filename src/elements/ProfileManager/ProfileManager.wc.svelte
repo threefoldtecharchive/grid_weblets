@@ -1,3 +1,5 @@
+<svelte:options tag="tf-profile-manager" />
+
 <script lang="ts">
   const activeProfile = window.configs.activeProfileStore;
 
