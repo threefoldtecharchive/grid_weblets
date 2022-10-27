@@ -1,4 +1,14 @@
 <script lang="ts">
+  import activeProfile from './stores/activeProfile';
+
+  $: activeProfile$ = $activeProfile;
+  $: balance = activeProfile$?.balance;
+  $: balance$ = $balance;
+
+  $: console.log({ activeProfile$, balance$ });
+</script>
+
+<!-- <script lang="ts">
   import Base from "./elements/base/Base.wc.svelte";
   import ProfileManager from "./elements/profiles/Profiles.wc.svelte";
 
@@ -60,4 +70,4 @@
   {/each}
 </div>
 
-<svelte:component this={weblets[selectedWebletIndex].cmp} />
+<svelte:component this={weblets[selectedWebletIndex].cmp} /> -->

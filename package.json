@@ -76,6 +76,7 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "serve": "^13.0.2",
     "sirv-cli": "^1.0.0",
+    "tf-profile-manager": "^1.0.0",
     "ts-rmb-http-client": "1.0.6",
     "uuid": "^8.3.2",
     "yarn": "^1.22.17"

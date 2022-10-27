@@ -1,18 +1,16 @@
-import type { IProfile } from "../types/Profile";
-import type { GridClient } from "grid3_client";
+import type { Profile } from 'tf-profile-manager';
+import type { GridClient, NetworkEnv } from 'grid3_client';
 
 export default async function getGrid<T>(
-  profile: IProfile,
-  cb: (grid: GridClient) => T,
-  disconnect: boolean = true,
-  solutionType?: string
+  profile: Profile,
+  cb: (grid: GridClient) => T
 ): Promise<T> {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+  const { network, mnemonics, secret } = profile;
   const grid = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
+    network as NetworkEnv,
     mnemonics,
-    storeSecret,
-    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+    secret,
+    new window.configs.client.HTTPMessageBusClient(0, '', '', ''),
     undefined,
     window.configs.grid3_client.BackendStorageType.tfkvstore
   );
