@@ -13,7 +13,8 @@
 
   <div class="box is-flex is-align-items-center">
     <span
-      class="icon pr-5 pl-5 mr-3"
+      class="icon pr-5 pl-5"
+      class:mr-3={activeProfile$ !== null}
       style:height="100%"
       style:border-right={activeProfile$ ? '1px solid #ccc' : null}
       style:font-size="25px"

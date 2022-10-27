@@ -1,12 +1,12 @@
-import type { IProfile } from "../types/Profile";
+import type { ActiveProfile } from "../stores/activeProfile";
 
-export default function validateMnemonics(profile: IProfile) {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+export default function validateMnemonics(profile: ActiveProfile) {
+  const { network, mnemonics, secret } = profile;
   const http = new window.configs.client.HTTPMessageBusClient(0, "", "", "");
   const grid = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
+    network,
     mnemonics,
-    storeSecret,
+    secret,
     http,
     undefined,
     "tfkvstore" as any

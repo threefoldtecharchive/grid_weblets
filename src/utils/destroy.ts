@@ -1,12 +1,11 @@
-import type { IProfile } from "../types/Profile";
-import type { IStore } from "../stores/currentDeployment";
+import type { ActiveProfile } from "../stores/activeProfile";
 
-export default function destroy(profile: IProfile, type: string, name: string) {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+export default function destroy(profile: ActiveProfile, type: string, name: string) {
+  const { network, mnemonics, secret } = profile;
   const client = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
+    network,
     mnemonics,
-    storeSecret,
+    secret,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     type,
     window.configs.grid3_client.BackendStorageType.tfkvstore

@@ -80,7 +80,7 @@
           class="navbar-end mt-2 mb-2 mr-2"
           style="height: 112px"
         >
-          <tf-profiles></tf-profiles>
+          <tf-profile-manager></tf-profile-manager>
         </div>
       </nav>
       <div v-html="weblets[active].html" />

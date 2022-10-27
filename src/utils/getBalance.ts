@@ -1,7 +1,7 @@
-import type { IProfile } from "../types/Profile";
-import getGrid from "./getGrid";
+import type { ActiveProfile } from '../stores/activeProfile';
+import getGrid from './getGrid';
 
-export default async function getBalance(profile: IProfile) {
+export default async function getBalance(profile: ActiveProfile) {
   if (!profile) return null;
 
   return getGrid(profile, (grid) => {
@@ -11,4 +11,3 @@ export default async function getBalance(profile: IProfile) {
       .then((res) => res);
   });
 }
-

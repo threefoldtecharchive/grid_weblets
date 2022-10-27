@@ -1,9 +1,9 @@
-import type { IProfile } from "../types/Profile";
+import type { ActiveProfile } from "../stores/activeProfile";
 
-export default async function nodeExists(profile: IProfile, nodeId:number) : Promise<boolean> {
-  const { networkEnv } = profile;
+export default async function nodeExists(profile: ActiveProfile, nodeId:number) : Promise<boolean> {
+  const { network } = profile;
   
-  return fetch(`https://gridproxy.${networkEnv}.grid.tf/nodes/${nodeId}`, {
+  return fetch(`https://gridproxy.${network}.grid.tf/nodes/${nodeId}`, {
     method: "GET",
   })
     .then((res) => {console.log(res); return (res.status >= 200 && res.status < 400) ? true : false})
