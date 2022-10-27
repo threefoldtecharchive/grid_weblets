@@ -42,13 +42,11 @@ jobs:
           cd ..
 
       - name: Build in case development
-        if: ${{ github.ref == 'refs/heads/development' }}
         run: |
           VERSION=$GITHUB_SHA
           VERSION=${VERSION:0:7} NETWORK=dev yarn build:app
 
       - name: Copying files to staging server
-        if: ${{ github.ref == 'refs/heads/development' }}
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.DEV_REMOTE_HOST }}
