@@ -11,6 +11,7 @@ import {
   validateEntryPoint,
   validateKeyValue,
 } from "../utils/validateName";
+import type { DiskFullVm } from "./fullvm";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 
@@ -63,40 +64,6 @@ export class Disk {
     );
   }
 }
-export class DiskFullVm {
-  // prettier-ignore
-  public diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
-    { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
-  ]
- 
-  constructor(
-    public id = v4(),
-    public name = "DISK" + id.split("-")[0],
-    public size = 50,
-    public mountpoint = `/mnt/${id.split("-")[0]}`
-  ) {}
-
-  get _diskFieldsValid(): boolean {
-    return this.diskFields.reduce((res, field) => {
-      if (field.invalid === undefined) return res;
-      return res && !field.invalid;
-    }, true);
-  }
-
-  public get valid(): boolean {
-    const { name, size, mountpoint } = this;
-    let point = mountpoint.trim();
-
-    return (
-      name !== "" &&
-      isValidInteger(size) &&
-      validateDiskName(name) === undefined &&
-      this._diskFieldsValid
-    );
-  }
-}
-
 export default class VM {
   constructor(
     /* Base */
@@ -114,7 +81,7 @@ export default class VM {
     public network = new Network(),
 
     public envs: Env[] = [],
-    public disks: DiskFullVm[] = [],
+    public disks: Disk[] = [],
     public publicIp = false,
     public publicIp6 = false,
 

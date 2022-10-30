@@ -1,8 +1,8 @@
 <svelte:options tag="tf-fullvm" />
 
 <script lang="ts">
-  import { DiskFullVm, Env } from "../../types/vm";
-  import Fullvm from "../../types/fullvm";
+  import { Env } from "../../types/vm";
+  import Fullvm, { DiskFullVm } from "../../types/fullvm";
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
@@ -182,8 +182,6 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      console.log("data.envs[0]",data.envs[0]);
-      
       data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
     }
   }}
