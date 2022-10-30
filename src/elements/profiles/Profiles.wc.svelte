@@ -94,7 +94,7 @@
     //   { label: "Testnet", value: "test" },
     //   { label: "Devnet", value: "dev" }
     // ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Polkadot Mnemonics or TFChain secret", type: "password" },
+    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Polkadot Mnemonics", type: "password" },
     // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
     { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
   ];
