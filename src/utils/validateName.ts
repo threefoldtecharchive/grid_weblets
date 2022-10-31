@@ -15,6 +15,7 @@ const URL_REGEX =
   /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
+const MNEMONICS_LENGTH_REGEX= /^(?:\s*\S+(?:\s+\S+){24})?\s*$/;
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
 const SSH_REGEX =
@@ -33,6 +34,14 @@ export function validateMnemonics(mnemonics: string): string | void {
   if (!mnemonics.length) return "Mnemonics required";
   if (!ALPHA_ONLY_REGEX.test(mnemonics))
     return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
+}
+
+export function validateMnemonicsAlgorand(mnemonics: string): string | void {
+  if (!mnemonics.length) return "Mnemonics required";
+  if (!ALPHA_ONLY_REGEX.test(mnemonics))
+    return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
+  if (!MNEMONICS_LENGTH_REGEX.test(mnemonics))
+    return "Mnemonics should be 25 words";
 }
 
 export function validateEmail(email: string): string | void {
@@ -238,14 +247,26 @@ export function validateethereumRpc(value: string): string | void {
 
 export function validateAlgoCpu(value: string, net, type): string | void {
   let [cpu, memory, storage] = getResources(net, type);
-  if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}`;
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
+  return "CPU must be a valid number.";
+  if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}.`;
+  if (+value > 32) return "Maximum allowed CPU cores is 32.";
+
 }
 export function validateAlgoMemory(value: string, net, type): string | void {
   let [cpu, memory, storage] = getResources(net, type);
-  if (+value < memory) return `Minimum Memory for this deployment is ${memory}`;
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
+  return "Memory must be a valid number.";
+  if (+value < memory) return `Minimum Memory for this deployment is ${memory}.`;
+  if (+value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
+
 }
 export function validateAlgoStorage(value: string, net, type): string | void {
   let [cpu, memory, storage] = getResources(net, type);
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
+  return "Storage must be a valid number.";
   if (+value < storage)
     return `Minimum Storage for this deployment is ${storage}`;
+  if (+value > storage+200)
+    return `Maximum Storage for this deployment is ${storage+200}.`;
 }
