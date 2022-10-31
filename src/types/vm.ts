@@ -11,6 +11,7 @@ import {
   validateEntryPoint,
   validateKeyValue,
 } from "../utils/validateName";
+import type { DiskFullVm } from "./fullvm";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 
@@ -31,7 +32,8 @@ export class Disk {
     { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator: validateMountPoint, invalid: false},
   ]
-
+ 
+  
   constructor(
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
@@ -62,7 +64,6 @@ export class Disk {
     );
   }
 }
-
 export default class VM {
   constructor(
     /* Base */
