@@ -1,33 +1,33 @@
 <svelte:options tag="tf-subsquid" />
 
 <script lang="ts">
-  import Subsquid from "../../types/subsquid";
-  import type { IProfile } from "../../types/Profile";
+  import Subsquid from '../../types/subsquid';
+  import type { IProfile } from '../../types/Profile';
   import {
     IFormField,
     IPackage,
     ITab,
     SelectCapacityUpdate,
-  } from "../../types";
-  import deploySubsquid from "../../utils/deploySubsquid";
-  import { Disk } from "../../types/vm";
+  } from '../../types';
+  import deploySubsquid from '../../utils/deploySubsquid';
+  import { Disk } from '../../types/vm';
 
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import SelectProfile from '../../components/SelectProfile.svelte';
+  import Input from '../../components/Input.svelte';
+  import Tabs from '../../components/Tabs.svelte';
+  import DeployBtn from '../../components/DeployBtn.svelte';
+  import Alert from '../../components/Alert.svelte';
+  import SelectNodeId from '../../components/SelectNodeId.svelte';
+  import Modal from '../../components/DeploymentModal.svelte';
 
   // utils
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import hasEnoughBalance from '../../utils/hasEnoughBalance';
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
-  import { noActiveProfile } from "../../utils/message";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import { noActiveProfile } from '../../utils/message';
+  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
+  import type { GatewayNodes } from '../../utils/gatewayHelpers';
+  import SelectCapacity from '../../components/SelectCapacity.svelte';
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -38,7 +38,7 @@
   let failed = false;
   let invalid = true;
 
-  let status: "valid" | "invalid";
+  let status: 'valid' | 'invalid';
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -48,14 +48,14 @@
   // define this solution packages
 
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
+    { name: 'Minimum', cpu: 1, memory: 1024, diskSize: 50 },
+    { name: 'Standard', cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: 'Recommended', cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
-  const tabs: ITab[] = [{ label: "Base", value: "base" }];
-  let active = "base";
+  const tabs: ITab[] = [{ label: 'Base', value: 'base' }];
+  let active = 'base';
 
   // Fields
   // prettier-ignore
@@ -80,7 +80,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
       return;
     }
 
@@ -125,8 +125,8 @@
 
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "Subsquid")}
-      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {#if loading || (logs !== null && logs.type === 'Subsquid')}
+      <Alert type="info" message={logs?.message ?? 'Loading...'} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
@@ -136,53 +136,51 @@
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Subsquid."} />
+      <Alert type="danger" message={message || 'Failed to Deploy Subsquid.'} />
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "base"}
-        {#each fields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
-        <SelectCapacity
-          {packages}
-          selectedPackage={selectCapacity.selectedPackage}
-          cpu={data.cpu}
-          memory={data.memory}
-          diskSize={data.disks[0].size}
-          on:update={({ detail }) => {
-            selectCapacity = detail;
-            if (!detail.invalid) {
-              const { cpu, memory, diskSize } = detail.package;
-              data.cpu = cpu;
-              data.memory = memory;
-              data.disks[0].size = diskSize;
-            }
-          }}
-        />
-        <SelectGatewayNode bind:gateway bind:invalid />
-        <SelectNodeId
-          cpu={data.cpu}
-          memory={data.memory}
-          publicIp={data.publicIp}
-          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
-        />
-      {/if}
+      {#each fields as field (field.symbol)}
+        {#if field.invalid !== undefined}
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
+        {:else}
+          <Input bind:data={data[field.symbol]} {field} />
+        {/if}
+      {/each}
+      <SelectCapacity
+        {packages}
+        selectedPackage={selectCapacity.selectedPackage}
+        cpu={data.cpu}
+        memory={data.memory}
+        diskSize={data.disks[0].size}
+        on:update={({ detail }) => {
+          selectCapacity = detail;
+          if (!detail.invalid) {
+            const { cpu, memory, diskSize } = detail.package;
+            data.cpu = cpu;
+            data.memory = memory;
+            data.disks[0].size = diskSize;
+          }
+        }}
+      />
+      <SelectGatewayNode bind:gateway bind:invalid />
+      <SelectNodeId
+        cpu={data.cpu}
+        memory={data.memory}
+        publicIp={data.publicIp}
+        ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
+        bind:data={data.nodeId}
+        bind:nodeSelection={data.selection.type}
+        bind:status
+        filters={data.selection.filters}
+        {profile}
+        on:fetch={({ detail }) => (data.selection.nodes = detail)}
+        nodes={data.selection.nodes}
+      />
     {/if}
 
     <DeployBtn
@@ -207,5 +205,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
 </style>

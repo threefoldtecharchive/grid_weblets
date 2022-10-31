@@ -7,55 +7,55 @@
     IPackage,
     ITab,
     SelectCapacityUpdate,
-  } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-  import { Disk, Env } from "../../types/vm";
-  import Owncloud from "../../types/owncloud";
+  } from '../../types';
+  import type { IProfile } from '../../types/Profile';
+  import { Disk, Env } from '../../types/vm';
+  import Owncloud from '../../types/owncloud';
   // Modules
-  import deployOwncloud from "../../utils/deployOwncloud";
+  import deployOwncloud from '../../utils/deployOwncloud';
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import SelectProfile from '../../components/SelectProfile.svelte';
+  import Input from '../../components/Input.svelte';
+  import Tabs from '../../components/Tabs.svelte';
+  import SelectNodeId from '../../components/SelectNodeId.svelte';
+  import DeployBtn from '../../components/DeployBtn.svelte';
+  import Alert from '../../components/Alert.svelte';
+  import Modal from '../../components/DeploymentModal.svelte';
+  import hasEnoughBalance from '../../utils/hasEnoughBalance';
   import validateName, {
     isInvalid,
     validateRequiredPassword,
     validateRequiredEmail,
-    validateRequiredPortNumber
-  } from "../../utils/validateName";
-  import { validateRequiredHostName } from "../../utils/validateDomainName";
+    validateRequiredPortNumber,
+  } from '../../utils/validateName';
+  import { validateRequiredHostName } from '../../utils/validateDomainName';
 
-  import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import { noActiveProfile } from '../../utils/message';
+  import SelectCapacity from '../../components/SelectCapacity.svelte';
+  import type { GatewayNodes } from '../../utils/gatewayHelpers';
+  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
 
   let data = new Owncloud();
   let gateway: GatewayNodes;
   let invalid = true;
-  let editable:boolean;
+  let editable: boolean;
   data.disks = [new Disk()];
   let profile: IProfile;
-  let active: string = "base";
+  let active: string = 'base';
   let loading = false;
   let success = false;
   let failed = false;
 
   const tabs: ITab[] = [
-    { label: "Base", value: "base" },
-    { label: "Mail Server", value: "mail" },
+    { label: 'Base', value: 'base' },
+    { label: 'Mail Server', value: 'mail' },
   ];
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
-    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
+    { name: 'Minimum', cpu: 2, memory: 1024 * 16, diskSize: 250 },
+    { name: 'Standard', cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: 'Recommended', cpu: 4, memory: 1024 * 16, diskSize: 1000 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
@@ -63,18 +63,18 @@
 
   let adminFields: IFormField[] = [
     {
-      label: "Username",
-      symbol: "adminUsername",
-      placeholder: "Admin Username",
-      type: "text",
+      label: 'Username',
+      symbol: 'adminUsername',
+      placeholder: 'Admin Username',
+      type: 'text',
       validator: validateName,
       invalid: false,
     },
     {
-      label: "Password",
-      symbol: "adminPassword",
-      placeholder: "Admin Password",
-      type: "password",
+      label: 'Password',
+      symbol: 'adminPassword',
+      placeholder: 'Admin Password',
+      type: 'password',
       validator: validateRequiredPassword,
       invalid: false,
     },
@@ -82,52 +82,52 @@
 
   let mailFields: IFormField[] = [
     {
-      label: "From Email Address",
-      symbol: "smtpFromEmail",
-      placeholder: "support@example.com",
-      type: "text",
+      label: 'From Email Address',
+      symbol: 'smtpFromEmail',
+      placeholder: 'support@example.com',
+      type: 'text',
       validator: validateRequiredEmail,
       invalid: true,
     },
     {
-      label: "Port",
-      symbol: "smtpPort",
-      placeholder: "587",
-      type: "text",
+      label: 'Port',
+      symbol: 'smtpPort',
+      placeholder: '587',
+      type: 'text',
       validator: validateRequiredPortNumber,
-      invalid: true, 
+      invalid: true,
     },
     {
-      label: "Host Name",
-      symbol: "smtpHost",
-      placeholder: "smtp.example.com",
-      type: "text",
+      label: 'Host Name',
+      symbol: 'smtpHost',
+      placeholder: 'smtp.example.com',
+      type: 'text',
       validator: validateRequiredHostName,
       invalid: true,
     },
     {
-      label: "Username",
-      symbol: "smtpHostUser",
-      placeholder: "user@example.com",
-      type: "text",
+      label: 'Username',
+      symbol: 'smtpHostUser',
+      placeholder: 'user@example.com',
+      type: 'text',
       validator: validateRequiredEmail,
       invalid: true,
     },
     {
-      label: "Password",
-      symbol: "smtpHostPassword",
-      placeholder: "password",
-      type: "password",
-      validator: validateRequiredPassword, 
-      invalid: true
+      label: 'Password',
+      symbol: 'smtpHostPassword',
+      placeholder: 'password',
+      type: 'password',
+      validator: validateRequiredPassword,
+      invalid: true,
     },
-    { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
-    { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
+    { label: 'Use TLS', symbol: 'smtpUseTLS', type: 'checkbox' },
+    { label: 'Use SSL', symbol: 'smtpUseSSL', type: 'checkbox' },
   ];
 
   let message: string;
   let modalData: Object;
-  let status: "valid" | "invalid";
+  let status: 'valid' | 'invalid';
 
   const deploymentStore = window.configs?.deploymentStore;
 
@@ -154,7 +154,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
       return;
     }
     deployOwncloud(data, profile, gateway)
@@ -165,7 +165,7 @@
       })
       .catch((err: Error) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = typeof err === 'string' ? err : err.message;
       })
       .finally(() => {
         loading = false;
@@ -179,7 +179,7 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
+      data.envs[0] = new Env(undefined, 'SSH_KEY', detail?.sshKey);
     }
   }}
 />
@@ -200,8 +200,8 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "VM")}
-      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {#if loading || (logs !== null && logs.type === 'VM')}
+      <Alert type="info" message={logs?.message ?? 'Loading...'} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
@@ -211,11 +211,11 @@
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy owncloud."} />
+      <Alert type="danger" message={message || 'Failed to deploy owncloud.'} />
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "base"}
+      <section style:display={active === 'base' ? null : 'none'}>
         <Input
           bind:data={data.name}
           bind:invalid={nameField.invalid}
@@ -265,7 +265,9 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "mail"}
+      </section>
+
+      <section style:display={active === 'mail' ? null : 'none'}>
         <div class="notification is-warning is-light">
           <p>
             configure these settings only If you have an smtp service and you
@@ -275,13 +277,13 @@
         <div class="is-flex is-justify-content-flex-end">
           <div style="display: inline-block;">
             <Input
-            bind:data={editable}
-            field={{
-              label: "",
-              symbol: "editable",
-              type: "checkbox",
-            }}
-          />
+              bind:data={editable}
+              field={{
+                label: '',
+                symbol: 'editable',
+                type: 'checkbox',
+              }}
+            />
           </div>
         </div>
         {#each mailFields as field (field.symbol)}
@@ -289,13 +291,16 @@
             <Input
               bind:data={data[field.symbol]}
               bind:invalid={field.invalid}
-              field={{...field, disabled: !editable}}
+              field={{ ...field, disabled: !editable }}
             />
           {:else}
-            <Input bind:data={data[field.symbol]} field={{...field, disabled: !editable}} />
+            <Input
+              bind:data={data[field.symbol]}
+              field={{ ...field, disabled: !editable }}
+            />
           {/if}
         {/each}
-      {/if}
+      </section>
     {/if}
 
     <DeployBtn
@@ -319,5 +324,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
 </style>
