@@ -267,6 +267,6 @@ export function validateAlgoStorage(value: string, net, type): string | void {
   return "Storage must be a valid number.";
   if (+value < storage)
     return `Minimum Storage for this deployment is ${storage}`;
-    if (+value > storage)
-    return `Maximum Storage for this deployment is ${storage+100}.`;
+  if (+value > storage+200)
+    return `Maximum Storage for this deployment is ${storage+200}.`;
 }
