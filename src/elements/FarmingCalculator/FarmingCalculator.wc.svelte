@@ -15,8 +15,7 @@
   // Components
   import Input from "../../components/Input.svelte";
   import type { IFormField } from "../../types";
-    import AddBtn from "../../components/AddBtn.svelte";
-    import Alert from "../../components/Alert.svelte";
+
 
   const profiles = [
     new FarmingProfile({
