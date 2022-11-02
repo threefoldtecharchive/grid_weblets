@@ -26,7 +26,7 @@
   let deleteAllopened: boolean = false;
   let removing: string = null;
   let infoToShow: Object;
-  
+
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
     let parsed = {};
@@ -233,9 +233,10 @@
           {
             type: "info",
             label: "Show Details",
-            click: async (_, i) => (infoToShow = await getContractDetails(+contracts[i].id)),
-            disabled: () => removing !== null,
+            click: async (_, i) => contracts[i].type !== "node"? "": (infoToShow = await getContractDetails(+contracts[i].id)),
+            disabled: (i) => removing !== null && contracts[i].type !== "node",
             loading: (i) => removing === contracts[i][i],
+            show: (i) => contracts[i].type === "node"? true : false
           }
         ]}
         on:selected={({ detail }) => (selectedContracts = detail)}
