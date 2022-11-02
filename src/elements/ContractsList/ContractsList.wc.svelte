@@ -9,7 +9,7 @@
   import Alert from "../../components/Alert.svelte";
   import Table from "../../components/Table.svelte";
   import { noActiveProfile } from "../../utils/message";
-
+  import Modal from "../../components/DeploymentModal.svelte";
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
   import DialogueMsg from "../../components/DialogueMsg.svelte";
@@ -24,7 +24,9 @@
   let name: string = null;
   let opened = false;
   let deleteAllopened: boolean = false;
-
+  let removing: string = null;
+  let infoToShow: Object;
+  
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
     let parsed = {};
@@ -100,6 +102,15 @@
     }
   }
 
+  async function getContractDetails(contractId: number){
+    let deployment = await getGrid(profile, (grid) => grid.zos
+        .getDeployment({contractId})
+        .then((res) => res)
+        .catch((err) => {
+            console.log("Deployment Error", err);
+        }))
+    return deployment
+  }
   let message: string;
   function onDeleteHandler() {
     message = null;
@@ -218,6 +229,15 @@
             expiration,
           ]
         )}
+        actions={[
+          {
+            type: "info",
+            label: "Show Details",
+            click: async (_, i) => (infoToShow = await getContractDetails(+contracts[i].id)),
+            disabled: () => removing !== null,
+            loading: (i) => removing === contracts[i][i],
+          }
+        ]}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
       />
@@ -278,6 +298,10 @@
     {/if}
   </div>
 </div>
+
+{#if infoToShow}
+  <Modal data={infoToShow} onlyJSON on:closed={() => (infoToShow = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
