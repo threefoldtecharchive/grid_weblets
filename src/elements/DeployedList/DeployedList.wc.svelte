@@ -642,7 +642,7 @@
                 active == "casperlabs"
                   ? "Casperlab"
                   : get_solution_label(active)
-              }s found on this profile 222.`}
+              }s found on this profile.`}
             />
           {/if}
         {:catch err}
