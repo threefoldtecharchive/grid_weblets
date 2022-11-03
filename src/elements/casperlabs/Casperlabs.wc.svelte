@@ -7,27 +7,27 @@
     IPackage,
     ITab,
     SelectCapacityUpdate,
-  } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-  import { Disk, Env } from "../../types/vm";
-  import Casperlabs from "../../types/casperlabs";
+  } from '../../types';
+  import type { IProfile } from '../../types/Profile';
+  import { Disk, Env } from '../../types/vm';
+  import Casperlabs from '../../types/casperlabs';
   // Modules
-  import deployCasperlabs from "../../utils/deployCasperlabs";
+  import deployCasperlabs from '../../utils/deployCasperlabs';
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid } from "../../utils/validateName";
+  import SelectProfile from '../../components/SelectProfile.svelte';
+  import Input from '../../components/Input.svelte';
+  import Tabs from '../../components/Tabs.svelte';
+  import SelectNodeId from '../../components/SelectNodeId.svelte';
+  import DeployBtn from '../../components/DeployBtn.svelte';
+  import Alert from '../../components/Alert.svelte';
+  import Modal from '../../components/DeploymentModal.svelte';
+  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
+  import hasEnoughBalance from '../../utils/hasEnoughBalance';
+  import validateName, { isInvalid } from '../../utils/validateName';
 
-  import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import { noActiveProfile } from '../../utils/message';
+  import SelectCapacity from '../../components/SelectCapacity.svelte';
+  import type { GatewayNodes } from '../../utils/gatewayHelpers';
 
   let data = new Casperlabs();
   let invalid = true;
@@ -35,26 +35,26 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024 * 4, diskSize: 100 },
-    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 32, diskSize: 1000 },
+    { name: 'Minimum', cpu: 1, memory: 1024 * 4, diskSize: 100 },
+    { name: 'Standard', cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: 'Recommended', cpu: 4, memory: 1024 * 32, diskSize: 1000 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
   data.disks = [new Disk()];
   let profile: IProfile;
-  let active: string = "base";
+  let active: string = 'base';
   let loading = false;
   let success = false;
   let failed = false;
 
-  const tabs: ITab[] = [{ label: "Base", value: "base" }];
+  const tabs: ITab[] = [{ label: 'Base', value: 'base' }];
 
   const nameField: IFormField = { label: "Name", placeholder: "Casperlabs Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   let message: string;
   let modalData: Object;
-  let status: "valid" | "invalid";
+  let status: 'valid' | 'invalid';
 
   const deploymentStore = window.configs?.deploymentStore;
 
@@ -71,7 +71,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
       return;
     }
     deployCasperlabs(data, profile, gateway)
@@ -82,7 +82,7 @@
       })
       .catch((err: Error) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = typeof err === 'string' ? err : err.message;
       })
       .finally(() => {
         loading = false;
@@ -96,7 +96,7 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
+      data.envs[0] = new Env(undefined, 'SSH_KEY', detail?.sshKey);
     }
   }}
 />
@@ -116,8 +116,8 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "VM")}
-      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {#if loading || (logs !== null && logs.type === 'VM')}
+      <Alert type="info" message={logs?.message ?? 'Loading...'} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
@@ -129,50 +129,48 @@
     {:else if failed}
       <Alert
         type="danger"
-        message={message || "Failed to deploy casperlabs."}
+        message={message || 'Failed to deploy casperlabs.'}
       />
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "base"}
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
+      <Input
+        bind:data={data.name}
+        bind:invalid={nameField.invalid}
+        field={nameField}
+      />
 
-        <SelectCapacity
-          {packages}
-          selectedPackage={selectCapacity.selectedPackage}
-          cpu={data.cpu}
-          memory={data.memory}
-          diskSize={data.diskSize}
-          on:update={({ detail }) => {
-            selectCapacity = detail;
-            if (!detail.invalid) {
-              const { cpu, memory, diskSize } = detail.package;
-              data.cpu = cpu;
-              data.memory = memory;
-              data.diskSize = diskSize;
-            }
-          }}
-        />
-        <SelectGatewayNode bind:gateway bind:invalid />
+      <SelectCapacity
+        {packages}
+        selectedPackage={selectCapacity.selectedPackage}
+        cpu={data.cpu}
+        memory={data.memory}
+        diskSize={data.diskSize}
+        on:update={({ detail }) => {
+          selectCapacity = detail;
+          if (!detail.invalid) {
+            const { cpu, memory, diskSize } = detail.package;
+            data.cpu = cpu;
+            data.memory = memory;
+            data.diskSize = diskSize;
+          }
+        }}
+      />
+      <SelectGatewayNode bind:gateway bind:invalid />
 
-        <SelectNodeId
-          publicIp={data.publicIp}
-          cpu={data.cpu}
-          memory={data.memory}
-          ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
-          bind:nodeSelection={data.selection.type}
-          bind:data={data.nodeId}
-          filters={data.selection.filters}
-          bind:status
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
-        />
-      {/if}
+      <SelectNodeId
+        publicIp={data.publicIp}
+        cpu={data.cpu}
+        memory={data.memory}
+        ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
+        bind:nodeSelection={data.selection.type}
+        bind:data={data.nodeId}
+        filters={data.selection.filters}
+        bind:status
+        {profile}
+        on:fetch={({ detail }) => (data.selection.nodes = detail)}
+        nodes={data.selection.nodes}
+      />
     {/if}
 
     <DeployBtn
@@ -196,5 +194,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
 </style>

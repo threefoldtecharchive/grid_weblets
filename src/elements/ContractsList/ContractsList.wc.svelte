@@ -12,7 +12,7 @@
 
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
-  import DialogueMsg from '../../components/DialogueMsg.svelte';
+  import DialogueMsg from "../../components/DialogueMsg.svelte";
 
   let profile: IProfile;
   let contracts: IContract[] = [];
@@ -23,6 +23,7 @@
   let selectedRows: number[] = [];
   let name: string = null;
   let opened = false;
+  let deleteAllopened: boolean = false;
 
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
@@ -72,7 +73,7 @@
                   deploymentData: jsonParser(deploymentData),
                 } as IContract)
             );
-              contracts = [...names, ...nodes, ...rents];
+            contracts = [...names, ...nodes, ...rents];
           })
           .then(async () => {
             for (let contract of contracts) {
@@ -101,7 +102,6 @@
 
   let message: string;
   function onDeleteHandler() {
-
     message = null;
     deleting = true;
     deletingType = "all";
@@ -127,7 +127,6 @@
   function onDeleteSelectedHandler() {
     if (selectedContracts.length === contracts.length) return onDeleteHandler();
 
-    
     message = null;
     deleting = true;
     deletingType = "selected";
@@ -172,13 +171,13 @@
 
 <div style="padding: 15px;">
   <div class="box">
-    <h4 class="is-size-4 mb-4">Contracts List
-    </h4>    <a
-    target="_blank"
-    href="https://library.threefold.me/info/manual/#/manual__tfchain_home"
-  >
-    Quick start documentation</a
-  >
+    <h4 class="is-size-4 mb-4">Contracts List</h4>
+    <a
+      target="_blank"
+      href="https://library.threefold.me/info/manual/#/manual__tfchain_home"
+    >
+      Quick start documentation</a
+    >
     <hr />
 
     {#if loading}
@@ -186,18 +185,39 @@
     {:else if contracts.length}
       <Table
         rowsData={contracts}
-        headers={["ID", "Type", "Node ID", "State", "Billing Rate", "Solution type", "Solution name", "Created at", "Expiration"]}
-        rows={contracts.map(({ id, type, nodeID, state, expiration, deploymentData, createdAt }, idx) => [
-          id.toString(),
-          type,
-          nodeID ?? " - ",
-          state,
-          loadingConsumption ? "Loading..." : consumptions[idx],
-          deploymentData? (deploymentData.type == "vm" ? deploymentData.projectName == "" ? "virtual machine" : deploymentData.projectName.toLowerCase() : deploymentData.type) ?? "- " : "-",
-          deploymentData? deploymentData.name ?? "-" : "-",
-          createdAt.toLocaleString(),
-          expiration,
-        ])}
+        headers={[
+          "ID",
+          "Type",
+          "Node ID",
+          "State",
+          "Billing Rate",
+          "Solution type",
+          "Solution name",
+          "Created at",
+          "Expiration",
+        ]}
+        rows={contracts.map(
+          (
+            { id, type, nodeID, state, expiration, deploymentData, createdAt },
+            idx
+          ) => [
+            id.toString(),
+            type,
+            nodeID ?? " - ",
+            state,
+            loadingConsumption ? "Loading..." : consumptions[idx],
+            deploymentData
+              ? (deploymentData.type == "vm"
+                  ? deploymentData.projectName == ""
+                    ? "virtual machine"
+                    : deploymentData.projectName.toLowerCase()
+                  : deploymentData.type) ?? "- "
+              : "-",
+            deploymentData ? deploymentData.name ?? "-" : "-",
+            createdAt.toLocaleString(),
+            expiration,
+          ]
+        )}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
       />
@@ -220,16 +240,16 @@
               contracts.length === 0 ||
               selectedContracts.length === 0}
             on:click={() => {
-              name = "selected contracts"
+              name = "selected contracts";
               opened = !opened;
             }}
           >
             Delete Selected
           </button>
-          <DialogueMsg 
-          bind:opened 
-          on:removed={onDeleteSelectedHandler}
-          {name}
+          <DialogueMsg
+            bind:opened
+            on:removed={onDeleteSelectedHandler}
+            {name}
           />
           <button
             class={"button is-danger" +
@@ -237,16 +257,16 @@
             style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
             on:click={() => {
-              name = "your contracts"
-              opened = !opened;
+              name = "your contracts";
+              deleteAllopened = !deleteAllopened;
             }}
           >
             Delete All
           </button>
-          <DialogueMsg 
-          bind:opened 
-          on:removed={onDeleteHandler}
-          {name}
+          <DialogueMsg
+            bind:opened={deleteAllopened}
+            on:removed={onDeleteHandler}
+            {name}
           />
         </div>
       </div>

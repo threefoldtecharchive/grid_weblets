@@ -7,38 +7,38 @@
     ITab,
     IPackage,
     SelectCapacityUpdate,
-  } from "../../types";
-  import type { IProfile } from "../../types/Profile";
+  } from '../../types';
+  import type { IProfile } from '../../types/Profile';
   // Modules
-  import { Disk, Env } from "../../types/vm";
-  import Peertube from "../../types/peertube";
-  import deployPeertube from "../../utils/deployPeertube";
+  import { Disk, Env } from '../../types/vm';
+  import Peertube from '../../types/peertube';
+  import deployPeertube from '../../utils/deployPeertube';
   // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import AlertDetailed from "../../components/AlertDetailed.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import SelectProfile from '../../components/SelectProfile.svelte';
+  import Input from '../../components/Input.svelte';
+  import Tabs from '../../components/Tabs.svelte';
+  import SelectNodeId from '../../components/SelectNodeId.svelte';
+  import DeployBtn from '../../components/DeployBtn.svelte';
+  import Alert from '../../components/Alert.svelte';
+  import Modal from '../../components/DeploymentModal.svelte';
+  import AlertDetailed from '../../components/AlertDetailed.svelte';
+  import hasEnoughBalance from '../../utils/hasEnoughBalance';
   import validateName, {
     isInvalid,
     validateCpu,
     validateMemory,
     validateEmail,
     validatePassword,
-  } from "../../utils/validateName";
+  } from '../../utils/validateName';
 
-  import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import { noActiveProfile } from '../../utils/message';
+  import rootFs from '../../utils/rootFs';
+  import SelectCapacity from '../../components/SelectCapacity.svelte';
+  import type { GatewayNodes } from '../../utils/gatewayHelpers';
+  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
   // Values
 
-  const tabs: ITab[] = [{ label: "Base", value: "base" }];
+  const tabs: ITab[] = [{ label: 'Base', value: 'base' }];
 
   const fields: IFormField[] = [
     { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }, // prettier-ignore
@@ -48,23 +48,23 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 100 },
-    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 250 },
-    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 500 },
+    { name: 'Minimum', cpu: 1, memory: 1024, diskSize: 100 },
+    { name: 'Standard', cpu: 2, memory: 1024 * 2, diskSize: 250 },
+    { name: 'Recommended', cpu: 4, memory: 1024 * 4, diskSize: 500 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
   const deploymentStore = window.configs?.deploymentStore;
   let data = new Peertube();
 
-  let active: string = "base";
+  let active: string = 'base';
   let loading = false;
   let success = false;
   let failed = false;
   let profile: IProfile;
   let message: string;
   let modalData: Object;
-  let status: "valid" | "invalid";
+  let status: 'valid' | 'invalid';
 
   let gateway: GatewayNodes;
   let invalid = true;
@@ -82,7 +82,7 @@
       failed = true;
       loading = false;
       message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
       return;
     }
     deployPeertube(data, profile, gateway)
@@ -93,7 +93,7 @@
       })
       .catch((err: Error) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = typeof err === 'string' ? err : err.message;
       })
       .finally(() => {
         loading = false;
@@ -107,7 +107,7 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail.sshKey);
+      data.envs[0] = new Env(undefined, 'SSH_KEY', detail.sshKey);
     }
   }}
 />
@@ -129,8 +129,8 @@
     <hr />
 
     <!-- Status -->
-    {#if loading || (logs !== null && logs.type === "Peertube")}
-      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    {#if loading || (logs !== null && logs.type === 'Peertube')}
+      <Alert type="info" message={logs?.message ?? 'Loading...'} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
@@ -140,58 +140,56 @@
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" message={message || 'Failed to deploy VM.'} />
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "base"}
-        {#each fields as field (field.symbol)}
-          {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
-          {:else}
-            <Input bind:data={data[field.symbol]} {field} />
-          {/if}
-        {/each}
+      {#each fields as field (field.symbol)}
+        {#if field.invalid !== undefined}
+          <Input
+            bind:data={data[field.symbol]}
+            bind:invalid={field.invalid}
+            {field}
+          />
+        {:else}
+          <Input bind:data={data[field.symbol]} {field} />
+        {/if}
+      {/each}
 
-        <SelectCapacity
-          {packages}
-          selectedPackage={selectCapacity.selectedPackage}
-          cpu={data.cpu}
-          memory={data.memory}
-          diskSize={data.disks[0].size}
-          on:update={({ detail }) => {
-            selectCapacity = detail;
-            if (!detail.invalid) {
-              const { cpu, memory, diskSize } = detail.package;
-              data.cpu = cpu;
-              data.memory = memory;
-              data.disks[0].size = diskSize;
-            }
-          }}
-        />
-        <SelectGatewayNode bind:gateway bind:invalid />
+      <SelectCapacity
+        {packages}
+        selectedPackage={selectCapacity.selectedPackage}
+        cpu={data.cpu}
+        memory={data.memory}
+        diskSize={data.disks[0].size}
+        on:update={({ detail }) => {
+          selectCapacity = detail;
+          if (!detail.invalid) {
+            const { cpu, memory, diskSize } = detail.package;
+            data.cpu = cpu;
+            data.memory = memory;
+            data.disks[0].size = diskSize;
+          }
+        }}
+      />
+      <SelectGatewayNode bind:gateway bind:invalid />
 
-        <SelectNodeId
-          publicIp={data.publicIp}
-          cpu={data.cpu}
-          memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
-          )}
-          bind:data={data.nodeId}
-          bind:nodeSelection={data.selection.type}
-          bind:status
-          filters={data.selection.filters}
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
-        />
-      {/if}
+      <SelectNodeId
+        publicIp={data.publicIp}
+        cpu={data.cpu}
+        memory={data.memory}
+        ssd={data.disks.reduce(
+          (total, disk) => total + disk.size,
+          rootFs(data.cpu, data.memory)
+        )}
+        bind:data={data.nodeId}
+        bind:nodeSelection={data.selection.type}
+        bind:status
+        filters={data.selection.filters}
+        {profile}
+        on:fetch={({ detail }) => (data.selection.nodes = detail)}
+        nodes={data.selection.nodes}
+      />
     {/if}
 
     <DeployBtn
@@ -215,5 +213,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
 </style>
