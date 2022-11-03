@@ -152,11 +152,10 @@
                     {:else if label == "Show JSON"}
                       {#if show(idx) !== false}
                         <button
-                        title={label}
                         class={"button " + (loading && loading(idx) ? "is-loading" : "")}
                         style={`background-color: #1982b1; color: white`}
                         on:click={(e) => click(e, idx)}
-                        disabled={disabled ? disabled(idx) : false}>Show</button>
+                        disabled={disabled ? disabled(idx) : false}>Show Details</button>
                       {:else}
                         <p style="text-align: left;">-</p>
                       {/if}
