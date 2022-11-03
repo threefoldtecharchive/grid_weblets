@@ -24,7 +24,7 @@
   let name: string = null;
   let opened = false;
   let deleteAllopened: boolean = false;
-  let removing: string = null;
+  let loadingDetails: boolean = false;
   let infoToShow: Object;
 
   function jsonParser(str: string) {
@@ -76,6 +76,8 @@
                 } as IContract)
             );
             contracts = [...names, ...nodes, ...rents];
+            console.log({contracts});
+            
           })
           .then(async () => {
             for (let contract of contracts) {
@@ -103,12 +105,13 @@
   }
 
   async function getContractDetails(contractId: number){
+    loadingDetails = true;
     let deployment = await getGrid(profile, (grid) => grid.zos
         .getDeployment({contractId})
         .then((res) => res)
         .catch((err) => {
             console.log("Deployment Error", err);
-        }))
+        }).finally(() => loadingDetails = false))
     return deployment
   }
   let message: string;
@@ -232,10 +235,10 @@
         actions={[
           {
             type: "info",
-            label: "Show Details",
-            click: async (_, i) => contracts[i].type !== "node"? "": (infoToShow = await getContractDetails(+contracts[i].id)),
-            disabled: (i) => removing !== null && contracts[i].type !== "node",
-            loading: (i) => removing === contracts[i][i],
+            label: "Show JSON",
+            click: async (_, i) => contracts[i].type !== "node"? "" : (infoToShow = await getContractDetails(+contracts[i].id)),
+            disabled: (i) => contracts[i].type !== "node",
+            loading: (i) => loadingDetails,
             show: (i) => contracts[i].type === "node"? true : false
           }
         ]}
