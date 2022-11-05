@@ -40,7 +40,7 @@
   data.cpu = 1;
   data.memory = 2048;
   data.rootFs= 0;
-
+  
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false, disabled: true},
@@ -52,7 +52,8 @@
  const secretFields: IFormField[] =[
   { label: "Name", symbol: "qsfsName", placeholder: "Enter QSFS name", type: "text", validator:validateName, invalid: false},
   { label: "Secret", symbol: "secret", placeholder: "Enter QSFS secret", type: "password", invalid: false },
-  { label: "Count", symbol: "qsfsCount", placeholder: "Who many ZDBs needed?", type: "number", min:3, invalid: false},
+  { label: "Count", symbol: "qsfsCount", placeholder: "How many ZDBs needed?", type: "number", min:3, invalid: false},
+  { label: "Memory (GB) ", symbol: "qsfsCount", placeholder: "Memory of each ZDB in GB", type: "number",invalid: false}
   
   ];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
@@ -261,6 +262,22 @@
           bind:invalid={field.invalid}
           {field}
         />
+        <!-- <SelectNodeId
+          publicIp={data.publicIp}
+          cpu={data.cpu}
+          memory={data.memory}
+          ssd={data.disks.reduce(
+            (total, disk) => total + disk.size,
+            data.rootFs
+          )}
+          bind:nodeSelection={data.selection.type}
+          bind:data={data.nodeId}
+          filters={data.selection.filters}
+          bind:status
+          {profile}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
+          nodes={data.selection.nodes}
+        /> -->
       {:else}
         <Input bind:data={data[field.symbol]} {field} />
       {/if}
