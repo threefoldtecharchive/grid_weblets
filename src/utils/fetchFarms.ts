@@ -65,6 +65,15 @@ export default function fetchFarms(
 }
 
 export async function getOnlineFarms(profile, farms, exclusiveFor) {
+  const grid = new window.configs.grid3_client.GridClient(
+    "" as any,
+    "",
+    "",
+    null
+  );
+
+  const { graphql, rmbProxy } = grid.getDefaultUrls(profile.networkEnv);
+
   let blockedFarms = [];
   let onlineFarmsSet = new Set();
   let onlineFarmsArr = [];
@@ -72,13 +81,13 @@ export async function getOnlineFarms(profile, farms, exclusiveFor) {
   if (exclusiveFor) {
     blockedFarms = await getBlockedFarmsIDs(
       exclusiveFor,
-      `https://gridproxy.${profile.networkEnv}.grid.tf`,
-      `https://graphql.${profile.networkEnv}.grid.tf/graphql`
+      rmbProxy,
+      graphql
     );
   }
 
   const upNodes = await paginatedFetcher(
-    `https://gridproxy.${profile.networkEnv}.grid.tf/nodes?&status=up`,
+    `${rmbProxy}/nodes?&status=up`,
     0,
     50
   );
