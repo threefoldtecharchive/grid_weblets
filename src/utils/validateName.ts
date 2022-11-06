@@ -15,7 +15,8 @@ const URL_REGEX =
   /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-const MNEMONICS_LENGTH_REGEX= /^([a-zA-Z0-9]+\s?){25}$/;
+const MNEMONICS_LENGTH_REGEX= /^(?:\s*[a-zA-Z]+(?:\s+[a-zA-Z]+){24})?\s*$/;
+
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
 const SSH_REGEX =
@@ -42,7 +43,6 @@ export function validateMnemonicsAlgorand(mnemonics: string): string | void {
     return "Mnemonics should be 25 words and shouldn't contain alphanumeric characters.";
 
 }
-
 export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
 }
