@@ -44,7 +44,7 @@
   data.rootFs= 0;
 
   let qsfs = new QSFS();
- 
+  let nodeValues: number[] = [];
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false, disabled: true},
@@ -276,18 +276,18 @@
     cpu={null}
     multiSelect= {true}
     memory={qsfs.memory}
-    qsfscount={qsfs.nodes}
     ssd={null}
     bind:nodeSelection={qsfs.selection.type}
-    bind:data={qsfs.nodeIds[0].nodeId}
+    bind:multiData={nodeValues}
+    qsfscount={qsfs.nodes}
     filters={qsfs.selection.filters}
     bind:status
+    data={null}
     {profile}
     on:fetch={({ detail }) => (qsfs.selection.nodes = detail)}
-    
     nodes={qsfs.selection.nodes}
-    
   /> 
+
 
       {/if}
     {/if}

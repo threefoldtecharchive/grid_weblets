@@ -20,7 +20,8 @@
   export let memory: number;
   export let ssd: number;
   export let publicIp: boolean;
-  export let data: number;
+  export let data:  number;
+  export let multiData: number[] = [];
   export let status: "valid" | "invalid" | "dedicated" | "not found";
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
@@ -29,7 +30,7 @@
   export let qsfscount:number =1
   export let profile: IProfile;
   let loadingNodes: boolean = false;
-  let nodeIds :QSFSnode[] = [];
+  
 
 
   const configs = window.configs?.baseConfig;
@@ -382,10 +383,11 @@
   </button>
   {#if multiSelect}
     <p class="label pt-2 pb-3">{`Found ${nodeIdSelectField.options.length - 1}`}</p>
+    {multiData.join(", ")}
     {#each Array(qsfscount) as _, index (index)}
       
       <Input
-      bind:data
+      bind:data={multiData[index]}
       field={{
         label: `Node ${index+1} ID `,
         type: "select",
