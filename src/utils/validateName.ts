@@ -15,7 +15,7 @@ const URL_REGEX =
   /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-const MNEMONICS_LENGTH_REGEX= /^(?:\s*[a-zA-Z]+(?:\s+[a-zA-Z]+){24})?\s*$/;
+const MNEMONICS_LENGTH_REGEX= /^([a-zA-Z]+\s){24}[a-zA-Z]+$/;
 
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
