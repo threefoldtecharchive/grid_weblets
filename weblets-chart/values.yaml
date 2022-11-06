@@ -8,7 +8,7 @@ image:
   repository: threefolddev/grid_weblets
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "v1.5.1"
 
 imagePullSecrets: []
 nameOverride: ""
