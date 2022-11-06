@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
+  import QSFS , {QSFSnode} from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
@@ -29,6 +30,7 @@
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
+  import { log } from "grid3_client";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -36,11 +38,13 @@
     { label: "QSFS", value: "qsfs" },
   ];
 
-  let data = new VM();
+  let data = new VM()
   data.cpu = 1;
   data.memory = 2048;
   data.rootFs= 0;
-  
+
+  let qsfs = new QSFS();
+ 
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false, disabled: true},
@@ -49,12 +53,12 @@
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
- const secretFields: IFormField[] =[
+ const qsfsFields: IFormField[] =[
   { label: "Name", symbol: "qsfsName", placeholder: "Enter QSFS name", type: "text", validator:validateName, invalid: false},
   { label: "Secret", symbol: "secret", placeholder: "Enter QSFS secret", type: "password", invalid: false },
   { label: "Count", symbol: "qsfsCount", placeholder: "How many ZDBs needed?", type: "number", min:3, invalid: false},
-  { label: "Memory (GB) ", symbol: "qsfsCount", placeholder: "Memory of each ZDB in GB", type: "number",invalid: false}
-  
+  { label: "Memory (GB) ", symbol: "memory", placeholder: "Memory of each ZDB in GB", type: "number",invalid: false},
+  { label: "Number of Nodes", symbol: "nodes", placeholder: "Number of Nodes to deploy on", type: "number",invalid: false},
   ];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
  
@@ -63,8 +67,6 @@
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist", entryPoint: "/sbin/zinit init" },
   ];
   const flistField: IFormField = { label: "VM Image", placeholder: "Ubuntu-22.04", symbol: "flist", type: "text", disabled:true}; // prettier-ignore
-
-
   let selectedFlist: number = 0;
   let flistSelectValue: string = "Ubuntu-22.04";
 
@@ -255,36 +257,39 @@
           {/each}
         </div>
       {:else if active === "qsfs"}
-      {#each secretFields as field (field.symbol)}
+      {#each qsfsFields as field (field.symbol)}
       {#if field.invalid !== undefined}
         <Input
-          bind:data={data[field.symbol]}
+          bind:data={qsfs[field.symbol]}
           bind:invalid={field.invalid}
           {field}
         />
-        <!-- <SelectNodeId
-          publicIp={data.publicIp}
-          cpu={data.cpu}
-          memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFs
-          )}
-          bind:nodeSelection={data.selection.type}
-          bind:data={data.nodeId}
-          filters={data.selection.filters}
-          bind:status
-          {profile}
-          on:fetch={({ detail }) => (data.selection.nodes = detail)}
-          nodes={data.selection.nodes}
-        /> -->
+        
       {:else}
-        <Input bind:data={data[field.symbol]} {field} />
+        <Input bind:data={qsfs[field.symbol]} {field} />
       {/if}
     {/each}
+    <SelectNodeId
+    publicIp={null}
+    cpu={null}
+    multiSelect= {true}
+    memory={qsfs.memory}
+    k={qsfs.nodes}
+    ssd={null}
+    bind:nodeSelection={qsfs.selection.type}
+    bind:data={qsfs.count}
+    filters={qsfs.selection.filters}
+    bind:status
+    {profile}
+    on:fetch={({ detail }) => (qsfs.selection.nodes = detail)}
+    
+    nodes={qsfs.selection.nodes}
+    
+  /> 
+
       {/if}
     {/if}
-
+    
     <DeployBtn
       disabled={disabled || validateFlist.loading}
       loading={loading || validateFlist.loading}

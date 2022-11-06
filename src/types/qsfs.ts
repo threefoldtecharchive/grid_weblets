@@ -13,7 +13,9 @@ export default class QSFS{
     public name = "VM" + id.split("-")[0],
     public memory = 1024 * 8,
     public count: number = 3,
+    public nodes: number =1,
     public nodeIds : QSFSnode[]=[],
-    public password : string= undefined
-  ){}
+    public password : string= undefined,
+    public selection = new NodeID(),
+    ){}
   }

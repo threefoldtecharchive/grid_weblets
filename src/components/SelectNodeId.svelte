@@ -3,6 +3,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { IFormField, ISelectOption } from "../types";
+  import {QSFSnode} from '../types/qsfs'
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
   import fetchFarms from "../utils/fetchFarms";
@@ -23,9 +24,9 @@
   export let status: "valid" | "invalid" | "dedicated" | "not found";
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
-
+  export let multiSelect :boolean =false;
   export let exclusiveFor: string = "";
-
+  export let k:number =1
   export let profile: IProfile;
   let loadingNodes: boolean = false;
 
@@ -40,6 +41,11 @@
       { label: "Please select a country", value: null, selected: true }
     ] },
   ];
+  const farmNameField :IFormField = 
+  { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
+      { label: "Please select a farm", value: null, selected: true }
+  ] }
+  
 
   // prettier-ignore
   const nodeIdSelectField /* : IFormField */ = {
@@ -156,7 +162,7 @@
   let _network: string;
   $: {
     if (
-      nodeSelection === "automatic" &&
+      ( nodeSelection === "automatic" || multiSelect ) &&
       profile &&
       profile.networkEnv !== _network
     ) {
@@ -314,7 +320,7 @@
   const _reset = () => {
     requestAnimationFrame(() => {
       _nodeId = null;
-      if (nodeSelection === "automatic") {
+      if (nodeSelection === "automatic"|| multiSelect) {
         onLoadNodesHandler();
         onLoadFarmsHandler();
       }
@@ -333,7 +339,7 @@
     if (_update) _reset();
   }
 </script>
-
+{#if !multiSelect}
 <Input
   bind:data={nodeSelection}
   field={nodeSelectionField}
@@ -344,14 +350,23 @@
     }
   }}
 />
-{#if nodeSelection === "automatic"}
+{/if}
+{#if nodeSelection === "automatic" || multiSelect}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
-    <Input
+    {#if !multiSelect}
+      <Input
+        data={filters[field.symbol]}
+        {field}
+        on:input={_update(field.symbol)}
+      />
+    {:else if multiSelect && field.symbol !=="country"}
+      <Input
       data={filters[field.symbol]}
       {field}
       on:input={_update(field.symbol)}
-    />
+      />
+   {/if}
   {/each}
 
   <button
@@ -363,17 +378,35 @@
   >
     Apply Filters and Suggest Nodes
   </button>
+  {#if multiSelect}
+    <p class="label pt-2 pb-3">{`Found ${nodeIdSelectField.options.length - 1}`}</p>
+    {#each Array(k) as _, index (index)}
+      
+      <Input
+      bind:data
+      field={{
+        label: `Node ${index+1} ID `,
+        type: "select",
+        symbol: "nodeId",
+        options: nodeIdSelectField.options,
+      }}
+      on:input={() => (status = "valid")}
+      />
+      
+    {/each}
 
-  <Input
-    bind:data
-    field={{
-      label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
-      type: "select",
-      symbol: "nodeId",
-      options: nodeIdSelectField.options,
-    }}
-    on:input={() => (status = "valid")}
-  />
+    {:else}
+      <Input
+      bind:data
+      field={{
+        label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+        type: "select",
+        symbol: "nodeId",
+        options: nodeIdSelectField.options,
+      }}
+      on:input={() => (status = "valid")}
+      />
+    {/if}
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
   {#if validating && data}
