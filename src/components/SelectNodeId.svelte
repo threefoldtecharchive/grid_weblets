@@ -26,9 +26,11 @@
   // export let error: string = null;
   export let multiSelect :boolean =false;
   export let exclusiveFor: string = "";
-  export let k:number =1
+  export let qsfscount:number =1
   export let profile: IProfile;
   let loadingNodes: boolean = false;
+  let nodeIds :QSFSnode[] = [];
+
 
   const configs = window.configs?.baseConfig;
 
@@ -380,7 +382,7 @@
   </button>
   {#if multiSelect}
     <p class="label pt-2 pb-3">{`Found ${nodeIdSelectField.options.length - 1}`}</p>
-    {#each Array(k) as _, index (index)}
+    {#each Array(qsfscount) as _, index (index)}
       
       <Input
       bind:data

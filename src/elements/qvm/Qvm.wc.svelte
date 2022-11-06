@@ -38,7 +38,7 @@
     { label: "QSFS", value: "qsfs" },
   ];
 
-  let data = new VM()
+  let data = new QSFS()
   data.cpu = 1;
   data.memory = 2048;
   data.rootFs= 0;
@@ -88,14 +88,15 @@
   let modalData: Object;
   let status: "valid" | "invalid";
 
-  function _isInvalidDisks() {
-    const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
-    const mountSet = new Set(mounts);
+  // QSFS DISKS ARE HANDELED IN THE GRID
+  // function _isInvalidDisks() {
+  //   const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
+  //   const mountSet = new Set(mounts);
 
-    const names = data.disks.map(({ name }) => name.trim());
-    const nameSet = new Set(names);
-    return mounts.length !== mountSet.size || names.length !== nameSet.size;
-  }
+  //   const names = data.disks.map(({ name }) => name.trim());
+  //   const nameSet = new Set(names);
+  //   return mounts.length !== mountSet.size || names.length !== nameSet.size;
+  // }
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -269,15 +270,16 @@
         <Input bind:data={qsfs[field.symbol]} {field} />
       {/if}
     {/each}
+
     <SelectNodeId
     publicIp={null}
     cpu={null}
     multiSelect= {true}
     memory={qsfs.memory}
-    k={qsfs.nodes}
+    qsfscount={qsfs.nodes}
     ssd={null}
     bind:nodeSelection={qsfs.selection.type}
-    bind:data={qsfs.count}
+    bind:data={qsfs.nodeIds[0].nodeId}
     filters={qsfs.selection.filters}
     bind:status
     {profile}
