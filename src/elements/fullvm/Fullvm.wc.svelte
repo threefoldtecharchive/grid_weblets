@@ -70,7 +70,7 @@
       { label: "Other", value: "other" }
     ]
   };
-  let selectedFlist: number = 0;
+  let selectedFlist: number = 2;
   let flistSelectValue: string = "2";
   $: {
     const option = flistField.options[selectedFlist];
