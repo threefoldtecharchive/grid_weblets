@@ -11,16 +11,19 @@
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
-  import baseConfig from "../stores/baseConfig";
   const { GridClient } = window.configs?.grid3_client ?? {};
 
-  const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
+  const dispatch = createEventDispatcher<{
+    fetch: ISelectOption[];
+    multiple: number[];
+  }>();
   export let cpu: number;
   export let memory: number;
   export let ssd: number;
   export let publicIp: boolean;
-  export let data: number;
-  export let status: "valid" | "invalid" | "dedicated" | "not found";
+  export let data: number = undefined;
+  export let status: "valid" | "invalid" | "dedicated" | "not found" =
+    undefined;
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
@@ -29,15 +32,20 @@
   export let profile: IProfile;
   let loadingNodes: boolean = false;
 
+  // for multiple options
+  export let multiple: number = undefined;
+  let nodeIds: number[] = [];
+  let multiData: number = null;
+
   const configs = window.configs?.baseConfig;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
-      { label: "Please select a farm", value: null, selected: true }
+      { label: "Please select a farm", value: "", selected: true }
     ] },
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter Country Name", options: [
-      { label: "Please select a country", value: null, selected: true }
+      { label: "Please select a country", value: "", selected: true }
     ] },
   ];
 
@@ -59,7 +67,7 @@
       { label: "Manual", value: "manual" }
     ]
   };
-  export let nodeSelection: string;
+  export let nodeSelection: string = undefined;
 
   export let filters: any;
 
@@ -94,6 +102,8 @@
           data = null;
           status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
+          nodeIds = [];
+          dispatch("multiple", nodeIds);
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
@@ -102,6 +112,12 @@
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
+        }
+
+        if (multiple && nodeIds.length) {
+          const fetchedNodes = _nodes.map((n) => +n.value);
+          nodeIds = nodeIds.filter((n) => fetchedNodes.includes(n));
+          dispatch("multiple", nodeIds);
         }
       })
       .catch((err) => {
@@ -120,7 +136,11 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, oldLabel: string,  label: string = "Loading...") {
+  function _setLabel(
+    index: number,
+    oldLabel: string,
+    label: string = "Loading..."
+  ) {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
@@ -140,23 +160,22 @@
     );
   }
 
-  function _setCountriesOptions(
-    index: number,
-    items: Map< string, Number >
-  ) {
+  function _setCountriesOptions(index: number, items: Map<string, Number>) {
     const [option] = filtersFields[index].options;
-    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
-        const op = { label: name, value: name } as ISelectOption;
-        return op;
-      },
-    );
+    filtersFields[index].options = Object.entries(items).map(function ([
+      name,
+      code,
+    ]) {
+      const op = { label: name, value: name } as ISelectOption;
+      return op;
+    });
     filtersFields[index].options.unshift(option);
   }
 
   let _network: string;
   $: {
     if (
-      nodeSelection === "automatic" &&
+      (nodeSelection === "automatic" || multiple) &&
       profile &&
       profile.networkEnv !== _network
     ) {
@@ -167,7 +186,7 @@
     }
   }
 
-  function onLoadFarmsHandler(){
+  function onLoadFarmsHandler() {
     /* Loading farms & countries */
     const old_farm_label = "Please select a farm";
     const old_countries_label = "Please select a country";
@@ -188,7 +207,7 @@
       });
 
     fetchCountries(profile)
-      .then(( countries ) => {
+      .then((countries) => {
         _setCountriesOptions(1, countries);
       })
       .catch((err) => {
@@ -252,12 +271,15 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
-              if (node.error){
+              if (node.error) {
                 status = "not found";
                 return;
               }
 
-              if (node.rentedByTwinId != $configs.twinId && (node.dedicated || node.rentContractId != 0)) {
+              if (
+                node.rentedByTwinId != $configs.twinId &&
+                (node.dedicated || node.rentContractId != 0)
+              ) {
                 status = "dedicated";
                 return;
               }
@@ -314,7 +336,7 @@
   const _reset = () => {
     requestAnimationFrame(() => {
       _nodeId = null;
-      if (nodeSelection === "automatic") {
+      if (nodeSelection === "automatic" || multiple) {
         onLoadNodesHandler();
         onLoadFarmsHandler();
       }
@@ -334,46 +356,94 @@
   }
 </script>
 
-<Input
-  bind:data={nodeSelection}
-  field={nodeSelectionField}
-  on:input={() => {
-    if (nodeSelection === "manual") return (status = null);
-    if (data !== null && nodes.length > 0) {
-      status = "valid";
-    }
-  }}
-/>
-{#if nodeSelection === "automatic"}
+{#if !multiple}
+  <Input
+    bind:data={nodeSelection}
+    field={nodeSelectionField}
+    on:input={() => {
+      if (nodeSelection === "manual") return (status = null);
+      if (data !== null && nodes.length > 0) {
+        status = "valid";
+      }
+    }}
+  />
+{/if}
+
+{#if nodeSelection === "automatic" || multiple}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
-    <Input
-      data={filters[field.symbol]}
-      {field}
-      on:input={_update(field.symbol)}
-    />
+    {#if nodeSelection === "automatic" || (multiple && multiple !== nodeIds.length && field.symbol !== "country")}
+      <Input
+        data={filters[field.symbol]}
+        {field}
+        on:input={_update(field.symbol)}
+      />
+    {/if}
   {/each}
 
   <button
     class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
     style={`background-color: #1982b1; color: #fff`}
-    disabled={loadingNodes || !profile}
+    disabled={loadingNodes ||
+      !profile ||
+      (multiple && nodeIds.length === multiple)}
     type="button"
     on:click={onLoadNodesHandler}
   >
     Apply Filters and Suggest Nodes
   </button>
 
-  <Input
-    bind:data
-    field={{
-      label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
-      type: "select",
-      symbol: "nodeId",
-      options: nodeIdSelectField.options,
-    }}
-    on:input={() => (status = "valid")}
-  />
+  {#if multiple}
+    <div class="field is-grouped is-grouped-multiline mt-3">
+      {#each nodeIds as nodeId, index}
+        <div class="control">
+          <div class="tags has-addons">
+            <p class="tag">{nodeId}</p>
+            <span
+              class="tag is-delete is-danger"
+              style:cursor="pointer"
+              on:mousedown={() => {
+                nodeIds = nodeIds.filter((_, i) => i !== index);
+                dispatch("multiple", nodeIds);
+              }}
+            />
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    {#if nodeIds.length < multiple}
+      <Input
+        bind:data={multiData}
+        field={{
+          label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+          type: "select",
+          symbol: "nodeId",
+          options: nodeIdSelectField.options.filter(
+            (f) => !nodeIds.includes(+f.value)
+          ),
+        }}
+        on:input={(e) => {
+          const select = e.detail.target;
+          const selectedNodeId = +select.options[select.selectedIndex].value;
+          nodeIds = [...nodeIds, selectedNodeId];
+          dispatch("multiple", nodeIds);
+          multiData = null;
+        }}
+      />
+    {/if}
+  {:else}
+    <Input
+      bind:data
+      field={{
+        label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+        type: "select",
+        symbol: "nodeId",
+        options: nodeIdSelectField.options,
+      }}
+      on:input={() => (status = "valid")}
+    />
+  {/if}
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
   {#if validating && data}
