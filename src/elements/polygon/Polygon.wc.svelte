@@ -4,7 +4,6 @@
   import Polygon from "../../types/polygon";
   import type { IProfile } from "../../types/Profile";
   import type { IFormField, ITab } from "../../types";
-  import deployAlgorand from "../../utils/deployAlgorand";
   import rootFs from "../../utils/rootFs";
 
   // Components
@@ -81,7 +80,7 @@
     },
   ];
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields) || isInvalid(customCapacityFields); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
 
   const setResouces = () => {
     console.log("setting resources");
