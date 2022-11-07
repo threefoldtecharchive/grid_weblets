@@ -26,9 +26,9 @@
     undefined;
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
-  export let multiSelect :boolean =false;
+
   export let exclusiveFor: string = "";
-  export let qsfscount:number =1
+
   export let profile: IProfile;
   let loadingNodes: boolean = false;
 
@@ -48,11 +48,6 @@
       { label: "Please select a country", value: "", selected: true }
     ] },
   ];
-  const farmNameField :IFormField = 
-  { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
-      { label: "Please select a farm", value: null, selected: true }
-  ] }
-  
 
   // prettier-ignore
   const nodeIdSelectField /* : IFormField */ = {
