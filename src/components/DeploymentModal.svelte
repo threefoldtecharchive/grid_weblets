@@ -17,7 +17,7 @@
   let active: string = "details";
   export let data: any;
   $: json = data ? JSON.stringify(data, undefined, 4) : "";
-
+  export let onlyJSON = false;
   const style = `
 <style>
   .modal-content {
@@ -72,13 +72,14 @@
   />
   <div class="modal-content" on:click|stopPropagation>
     <div class="box">
+      {#if !onlyJSON}
       <Tabs bind:active {tabs} />
-
+      {/if}
       <section class="content">
-        {#if active === "details"}
+        {#if active === "details" && !onlyJSON}
           <Tabs bind:active={vmActiveTab} tabs={vmTabs} />
           <FormatData vm={vms[vmActiveTab]} />
-        {:else if active === "json"}
+        {:else if active === "json" || onlyJSON}
           <pre>
             <code>
               {json}

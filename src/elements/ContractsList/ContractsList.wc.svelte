@@ -9,7 +9,7 @@
   import Alert from "../../components/Alert.svelte";
   import Table from "../../components/Table.svelte";
   import { noActiveProfile } from "../../utils/message";
-
+  import Modal from "../../components/DeploymentModal.svelte";
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
   import DialogueMsg from "../../components/DialogueMsg.svelte";
@@ -24,6 +24,8 @@
   let name: string = null;
   let opened = false;
   let deleteAllopened: boolean = false;
+  let loadingDetails: string = null;
+  let infoToShow: Object;
 
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
@@ -100,6 +102,16 @@
     }
   }
 
+  async function getContractDetails(contractId: number){
+    loadingDetails = contractId as unknown as string;
+    let deployment = await getGrid(profile, (grid) => grid.zos
+        .getDeployment({contractId})
+        .then((res) => res)
+        .catch((err) => {
+            console.log("Deployment Error", err);
+        }).finally(() => loadingDetails = null))
+    return deployment
+  }
   let message: string;
   function onDeleteHandler() {
     message = null;
@@ -218,6 +230,16 @@
             expiration,
           ]
         )}
+        actions={[
+          {
+            type: "info",
+            label: "Show JSON",
+            click: async (_, i) => contracts[i].type !== "node"? "" : (infoToShow = await getContractDetails(+contracts[i].id)),
+            disabled: (i) => contracts[i].type !== "node" || loadingDetails !== null,
+            loading: (i) => loadingDetails == contracts[i].id.toString(),
+            show: (i) => contracts[i].type === "node"? true : false,
+          }
+        ]}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
       />
@@ -278,6 +300,10 @@
     {/if}
   </div>
 </div>
+
+{#if infoToShow}
+  <Modal data={infoToShow} onlyJSON on:closed={() => (infoToShow = null)} />
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
