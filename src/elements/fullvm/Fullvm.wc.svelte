@@ -64,14 +64,14 @@
     symbol: "flist",
     type: "select",
     options: [
-      { label: "Ubuntu-18.04", value: "0", selected: true },
+      { label: "Ubuntu-18.04", value: "0" },
       { label: "Ubuntu-20.04", value: "1" },
-      { label: "Ubuntu-22.04", value: "2" },
+      { label: "Ubuntu-22.04", value: "2", selected: true },
       { label: "Other", value: "other" }
     ]
   };
   let selectedFlist: number = 0;
-  let flistSelectValue: string = "0";
+  let flistSelectValue: string = "2";
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
