@@ -1,0 +1,1 @@
+import './Polygon.wc.svelte';

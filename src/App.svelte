@@ -19,6 +19,7 @@
   import DeployedList from "./elements/DeployedList/DeployedList.wc.svelte";
   import ContractsList from "./elements/ContractsList/ContractsList.wc.svelte";
   import Algorand from "./elements/algorand/Algorand.wc.svelte"
+  import Polygon from "./elements/polygon/Polygon.wc.svelte";
 
   const weblets = [
     { name: "Full VM", cmp: Fullvm },
@@ -36,6 +37,7 @@
     { name: "Casperlabs", cmp: Casperlabs },
     { name: "NodePilot", cmp: NodePilot },
     { name: "Algorand", cmp: Algorand },
+    { name: "Polygon", cmp: Polygon },
     { name: "Deployed List", cmp: DeployedList },
     { name: "Contracts List", cmp: ContractsList },
   ];

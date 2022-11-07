@@ -1,9 +1,9 @@
-<svelte:options tag="tf-algorand" />
+<svelte:options tag="tf-polygon" />
 
 <script lang="ts">
-  import Algorand from "../../types/algorand";
+  import Polygon from "../../types/polygon";
   import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployAlgorand from "../../utils/deployAlgorand";
   import rootFs from "../../utils/rootFs";
 
@@ -18,11 +18,12 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonics, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import { getResources } from "../../utils/getAlgoResources";
+  import { getResources } from "../../utils/getPolyResources";
+ import deployPolygon from "../../utils/deployPolygon";
 
-  let data = new Algorand();
+  let data = new Polygon();
   let profile: IProfile;
 
   let loading = false;
@@ -42,7 +43,7 @@
     {
       label: "Name",
       symbol: "name",
-      placeholder: "Algorand Instance Name",
+      placeholder: "Polygon Instance Name",
       type: "text",
       validator: validateName,
       invalid: false,
@@ -68,8 +69,6 @@
       options: [
         { label: "Mainnet", value: "mainnet", selected: true },
         { label: "Testnet", value: "testnet" },
-        { label: "Betanet", value: "betanet" },
-        { label: "Devnet", value: "devnet" },
       ],
     },
     {
@@ -77,71 +76,8 @@
       type: "select",
       symbol: "nodeType",
       options: [
-        { label: "Default", value: "default", selected: true },
-        { label: "Participant", value: "participant" },
-        { label: "Relay", value: "relay" },
-        { label: "Indexer", value: "indexer" },
+        { label: "Bor", value: "bor", selected: true },
       ],
-    },
-  ];
-
-  const participantFields: IFormField[] = [
-    {
-      label: "Account Mnemonics",
-      symbol: "mnemonics",
-      placeholder: "Algorand Account Mnemonics",
-      type: "text",
-      validator: validateMnemonicsAlgorand,
-      invalid: false,
-    },
-    {
-      label: "First Round",
-      symbol: "firstRound",
-      placeholder: "First Validation Block",
-      type: "number",
-      invalid: false,
-    },
-    {
-      label: "Last Round",
-      symbol: "lastRound",
-      placeholder: "Last Validation Block",
-      type: "number",
-      invalid: false,
-    },
-  ];
-
-  const customCapacityFields: IFormField[] = [
-    {
-      label: "CPU (Cores)",
-      symbol: "cpu",
-      placeholder: "CPU Cores",
-      type: "text",
-      validator: () =>
-        validateAlgoCpu(data.cpu, data.nodeNetwork, data.nodeType),
-      invalid: false,
-    },
-    {
-      label: "Memory (MB)",
-      symbol: "memory",
-      placeholder: "Your Memory in MB",
-      type: "text",
-      validator: () =>
-        validateAlgoMemory(data.memory, data.nodeNetwork, data.nodeType),
-      invalid: false,
-    },
-    {
-      label: "Storage (GB)",
-      symbol: "rootSize",
-      placeholder: "Storage",
-      type: "text",
-      validator: () => {
-        return validateAlgoStorage(
-          data.rootSize,
-          data.nodeNetwork,
-          data.nodeType
-        );
-      },
-      invalid: false,
     },
   ];
 
@@ -159,7 +95,7 @@
   let message: string;
   let modalData: Object;
 
-  async function deployAlgorandHandler() {
+  async function deployPolygonHandler() {
     loading = true;
     success = false;
     failed = false;
@@ -173,7 +109,7 @@
       return;
     }
 
-    deployAlgorand(data, profile)
+    deployPolygon(data, profile)
       .then((data) => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
@@ -198,14 +134,13 @@
 />
 
 <div style="padding: 15px;">
-  <form class="box" on:submit|preventDefault={deployAlgorandHandler}>
-    <h4 class="is-size-4 mb-4">Deploy a Algorand Instance</h4>
+  <form class="box" on:submit|preventDefault={deployPolygonHandler}>
+    <h4 class="is-size-4 mb-4">Deploy a Polygon Instance</h4>
     <p>
-      Algorand (ALGO) is a blockchain platform and cryptocurrency designed to
-      function like a major payments processor.
+      Polygon (MATIC) is an Indian blockchain platform. It aims to create a multi-chain blockchain ecosystem compatible with Ethereum. As with Ethereum, it uses a Proof of Stake consensus model. 
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_algorand"
+        href=""
       >
         Quick start documentation</a
       >
@@ -213,18 +148,18 @@
 
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "Algorand")}
+    {#if loading || (logs !== null && logs.type === "Polygon")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
       <Alert
         type="success"
-        message="Successfully Deployed Algorand."
+        message="Successfully Deployed Polygon."
         deployed={true}
       />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Algorand."} />
+      <Alert type="danger" message={message || "Failed to Deploy Polygon."} />
     {:else}
       <Tabs bind:active {tabs} />
 
@@ -257,33 +192,7 @@
           {/if}
         {/each}
 
-        {#if data.nodeType == "participant"}
-          {#each participantFields as field (field.symbol)}
-            {#if field.invalid !== undefined}
-              <Input
-                bind:data={data[field.symbol]}
-                bind:invalid={field.invalid}
-                {field}
-              />
-            {:else}
-              <Input bind:data={data[field.symbol]} {field} />
-            {/if}
-          {/each}
-        {/if}
 
-        {#if data.customCapacity}
-          {#each customCapacityFields as field (field.symbol)}
-            {#if field.invalid !== undefined}
-              <Input
-                bind:data={data[field.symbol]}
-                bind:invalid={field.invalid}
-                {field}
-              />
-            {:else}
-              <Input bind:data={data[field.symbol]} {field} />
-            {/if}
-          {/each}
-        {/if}
 
         <SelectNodeId
           cpu={data.cpu}
