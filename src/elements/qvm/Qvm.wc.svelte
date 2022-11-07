@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
-  import QSFS , {QSFSnode} from "../../types/qsfs"
+  import QSFS  from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
   import type { IProfile } from "../../types/Profile";
@@ -44,7 +44,7 @@
   data.rootFs= 0;
 
   let qsfs = new QSFS();
-  let nodeValues: number[] = [];
+
   // prettier-ignore
   let baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false, disabled: true},
@@ -138,7 +138,6 @@
         loading = false;
       });
   }
-  let secret :string;
   function validateMountPoint({ id, mountpoint }: Disk) {
     const disks = data.disks;
     const valid = disks.reduce((v, disk) => {
@@ -270,17 +269,17 @@
         <Input bind:data={qsfs[field.symbol]} {field} />
       {/if}
     {/each}
-
+    {qsfs.qNodeIds.join(", ")}
     <SelectNodeId
     publicIp={null}
     cpu={null}
     multiSelect= {true}
     memory={qsfs.memory}
     ssd={null}
-    bind:nodeSelection={qsfs.selection.type}
-    bind:multiData={nodeValues}
+    nodeSelection={"automatic"}
+    bind:multiData={qsfs.qNodeIds}
     qsfscount={qsfs.nodes}
-    filters={qsfs.selection.filters}
+    filters={qsfs.filters}
     bind:status
     data={null}
     {profile}

@@ -15,8 +15,27 @@ export default class QSFS extends VM{
     public qMemory = 1024 * 8;
     public qCount: number = 3;
     public nodes: number =1;
-    public qNodeIds : QSFSnode[]=[];
+    public qNodeIds : number[]=[];
     public qPassword : string= undefined;
     public qSelection = new NodeID();
+    public filters = {
+      // boolean
+      publicIPs: null, // -
 
+      // string
+      country: null,
+      farmName: null, // *
+
+      // number
+      cru: null, // *
+      // mru: (this.qCount * this.memory)/this.nodes, // *
+      mru: null,
+      sru: null, // *
+
+      /* updater */
+      update: (key: string, value: any) => {
+        this.filters[key] = value;
+        // this.filters["mru"]=(this.qCount * this.memory)/this.nodes
+      },
+    }
   }

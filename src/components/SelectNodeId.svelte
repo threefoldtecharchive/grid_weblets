@@ -3,7 +3,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { IFormField, ISelectOption } from "../types";
-  import {QSFSnode} from '../types/qsfs'
   import type { IProfile } from "../types/Profile";
   import findNodes from "../utils/findNodes";
   import fetchFarms from "../utils/fetchFarms";
