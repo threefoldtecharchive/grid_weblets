@@ -1,41 +1,27 @@
 import { v4 } from "uuid";
 import NodeID from "./nodeId";
 import VM from "./vm";
-export class QSFSnode{ 
-  constructor(
-    public nodeId : number= undefined,
-    public status : string= undefined,
-    
-  ) {}
-}
-export default class QSFS extends VM{
-  
+export default class QSFS {
     public id = v4();
-    public qName = "QSFS" + this.id.split("-")[0];
-    public qMemory = 1024 * 8;
-    public qCount: number = 3;
+    public name = "QSFS" + this.id.split("-")[0];
+    public disk = 1024 ;
+    public cache = 1
+    public count: number = 3;
     public nodes: number =1;
-    public qNodeIds : number[]=[];
-    public qPassword : string= undefined;
-    public qSelection = new NodeID();
+    public nodeIds : number[]=[];
+    public secret : string;
     public filters = {
-      // boolean
-      publicIPs: null, // -
 
-      // string
-      country: null,
-      farmName: null, // *
-
-      // number
-      cru: null, // *
-      // mru: (this.qCount * this.memory)/this.nodes, // *
-      mru: null,
-      sru: null, // *
-
+      hru: Math.ceil(Math.round(this.disk / 1024)*(this.count)/(this.nodes)), 
       /* updater */
       update: (key: string, value: any) => {
-        this.filters[key] = value;
-        // this.filters["mru"]=(this.qCount * this.memory)/this.nodes
-      },
+        if(key ==="hru"&&this.nodes) {
+          this.filters["hru"] = Math.ceil(value*(this.count)/(this.nodes))
+          console.log(this.filters["hru"]);
+          }
+        else this.filters[key] = value;
+          
     }
   }
+
+}
