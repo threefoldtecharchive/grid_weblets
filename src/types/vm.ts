@@ -14,6 +14,7 @@ import {
 import type { DiskFullVm } from "./fullvm";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
+import type QSFS from "./qsfs";
 
 
 export class Env {
@@ -87,7 +88,10 @@ export default class VM {
 
     public selection = new NodeID(),
     public rootFs = 2,
-    public rootFsEditable = false
+    public rootFsEditable = false,
+
+    /* QSFS */
+    public qsfsDisk:QSFS = undefined,
   ) {}
 
   public get valid(): boolean {
