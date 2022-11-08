@@ -5,6 +5,7 @@
   import QSFS  from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
+  import deployQVM from '../../utils/deployQVM';
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -30,7 +31,6 @@
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
-  import { log } from "grid3_client";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -38,12 +38,9 @@
     { label: "QSFS", value: "qsfs" },
   ];
 
-  let data = new QSFS()
-  data.cpu = 1;
-  data.memory = 2048;
-  data.rootFs= 0;
-
+  let data = new VM();
   let qsfs = new QSFS();
+  let _disk = new Disk();
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -54,10 +51,10 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
  const qsfsFields: IFormField[] =[
-  { label: "Name", symbol: "qsfsName", placeholder: "Enter QSFS name", type: "text", validator:validateName, invalid: false},
+  { label: "Name", symbol: "name", placeholder: "Enter QSFS name", type: "text", validator:validateName, invalid: false},
   { label: "Secret", symbol: "secret", placeholder: "Enter QSFS secret", type: "password", invalid: false },
-  { label: "Count", symbol: "qsfsCount", placeholder: "How many ZDBs needed?", type: "number", min:3, invalid: false},
-  { label: "Memory (GB) ", symbol: "memory", placeholder: "Memory of each ZDB in GB", type: "number",invalid: false},
+  { label: "Count", symbol: "count", placeholder: "How many ZDBs needed?", type: "number", min:3, invalid: false},
+  { label: "Disk size (MB) ", symbol: "disk", placeholder: "Memory of each ZDB in MB", type: "number",invalid: false},
   { label: "Number of Nodes", symbol: "nodes", placeholder: "Number of Nodes to deploy on", type: "number",invalid: false},
   ];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
@@ -88,15 +85,14 @@
   let modalData: Object;
   let status: "valid" | "invalid";
 
-  // QSFS DISKS ARE HANDELED IN THE GRID
-  // function _isInvalidDisks() {
-  //   const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
-  //   const mountSet = new Set(mounts);
+  function _isInvalidDisks() {
+    const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
+    const mountSet = new Set(mounts);
 
-  //   const names = data.disks.map(({ name }) => name.trim());
-  //   const nameSet = new Set(names);
-  //   return mounts.length !== mountSet.size || names.length !== nameSet.size;
-  // }
+    const names = data.disks.map(({ name }) => name.trim());
+    const nameSet = new Set(names);
+    return mounts.length !== mountSet.size || names.length !== nameSet.size;
+  }
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -107,37 +103,58 @@
     invalid: false,
   };
 
+  $:{
+  _disk.id =qsfs.id;
+  _disk.name =qsfs.name;
+  _disk.size= qsfs.cache;
+}
   async function onDeployVM() {
+    
+    console.log("diskk : ",_disk.name)
+    data.disks=[...data.disks,_disk]
+    console.log(data)
+    //deployQVM(qsfs,profile,data)
+    // if (flistSelectValue === "other") {
+    //   validateFlist.loading = true;
+    //   validateFlist.error = null;
 
-    loading = true;
+    //   if (await isInvalidFlist(data.flist)) {
+    //     validateFlist.loading = false;
+    //     validateFlist.error = "Invalid Flist URL.";
+    //     return;
+    //   }
+    // }
 
-    if (!hasEnoughBalance()) {
-      failed = true;
-      loading = false;
-      message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
-      return;
-    }
+    // loading = true;
 
-    success = false;
-    failed = false;
-    message = undefined;
+    // if (!hasEnoughBalance()) {
+    //   failed = true;
+    //   loading = false;
+    //   message =
+    //     "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+    //   return;
+    // }
 
-    deployVM(data, profile, "VM")
-      .then((data) => {
-        deploymentStore.set(0);
-        success = true;
-        modalData = data;
-      })
-      .catch((err: Error) => {
-        failed = true;
-        message = typeof err === "string" ? err : err.message;
-      })
-      .finally(() => {
-        validateFlist.loading = false;
-        loading = false;
-      });
+    // success = false;
+    // failed = false;
+    // message = undefined;
+
+    // deployVM(data, profile, "VM")
+    //   .then((data) => {
+    //     deploymentStore.set(0);
+    //     success = true;
+    //     modalData = data;
+    //   })
+    //   .catch((err: Error) => {
+    //     failed = true;
+    //     message = typeof err === "string" ? err : err.message;
+    //   })
+    //   .finally(() => {
+    //     validateFlist.loading = false;
+    //     loading = false;
+    //   });
   }
+
   function validateMountPoint({ id, mountpoint }: Disk) {
     const disks = data.disks;
     const valid = disks.reduce((v, disk) => {
@@ -256,6 +273,7 @@
             </div>
           {/each}
         </div>
+    <!-- qsfs field-->
       {:else if active === "qsfs"}
       {#each qsfsFields as field (field.symbol)}
       {#if field.invalid !== undefined}
@@ -265,32 +283,44 @@
           {field}
         />
         
+      
+        
       {:else}
         <Input bind:data={qsfs[field.symbol]} {field} />
       {/if}
     {/each}
-    {qsfs.qNodeIds.join(", ")}
+    {#each _disk.diskFields as field (field.symbol)}
+      {#if field.symbol === "mountpoint"}
+        <Input
+          bind:data={_disk[field.symbol]}
+          field={{
+            ...field,
+            error:
+              !field.invalid && !field.error
+                ? validateMountPoint(_disk)
+                : null,
+          }}
+        />
+      {/if}
+    {/each}
+
+
     <SelectNodeId
+    memory={null}
     publicIp={null}
     cpu={null}
-    multiSelect= {true}
-    memory={qsfs.memory}
+    multiple= {qsfs.nodes}
+    disk={qsfs.disk}
     ssd={null}
-    nodeSelection={"automatic"}
-    bind:multiData={qsfs.qNodeIds}
-    qsfscount={qsfs.nodes}
     filters={qsfs.filters}
-    bind:status
-    data={null}
     {profile}
-    on:fetch={({ detail }) => (qsfs.selection.nodes = detail)}
-    nodes={qsfs.selection.nodes}
-  /> 
-
+    on:multiple={e=>qsfs.nodeIds=e.detail}
+  />  
+  <!-- on:fetch={({ detail }) => (qsfs.selection.nodes = detail)} -->
 
       {/if}
     {/if}
-    
+
     <DeployBtn
       disabled={disabled || validateFlist.loading}
       loading={loading || validateFlist.loading}
