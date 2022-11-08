@@ -270,3 +270,7 @@ export function validateAlgoStorage(value: string, net, type): string | void {
   if (+value > storage+200)
     return `Maximum Storage for this deployment is ${storage+200}.`;
 }
+
+export function validateQsfsSecret(value: string): string | void{
+  if (!value.length) return `zDB password is re`
+}

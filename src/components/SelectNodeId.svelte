@@ -19,6 +19,7 @@
   }>();
   export let cpu: number;
   export let memory: number;
+  export let disk: number= undefined;
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number = undefined;
@@ -75,6 +76,7 @@
     if (filters) {
       if (cpu) filters.update("cru", cpu);
       if (memory) filters.update("mru", Math.round(memory / 1024));
+      if (disk) filters.update("hru", Math.round(disk / 1024));
       if (ssd) filters.update("sru", ssd);
       filters.update("publicIPs", publicIp);
     }
@@ -92,6 +94,7 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
+      hru: filters.hru,
       availableFor: $configs.twinId,
     };
 
@@ -332,6 +335,7 @@
   let _memory = memory;
   let _ssd = ssd;
   let _publicIp = publicIp;
+  let _disk= disk;
 
   const _reset = () => {
     requestAnimationFrame(() => {
@@ -350,6 +354,7 @@
     else if (_memory !== memory) _memory = memory;
     else if (_ssd !== ssd) _ssd = ssd;
     else if (_publicIp !== publicIp) _publicIp = publicIp;
+    else if (_disk !== disk) _disk = disk;
     else _update = false;
 
     if (_update) _reset();
@@ -413,6 +418,7 @@
     </div>
 
     {#if nodeIds.length < multiple}
+    {JSON.stringify(nodeIdSelectField.options)}
       <Input
         bind:data={multiData}
         field={{
@@ -423,6 +429,7 @@
             (f) => !nodeIds.includes(+f.value)
           ),
         }}
+        
         on:input={(e) => {
           const select = e.detail.target;
           const selectedNodeId = +select.options[select.selectedIndex].value;
