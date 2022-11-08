@@ -17,12 +17,13 @@ const DISK_MOUNT_POINT: string = "/disk";
 
 const VM_USE_PLANETARY: boolean = true;
 const VM_USE_PUBLIC_IP: boolean = false;
+const VM_USE_PUBLIC_IPV6: boolean = true;
 const VM_CPU_COUNT: number = 1;
 const VM_MEMORY_COUNT: number = 1024 * 2;
 const VM_ROOT_FS_SIZE: number = 0;
 const VM_ENTRY_POINT: string = "/sbin/zinit init";
 const VM_FLIST =
-  "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-ssh-latest.flist";
+  "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist";
 const VM_ROOT_FS_EDITABLE = false;
 
 export class Env {
@@ -58,6 +59,7 @@ export default class FreeFlow {
     public nodeId: number = null,
     public network = new Network(NETWORK_NAME, IP_RANGE),
     public publicIp = VM_USE_PUBLIC_IP,
+    public publicIpv6 = VM_USE_PUBLIC_IPV6,
     public selection = new NodeID(),
     public rootFs = VM_ROOT_FS_SIZE,
     public rootFsEditable = VM_ROOT_FS_EDITABLE

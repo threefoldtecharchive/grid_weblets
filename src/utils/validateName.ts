@@ -15,13 +15,14 @@ const URL_REGEX =
   /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-const MNEMONICS_LENGTH_REGEX= /^(?:\s*\S+(?:\s+\S+){24})?\s*$/;
+const MNEMONICS_LENGTH_REGEX = /^(?:\s*\S+(?:\s+\S+){24})?\s*$/;
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
 const SSH_REGEX =
   /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
 
-const ENDPOINT_REGEX = /^((?:wss):\/\/)(([a-z0-9-]+[.][a-z]){1,3}([a-z-/]?[:^\w\s]){1,10})$/;
+const ENDPOINT_REGEX =
+  /^((?:wss):\/\/)(([a-z0-9-]+[.][a-z]){1,3}([a-z-/]?[:^\w\s]){1,10})$/;
 
 // prettier-ignore
 export default function validateName(name: string): string | void {
@@ -36,10 +37,13 @@ export function validateMnemonics(mnemonics: string): string | void {
     return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
 }
 
-export const  validateThreeBotName = (name: string): string | void => {
+export const validateThreeBotName = (name: string): string | void => {
   if (name.length < 2) return "Name must be at least 2 characters";
-  if (!ALPHA_ONLY_REGEX.test(name[0])) return "Name can't start with a number, a non-alphanumeric character or a whitespace.";
-  if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
+  if (!ALPHA_ONLY_REGEX.test(name[0]))
+    return "Name can't start with a number, a non-alphanumeric character or a whitespace.";
+  if (!NAME_REGEX.test(name))
+    return "Name can only include alphanumeric characters.";
+};
 
 export function validateMnemonicsAlgorand(mnemonics: string): string | void {
   if (!mnemonics.length) return "Mnemonics required";
@@ -172,7 +176,8 @@ export function validateToken(token: string): string | void {
 }
 
 export function validateIPRange(value: string): string | void {
-  const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+  const IPv4SegmentFormat =
+    "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
   const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
   const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
   if (!ipRegex.test(value)) {
@@ -253,25 +258,24 @@ export function validateethereumRpc(value: string): string | void {
 export function validateAlgoCpu(value: string, net, type): string | void {
   let [cpu, memory, storage] = getResources(net, type);
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "CPU must be a valid number.";
+    return "CPU must be a valid number.";
   if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}.`;
   if (+value > 32) return "Maximum allowed CPU cores is 32.";
-
 }
 export function validateAlgoMemory(value: string, net, type): string | void {
   let [cpu, memory, storage] = getResources(net, type);
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "Memory must be a valid number.";
-  if (+value < memory) return `Minimum Memory for this deployment is ${memory}.`;
+    return "Memory must be a valid number.";
+  if (+value < memory)
+    return `Minimum Memory for this deployment is ${memory}.`;
   if (+value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
-
 }
 export function validateAlgoStorage(value: string, net, type): string | void {
   let [cpu, memory, storage] = getResources(net, type);
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "Storage must be a valid number.";
+    return "Storage must be a valid number.";
   if (+value < storage)
     return `Minimum Storage for this deployment is ${storage}`;
-  if (+value > storage+200)
-    return `Maximum Storage for this deployment is ${storage+200}.`;
+  if (+value > storage + 200)
+    return `Maximum Storage for this deployment is ${storage + 200}.`;
 }

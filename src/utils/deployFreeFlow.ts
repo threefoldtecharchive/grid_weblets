@@ -21,7 +21,7 @@ export default async function deployFreeFlow(
   let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
-  const yggdrasilIp = <string>deploymentInfo["planetary"];
+  const yggdrasilIp = <string>deploymentInfo["publicIP"]["ip6"].split("/")[0];
 
   try {
     await deployPrefixGateway(profile, domainName, yggdrasilIp, publicNodeId);
@@ -36,7 +36,7 @@ export default async function deployFreeFlow(
 async function deployFreeFlowVm(profile: IProfile, data: FreeFlow) {
   const { envs, disks, ...base } = data;
   const { vmName, flist, cpu, memory, entrypoint, network, rootFs } = base;
-  const { publicIp, planetary, nodeId } = base;
+  const { publicIp, planetary, nodeId, publicIpv6 } = base;
 
   const vm = new MachineModel();
   vm.name = vmName;
@@ -49,6 +49,7 @@ async function deployFreeFlowVm(profile: IProfile, data: FreeFlow) {
   vm.cpu = cpu;
   vm.planetary = planetary;
   vm.public_ip = publicIp;
+  vm.public_ip6 = publicIpv6;
 
   vm.env = createEnvs(envs);
 
@@ -78,7 +79,7 @@ async function deployFreeFlowVm(profile: IProfile, data: FreeFlow) {
 async function deployPrefixGateway(
   profile: IProfile,
   domainName: string,
-  backendPlanetaryIp: string,
+  ip6: string,
   publicNodeId: number
 ) {
   const { GatewayNameModel } = window.configs.grid3_client;
@@ -88,7 +89,7 @@ async function deployPrefixGateway(
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
-  gw.backends = [`http://[${backendPlanetaryIp}]`];
+  gw.backends = [`http://[${ip6}]`];
 
   const metadata = {
     type: "gateway",
