@@ -7,7 +7,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 
 const CAPROVER_FLIST =
-  "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
+  "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist";
 
 export default async function deployCaprover(
   data: Caprover,
