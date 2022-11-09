@@ -40,7 +40,7 @@ export function validateMnemonics(mnemonics: string): string | void {
 export function validateMnemonicsAlgorand(mnemonics: string): string | void {
   if (!mnemonics.length) return "Mnemonics required";
   if (!MNEMONICS_LENGTH_REGEX.test(mnemonics))
-    return "Mnemonics should be 25 words and shouldn't contain alphanumeric characters.";
+    return "Mnemonics should be 25 words and should contain alphabetic characters with only one space between the words.";
 
 }
 export function validateEmail(email: string): string | void {
