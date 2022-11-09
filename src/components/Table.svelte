@@ -107,60 +107,75 @@
 
             {#if actions.length}
               <td>
-                {#each actions as { type, label, click, disabled, loading }}
-                  {#if label == "Show Details"}
-                    <span
-                      title={label}
-                      class={"icon " +
-                        (loading && loading(idx) ? " is-loading" : "")}
-                      on:click={(e) => click(e, idx)}
-                      disabled={disabled ? disabled(idx) : false}
-                    >
-                      <i class="fa-solid fa-eye" />
-                    </span>
-                  {:else if label == "Visit"}
-                    <span
-                      title={label}
-                      class={"icon " +
-                        (loading && loading(idx) ? " is-loading" : "")}
-                      on:click={(e) => click(e, idx)}
-                      disabled={disabled ? disabled(idx) : false}
-                    >
-                      <i class="fa-solid fa-globe" />
-                    </span>
-                  {:else if label == "Admin Panel"}
-                    <span
-                      title={label}
-                      class={"icon " +
-                        (loading && loading(idx) ? " is-loading" : "")}
-                      on:click={(e) => click(e, idx)}
-                      disabled={disabled ? disabled(idx) : false}
-                    >
-                      <i class="fa-solid fa-user-gear" />
-                    </span>
-                  {:else if label == "Manage Workers"}
-                    <span
-                      title={label}
-                      class={"icon " +
-                        (loading && loading(idx) ? " is-loading" : "")}
-                      on:click={(e) => click(e, idx)}
-                      disabled={disabled ? disabled(idx) : false}
-                    >
-                      <i class="fa-solid fa-gears" />
-                    </span>
-                  {:else if label == "Delete"}
-                    <span
-                      title={label}
-                      class={"icon " +
-                        type +
-                        (loading && loading(idx) ? " is-loading" : "")}
-                      on:click={(e) => click(e, idx)}
-                      disabled={disabled ? disabled(idx) : false}
-                    >
-                      <i class="fa-solid fa-trash-can" />
-                    </span>
-                  {/if}
+                {#each actions as { type, label, click, disabled, loading, show }}
+                    {#if label == "Show Details"}
+                      <span
+                        title={label}
+                        class={"icon " +
+                          (loading && loading(idx) ? " is-loading" : "")}
+                        on:click={(e) => click(e, idx)}
+                        disabled={disabled ? disabled(idx) : false}
+                      >
+                        <i class="fa-solid fa-eye" />
+                      </span>
+                    {:else if label == "Visit"}
+                      <span
+                        title={label}
+                        class={"icon " +
+                          (loading && loading(idx) ? " is-loading" : "")}
+                        on:click={(e) => click(e, idx)}
+                        disabled={disabled ? disabled(idx) : false}
+                      >
+                        <i class="fa-solid fa-globe" />
+                      </span>
+                    {:else if label == "Admin Panel"}
+                      <span
+                        title={label}
+                        class={"icon " +
+                          (loading && loading(idx) ? " is-loading" : "")}
+                        on:click={(e) => click(e, idx)}
+                        disabled={disabled ? disabled(idx) : false}
+                      >
+                        <i class="fa-solid fa-user-gear" />
+                      </span>
+                    {:else if label == "Manage Workers"}
+                      <span
+                        title={label}
+                        class={"icon " +
+                          (loading && loading(idx) ? " is-loading" : "")}
+                        on:click={(e) => click(e, idx)}
+                        disabled={disabled ? disabled(idx) : false}
+                      >
+                        <i class="fa-solid fa-gears" />
+                      </span>
+
+                    {:else if label == "Show JSON"}
+                      {#if show(idx) !== false}
+                        <button
+                        class={"button " + (loading && loading(idx) ? "is-loading" : "")}
+                        style={`background-color: #1982b1; color: white`}
+                        on:click={(e) => click(e, idx)}
+                        disabled={disabled ? disabled(idx) : false}>Show Details</button>
+                      {:else}
+                        <p style="text-align: left;">-</p>
+                      {/if}
+
+                    {:else if label == "Delete"}
+                      <span
+                        title={label}
+                        class={"icon " +
+                          type +
+                          (loading && loading(idx) ? " is-loading" : "")}
+                        on:click={(e) => click(e, idx)}
+                        disabled={disabled ? disabled(idx) : false}
+                      >
+                        <i class="fa-solid fa-trash-can" />
+                      </span>
+                    {/if}
+
+
                 {/each}
+
               </td>
             {/if}
           </tr>
