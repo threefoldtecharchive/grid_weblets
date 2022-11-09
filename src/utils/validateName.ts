@@ -15,7 +15,8 @@ const URL_REGEX =
   /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-const MNEMONICS_LENGTH_REGEX= /^(?:\s*\S+(?:\s+\S+){24})?\s*$/;
+const MNEMONICS_LENGTH_REGEX= /^([a-zA-Z]+\s){24}[a-zA-Z]+$/;
+
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
 const SSH_REGEX =
@@ -38,12 +39,10 @@ export function validateMnemonics(mnemonics: string): string | void {
 
 export function validateMnemonicsAlgorand(mnemonics: string): string | void {
   if (!mnemonics.length) return "Mnemonics required";
-  if (!ALPHA_ONLY_REGEX.test(mnemonics))
-    return "Mnemonics are can only be composed of a non-alphanumeric character or a whitespace.";
   if (!MNEMONICS_LENGTH_REGEX.test(mnemonics))
-    return "Mnemonics should be 25 words";
-}
+    return "Mnemonics should be 25 words and should contain alphabetic characters with only one space between the words.";
 
+}
 export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
 }
