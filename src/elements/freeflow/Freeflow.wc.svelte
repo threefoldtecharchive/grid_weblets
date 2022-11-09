@@ -1,7 +1,5 @@
 <svelte:options tag="tf-freeflow"/>
 
-<SelectProfile on:profile={({ detail }) => (profile = detail)}/>
-
 <script lang="ts">
     import SelectProfile from "../../components/SelectProfile.svelte";
     import Input from "../../components/Input.svelte";
