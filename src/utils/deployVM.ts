@@ -34,14 +34,15 @@ export default async function deployVM(
   
 /*QSFS*/
   if(qsfsDisk){
-  
-    qsfs.name = "3mora";
+    
+    qsfs.name = qsfsDisk.name;
     qsfs.cache= qsfsDisk.cache;
     qsfs.mountpoint= qsfsDisk.mountpoint;
     qsfs.encryption_key= "3mora"
     qsfs.prefix="3mora";
     qsfs.qsfs_zdbs_name= qsfsDisk.name;
-
+    console.log("diskmodel in vm :")
+    console.log(qsfs)
     //add qsfs to vm
     vm.qsfs_disks = [qsfs]
     }

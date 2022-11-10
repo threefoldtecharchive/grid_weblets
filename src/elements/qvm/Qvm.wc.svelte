@@ -5,8 +5,8 @@
   import QSFS  from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
-  import deployQVM, { get_qsfs } from '../../utils/deployQVM';
-  import {delete_qsfs} from '../../utils/deployQVM'
+import deployQVM from '../../utils/deployQVM';
+  // import {delete_qsfs} from '../../utils/deployQVM'
   import type { IProfile } from "../../types/Profile";
 
   // Components

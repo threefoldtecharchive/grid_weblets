@@ -37,6 +37,7 @@ export default function deployQvm(
             qsfs.disk_size= filters.hru;
            
     try {
+        
        return deploy(profile, "QSFS", qsfs.name, async(grid) =>{  
             
             await checkVMExist(grid, "QSFS", name);
@@ -45,7 +46,15 @@ export default function deployQvm(
             .deploy(qsfs)
             .then(() => grid.qsfs_zdbs.get({name:name}))
             .then( 
-                ([qsfs]) => {
+                async ([qsfs]) => {
+                    const qsfsZdbs = await grid.qsfs_zdbs.getZdbs(name);
+                    console.log("===========================qsfs zdbz =================================")
+                    console.log(qsfsZdbs)
+                    console.log("===========================qsfs groups =================================")
+                    console.log(qsfsZdbs.groups)
+                    console.log("===========================qsfs meta =================================")
+                    console.log(qsfsZdbs.meta)
+                    console.log("===========================qsfs  =================================")
                     console.log(qsfs)
                     return deployVM(vm,profile,"Qvm")
                     .then((vm)=> vm )
