@@ -271,5 +271,12 @@ export function validateAlgoStorage(value: string, net, type): string | void {
 }
 
 export function validateQsfsSecret(value: string): string | void{
-  if (!value.length) return `zDB password is re`
+  if (!value.length) return `zDB password is required`
+}
+
+export function validateZdbCount(value:number): string| void{
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
+  return "zDB count must be a valid number.";
+  else if(value < 3) return `Minimum allowed zDB is 3 zDBs`;
+  
 }

@@ -12,10 +12,12 @@ export default async function deployVM(
   profile: IProfile,
   type: IStore["type"]
 ) {
-  const { MachineModel, MachinesModel } = window.configs.grid3_client;
-  const { envs, disks, rootFs, ...base } = data;
+  const { MachineModel, MachinesModel, QSFSDiskModel } = window.configs.grid3_client;
+  const { envs, disks, rootFs, qsfsDisk, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, publicIp6 } = base;
+  const qsfs= new QSFSDiskModel
+  /*QSFS*/
 
   const vm = new MachineModel();
   vm.name = name;
@@ -30,6 +32,21 @@ export default async function deployVM(
   vm.flist = flist;
   vm.entrypoint = entrypoint;
   vm.env = type == "VM" ?createEnvs(envs) :{SSH_KEY: profile.sshKey,};
+  
+
+  if(qsfsDisk){
+  
+    qsfs.name = `${qsfsDisk.name}`;
+    qsfs.cache= qsfsDisk.cache;
+    qsfs.mountpoint= qsfsDisk.mountpoint;
+    qsfs.encryption_key= "3mora"
+    qsfs.prefix="3mora";
+    qsfs.qsfs_zdbs_name= qsfsDisk.name;
+
+    //add qsfs to vm
+    vm.qsfs_disks = [qsfs]
+    }
+
 
   const vms = new MachinesModel();
   vms.name = name;

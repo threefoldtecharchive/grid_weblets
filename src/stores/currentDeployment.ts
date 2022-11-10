@@ -21,7 +21,8 @@ export interface IStore {
   | "Casperlabs"
   | "NodePilot"
   | "Fullvm"
-  | "Algorand";
+  | "Algorand"
+  | "Qvm";
   name: string;
   message: string;
 }
