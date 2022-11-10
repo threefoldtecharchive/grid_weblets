@@ -112,54 +112,57 @@
 
 
   async function onDeployVM() {
-    let grid = await getGrid(profile, (grid) => grid, false);
-    const reslog = await grid.qsfs_zdbs.list();
-    reslog.forEach( async e => await grid.qsfs_zdbs.delete({name:e}))
-    const reslog1 = await grid.qsfs_zdbs.list();
-    console.log(reslog1)
-    // data.qsfsDisk= qsfs;
-    // console.log(data.qsfsDisk)
-    // if (flistSelectValue === "other") {
-    //   validateFlist.loading = true;
-    //   validateFlist.error = null;
+    // let grid = await getGrid(profile, (grid) => grid, false);
+    // const reslog = await grid.qsfs_zdbs.list();
+    // reslog.forEach( async e =>
+    //  {await grid.qsfs_zdbs.delete({name:e})
+    //   console.log("======================  "+e)  
+    // })
+    // const reslog1 = await grid.qsfs_zdbs.list();
+    // console.log(reslog1)
+    data.qsfsDisk= qsfs;
+    console.log(data.qsfsDisk)
+    if (flistSelectValue === "other") {
+      validateFlist.loading = true;
+      validateFlist.error = null;
 
-    //   if (await isInvalidFlist(data.flist)) {
-    //     validateFlist.loading = false;
-    //     validateFlist.error = "Invalid Flist URL.";
-    //     return;
-    //   }
-    // }
+      if (await isInvalidFlist(data.flist)) {
+        validateFlist.loading = false;
+        validateFlist.error = "Invalid Flist URL.";
+        return;
+      }
+    }
 
-    // loading = true;
+    loading = true;
 
-    // if (!hasEnoughBalance()) {
-    //   failed = true;
-    //   loading = false;
-    //   message =
-    //     "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
-    //   return;
-    // }
+    if (!hasEnoughBalance()) {
+      failed = true;
+      loading = false;
+      message =
+        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      return;
+    }
 
-    // success = false;
-    // failed = false;
-    // message = undefined;
+    success = false;
+    failed = false;
+    message = undefined;
 
   
    
-    // deployQVM(data, qsfs,profile)
-    //   .then((data) => {
-    //     deploymentStore.set(0);
-    //     success = true;
-    //     modalData = data;
-    //   })
-    //   .catch((err: Error) => {
-    //     failed = true;
-    //     message = typeof err === "string" ? err : err.message;
-    //   })
-    //   .finally(() => {
-    //     validateFlist.loading = false;
-    //     loading = false;
-    //   });
+    deployQVM(data, qsfs,profile)
+      .then((data) => {
+        deploymentStore.set(0);
+        success = true;
+        modalData = data;
+      })
+      .catch((err: Error) => {
+        failed = true;
+        message = typeof err === "string" ? err : err.message;
+      })
+      .finally(() => {
+        validateFlist.loading = false;
+        loading = false;
+      });
       
   }
 

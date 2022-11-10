@@ -38,16 +38,20 @@ export default function deployQvm(
            
     try {
        return deploy(profile, "QSFS", qsfs.name, async(grid) =>{  
-            return grid.qsfs_zdbs.deploy(qsfs)
-            .then(
-                async() =>{
-                     const reslog = await grid.qsfs_zdbs.get(qsfs);
-                     log(reslog)
-                     log(">>>>>>>>>>>>>>>QSFS backend result<<<<<<<<<<<<<<<");
-                     
-                     console.log(vm.qsfsDisk) 
-                    deployVM(vm,profile,"Qvm")
-            })
+            
+            await checkVMExist(grid, "QSFS", name);
+
+            return grid.qsfs_zdbs
+            .deploy(qsfs)
+            .then(() => grid.qsfs_zdbs.get({name:name}))
+            .then( 
+                ([qsfs]) => {
+                    console.log(qsfs)
+                    return deployVM(vm,profile,"Qvm")
+                    .then((vm)=> vm )
+                }
+            )
+    
         })
         }catch(err){
             getGrid(profile, (grid) => grid, false)
