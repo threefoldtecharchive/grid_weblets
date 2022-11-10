@@ -101,6 +101,7 @@
     findNodes(_filters, profile, exclusiveFor)
       .then((_nodes) => {
         dispatch("fetch", _nodes);
+        nodes = _nodes; // fix issue 
         if (_nodes.length <= 0) {
           data = null;
           status = null;
@@ -109,7 +110,7 @@
           dispatch("multiple", nodeIds);
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
-          nodes = _nodes;
+          
           data = +_nodes[0].value;
           status = "valid";
         } else {
@@ -418,11 +419,11 @@
     </div>
 
     {#if nodeIds.length < multiple}
-    {JSON.stringify(nodeIdSelectField.options)}
+    
       <Input
         bind:data={multiData}
         field={{
-          label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+          label: `Node ID (Found ${nodes.length})`,
           type: "select",
           symbol: "nodeId",
           options: nodeIdSelectField.options.filter(

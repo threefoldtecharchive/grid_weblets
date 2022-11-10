@@ -22,7 +22,8 @@ export interface IStore {
   | "NodePilot"
   | "Fullvm"
   | "Algorand"
-  | "Qvm";
+  | "Qvm"
+  | "QSFS"
   name: string;
   message: string;
 }

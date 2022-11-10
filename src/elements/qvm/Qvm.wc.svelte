@@ -5,7 +5,8 @@
   import QSFS  from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
-  import deployQVM from '../../utils/deployQVM';
+  import deployQVM, { get_qsfs } from '../../utils/deployQVM';
+  import {delete_qsfs} from '../../utils/deployQVM'
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -22,15 +23,20 @@
   import validateName, {
     isInvalid,
     validateCpu,
+    validateDiskName,
     validateEntryPoint,
     validateFlistvalue,
     validateKey,
     validateKeyValue,
     validateMemory,
+    validateMountPoint,
+    validateQsfsSecret,
+    validateZdbCount
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
+  import getGrid from "../../utils/getGrid";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -40,7 +46,7 @@
 
   let data = new VM();
   let qsfs = new QSFS();
-  let _disk = new Disk();
+
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -51,11 +57,12 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
  const qsfsFields: IFormField[] =[
-  { label: "Name", symbol: "name", placeholder: "Enter QSFS name", type: "text", validator:validateName, invalid: false},
-  { label: "Secret", symbol: "secret", placeholder: "Enter QSFS secret", type: "password", invalid: false },
-  { label: "Count", symbol: "count", placeholder: "How many ZDBs needed?", type: "number", min:3, invalid: false},
-  { label: "Disk size (MB) ", symbol: "disk", placeholder: "Memory of each ZDB in MB", type: "number",invalid: false},
+  { label: "Name", symbol: "name", placeholder: "Enter QSFS name", type: "text", validator:validateName&&validateDiskName, invalid: false},
+  { label: "Secret", symbol: "secret", placeholder: "Enter QSFS secret", type: "password", validator:validateQsfsSecret },
+  { label: "Count", symbol: "count", placeholder: "How many ZDBs needed?", type: "number", validator:validateZdbCount, invalid: false},
+  { label: "Disk size (MB) ", symbol: "disk", placeholder: "Memory of each ZDB in MB", type: "number",validator:validateMemory,invalid: false},
   { label: "Number of Nodes", symbol: "nodes", placeholder: "Number of Nodes to deploy on", type: "number",invalid: false},
+  { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text",  validator:validateMountPoint, invalid: false}
   ];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
  
@@ -93,8 +100,8 @@
     const nameSet = new Set(names);
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
-
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
+  $: console.log(qsfs.filters.hru)
+  $: disabled = ((loading || !data.valid || !qsfs.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields,...qsfsFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -103,17 +110,15 @@
     invalid: false,
   };
 
-  $:{
-  _disk.id =qsfs.id;
-  _disk.name =qsfs.name;
-  _disk.size= qsfs.cache;
-}
+
   async function onDeployVM() {
-    
-    console.log("diskk : ",_disk.name)
-    data.disks=[...data.disks,_disk]
-    console.log(data)
-    //deployQVM(qsfs,profile,data)
+    let grid = await getGrid(profile, (grid) => grid, false);
+    const reslog = await grid.qsfs_zdbs.list();
+    reslog.forEach( async e => await grid.qsfs_zdbs.delete({name:e}))
+    const reslog1 = await grid.qsfs_zdbs.list();
+    console.log(reslog1)
+    // data.qsfsDisk= qsfs;
+    // console.log(data.qsfsDisk)
     // if (flistSelectValue === "other") {
     //   validateFlist.loading = true;
     //   validateFlist.error = null;
@@ -139,7 +144,9 @@
     // failed = false;
     // message = undefined;
 
-    // deployVM(data, profile, "VM")
+  
+   
+    // deployQVM(data, qsfs,profile)
     //   .then((data) => {
     //     deploymentStore.set(0);
     //     success = true;
@@ -153,25 +160,10 @@
     //     validateFlist.loading = false;
     //     loading = false;
     //   });
+      
   }
 
-  function validateMountPoint({ id, mountpoint }: Disk) {
-    const disks = data.disks;
-    const valid = disks.reduce((v, disk) => {
-      if (disk.id === id) return v;
-      return v && disk.mountpoint.replaceAll("/", "") !== mountpoint.replaceAll("/", ""); // prettier-ignore
-    }, true);
-    return valid ? null : "Disks can't have duplicated mountpoint.";
-  }
 
-  function validateDiskName({ id, name }: Disk) {
-    if (!name) return "Disk name is required";
-    const valid = data.disks.reduce((v, disk) => {
-      if (disk.id === id) return v;
-      return v && disk.name.trim() !== name.trim();
-    }, true);
-    return valid ? null : "Disks can't have duplicated name.";
-  }
 
   $: logs = $currentDeployment;
 </script>
@@ -287,20 +279,6 @@
         
       {:else}
         <Input bind:data={qsfs[field.symbol]} {field} />
-      {/if}
-    {/each}
-    {#each _disk.diskFields as field (field.symbol)}
-      {#if field.symbol === "mountpoint"}
-        <Input
-          bind:data={_disk[field.symbol]}
-          field={{
-            ...field,
-            error:
-              !field.invalid && !field.error
-                ? validateMountPoint(_disk)
-                : null,
-          }}
-        />
       {/if}
     {/each}
 

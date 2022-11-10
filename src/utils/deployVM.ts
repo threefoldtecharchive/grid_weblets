@@ -17,7 +17,6 @@ export default async function deployVM(
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, publicIp6 } = base;
   const qsfs= new QSFSDiskModel
-  /*QSFS*/
 
   const vm = new MachineModel();
   vm.name = name;
@@ -33,10 +32,10 @@ export default async function deployVM(
   vm.entrypoint = entrypoint;
   vm.env = type == "VM" ?createEnvs(envs) :{SSH_KEY: profile.sshKey,};
   
-
+/*QSFS*/
   if(qsfsDisk){
   
-    qsfs.name = `${qsfsDisk.name}`;
+    qsfs.name = "3mora";
     qsfs.cache= qsfsDisk.cache;
     qsfs.mountpoint= qsfsDisk.mountpoint;
     qsfs.encryption_key= "3mora"
