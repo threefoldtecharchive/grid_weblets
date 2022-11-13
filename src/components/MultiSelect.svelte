@@ -17,7 +17,7 @@
 
   let input: HTMLInputElement;
   let filter = "";
-  export let active = false;
+  let active = false;
 
   function getLabel(value: any): string {
     for (const label in options) {

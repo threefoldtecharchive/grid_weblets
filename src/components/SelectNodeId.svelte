@@ -39,7 +39,6 @@
   export let multiple: number = undefined;
   let multiData: number = null;
   let disabledMultiSelect: boolean = false;
-  let active = false;
   const configs = window.configs?.baseConfig;
 
   // prettier-ignore
@@ -112,11 +111,11 @@
           nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
-          active=true
+          
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
-          active=true
+
         }
       })
       .catch((err) => {
@@ -381,12 +380,12 @@
     disabled={loadingNodes || !profile  }
     type="button"
     on:click={onLoadNodesHandler}
+
   >
     Apply Filters and Suggest Nodes
   </button>
   {#if multiple}
   <MultiSelect
-  bind:active
     options={nodeIdSelectField.options.reduce((out, { label, value }) => {
       if (label && value) {
         out[label] = value;
