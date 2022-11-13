@@ -61,6 +61,8 @@ export default async function deployVM(
 
   return deploy(profile, type, name, async (grid) => {
     if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
+    console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+    console.log(await grid.qsfs_zdbs.get(qsfsDisk))
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
