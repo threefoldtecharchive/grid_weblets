@@ -37,6 +37,7 @@ import deployQVM from '../../utils/deployQVM';
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
   import getGrid from "../../utils/getGrid";
+  import nodeExists from "../../utils/nodeExists";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -46,7 +47,7 @@ import deployQVM from '../../utils/deployQVM';
 
   let data = new VM();
   let qsfs = new QSFS();
-
+  data.name = "QVM" + data.id.split("-")[0]
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -100,7 +101,6 @@ import deployQVM from '../../utils/deployQVM';
     const nameSet = new Set(names);
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
-  $: console.log(qsfs.filters.hru)
   $: disabled = ((loading || !data.valid || !qsfs.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields,...qsfsFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
@@ -112,14 +112,6 @@ import deployQVM from '../../utils/deployQVM';
 
 
   async function onDeployVM() {
-    // let grid = await getGrid(profile, (grid) => grid, false);
-    // const reslog = await grid.qsfs_zdbs.list();
-    // reslog.forEach( async e =>
-    //  {await grid.qsfs_zdbs.delete({name:e})
-    //   console.log("======================  "+e)  
-    // })
-    // const reslog1 = await grid.qsfs_zdbs.list();
-    // console.log(reslog1)
     data.qsfsDisk= qsfs;
     console.log(data.qsfsDisk)
     if (flistSelectValue === "other") {
@@ -208,8 +200,7 @@ import deployQVM from '../../utils/deployQVM';
       <Alert type="danger" message={message || "Failed to deploy QVM."} />
     {:else}
       <Tabs bind:active {tabs} />
-
-      {#if active === "config"}
+      <section style:display={active === 'config' ? null : 'none'}>
         <Input
           bind:data={data.name}
           bind:invalid={nameField.invalid}
@@ -252,7 +243,8 @@ import deployQVM from '../../utils/deployQVM';
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "env"}
+      </section>
+      <section style:display={active === 'env' ? null : 'none'}>
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
@@ -269,7 +261,8 @@ import deployQVM from '../../utils/deployQVM';
           {/each}
         </div>
     <!-- qsfs field-->
-      {:else if active === "qsfs"}
+      </section>
+    <section style:display={active === 'qsfs' ? null : 'none'}>
       {#each qsfsFields as field (field.symbol)}
       {#if field.invalid !== undefined}
         <Input
@@ -295,14 +288,12 @@ import deployQVM from '../../utils/deployQVM';
     ssd={null}
     filters={qsfs.filters}
     {profile}
-    on:multiple={(e)=>{
-      
-      qsfs.nodeIds=e.detail}}
+    on:multiple={(e)=>qsfs.nodeIds=e.detail}
   />  
   <!-- on:fetch={({ detail }) => (qsfs.selection.nodes = detail)} -->
-
+    </section>
       {/if}
-    {/if}
+    
 
     <DeployBtn
       disabled={disabled || validateFlist.loading}
