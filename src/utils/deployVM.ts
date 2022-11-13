@@ -34,15 +34,12 @@ export default async function deployVM(
   
 /*QSFS*/
   if(qsfsDisk){
-    
     qsfs.name = qsfsDisk.name;
     qsfs.cache= qsfsDisk.cache;
     qsfs.mountpoint= qsfsDisk.mountpoint;
-    qsfs.encryption_key= "3mora"
-    qsfs.prefix="3mora";
+    qsfs.encryption_key= qsfsDisk.name;
+    qsfs.prefix= qsfsDisk.name;
     qsfs.qsfs_zdbs_name= qsfsDisk.name;
-    console.log("diskmodel in vm :")
-    console.log(qsfs)
     //add qsfs to vm
     vm.qsfs_disks = [qsfs]
     }
@@ -61,8 +58,6 @@ export default async function deployVM(
 
   return deploy(profile, type, name, async (grid) => {
     if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
-    console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
-    console.log(await grid.qsfs_zdbs.get(qsfsDisk))
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
