@@ -5,7 +5,7 @@
   import QSFS  from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployVM from "../../utils/deployVM";
-import deployQVM from '../../utils/deployQVM';
+  import deployQVM from "../../utils/deployQVM";
   // import {delete_qsfs} from '../../utils/deployQVM'
   import type { IProfile } from "../../types/Profile";
 
@@ -31,7 +31,7 @@ import deployQVM from '../../utils/deployQVM';
     validateMemory,
     validateMountPoint,
     validateQsfsSecret,
-    validateZdbCount
+    validateZdbCount,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
@@ -47,7 +47,7 @@ import deployQVM from '../../utils/deployQVM';
 
   let data = new VM();
   let qsfs = new QSFS();
-  data.name = "QVM" + data.id.split("-")[0]
+  data.name = "QVM" + data.id.split("-")[0];
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -57,16 +57,56 @@ import deployQVM from '../../utils/deployQVM';
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
   ];
- const qsfsFields: IFormField[] =[
-  { label: "Name", symbol: "name", placeholder: "Enter QSFS name", type: "text", validator:validateName&&validateDiskName, invalid: false},
-  { label: "Secret", symbol: "secret", placeholder: "Enter QSFS secret", type: "password", validator:validateQsfsSecret },
-  { label: "Count", symbol: "count", placeholder: "How many ZDBs needed?", type: "number", validator:validateZdbCount, invalid: false},
-  { label: "Disk size (MB) ", symbol: "disk", placeholder: "Memory of each ZDB in MB", type: "number",validator:validateMemory,invalid: false},
-  { label: "Number of Nodes", symbol: "nodes", placeholder: "Number of Nodes to deploy on", type: "number",invalid: false},
-  { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text",  validator:validateMountPoint, invalid: false}
+  const qsfsFields: IFormField[] = [
+    {
+      label: "Name",
+      symbol: "name",
+      placeholder: "Enter QSFS name",
+      type: "text",
+      validator: validateName && validateDiskName,
+      invalid: false,
+    },
+    {
+      label: "Secret",
+      symbol: "secret",
+      placeholder: "Enter QSFS secret",
+      type: "password",
+      validator: validateQsfsSecret,
+    },
+    {
+      label: "Count",
+      symbol: "count",
+      placeholder: "How many ZDBs needed?",
+      type: "number",
+      validator: validateZdbCount,
+      invalid: false,
+    },
+    {
+      label: "Disk size (MB) ",
+      symbol: "disk",
+      placeholder: "Memory of each ZDB in MB",
+      type: "number",
+      validator: validateMemory,
+      invalid: false,
+    },
+    {
+      label: "Number of Nodes",
+      symbol: "nodes",
+      placeholder: "Number of Nodes to deploy on",
+      type: "number",
+      invalid: false,
+    },
+    {
+      label: "Mount Point",
+      symbol: "mountpoint",
+      placeholder: "Disk Mount Point",
+      type: "text",
+      validator: validateMountPoint,
+      invalid: false,
+    },
   ];
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
- 
+
   // prettier-ignore
   const flists: IFlist[] = [
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist", entryPoint: "/sbin/zinit init" },
@@ -74,8 +114,6 @@ import deployQVM from '../../utils/deployQVM';
   const flistField: IFormField = { label: "VM Image", placeholder: "Ubuntu-22.04", symbol: "flist", type: "text", disabled:true}; // prettier-ignore
   let selectedFlist: number = 0;
   let flistSelectValue: string = "Ubuntu-22.04";
-
-
 
   // prettier-ignore
   const envFields: IFormField[] = [
@@ -110,10 +148,9 @@ import deployQVM from '../../utils/deployQVM';
     invalid: false,
   };
 
-
   async function onDeployVM() {
-    data.qsfsDisk= qsfs;
-    console.log(data.qsfsDisk)
+    data.qsfsDisk = qsfs;
+    console.log(data.qsfsDisk);
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;
@@ -139,9 +176,7 @@ import deployQVM from '../../utils/deployQVM';
     failed = false;
     message = undefined;
 
-  
-   
-    deployQVM(data, qsfs,profile)
+    deployQVM(data, qsfs, profile)
       .then((data) => {
         deploymentStore.set(0);
         success = true;
@@ -155,10 +190,7 @@ import deployQVM from '../../utils/deployQVM';
         validateFlist.loading = false;
         loading = false;
       });
-      
   }
-
-
 
   $: logs = $currentDeployment;
 </script>
@@ -166,9 +198,6 @@ import deployQVM from '../../utils/deployQVM';
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-    }
   }}
 />
 
@@ -200,7 +229,7 @@ import deployQVM from '../../utils/deployQVM';
       <Alert type="danger" message={message || "Failed to deploy QVM."} />
     {:else}
       <Tabs bind:active {tabs} />
-      <section style:display={active === 'config' ? null : 'none'}>
+      <section style:display={active === "config" ? null : "none"}>
         <Input
           bind:data={data.name}
           bind:invalid={nameField.invalid}
@@ -244,7 +273,7 @@ import deployQVM from '../../utils/deployQVM';
           nodes={data.selection.nodes}
         />
       </section>
-      <section style:display={active === 'env' ? null : 'none'}>
+      <section style:display={active === "env" ? null : "none"}>
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
@@ -260,40 +289,35 @@ import deployQVM from '../../utils/deployQVM';
             </div>
           {/each}
         </div>
-    <!-- qsfs field-->
+        <!-- qsfs field-->
       </section>
-    <section style:display={active === 'qsfs' ? null : 'none'}>
-      {#each qsfsFields as field (field.symbol)}
-      {#if field.invalid !== undefined}
-        <Input
-          bind:data={qsfs[field.symbol]}
-          bind:invalid={field.invalid}
-          {field}
+      <section style:display={active === "qsfs" ? null : "none"}>
+        {#each qsfsFields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input
+              bind:data={qsfs[field.symbol]}
+              bind:invalid={field.invalid}
+              {field}
+            />
+          {:else}
+            <Input bind:data={qsfs[field.symbol]} {field} />
+          {/if}
+        {/each}
+
+        <SelectNodeId
+          memory={null}
+          publicIp={null}
+          cpu={null}
+          multiple={qsfs.nodes}
+          disk={qsfs.disk}
+          ssd={null}
+          filters={qsfs.filters}
+          {profile}
+          on:multiple={(e) => (qsfs.nodeIds = e.detail)}
         />
-        
-      
-        
-      {:else}
-        <Input bind:data={qsfs[field.symbol]} {field} />
-      {/if}
-    {/each}
-
-
-    <SelectNodeId
-    memory={null}
-    publicIp={null}
-    cpu={null}
-    multiple= {qsfs.nodes}
-    disk={qsfs.disk}
-    ssd={null}
-    filters={qsfs.filters}
-    {profile}
-    on:multiple={(e)=>qsfs.nodeIds=e.detail}
-  />  
-  <!-- on:fetch={({ detail }) => (qsfs.selection.nodes = detail)} -->
-    </section>
-      {/if}
-    
+        <!-- on:fetch={({ detail }) => (qsfs.selection.nodes = detail)} -->
+      </section>
+    {/if}
 
     <DeployBtn
       disabled={disabled || validateFlist.loading}
