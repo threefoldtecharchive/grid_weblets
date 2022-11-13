@@ -39,7 +39,7 @@
   export let multiple: number = undefined;
   let nodeIds: number[] = [];
   let multiData: number = null;
-  let disabled: boolean = true;
+  let disabledMultiSelect: boolean = false;
 
   const configs = window.configs?.baseConfig;
 
@@ -104,27 +104,19 @@
     findNodes(_filters, profile, exclusiveFor)
       .then((_nodes) => {
         dispatch("fetch", _nodes);
-        nodes = _nodes; // fix issue 
         if (_nodes.length <= 0) {
           data = null;
           status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-          nodeIds = [];
           dispatch("multiple", nodeIds);
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
-          
+          nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
-        }
-
-        if (multiple && nodeIds.length) {
-          const fetchedNodes = _nodes.map((n) => +n.value);
-          nodeIds = nodeIds.filter((n) => fetchedNodes.includes(n));
-          dispatch("multiple", nodeIds);
         }
       })
       .catch((err) => {
@@ -143,11 +135,7 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(
-    index: number,
-    oldLabel: string,
-    label: string = "Loading..."
-  ) {
+  function _setLabel(index: number, oldLabel: string,  label: string = "Loading...") {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
@@ -167,15 +155,16 @@
     );
   }
 
-  function _setCountriesOptions(index: number, items: Map<string, Number>) {
+  function _setCountriesOptions(
+    index: number,
+    items: Map< string, Number >
+  ) {
     const [option] = filtersFields[index].options;
-    filtersFields[index].options = Object.entries(items).map(function ([
-      name,
-      code,
-    ]) {
-      const op = { label: name, value: name } as ISelectOption;
-      return op;
-    });
+    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
+        const op = { label: name, value: name } as ISelectOption;
+        return op;
+      },
+    );
     filtersFields[index].options.unshift(option);
   }
 
@@ -193,7 +182,7 @@
     }
   }
 
-  function onLoadFarmsHandler() {
+  function onLoadFarmsHandler(){
     /* Loading farms & countries */
     const old_farm_label = "Please select a farm";
     const old_countries_label = "Please select a country";
@@ -214,7 +203,7 @@
       });
 
     fetchCountries(profile)
-      .then((countries) => {
+      .then(( countries ) => {
         _setCountriesOptions(1, countries);
       })
       .catch((err) => {
@@ -278,15 +267,12 @@
           })
             .then<{ capacity: ICapacity }>((res) => res.json())
             .then((node: any) => {
-              if (node.error) {
+              if (node.error){
                 status = "not found";
                 return;
               }
 
-              if (
-                node.rentedByTwinId != $configs.twinId &&
-                (node.dedicated || node.rentContractId != 0)
-              ) {
+              if (node.rentedByTwinId != $configs.twinId && (node.dedicated || node.rentContractId != 0)) {
                 status = "dedicated";
                 return;
               }
@@ -381,7 +367,7 @@
 {#if nodeSelection === "automatic" || multiple}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
-    {#if nodeSelection === "automatic" || (multiple && multiple !== nodeIds.length && field.symbol !== "country")}
+    {#if nodeSelection === "automatic" || (multiple  && field.symbol !== "country")}
       <Input
         data={filters[field.symbol]}
         {field}
@@ -389,13 +375,11 @@
       />
     {/if}
   {/each}
-
+    { disabledMultiSelect}
   <button
     class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
     style={`background-color: #1982b1; color: #fff`}
-    disabled={loadingNodes ||
-      !profile ||
-      (multiple && nodeIds.length === multiple)}
+    disabled={loadingNodes || !profile || disabledMultiSelect }
     type="button"
     on:click={onLoadNodesHandler}
   >
@@ -410,53 +394,15 @@
       }
       return out;
       }, {})}
-    bind:disabled
+    bind:disabled={disabledMultiSelect}
+    selected={nodeIds}
     on:select={(e) => {
+      
       dispatch("multiple", e.detail)
-      disabled= e.detail.length >=multiple
-      console.log( e.detail.length >=multiple)
+      disabledMultiSelect= e.detail.length >=multiple
       }}
     />
-    <!-- <div class="field is-grouped is-grouped-multiline mt-3">
-      {#each nodeIds as nodeId, index}
-        <div class="control">
-          <div class="tags has-addons">
-            <p class="tag">{nodeId}</p>
-            <span
-              class="tag is-delete is-danger"
-              style:cursor="pointer"
-              on:mousedown={() => {
-                nodeIds = nodeIds.filter((_, i) => i !== index);
-                dispatch("multiple", nodeIds);
-              }}
-            />
-          </div>
-        </div>
-      {/each}
-    </div>
 
-    {#if nodeIds.length < multiple}
-    
-      <Input
-        bind:data={multiData}
-        field={{
-          label: `Node ID (Found ${nodes.length})`,
-          type: "select",
-          symbol: "nodeId",
-          options: nodeIdSelectField.options.filter(
-            (f) => !nodeIds.includes(+f.value)
-          ),
-        }}
-        
-        on:input={(e) => {
-          const select = e.detail.target;
-          const selectedNodeId = +select.options[select.selectedIndex].value;
-          nodeIds = [...nodeIds, selectedNodeId];
-          dispatch("multiple", nodeIds);
-          multiData = null;
-        }}
-      />
-    {/if} -->
   {:else}
     <Input
       bind:data

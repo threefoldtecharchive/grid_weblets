@@ -296,7 +296,7 @@ import deployQVM from '../../utils/deployQVM';
     filters={qsfs.filters}
     {profile}
     on:multiple={(e)=>{
-      console.log(e.detail)
+      
       qsfs.nodeIds=e.detail}}
   />  
   <!-- on:fetch={({ detail }) => (qsfs.selection.nodes = detail)} -->
