@@ -4,7 +4,6 @@
   import VM, { Disk, Env } from "../../types/vm";
   import QSFS  from "../../types/qsfs"
   import type { IFlist, IFormField, ITab } from "../../types";
-  import deployVM from "../../utils/deployVM";
   import deployQVM from "../../utils/deployQVM";
   // import {delete_qsfs} from '../../utils/deployQVM'
   import type { IProfile } from "../../types/Profile";
@@ -35,9 +34,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
-  import RootFsSize from "../../components/RootFsSize.svelte";
-  import getGrid from "../../utils/getGrid";
-  import nodeExists from "../../utils/nodeExists";
+
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
