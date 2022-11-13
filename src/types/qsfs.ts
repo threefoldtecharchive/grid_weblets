@@ -15,15 +15,15 @@ export default class QSFS {
     public count: number = 3;
     public nodes: number =1;
     public nodeIds : number[]=[];
-    public secret : string;
+    public secret : string="";
     public mountpoint: string= `/${this.name}`;
     public filters = {
-
-      hru: Math.ceil(Math.round(this.disk / 1024)*(this.count)/(this.nodes)), 
+      farmName: null,
+      hru: Math.ceil(Math.round(this.disk / 1024)*(this.count+4)/(this.nodes)), 
       /* updater */
       update: (key: string, value: any) => {
         if(key ==="hru"&&this.nodes) {
-          this.filters["hru"] = Math.ceil(value*(this.count)/(this.nodes))
+          this.filters["hru"] = Math.ceil(value*(this.count+4)/(this.nodes))
           }
         else this.filters[key] = value;
           
