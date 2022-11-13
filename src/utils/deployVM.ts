@@ -50,7 +50,7 @@ export default async function deployVM(
   vms.network = createNetwork(new Network());
   vms.machines = [vm];
   const metadate = {
-    type: "vm",
+    type: type == "VM" ? "vm" : type,
     name: name,
     projectName: type == "VM" ? "" : type,
   };
