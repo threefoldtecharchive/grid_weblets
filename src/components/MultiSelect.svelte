@@ -17,7 +17,7 @@
 
   let input: HTMLInputElement;
   let filter = "";
-  let active = false;
+  export let active = false;
 
   function getLabel(value: any): string {
     for (const label in options) {
@@ -79,15 +79,19 @@
   {@html styles}
 </div>
 
-<section on:mousedown|preventDefault|stopPropagation={() => input?.focus()}>
+<section
+class="pt-3"
+ on:mousedown|preventDefault|stopPropagation={() => input?.focus()}>
   <div
-    class="field is-grouped is-grouped-multiline"
-    style:border-bottom="1px solid #ccc"
+    class="field is-grouped is-grouped-multiline p-2"
+    style:border="1px solid #ccc"
+    style:border-radius="3px"
   >
     {#each selected as value}
-      <div class="control">
+      <div class="control mb-2">
         <div class="tags has-addons">
-          <span class="tag is-dark mb-0">{getLabel(value)}</span>
+          <span class="tag mb-0"
+          style="background-color: #1982b1; color:#fff">{getLabel(value)}</span>
           <span
             class="tag is-delete mb-0"
             style:cursor="pointer"
