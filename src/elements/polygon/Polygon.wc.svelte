@@ -17,7 +17,7 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonics, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getPolyResources";
  import deployPolygon from "../../utils/deployPolygon";

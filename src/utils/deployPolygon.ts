@@ -52,7 +52,8 @@ async function depoloyPolygonVM(data: Polygon, profile: IProfile) {
 	machine.planetary = planetary;
 	machine.qsfs_disks = [];
 	machine.rootfs_size = rootSize;
-	machine.flist = 'https://hub.grid.tf/tf-official-apps/algorand-latest.flist';
+	machine.flist =
+		'https://hub.grid.tf/slayerprincessmetal.3bot/threefolddev-polygon-bor.flist';
 	machine.entrypoint = '/sbin/zinit init';
 	machine.env = {
 		SSH_KEY: profile.sshKey,
