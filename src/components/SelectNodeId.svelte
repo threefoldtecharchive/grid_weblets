@@ -37,10 +37,9 @@
 
   // for multiple options
   export let multiple: number = undefined;
-  let nodeIds: number[] = [];
   let multiData: number = null;
   let disabledMultiSelect: boolean = false;
-
+  let active = false;
   const configs = window.configs?.baseConfig;
 
   // prettier-ignore
@@ -108,15 +107,16 @@
           data = null;
           status = null;
           nodeIdSelectField.options[0].label = "No nodes available";
-          dispatch("multiple", nodeIds);
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
+          active=true
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
+          active=true
         }
       })
       .catch((err) => {
@@ -375,19 +375,18 @@
       />
     {/if}
   {/each}
-    { disabledMultiSelect}
   <button
     class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
     style={`background-color: #1982b1; color: #fff`}
-    disabled={loadingNodes || !profile || disabledMultiSelect }
+    disabled={loadingNodes || !profile  }
     type="button"
     on:click={onLoadNodesHandler}
   >
     Apply Filters and Suggest Nodes
   </button>
-
   {#if multiple}
   <MultiSelect
+  bind:active
     options={nodeIdSelectField.options.reduce((out, { label, value }) => {
       if (label && value) {
         out[label] = value;
@@ -395,9 +394,7 @@
       return out;
       }, {})}
     bind:disabled={disabledMultiSelect}
-    selected={nodeIds}
     on:select={(e) => {
-      
       dispatch("multiple", e.detail)
       disabledMultiSelect= e.detail.length >=multiple
       }}
