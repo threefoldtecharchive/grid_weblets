@@ -38,14 +38,16 @@ export default function deployQvm(
            
     try {
         
-       return deploy(profile, "VM", qsfs.name, async(grid) =>{  
+       return deploy(profile, "Qvm", qsfs.name, async(grid) =>{  
             
+            await checkVMExist(grid, "qvm", name);
 
             return grid.qsfs_zdbs
             .deploy(qsfs)
             .then(() => grid.qsfs_zdbs.get({name:name}))
             .then( 
                 async ([qsfs]) => {
+                    console.log(grid.projectName)
                     const qsfsZdbs = await grid.qsfs_zdbs.getZdbs(name);
                     console.log("===========================qsfs zdbs =================================")
                     console.log(qsfsZdbs)
@@ -54,8 +56,9 @@ export default function deployQvm(
                     console.log("===========================qsfs meta =================================")
                     console.log(qsfsZdbs.meta)
                     console.log("===========================qsfs  =================================")
+                
                     console.log(await grid.qsfs_zdbs.get({name:name}))
-                    return deployVM(vm,profile,"VM")
+                    return deployVM(vm,profile,"Qvm")
                     .then((vm)=> vm )
                 }
             )
