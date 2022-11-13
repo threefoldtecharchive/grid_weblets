@@ -31,7 +31,7 @@ export default function deployQvm(
             }= QSFS
             const qsfs= new QSFSZDBSModel();
             qsfs.name = name;
-            qsfs.count = count; // 4 zdbs for meta
+            qsfs.count = count; 
             qsfs.node_ids= nodeIds;
             qsfs.password = secret;
             qsfs.disk_size= filters.hru;
@@ -47,17 +47,6 @@ export default function deployQvm(
             .then(() => grid.qsfs_zdbs.get({name:name}))
             .then( 
                 async ([qsfs]) => {
-                    console.log(grid.projectName)
-                    const qsfsZdbs = await grid.qsfs_zdbs.getZdbs(name);
-                    console.log("===========================qsfs zdbs =================================")
-                    console.log(qsfsZdbs)
-                    console.log("===========================qsfs groups =================================")
-                    console.log(qsfsZdbs.groups)
-                    console.log("===========================qsfs meta =================================")
-                    console.log(qsfsZdbs.meta)
-                    console.log("===========================qsfs  =================================")
-                
-                    console.log(await grid.qsfs_zdbs.get({name:name}))
                     return deployVM(vm,profile,"Qvm")
                     .then((vm)=> vm )
                 }
@@ -84,54 +73,4 @@ export default function deployQvm(
 
 
 
-// let type: IStore["type"] = "Qvm"
-// async function deployQsfs( data: QSFS, profile: IProfile,){
-//     const { MachineModel, FilterOptions, QSFSZDBSModel, log, }
-                                     
-//     = window.configs.grid3_client;
-//     console.log("data of qsfs",data)
-//     const{
-//         name,
-//         filters,
-//         count,
-//         nodeIds,
-//         secret,
-//     }= data
-//     const qsfs= new QSFSZDBSModel();
-//     qsfs.name = name;
-//     qsfs.count = count+4; // 4 zdbs for meta
-//     qsfs.node_ids= nodeIds;
-//     qsfs.password = secret;
-//     qsfs.disk_size= filters.hru;
-//     let grid = await getGrid(profile, (grid) => grid, false);
-//     const res = await grid.qsfs_zdbs.deploy(qsfs);
-//     log(">>>>>>>>>>>>>>>QSFS backend has been created<<<<<<<<<<<<<<<");
-//     log(res);
 
-//     const reslog = await grid.qsfs_zdbs.get(qsfs);
-//     log(">>>>>>>>>>>>>>>QSFS backend result<<<<<<<<<<<<<<<");
-//     log(reslog);
-
-   
-//     // return deploy(profile, "Qvm", name, async (grid) => {
-//     //     if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
-//     //     return grid.qsfs_zdbs
-//     //       .deploy(qsfs)
-//     //       .then(() => grid.machines.getObj(name))
-//     //       .then(([vm]) => vm);
-//     //   });
-  
-
-// }
-// export async function delete_qsfs(name, profile){
-//     let grid = await getGrid(profile, (grid) => grid, false);
-//     const r = await grid.qsfs_zdbs.delete({ name: name });
-//     log(r);
-// }
-// export async function get_qsfs(name, profile){
-//     let grid = await getGrid(profile, (grid) => grid, false);
-//     const reslog = await grid.machines.getObj(name)
-//     log(">>>>>>>>>>>>>>>QSFS backend getZDB<<<<<<<<<<<<<<<");
-//     log(reslog);
-
-// }
