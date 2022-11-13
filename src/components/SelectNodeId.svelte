@@ -11,6 +11,8 @@
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
+  import MultiSelect from "./MultiSelect.svelte"
+
   const { GridClient } = window.configs?.grid3_client ?? {};
 
   const dispatch = createEventDispatcher<{
@@ -37,16 +39,17 @@
   export let multiple: number = undefined;
   let nodeIds: number[] = [];
   let multiData: number = null;
+  let disabled: boolean = true;
 
   const configs = window.configs?.baseConfig;
 
   // prettier-ignore
   const filtersFields: IFormField[] = [
     { label: "Farm Name", symbol: "farmName", type: "select", placeholder: "Enter Farm Name", options: [
-      { label: "Please select a farm", value: "", selected: true }
+      { label: "Please select a farm", value: null, selected: true }
     ] },
     { label: "Country", symbol: "country", type: "select", placeholder: "Enter Country Name", options: [
-      { label: "Please select a country", value: "", selected: true }
+      { label: "Please select a country", value: null, selected: true }
     ] },
   ];
 
@@ -400,7 +403,21 @@
   </button>
 
   {#if multiple}
-    <div class="field is-grouped is-grouped-multiline mt-3">
+  <MultiSelect
+    options={nodeIdSelectField.options.reduce((out, { label, value }) => {
+      if (label && value) {
+        out[label] = value;
+      }
+      return out;
+      }, {})}
+    bind:disabled
+    on:select={(e) => {
+      dispatch("multiple", e.detail)
+      disabled= e.detail.length >=multiple
+      console.log( e.detail.length >=multiple)
+      }}
+    />
+    <!-- <div class="field is-grouped is-grouped-multiline mt-3">
       {#each nodeIds as nodeId, index}
         <div class="control">
           <div class="tags has-addons">
@@ -439,7 +456,7 @@
           multiData = null;
         }}
       />
-    {/if}
+    {/if} -->
   {:else}
     <Input
       bind:data
