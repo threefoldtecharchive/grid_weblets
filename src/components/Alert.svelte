@@ -18,9 +18,7 @@
     }
   }
 
-  if(deployed){
-    setTimeout(() => { deployed = false; }, 120000);
-  }
+  setTimeout(() => { deployed = false; }, 120000);
 
 </script>
 
