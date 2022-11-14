@@ -118,7 +118,7 @@
                       >
                         <i class="fa-solid fa-eye" />
                       </span>
-                    {:else if label == "Visit"}
+                    {:else if label == "Visit" || label == "Metrics"}
                       <span
                         title={label}
                         class={"icon " +
