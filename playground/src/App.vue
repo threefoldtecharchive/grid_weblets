@@ -55,6 +55,7 @@ export default class App extends Vue {
     "nodepilot",
     "fullvm",
     "algorand",
+    "polygon",
   ];
   sidenav: ISidenav | null = null;
 
