@@ -40,7 +40,6 @@
     { name: "Algorand", cmp: Algorand },
     { name: "Deployed List", cmp: DeployedList },
     { name: "Contracts List", cmp: ContractsList },
-    
   ];
   let selectedWebletIndex = weblets.findIndex(({ cmp }) => cmp === Fullvm);
 </script>

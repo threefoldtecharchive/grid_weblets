@@ -24,8 +24,7 @@
     | "subsquid"
     | "fullvm"
     | "algorand"
-    | "qvm"
-    ;
+    | "qvm";
 
   export let tab: TabsType = undefined;
 

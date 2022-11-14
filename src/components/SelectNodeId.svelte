@@ -37,8 +37,8 @@
 
   // for multiple options
   export let multiple: number = undefined;
-  let multiData: number = null;
   let disabledMultiSelect: boolean = false;
+
   const configs = window.configs?.baseConfig;
 
   // prettier-ignore
@@ -111,11 +111,9 @@
           nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
-          
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
-
         }
       })
       .catch((err) => {
@@ -356,9 +354,7 @@
     field={nodeSelectionField}
     on:input={() => {
       if (nodeSelection === "manual") return (status = null);
-      if (data !== null && nodes.length > 0) {
-        status = "valid";
-      }
+      if (data !== null && nodes.length > 0) status = "valid";
     }}
   />
 {/if}
@@ -374,13 +370,13 @@
       />
     {/if}
   {/each}
+
   <button
     class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
     style={`background-color: #1982b1; color: #fff`}
-    disabled={loadingNodes || !profile  }
+    disabled={loadingNodes || !profile}
     type="button"
     on:click={onLoadNodesHandler}
-
   >
     Apply Filters and Suggest Nodes
   </button>
