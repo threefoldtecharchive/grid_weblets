@@ -75,7 +75,7 @@
       type: "select",
       symbol: "nodeType",
       options: [
-        { label: "Bor", value: "bor", selected: true },
+        { label: "Bor - light", value: "bor_light", selected: true },
       ],
     },
   ];
