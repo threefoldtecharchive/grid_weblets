@@ -41,16 +41,16 @@ sudo apt-get update
 sudo apt-get install libtool gcc g++ make
 ```
 
-## Increase the Max Memory for Node
+## Increase the Max Memory for Node and for nodejs version newer than 16.
 
 To avoid the `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` run the following command:
 
 ```bash
-export NODE_OPTIONS="--max-old-space-size=8192"
+export NODE_OPTIONS="--max-old-space-size=8192 -openssl-legacy-provider"
 ```
 
 Or to make it permanent:
 
 ```bash
-echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> ~/.bashrc
+echo "export NODE_OPTIONS=\"--max-old-space-size=8192 -openssl-legacy-provider\"" >> ~/.bashrc
 ```
