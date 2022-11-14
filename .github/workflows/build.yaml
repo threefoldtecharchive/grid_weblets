@@ -1,0 +1,43 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to play.dev.grid.tf
+
+name: build
+
+on:
+  push:
+    branches:
+      - development
+      - development_build_workflow
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096"
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Install dependencies
+        run: |
+          yarn install
+          cd playground
+          yarn install
+          cd ..
+
+      - name: Build in case development
+        run: yarn serve:app
