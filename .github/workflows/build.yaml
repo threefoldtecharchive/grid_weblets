@@ -38,6 +38,9 @@ jobs:
           cd playground
           yarn install
           cd ..
-
+          
       - name: Build in case development
+        run: yarn dev
+
+      - name: Build in case production
         run: yarn build
