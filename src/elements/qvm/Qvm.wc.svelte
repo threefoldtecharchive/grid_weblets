@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import VM, { Disk, Env } from "../../types/vm";
-  import QSFS  from "../../types/qsfs"
+  import QSFS from "../../types/qsfs";
   import type { IFlist, IFormField, ITab } from "../../types";
   import deployQVM from "../../utils/deployQVM";
   // import {delete_qsfs} from '../../utils/deployQVM'
@@ -35,7 +35,6 @@
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
 
-
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
     { label: "Environment Variables", value: "env" },
@@ -45,9 +44,8 @@
   let data = new VM();
   let qsfs = new QSFS();
   data.name = "QVM" + data.id.split("-")[0];
-  data.cpu= 1;
-  data.memory = 2048
-
+  data.cpu = 1;
+  data.memory = 2048;
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -134,7 +132,6 @@
   function _isInvalidDisks() {
     const mounts = data.disks.map(({ mountpoint }) => mountpoint.replaceAll("/", "")); // prettier-ignore
     const mountSet = new Set(mounts);
-
     const names = data.disks.map(({ name }) => name.trim());
     const nameSet = new Set(names);
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
@@ -209,8 +206,8 @@
         target="_blank"
         href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
       >
-        Quick start documentation</a
-      >
+        Quick start documentation
+      </a>
     </p>
     <hr />
 
@@ -288,8 +285,8 @@
             </div>
           {/each}
         </div>
-        <!-- qsfs field-->
       </section>
+      <!-- qsfs field-->
       <section style:display={active === "qsfs" ? null : "none"}>
         {#each qsfsFields as field (field.symbol)}
           {#if field.invalid !== undefined}
@@ -314,7 +311,6 @@
           {profile}
           on:multiple={(e) => (qsfs.nodeIds = e.detail)}
         />
-        <!-- on:fetch={({ detail }) => (qsfs.selection.nodes = detail)} -->
       </section>
     {/if}
 

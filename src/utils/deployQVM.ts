@@ -6,13 +6,8 @@ import deployVM from "./deployVM";
 import checkVMExist from "./prepareDeployment";
 import getGrid from "./getGrid";
 
-export default function deployQvm(
-  vm: VM,
-  QSFS: QSFS,
-  profile: IProfile
-  //  type: IStore['type']
-) {
-  const { QSFSZDBSModel, log } = window.configs.grid3_client;
+export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
+  const { QSFSZDBSModel } = window.configs.grid3_client;
   const { name, filters, count, nodeIds, secret } = QSFS;
   const qsfs = new QSFSZDBSModel();
   qsfs.name = name;
@@ -27,11 +22,9 @@ export default function deployQvm(
   };
   qsfs.metadata = JSON.stringify(metadate);
 
-  // vm.envs=[...vm.envs,new Env(undefined, "SSH_KEY", profile.sshKey)]
   try {
     return deploy(profile, "Qvm", qsfs.name, async (grid) => {
       await checkVMExist(grid, "qvm", name);
-
       return grid.qsfs_zdbs
         .deploy(qsfs)
         .then(() => grid.qsfs_zdbs.get({ name: name }))
