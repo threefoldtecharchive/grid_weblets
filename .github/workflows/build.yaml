@@ -40,4 +40,4 @@ jobs:
           cd ..
 
       - name: Build in case development
-        run: yarn serve:app
+        run: yarn build
