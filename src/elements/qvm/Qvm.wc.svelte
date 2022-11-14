@@ -45,6 +45,9 @@
   let data = new VM();
   let qsfs = new QSFS();
   data.name = "QVM" + data.id.split("-")[0];
+  data.cpu= 1;
+  data.memory = 2048
+
 
   // prettier-ignore
   let baseFields: IFormField[] = [
@@ -147,7 +150,6 @@
 
   async function onDeployVM() {
     data.qsfsDisk = qsfs;
-    console.log(data.qsfsDisk);
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
       validateFlist.error = null;

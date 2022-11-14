@@ -21,7 +21,7 @@ export default function deployQvm(
   qsfs.password = secret;
   qsfs.disk_size = filters.hru;
   const metadate = {
-    type: "qsfs",
+    type: "QSFS",
     name: name,
     projectName: `QSFS of vm ${vm.name}`,
   };
