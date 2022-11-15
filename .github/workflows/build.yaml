@@ -39,5 +39,8 @@ jobs:
           yarn install
           cd ..
 
-      - name: Build in case production
-        run: yarn build:app
+      - name: Build in case dev 
+        run:  |
+          yarn dev 
+          echo $
+        
