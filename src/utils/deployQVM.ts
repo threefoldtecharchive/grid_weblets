@@ -18,7 +18,7 @@ export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
   const metadate = {
     type: "QSFS",
     name: name,
-    projectName: `QSFS of vm ${vm.name}`,
+    projectName: `QVM`,
   };
   qsfs.metadata = JSON.stringify(metadate);
 
