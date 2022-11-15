@@ -41,6 +41,6 @@ jobs:
 
       - name: Build in case dev 
         run:  |
-          yarn dev 
-          echo $
+          yarn build:app 
+          echo $?
         
