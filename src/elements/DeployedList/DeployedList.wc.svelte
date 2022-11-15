@@ -466,14 +466,6 @@
           disabled: () => removing !== null,
           loading: (i) => removing === rows[i].name,
         },
-        {
-          type: "warning",
-          label: "Metrics",
-          click: (_, i) => {
-            const domain = rows[i].details.mounts[0]["metricsEndpoint"];
-            window.open(domain , "_blank").focus();
-          },
-        },
       ],
       algorand: (rows) => [
         {
