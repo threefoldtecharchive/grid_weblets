@@ -82,7 +82,7 @@
     {
       label: "Disk size (MB) ",
       symbol: "disk",
-      placeholder: "Memory of each ZDB in MB",
+      placeholder: "Disk size of each ZDB in MB",
       type: "number",
       validator: validateMemory,
       invalid: false,
