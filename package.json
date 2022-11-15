@@ -9,6 +9,8 @@
     "dev": "webpack serve --content-base public",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check-eslint": "eslint .eslintrc.js .",
+    "check-prettier": "npx prettier .prettierrc .",
     "deps": "sh scripts/install_deps.sh",
     "serve": "serve ./dist",
     "prepare": "husky install"
@@ -81,6 +83,7 @@
     "crypto-js": "^4.1.1",
     "cypress": "^10.1.0",
     "decimal.js": "^10.3.1",
+    "eslint-plugin-svelte3": "^4.0.0",
     "front-matter": "^4.0.2",
     "grid3_client": "1.5.0-rc1",
     "js-yaml": "^4.1.0",
