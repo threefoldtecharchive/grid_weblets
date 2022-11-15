@@ -142,8 +142,8 @@
     return rows.map((row, i) => {
       const { name, master, workers, consumption } = row;
       let publicIp = master.publicIP ?? ({} as any);
-      master.publicIP? publicIp.ip = publicIp.ip.replace(/.{0,3}$/, '') : publicIp.ip = "None";
-      master.publicIP? publicIp.ip6 = publicIp.ip6.replace(/.{0,3}$/, '') : publicIp.ip6 = "None";
+      master.publicIP? publicIp.ip = publicIp.ip.split("/")[0] : publicIp.ip = "None";
+      master.publicIP? publicIp.ip6 = publicIp.ip6.split("/")[0] : publicIp.ip6 = "None";
       return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
     });
   }
@@ -155,8 +155,8 @@
         typeof flist === "string"
           ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "")
           : flist;
-          publicIp = publicIp != "None"? publicIp.replace(/.{0,3}$/, '') : "None";
-          publicIp6 = publicIp6 != "None"? publicIp6.replace(/.{0,3}$/, '') : "None";
+          publicIp = publicIp != "None"? publicIp.split("/")[0] : "None";
+          publicIp6 = publicIp6 != "None"? publicIp6.split("/")[0] : "None";
       return [i + 1, name, publicIp, publicIp6, planetary, _flist, consumption];
     });
   }
