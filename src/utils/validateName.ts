@@ -271,7 +271,7 @@ export function validateAlgoStorage(value: string, net, type): string | void {
 }
 
 export function validateQsfsSecret(value: string): string | void{
-  if (!value.length) return `zDB password is required`
+  if (!value.length) return `ZDB password is required`
 }
 
 export function validateZdbCount(value:number): string| void{
