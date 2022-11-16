@@ -22,6 +22,7 @@
   import validateName, {
     isInvalid,
     validateCpu,
+    validateDisk,
     validateDiskName,
     validateEntryPoint,
     validateFlistvalue,
@@ -80,11 +81,11 @@
       invalid: false,
     },
     {
-      label: "Disk size (MB) ",
+      label: "Disk size (GB) ",
       symbol: "disk",
-      placeholder: "Disk size of each ZDB in MB",
+      placeholder: "Disk size of each ZDB in GB",
       type: "number",
-      validator: validateMemory,
+      validator: validateDisk,
       invalid: false,
     },
     {

@@ -77,7 +77,7 @@
     if (filters) {
       if (cpu) filters.update("cru", cpu);
       if (memory) filters.update("mru", Math.round(memory / 1024));
-      if (disk) filters.update("hru", Math.round(disk / 1024));
+      if (disk) filters.update("hru", disk);
       if (ssd) filters.update("sru", ssd);
       filters.update("publicIPs", publicIp);
     }

@@ -10,7 +10,7 @@ import {
 export default class QSFS {
   public id = v4();
   public name = "QSFS" + this.id.split("-")[0];
-  public disk = 1024;
+  public disk = 1;
   public cache = 1;
   public count: number = 3;
   public nodes: number = 1;
