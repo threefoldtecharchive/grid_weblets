@@ -32,11 +32,7 @@ jobs:
           cache-dependency-path: "**/yarn.lock"
 
       - name: Install dependencies
-        run: |
-          yarn install
-          cd playground
-          yarn install
-          cd ..
+        run: yarn install
 
       - name: Build
         run: |
