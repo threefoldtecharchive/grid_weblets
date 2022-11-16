@@ -22,7 +22,8 @@
     | "casperlabs"
     | "nodepilot"
     | "subsquid"
-    | "fullvm"|
+    | "fullvm"
+    | "freeflow" |
     "algorand";
 
   export let tab: TabsType = undefined;
@@ -58,6 +59,7 @@
     { label: "Algorand", value: "algorand" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
+    { label: "freeflow", value: "freeflow" },
   ];
   let grid;
   let active: string = "vm";
@@ -162,8 +164,8 @@
   }
 
   let selectedRows: any[] = [];
-  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore  
-  
+  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
+
   async function onDeleteHandler() {
     message = null;
 
@@ -469,6 +471,27 @@
           loading: (i) => removing === rows[i].name,
         },
       ],
+      freeflow: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.DIGITALTWIN_APPID;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: (i) => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
+        },
+      ],
     },
     {
       get(target, prop) {
@@ -531,8 +554,8 @@
           Delete
         </button>
       </div>
-      <DialogueMsg 
-        bind:opened 
+      <DialogueMsg
+        bind:opened
         on:removed={onDeleteHandler}
         {name}
       />
@@ -547,8 +570,8 @@
               <Alert
                 type="warning"
                 message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
+                Failed to load
+                <strong>${rows.total - rows.data.length}</strong>
                 out of ${rows.total} Deployments`}
               />
             {/if}
@@ -604,8 +627,8 @@
               <Alert
                 type="warning"
                 message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
+                Failed to load
+                <strong>${rows.total - rows.data.length}</strong>
                 out of ${rows.total} Deployments`}
               />
             {/if}

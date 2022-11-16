@@ -2,26 +2,27 @@ import { writable } from "svelte/store";
 
 export interface IStore {
   type:
-  | "Kubernetes"
-  | "VM"
-  | "CapRover"
-  | "Discourse"
-  | "Peertube"
-  | "Funkwhale"
-  | "GatewayName"
-  | "Add Worker"
-  | "Remove Worker"
-  | "Deleting Deployment"
-  | "Taiga"
-  | "Owncloud"
-  | "Presearch"
-  | "Subsquid"
-  | "Mattermost"
-  | "TFhubValidator"
-  | "Casperlabs"
-  | "NodePilot"
-  | "Fullvm"
-  | "Algorand";
+    | "Kubernetes"
+    | "VM"
+    | "CapRover"
+    | "Discourse"
+    | "Peertube"
+    | "Funkwhale"
+    | "GatewayName"
+    | "Add Worker"
+    | "Remove Worker"
+    | "Deleting Deployment"
+    | "Taiga"
+    | "Owncloud"
+    | "Presearch"
+    | "Subsquid"
+    | "Mattermost"
+    | "TFhubValidator"
+    | "Casperlabs"
+    | "NodePilot"
+    | "Fullvm"
+    | "Algorand"
+    | "freeflow";
   name: string;
   message: string;
 }
