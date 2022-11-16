@@ -37,6 +37,7 @@
 
   // for multiple options
   export let multiple: number = undefined;
+  export let count: number = undefined;
   let disabledMultiSelect: boolean = false;
 
   const configs = window.configs?.baseConfig;
@@ -342,7 +343,7 @@
     else if (_memory !== memory) _memory = memory;
     else if (_ssd !== ssd) _ssd = ssd;
     else if (_publicIp !== publicIp) _publicIp = publicIp;
-    else if (_disk !== disk) _disk = disk;
+    else if (_disk !== disk|| multiple || count) _disk = disk;
     else _update = false;
 
     if (_update) _reset();

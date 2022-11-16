@@ -306,6 +306,7 @@
           publicIp={null}
           cpu={null}
           multiple={qsfs.nodes}
+          count={qsfs.count}
           disk={qsfs.disk}
           ssd={null}
           filters={qsfs.filters}
