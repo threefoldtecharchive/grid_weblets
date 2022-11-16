@@ -1,4 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to play.dev.grid.tf
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build:app
 
 name: build
 
@@ -39,8 +39,6 @@ jobs:
           yarn install
           cd ..
 
-      - name: Build in case dev 
-        run:  |
-          yarn build:app 
-          echo $?
-        
+      - name: Build
+        run: |
+          yarn build:app
