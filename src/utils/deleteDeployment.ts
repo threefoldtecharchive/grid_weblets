@@ -46,6 +46,10 @@ export default async function deleteDeployment(
 
 async function _deleteDeployments(grid, name, configs, type, key) {
   const domainName = await getUniqueDomainName(configs, name, type);
+  if(type === "qvm"){
+    let qvm =await grid.machines.getObj(name)
+    await grid.qsfs_zdbs.delete({name:qvm[0].mounts[0].name})
+  }
   await grid.gateway.delete_name({ name: domainName });
   return await grid[key].delete({ name });
 }

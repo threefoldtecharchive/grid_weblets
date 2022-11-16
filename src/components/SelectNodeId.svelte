@@ -11,16 +11,22 @@
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
-  import baseConfig from "../stores/baseConfig";
+  import MultiSelect from "./MultiSelect.svelte"
+
   const { GridClient } = window.configs?.grid3_client ?? {};
 
-  const dispatch = createEventDispatcher<{ fetch: ISelectOption[] }>();
+  const dispatch = createEventDispatcher<{
+    fetch: ISelectOption[];
+    multiple: number[];
+  }>();
   export let cpu: number;
   export let memory: number;
+  export let disk: number= undefined;
   export let ssd: number;
   export let publicIp: boolean;
-  export let data: number;
-  export let status: "valid" | "invalid" | "dedicated" | "not found";
+  export let data: number = undefined;
+  export let status: "valid" | "invalid" | "dedicated" | "not found" =
+    undefined;
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
@@ -28,6 +34,11 @@
 
   export let profile: IProfile;
   let loadingNodes: boolean = false;
+
+  // for multiple options
+  export let multiple: number = undefined;
+  export let count: number = undefined;
+  let disabledMultiSelect: boolean = false;
 
   const configs = window.configs?.baseConfig;
 
@@ -59,7 +70,7 @@
       { label: "Manual", value: "manual" }
     ]
   };
-  export let nodeSelection: string;
+  export let nodeSelection: string = undefined;
 
   export let filters: any;
 
@@ -67,6 +78,7 @@
     if (filters) {
       if (cpu) filters.update("cru", cpu);
       if (memory) filters.update("mru", Math.round(memory / 1024));
+      if (disk) filters.update("hru", disk);
       if (ssd) filters.update("sru", ssd);
       filters.update("publicIPs", publicIp);
     }
@@ -84,6 +96,7 @@
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
+      hru: filters.hru,
       availableFor: $configs.twinId,
     };
 
@@ -93,6 +106,7 @@
         if (_nodes.length <= 0) {
           data = null;
           status = null;
+          nodes= _nodes
           nodeIdSelectField.options[0].label = "No nodes available";
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
@@ -156,7 +170,7 @@
   let _network: string;
   $: {
     if (
-      nodeSelection === "automatic" &&
+      (nodeSelection === "automatic" || multiple) &&
       profile &&
       profile.networkEnv !== _network
     ) {
@@ -310,11 +324,12 @@
   let _memory = memory;
   let _ssd = ssd;
   let _publicIp = publicIp;
+  let _disk= disk;
 
   const _reset = () => {
     requestAnimationFrame(() => {
       _nodeId = null;
-      if (nodeSelection === "automatic") {
+      if (nodeSelection === "automatic" || multiple) {
         onLoadNodesHandler();
         onLoadFarmsHandler();
       }
@@ -328,30 +343,34 @@
     else if (_memory !== memory) _memory = memory;
     else if (_ssd !== ssd) _ssd = ssd;
     else if (_publicIp !== publicIp) _publicIp = publicIp;
+    else if (_disk !== disk|| multiple || count) _disk = disk;
     else _update = false;
 
     if (_update) _reset();
   }
 </script>
 
-<Input
-  bind:data={nodeSelection}
-  field={nodeSelectionField}
-  on:input={() => {
-    if (nodeSelection === "manual") return (status = null);
-    if (data !== null && nodes.length > 0) {
-      status = "valid";
-    }
-  }}
-/>
-{#if nodeSelection === "automatic"}
+{#if !multiple}
+  <Input
+    bind:data={nodeSelection}
+    field={nodeSelectionField}
+    on:input={() => {
+      if (nodeSelection === "manual") return (status = null);
+      if (data !== null && nodes.length > 0) status = "valid";
+    }}
+  />
+{/if}
+
+{#if nodeSelection === "automatic" || multiple}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
-    <Input
-      data={filters[field.symbol]}
-      {field}
-      on:input={_update(field.symbol)}
-    />
+    {#if nodeSelection === "automatic" || (multiple  && field.symbol !== "country")}
+      <Input
+        data={filters[field.symbol]}
+        {field}
+        on:input={_update(field.symbol)}
+      />
+    {/if}
   {/each}
 
   <button
@@ -363,17 +382,40 @@
   >
     Apply Filters and Suggest Nodes
   </button>
+  {#if multiple}
+  <h5 class="label pt-2 ">
+    {#if (nodeIdSelectField.options.length-1 == 1)}
+      Found one Node
+    {:else}
+      Found {nodeIdSelectField.options.length - 1} Nodes
+    {/if}
+  </h5>
+  <MultiSelect
+    options={nodeIdSelectField.options.reduce((out, { label, value }) => {
+      if (label && value) {
+        out[label] = value;
+      }
+      return out;
+      }, {})}
+    bind:disabled={disabledMultiSelect}
+    on:select={(e) => {
+      dispatch("multiple", e.detail)
+      disabledMultiSelect= e.detail.length >=multiple
+      }}
+    />
 
-  <Input
-    bind:data
-    field={{
-      label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
-      type: "select",
-      symbol: "nodeId",
-      options: nodeIdSelectField.options,
-    }}
-    on:input={() => (status = "valid")}
-  />
+  {:else}
+    <Input
+      bind:data
+      field={{
+        label: `Node ID (Found ${nodeIdSelectField.options.length - 1})`,
+        type: "select",
+        symbol: "nodeId",
+        options: nodeIdSelectField.options,
+      }}
+      on:input={() => (status = "valid")}
+    />
+  {/if}
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
   {#if validating && data}

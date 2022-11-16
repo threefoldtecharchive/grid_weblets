@@ -269,3 +269,14 @@ export function validateAlgoStorage(value: string, net, type): string | void {
   if (+value > storage+200)
     return `Maximum Storage for this deployment is ${storage+200}.`;
 }
+
+export function validateQsfsSecret(value: string): string | void{
+  if (!value.length) return `ZDB password is required`
+}
+
+export function validateZdbCount(value:number): string| void{
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
+  return "ZDB count must be a valid number.";
+  else if(value < 3) return `Minimum allowed ZDB is 3 ZDBs`;
+  
+}

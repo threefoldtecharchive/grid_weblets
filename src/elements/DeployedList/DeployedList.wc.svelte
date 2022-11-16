@@ -22,8 +22,9 @@
     | "casperlabs"
     | "nodepilot"
     | "subsquid"
-    | "fullvm"|
-    "algorand";
+    | "fullvm"
+    | "algorand"
+    | "qvm";
 
   export let tab: TabsType = undefined;
 
@@ -58,6 +59,7 @@
     { label: "Algorand", value: "algorand" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
+    { label: "QSFS Virtual Machine", value: "qvm"}
   ];
   let grid;
   let active: string = "vm";
@@ -452,6 +454,15 @@
         },
       ],
       fullvm: (rows) => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: (i) => removing === rows[i].name,
+        },
+      ],
+      qvm: (rows) => [
         {
           type: "info",
           label: "Show Details",

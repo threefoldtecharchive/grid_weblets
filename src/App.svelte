@@ -19,6 +19,7 @@
   import DeployedList from "./elements/DeployedList/DeployedList.wc.svelte";
   import ContractsList from "./elements/ContractsList/ContractsList.wc.svelte";
   import Algorand from "./elements/algorand/Algorand.wc.svelte"
+  import QVM from "./elements/qvm/Qvm.wc.svelte"
 
   const weblets = [
     { name: "Full VM", cmp: Fullvm },
@@ -35,6 +36,7 @@
     { name: "Subsquid", cmp: Subsquid },
     { name: "Casperlabs", cmp: Casperlabs },
     { name: "NodePilot", cmp: NodePilot },
+    {name: "QVM", cmp: QVM},
     { name: "Algorand", cmp: Algorand },
     { name: "Deployed List", cmp: DeployedList },
     { name: "Contracts List", cmp: ContractsList },
