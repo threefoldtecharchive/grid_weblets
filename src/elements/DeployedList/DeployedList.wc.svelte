@@ -141,18 +141,22 @@
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
       const { name, master, workers, consumption } = row;
-      const publicIp = master.publicIP ?? ({} as any);
-      return [i + 1, name, publicIp.ip || "None", publicIp.ip6 || "None", master.planetary || "None", workers, consumption]; // prettier-ignore
+      let publicIp = master.publicIP ?? ({} as any);
+      master.publicIP? publicIp.ip = publicIp.ip.split("/")[0] : publicIp.ip = "None";
+      master.publicIP? publicIp.ip6 = publicIp.ip6.split("/")[0] : publicIp.ip6 = "None";
+      return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
     });
   }
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, publicIp, publicIp6, planetary, flist, consumption } = row;
+      let { name, publicIp, publicIp6, planetary, flist, consumption } = row;
       const _flist =
         typeof flist === "string"
           ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "")
           : flist;
+          publicIp = publicIp != "None"? publicIp.split("/")[0] : "None";
+          publicIp6 = publicIp6 != "None"? publicIp6.split("/")[0] : "None";
       return [i + 1, name, publicIp, publicIp6, planetary, _flist, consumption];
     });
   }
