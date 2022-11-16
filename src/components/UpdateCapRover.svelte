@@ -18,6 +18,7 @@
   import { CapWorker } from "../types/caprover";
   import SelectCapacity from "./SelectCapacity.svelte";
   import getGrid from "../utils/getGrid";
+    import DialogueMsg from './DialogueMsg.svelte';
   const { AddMachineModel, DeleteMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
@@ -35,7 +36,9 @@
   let failed: boolean = false;
   let removing: string = null;
   let domain: string = "";
-
+  let opened = false;
+  let workerIndex:number = 0;
+  let name: string = null;
   let worker = new CapWorker();
   let grid;
 
@@ -135,7 +138,6 @@
   }
 
   function onDeleteWorker(idx: number) {
-    if (!window.confirm("Are you sure you want to delete your worker?")) return;
     const worker = workers[idx];
     removing = worker.name;
     loading = true;
@@ -148,7 +150,7 @@
       .then(({ deleted, updated }) => {
         if (deleted.length > 0 || updated.length > 0) {
           shouldBeUpdated = true;
-          let r = removing;
+          let r = removing;          
           requestAnimationFrame(() => {
             workers = workers.filter(({ name }) => name !== r); // prettier-ignore
           });
@@ -269,10 +271,19 @@
                 label: "Delete",
                 type: "danger",
                 loading: (i) => loading && removing === workers[i].name,
-                click: (_, i) => onDeleteWorker(i),
+                click: (_, i) => {
+                  workerIndex = i,
+                  name = `worker ${workers[i].name}`;
+                  opened = !opened;
+                },
                 disabled: () => loading || removing !== null,
               },
             ]}
+          />
+          <DialogueMsg 
+            bind:opened 
+            on:removed={onDeleteWorker(workerIndex)}
+            {name}
           />
           <hr />
         {:else if workers_loading}
