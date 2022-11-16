@@ -105,6 +105,7 @@
         if (_nodes.length <= 0) {
           data = null;
           status = null;
+          nodes= _nodes
           nodeIdSelectField.options[0].label = "No nodes available";
         } else if (!_nodes.some((node) => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
@@ -381,6 +382,13 @@
     Apply Filters and Suggest Nodes
   </button>
   {#if multiple}
+  <h5 class="label pt-2 ">
+    {#if (nodeIdSelectField.options.length-1 == 1)}
+      Found one Node
+    {:else}
+      Found {nodeIdSelectField.options.length - 1} Nodes
+    {/if}
+  </h5>
   <MultiSelect
     options={nodeIdSelectField.options.reduce((out, { label, value }) => {
       if (label && value) {
