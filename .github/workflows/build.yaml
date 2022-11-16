@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - development
-      - development_build_workflow
   pull_request:
     branches:
       - development
