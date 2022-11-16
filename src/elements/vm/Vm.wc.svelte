@@ -54,6 +54,7 @@
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist", entryPoint: "/sbin/zinit init" },
     { name: "Alpine", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist", entryPoint: "/entrypoint.sh" },
     { name: "CentOS", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist", entryPoint: "/entrypoint.sh" },
+    { name: "Nixos", url: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist", entryPoint: "/entrypoint.sh" }
 
   ];
 
@@ -66,6 +67,7 @@
       { label: "Ubuntu-22.04", value: "0", selected: true },
       { label: "Alpine-3", value: "1" },
       { label: "CentOS-8", value: "2" },
+      { label: "Nixos", value: "3" },
       { label: "Other", value: "other" }
     ]
   };
