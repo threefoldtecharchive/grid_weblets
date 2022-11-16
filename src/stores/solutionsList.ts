@@ -5,6 +5,7 @@ export const solutionList = {
   discourse: "dc",
   owncloud: "oc",
   mattermost: "mm",
+  mastodon: "md",
   tfhubValidator: "tfvalidator",
   casperlabs: "cl",
   presearch: "ps",
