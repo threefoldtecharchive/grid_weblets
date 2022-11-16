@@ -194,7 +194,7 @@
       Deploy a new full virtual machine on the Threefold Grid
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+        href="https://library.threefold.me/info/manual/#/manual__weblets_fullvm"
       >
         Quick start documentation</a
       >
