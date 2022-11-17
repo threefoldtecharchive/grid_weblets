@@ -1,5 +1,6 @@
 import type { IFormField } from "../types";
 import { getResources } from "./getAlgoResources";
+import isPrivateIP from "private-ip"
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
@@ -183,6 +184,12 @@ export function validateIPRange(value: string): string | void {
   if (!ipRegex.test(value)) {
     return "Invalid IP range. IP address in CIDR format xxx.xx.xx.xx/16";
   }
+}
+
+export function validatePrivateIPRange(value: string): string | void {
+  if (!value.includes("/")) return "IP range must contain subnet";
+  if (value.split("/")[1] !== "16") return "Subnet must be /16";
+  if (!isPrivateIP(value.split("/")[0])) return "Invalid private IP range.";
 }
 
 export function validateMountPoint(value: string): string | void {
