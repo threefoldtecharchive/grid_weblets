@@ -114,6 +114,7 @@
           data = +_nodes[0].value;
           status = "valid";
         } else {
+          nodes = _nodes;
           nodeIdSelectField.options[0].label = label;
           status = "valid";
         }
