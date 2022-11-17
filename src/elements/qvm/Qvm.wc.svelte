@@ -113,7 +113,7 @@
   const flistField: IFormField = { label: "VM Image", placeholder: "Ubuntu-22.04", symbol: "flist", type: "text", disabled:true}; // prettier-ignore
   let selectedFlist: number = 0;
   let flistSelectValue: string = "Ubuntu-22.04";
-
+  data.flist = flists[0].url
   // prettier-ignore
   const envFields: IFormField[] = [
     { label: 'Key', symbol: 'key', placeholder: "Environment Key", type: "text", validator: validateKey, invalid:false},
