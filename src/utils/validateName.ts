@@ -174,6 +174,14 @@ export function validateIPRange(value: string): string | void {
   }
 }
 
+export function validatePrivateIPRange(value: string): string | void {
+  const IPPrivateRange = '(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\/(1[6-9]|2[0-9]|3[0-2])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\/(1[6-9]|2[0-9]|3[0-2])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5]))/(1[6-9]|2[0-9]|3[0-2])';
+  const ipRegex = new RegExp(IPPrivateRange);
+  if (!ipRegex.test(value)) {
+    return "Invalid private IP range.";
+  }
+}
+
 export function validateMountPoint(value: string): string | void {
   if (value === "") return "Mount point is required";
   value = value.trim();

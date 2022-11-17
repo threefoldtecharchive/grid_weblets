@@ -22,7 +22,7 @@
     isInvalid,
     validateCpu,
     validateDisk,
-    validateIPRange,
+    validatePrivateIPRange,
     validateKubernetesMemory,
     validateToken,
   } from "../../utils/validateName";
@@ -45,7 +45,7 @@
   // prettier-ignore
   const networkFields: IFormField[] = [
     { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xx.xx.xx/16", type: "text", validator: validateIPRange, invalid: false },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xx.xx.xx/16", type: "text", validator: validatePrivateIPRange, invalid: false },
   ];
 
   // prettier-ignore
