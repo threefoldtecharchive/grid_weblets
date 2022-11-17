@@ -150,7 +150,7 @@
       .then(({ deleted, updated }) => {
         if (deleted.length > 0 || updated.length > 0) {
           shouldBeUpdated = true;
-          let r = removing;          
+          let r = removing;
           requestAnimationFrame(() => {
             workers = workers.filter(({ name }) => name !== r); // prettier-ignore
           });
