@@ -184,6 +184,13 @@ export default class Editor extends Vue {
       "mattermost.png"
     ),
     new Weblet(
+      "Mastodon",
+      "mastodon",
+      "mastodon",
+      "deployment",
+      "mastodon.png"
+    ),
+    new Weblet(
       "Discourse",
       "discourse",
       "discourse",

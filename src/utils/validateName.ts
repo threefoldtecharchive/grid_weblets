@@ -31,6 +31,17 @@ export default function validateName(name: string): string | void {
   if (!NAME_REGEX.test(name)) return "Name can only include alphanumeric characters.";
   if (name.length > 15) return "Name must be at most 15 characters.";
 }
+export function validateMastodonAdminEmail(email: string): string | void {
+  if (email == "") return "Email is required";
+  if (email.slice(0, 6).toLowerCase() == "admin@") return "The email is reserved, use different email."; 
+  return validateEmail(email);
+}
+export function validateMastodonAdminUsername(username: string): string | void {
+  if (username.length < 5) return "username must be at least 5 characters";
+  if (!ALPHA_ONLY_REGEX.test(username[0])) return "username can't start with a number, a non-alphanumeric character or a whitespace.";
+  if (!NAME_REGEX.test(username)) return "username can only include alphanumeric characters.";
+  if (username.toLowerCase() == "admin") return "The username is reserved, use different username.";
+}
 export function validateMnemonics(mnemonics: string): string | void {
   if (!mnemonics.length) return "Mnemonics required";
   if (!ALPHA_ONLY_REGEX.test(mnemonics))

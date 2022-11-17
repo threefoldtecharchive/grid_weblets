@@ -17,6 +17,7 @@ export interface IStore {
   | "Presearch"
   | "Subsquid"
   | "Mattermost"
+  | "Mastodon"
   | "TFhubValidator"
   | "Casperlabs"
   | "NodePilot"
