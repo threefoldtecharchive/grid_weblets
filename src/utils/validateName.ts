@@ -1,5 +1,6 @@
 import type { IFormField } from "../types";
 import { getResources } from "./getAlgoResources";
+import isPrivateIP from "private-ip"
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
@@ -175,11 +176,9 @@ export function validateIPRange(value: string): string | void {
 }
 
 export function validatePrivateIPRange(value: string): string | void {
-  const IPPrivateRange = '(^192\.168\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\/(1[6-9]|2[0-9]|3[0-2])$)|(^172\.([1][6-9]|[2][0-9]|[3][0-1])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\/(1[6-9]|2[0-9]|3[0-2])$)|(^10\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5])\.([0-9]|[0-9][0-9]|[0-2][0-5][0-5]))/(1[6-9]|2[0-9]|3[0-2])';
-  const ipRegex = new RegExp(IPPrivateRange);
-  if (!ipRegex.test(value)) {
-    return "Invalid private IP range.";
-  }
+  if (!value.includes("/")) return "IP range must contain subnet";
+  if (value.split("/")[1] !== "16") return "Subnet must be /16";
+  if (!isPrivateIP(value.split("/")[0])) return "Invalid private IP range.";
 }
 
 export function validateMountPoint(value: string): string | void {

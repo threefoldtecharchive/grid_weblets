@@ -45,7 +45,7 @@
   // prettier-ignore
   const networkFields: IFormField[] = [
     { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xx.xx.xx/16", type: "text", validator: validatePrivateIPRange, invalid: false },
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xxx.0.0/16", type: "text", validator: validatePrivateIPRange, invalid: false },
   ];
 
   // prettier-ignore
