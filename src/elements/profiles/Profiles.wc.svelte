@@ -28,28 +28,6 @@
   let currentProfile: IProfile;
   let selectedIdx: string = "0";
   let bridgeAddress: string = "";
-  let editable: boolean;
-
-  // if (activeProfileId === activeProfile.id) {
-  //   console.log("disabled is true");
-  //   editable = false;
-  // } else {
-  //   editable = true;
-  // }
-  $: checked = editable;
-  if (configured) {
-    editable = false;
-  }
-
-  function _updateEditable(e: Event) {
-    const input = e.target as HTMLInputElement;
-
-    checked = input.checked;
-    if (!checked) {
-      const sshIsValid = activeProfile.sshKey == "";
-      _updateError("sshKey", sshIsValid, "");
-    }
-  }
 
   let tabs: ITab[] = [];
   $: {
@@ -62,12 +40,6 @@
       tabs = profiles.map((profile, i) => {
         return { label: profile.name || `Profile${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
       });
-      if (activeProfileId === activeProfile.id) {
-        console.log("disabled is true");
-        editable = false;
-      } else {
-        editable = true;
-      }
 
       if (currentProfile) {
         if (
@@ -133,11 +105,9 @@
       console.log("Error", err);
     }
 
-    if (checked) {
-      const sshIsValid = activeProfile.sshKey !== "";
-      invalid = invalid || !sshIsValid;
-      _updateError("sshKey", sshIsValid, "Invalid SSH Key");
-    }
+    const sshIsValid = activeProfile.sshKey !== "";
+    invalid = invalid || !sshIsValid;
+    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
 
     const nameIsValid = activeProfile.name !== "";
     invalid = invalid || !nameIsValid;
@@ -223,10 +193,8 @@
               style={`border-color: #1982b1; color: #1982b1`}
               type="button"
               disabled={Boolean(validateProfileName(activeProfile.name)) ||
-              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-              checked
-                ? Boolean(validateSSH(activeProfile.sshKey))
-                : false}
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={() => {
                 selectedIdx = configs.addProfile();
                 fields.forEach((_, i) => (fields[i].error = null));
@@ -239,10 +207,8 @@
               style={`background-color: #1982b1; color: #fff`}
               type="button"
               disabled={Boolean(validateProfileName(activeProfile.name)) ||
-              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-              checked
-                ? Boolean(validateSSH(activeProfile.sshKey))
-                : false}
+                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+                Boolean(validateSSH(activeProfile.sshKey))}
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
@@ -295,12 +261,10 @@
             class={"button" + (activating ? " is-loading" : "")}
             style={`background-color: #1982b1; color: #fff`}
             disabled={activating ||
-            activeProfileId === activeProfile?.id ||
-            Boolean(validateProfileName(activeProfile.name)) ||
-            Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-            checked
-              ? Boolean(validateSSH(activeProfile.sshKey))
-              : false}
+              activeProfileId === activeProfile?.id ||
+              Boolean(validateProfileName(activeProfile.name)) ||
+              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
+              Boolean(validateSSH(activeProfile.sshKey))}
             on:click={onActiveProfile}
           >
             {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
@@ -345,36 +309,17 @@
                 <Input data={$configs.twinId} field={twinField} />
                 <Input data={$configs.address} field={addressField} />
               {/if}
-              <div style="display: flex; align-items: center;">
-                <div style="margin-right: 15px; width: 100%;">
-                  <Input
-                    bind:data={activeProfile.sshKey}
-                    field={{
-                      ...fields[2],
-
-                      disabled: !checked,
-                      error:
-                        activeProfile.sshKey != "" && checked
-                          ? validateSSH(activeProfile.sshKey)
-                          : null,
-                    }}
-                  />
-                </div>
-                <div
-                  style="margin-top: 30px;"
-                  data-my-tooltip="On disable the deployed solutions'll be inaccessible."
-                >
-                  <Input
-                    data={editable}
-                    field={{
-                      label: "",
-                      symbol: "editable",
-                      type: "checkbox",
-                    }}
-                    on:input={_updateEditable}
-                  />
-                </div>
-              </div>
+              <Input
+                bind:data={activeProfile.sshKey}
+                field={{
+                  ...fields[2],
+                  error:
+                    activeProfile.sshKey == ""
+                      ? null
+                      : validateSSH(activeProfile.sshKey),
+                  disabled: activeProfileId === activeProfile.id,
+                }}
+              />
             </div>
 
             {#if activeProfileId === activeProfile?.id}
@@ -447,22 +392,7 @@
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-  [data-my-tooltip]:before {
-    content: attr(data-my-tooltip);
-    position: absolute;
-    opacity: 0;
-  }
 
-  [data-my-tooltip]:hover:before {
-    opacity: 1;
-    padding: 10px 15px;
-    border-radius: 5px;
-    background-color: rgba(51, 51, 51, 0.9);
-    color: white;
-    margin-top: -70px;
-    margin-left: -120px;
-    // margin-right: 110px; /*setting it above. to the left. You can play with this */
-  }
   .profile-menu {
     display: flex;
     align-items: center;
