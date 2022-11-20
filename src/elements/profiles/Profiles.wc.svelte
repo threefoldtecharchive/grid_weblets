@@ -36,20 +36,10 @@
   // } else {
   //   editable = true;
   // }
-  $: checked = editable;
   if (configured) {
     editable = false;
   }
 
-  function _updateEditable(e: Event) {
-    const input = e.target as HTMLInputElement;
-
-    checked = input.checked;
-    if (!checked) {
-      const sshIsValid = activeProfile.sshKey == "";
-      _updateError("sshKey", sshIsValid, "");
-    }
-  }
 
   let tabs: ITab[] = [];
   $: {
@@ -133,11 +123,11 @@
       console.log("Error", err);
     }
 
-    if (checked) {
-      const sshIsValid = activeProfile.sshKey !== "";
-      invalid = invalid || !sshIsValid;
-      _updateError("sshKey", sshIsValid, "Invalid SSH Key");
-    }
+    
+    const sshIsValid = activeProfile.sshKey !== "";
+    invalid = invalid || !sshIsValid;
+    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
+    
 
     const nameIsValid = activeProfile.name !== "";
     invalid = invalid || !nameIsValid;
@@ -224,9 +214,8 @@
               type="button"
               disabled={Boolean(validateProfileName(activeProfile.name)) ||
               Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-              checked
-                ? Boolean(validateSSH(activeProfile.sshKey))
-                : false}
+              Boolean(validateSSH(activeProfile.sshKey))
+              }
               on:click={() => {
                 selectedIdx = configs.addProfile();
                 fields.forEach((_, i) => (fields[i].error = null));
@@ -240,9 +229,8 @@
               type="button"
               disabled={Boolean(validateProfileName(activeProfile.name)) ||
               Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-              checked
-                ? Boolean(validateSSH(activeProfile.sshKey))
-                : false}
+              Boolean(validateSSH(activeProfile.sshKey))
+              }
               on:click={onEventHandler.bind(undefined, "save")}
             >
               Save
@@ -298,9 +286,8 @@
             activeProfileId === activeProfile?.id ||
             Boolean(validateProfileName(activeProfile.name)) ||
             Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-            checked
-              ? Boolean(validateSSH(activeProfile.sshKey))
-              : false}
+            Boolean(validateSSH(activeProfile.sshKey))
+            }
             on:click={onActiveProfile}
           >
             {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
@@ -345,36 +332,19 @@
                 <Input data={$configs.twinId} field={twinField} />
                 <Input data={$configs.address} field={addressField} />
               {/if}
-              <div style="display: flex; align-items: center;">
+              
                 <div style="margin-right: 15px; width: 100%;">
                   <Input
                     bind:data={activeProfile.sshKey}
                     field={{
                       ...fields[2],
-
-                      disabled: !checked,
                       error:
-                        activeProfile.sshKey != "" && checked
+                        activeProfile.sshKey != "" 
                           ? validateSSH(activeProfile.sshKey)
                           : null,
                     }}
                   />
                 </div>
-                <div
-                  style="margin-top: 30px;"
-                  data-my-tooltip="On disable the deployed solutions'll be inaccessible."
-                >
-                  <Input
-                    data={editable}
-                    field={{
-                      label: "",
-                      symbol: "editable",
-                      type: "checkbox",
-                    }}
-                    on:input={_updateEditable}
-                  />
-                </div>
-              </div>
             </div>
 
             {#if activeProfileId === activeProfile?.id}
