@@ -29,6 +29,7 @@
   let selectedIdx: string = "0";
   let bridgeAddress: string = "";
   let editable: boolean;
+  let mnIsInvalid: boolean = true;
 
   // if (activeProfileId === activeProfile.id) {
   //   console.log("disabled is true");
@@ -112,26 +113,13 @@
 
   function _updateError(symbol: string, valid: boolean, msg: string) {
     const idx = fields.findIndex((f) => f.symbol === symbol);
-    fields[idx].error = valid ? null : msg;
+    fields[idx].error = valid ? null : msg;    
   }
 
   let activating: boolean = false;
   async function onActiveProfile() {
     activating = true;
-
     let invalid = false;
-    try {
-      const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
-      invalid = !mnIsValid;
-
-      _updateError(
-        "mnemonics",
-        mnIsValid,
-        "No twin exists for this account on this network. Are you using the correct network?"
-      );
-    } catch (err) {
-      console.log("Error", err);
-    }
 
     if (checked) {
       const sshIsValid = activeProfile.sshKey !== "";
@@ -171,9 +159,15 @@
 
   $: balanceStore = $_balanceStore;
 
-  function syncValidateMnemonics(mnemonics: string): string | void {
+  function syncValidateMnemonics(mnemonics: string){
     if (!window.configs.bip39.validateMnemonic(mnemonics)) {
       return "Invalid Mnemonics.";
+    }else{
+      validateMnemonics({...activeProfile,  storeSecret: password}).then(((res) => mnIsInvalid = res))
+      console.log({mnIsInvalid});
+      if (mnIsInvalid){
+        return "No twin exists for this account on this network. Are you using the correct network?";
+      }
     }
   }
 </script>
@@ -296,6 +290,7 @@
             style={`background-color: #1982b1; color: #fff`}
             disabled={activating ||
             activeProfileId === activeProfile?.id ||
+            mnIsInvalid ||
             Boolean(validateProfileName(activeProfile.name)) ||
             Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
             checked
@@ -329,17 +324,17 @@
                 }}
               />
 
-              <Input
-                bind:data={activeProfile.mnemonics}
-                field={{
-                  ...fields[1],
-                  error:
+                <Input
+                  bind:data={activeProfile.mnemonics}
+                  field={{
+                    ...fields[1],
+                    error: 
                     activeProfile.mnemonics == ""
                       ? null
                       : syncValidateMnemonics(activeProfile.mnemonics),
-                  disabled: activeProfileId === activeProfile.id,
-                }}
-              />
+                    disabled: activeProfileId === activeProfile.id,
+                  }}
+                />
 
               {#if activeProfileId === activeProfile?.id}
                 <Input data={$configs.twinId} field={twinField} />
