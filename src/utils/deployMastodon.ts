@@ -1,14 +1,11 @@
 import type Mastodon from "../types/mastodon";
 import type { IProfile } from "../types/Profile";
-import { Network } from "../types/kubernetes";
 
 import {
   GatewayNodes,
   getUniqueDomainName,
-  selectGatewayNode,
   selectSpecificGatewayNode,
 } from "./gatewayHelpers";
-import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
@@ -58,7 +55,8 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
     adminEmail,
     domain,
     nodeId,
-
+    
+    tfConnect,
     SMTP_PORT,
     SMTP_EMAIL,
     SMTP_SERVER,
@@ -104,6 +102,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
     SUPERUSER_EMAIL: adminEmail,
     SUPERUSER_PASSWORD: adminPassword,
     SSH_KEY: profile.sshKey,
+    IS_TF_CONNECT: `${tfConnect}`
   };
 
   const vms = new MachinesModel();

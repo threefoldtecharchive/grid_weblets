@@ -11,6 +11,7 @@ interface IMastodon {
   adminPassword: string;
   domain: string;
   nodeId: number;
+  tfConnect: boolean;
 
   SMTP_SERVER: string;
   SMTP_PORT: string;
@@ -29,6 +30,7 @@ export default class Mastodon implements IMastodon {
   adminEmail: string;
   domain: string;
   nodeId: number;
+  tfConnect: boolean;
 
   SMTP_SERVER: string;
   SMTP_PORT: string;
@@ -47,6 +49,7 @@ export default class Mastodon implements IMastodon {
     adminPassword,
     domain,
     nodeId,
+    tfConnect,
     
     SMTP_SERVER,
     SMTP_PORT,
@@ -56,9 +59,10 @@ export default class Mastodon implements IMastodon {
     this.name = name || "MD" + this.id.split("-")[0];    
     this.adminUsername = adminUsername || "mastodon_admin";
     this.adminPassword = adminPassword || generatePassword(10);
-    this.adminEmail = adminEmail || "";
+    this.adminEmail = adminEmail;
     this.domain = domain || "";
     this.nodeId = nodeId;
+    this.tfConnect = tfConnect || false;
 
     this.SMTP_SERVER = SMTP_SERVER || "smtp.gmail.com";
     this.SMTP_PORT = SMTP_PORT || "587";
