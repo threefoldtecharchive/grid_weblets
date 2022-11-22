@@ -120,11 +120,15 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
 
   return deploy(profile, "Mastodon", name, async (grid) => {
     await checkVMExist(grid, "mastodon", name);
-
-    return grid.machines
-      .deploy(vms)
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+    try {
+      await grid.zos.pingNode({ nodeId: vm.node_id });
+      return grid.machines
+        .deploy(vms)
+        .then(() => grid.machines.getObj(name))
+        .then(([vm]) => vm);
+    } catch (error) {
+      throw error;
+    }
   });
 }
 
