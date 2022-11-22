@@ -86,10 +86,14 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   // Deploy
   return deploy(profile, "Algorand", name, async (grid) => {
     await checkVMExist(grid, "algorand", name);
-
-    return grid.machines
-      .deploy(machines)
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+    try {
+      await grid.zos.pingNode({ nodeId: machine.node_id });
+      return grid.machines
+        .deploy(machines)
+        .then(() => grid.machines.getObj(name))
+        .then(([vm]) => vm);
+    } catch (error) {
+      throw error;
+    }
   });
 }
