@@ -32,8 +32,18 @@ export default async function deployKubernetes(
   k8s.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "Kubernetes", name, async (grid) => {
-    await grid.k8s.deploy(k8s);
-    return await grid.k8s.getObj(name);
+    try {
+      // ping master node
+      await grid.zos.pingNode({ nodeId: k8s.masters[0].node_id });
+      //ping worker nodes
+      k8s.workers?.forEach(async (node) => {
+        await grid.zos.pingNode({ nodeId: node.node_id });
+      });
+      await grid.k8s.deploy(k8s);
+      return await grid.k8s.getObj(name);
+    } catch (error) {
+      throw error;
+    }
   });
 }
 
