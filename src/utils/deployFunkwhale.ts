@@ -108,10 +108,15 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
 
   return deploy(profile, "Funkwhale", name, async (grid) => {
     await checkVMExist(grid, "funkwhale", name);
-    return grid.machines
-      .deploy(vms)
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+    try {
+      await grid.zos.pingNode({ nodeId: vm.node_id });
+      return grid.machines
+        .deploy(vms)
+        .then(() => grid.machines.getObj(name))
+        .then(([vm]) => vm);
+    } catch (error) {
+      throw error;
+    }
   });
 }
 
