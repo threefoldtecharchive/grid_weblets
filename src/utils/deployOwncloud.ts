@@ -140,11 +140,15 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   // deploy
   return deploy(profile, "Owncloud", name, async (grid) => {
     await checkVMExist(grid, "owncloud", name);
-
-    return grid.machines
-      .deploy(vms)
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+    try {
+      await grid.zos.pingNode({ nodeId: vm.node_id });
+      return grid.machines
+        .deploy(vms)
+        .then(() => grid.machines.getObj(name))
+        .then(([vm]) => vm);
+    } catch (error) {
+      throw error;
+    }
   });
 }
 
