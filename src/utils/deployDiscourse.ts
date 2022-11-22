@@ -110,10 +110,15 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
 
   return deploy(profile, "Discourse", name, async (grid) => {
     await checkVMExist(grid, "discourse", name);
-    return grid.machines
-      .deploy(machines)
-      .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+    try {
+      await grid.zos.pingNode({ nodeId: machine.node_id });
+      return grid.machines
+        .deploy(machines)
+        .then(() => grid.machines.getObj(name))
+        .then(([vm]) => vm);
+    } catch (error) {
+      throw error;
+    }
   });
 }
 
