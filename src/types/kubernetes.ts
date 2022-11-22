@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
 import NodeID from "./nodeId";
-import validateName, { validateIPRange } from '../utils/validateName';
+import validateName, { validatePrivateIPRange } from '../utils/validateName';
 
 export abstract class Base {
   public constructor(
@@ -53,7 +53,7 @@ export class Network {
     return name !== "" &&
       ipRange !== "" &&
       validateName(name) === undefined &&
-      validateIPRange(ipRange) === undefined
+      validatePrivateIPRange(ipRange) === undefined
   }
 }
 
