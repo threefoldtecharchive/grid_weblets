@@ -52,17 +52,12 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, type, name, async grid => {
-    // eslint-disable-next-line no-useless-catch
-    try {
-      await grid.zos.pingNode({ nodeId: vm.node_id });
-      if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
-      return grid.machines
-        .deploy(vms)
-        .then(() => grid.machines.getObj(name))
-        .then(([vm]) => vm);
-    } catch (error) {
-      throw error;
-    }
+    await grid.zos.pingNode({ nodeId: vm.node_id });
+    if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
 
