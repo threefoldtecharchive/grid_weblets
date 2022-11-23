@@ -7,13 +7,8 @@ import type { IStore } from "../stores/currentDeployment";
 import checkVMExist from "./prepareDeployment";
 import { Network } from "../types/kubernetes";
 
-export default async function deployVM(
-  data: VM,
-  profile: IProfile,
-  type: IStore["type"]
-) {
-  const { MachineModel, MachinesModel, QSFSDiskModel } =
-    window.configs.grid3_client;
+export default async function deployVM(data: VM, profile: IProfile, type: IStore["type"]) {
+  const { MachineModel, MachinesModel, QSFSDiskModel } = window.configs.grid3_client;
   const { envs, disks, rootFs, qsfsDisk, ...base } = data;
   const { name, flist, cpu, memory, entrypoint, network: nw } = base;
   const { publicIp, planetary, nodeId, publicIp6 } = base;
@@ -56,10 +51,11 @@ export default async function deployVM(
   };
   vms.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, type, name, async (grid) => {
-    if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
+  return deploy(profile, type, name, async grid => {
+    // eslint-disable-next-line no-useless-catch
     try {
       await grid.zos.pingNode({ nodeId: vm.node_id });
+      if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
       return grid.machines
         .deploy(vms)
         .then(() => grid.machines.getObj(name))
