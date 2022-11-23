@@ -2,28 +2,19 @@ import type { default as Peertube } from "../types/peertube";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  selectSpecificGatewayNode,
-  GatewayNodes,
-} from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployPeertube(
-  data: Peertube,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
+export default async function deployPeertube(data: Peertube, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "peertube");
+  const domainName = await getUniqueDomainName(profile, data.name, "peertube");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy peertube
@@ -44,8 +35,7 @@ export default async function deployPeertube(
 }
 
 async function deployPeertubeVM(profile: IProfile, data: Peertube) {
-  const { DiskModel, MachineModel, MachinesModel, generateString } =
-    window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {
     name,
@@ -61,7 +51,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // Network Specs
   const net = new Network();
@@ -107,7 +97,8 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vms.metadata = JSON.stringify(metadate);
 
   // deploy
-  return deploy(profile, "Peertube", name, async (grid) => {
+  return deploy(profile, "Peertube", name, async grid => {
+    await grid.zos.pingNode({ nodeId: vm.node_id });
     await checkVMExist(grid, "peertube", name); // change the project name of the grid to be peertube
     return grid.machines
       .deploy(vms)
@@ -116,12 +107,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
 
   // Gateway Specs
@@ -138,7 +124,8 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
+    await grid.zos.pingNode({ nodeId: gw.node_id });
     await checkGW(grid, domainName, "peertube");
     return grid.gateway
       .deploy_name(gw)

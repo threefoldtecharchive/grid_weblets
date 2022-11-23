@@ -23,17 +23,23 @@ export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
   qsfs.metadata = JSON.stringify(metadate);
 
   try {
-    return deploy(profile, "Qvm", qsfs.name, async (grid) => {
+    return deploy(profile, "Qvm", qsfs.name, async grid => {
+      //ping qsfs nodes
+      qsfs.node_ids.forEach(async node_id => {
+        await grid.zos.pingNode({ nodeId: node_id });
+      });
+      // ping QVM node
+      await grid.zos.pingNode({ nodeId: vm.nodeId });
       await checkVMExist(grid, "qvm", name);
       return grid.qsfs_zdbs
         .deploy(qsfs)
         .then(() => grid.qsfs_zdbs.get({ name: name }))
         .then(async ([qsfs]) => {
-          return deployVM(vm, profile, "Qvm").then((vm) => vm);
+          return deployVM(vm, profile, "Qvm").then(vm => vm);
         });
     });
   } catch (err) {
-    getGrid(profile, (grid) => grid, false).then(async (grid) => {
+    getGrid(profile, grid => grid, false).then(async grid => {
       await grid.qsfs_zdbs.delete(qsfs);
       throw err;
     });

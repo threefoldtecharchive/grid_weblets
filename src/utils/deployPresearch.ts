@@ -8,38 +8,21 @@ import rootFs from "./rootFs";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 
-export default async function deployPresearch(
-  data: Presearch,
-  profile: IProfile
-) {
+export default async function deployPresearch(data: Presearch, profile: IProfile) {
   const deploymentInfo = await depoloyPresearchVM(data, profile);
   return { deploymentInfo };
 }
 
 async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
-  const { MachinesModel, DiskModel, MachineModel, generateString } =
-    window.configs.grid3_client;
+  const { MachinesModel, DiskModel, MachineModel, generateString } = window.configs.grid3_client;
 
-  const {
-    name,
-    cpu,
-    memory,
-    nodeId,
-    publicIp,
-    planetary,
-    preCode,
-    privateRestoreKey,
-    publicRestoreKey,
-  } = data;
+  const { name, cpu, memory, nodeId, publicIp, planetary, preCode, privateRestoreKey, publicRestoreKey } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // Private network
-  const network = createNetwork(
-    new Network(`nw${randomSuffix}`, "10.200.0.0/16")
-  );
-
+  const network = createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16"));
 
   // Machine specs
   const machine = new MachineModel();
@@ -76,7 +59,8 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   machines.metadata = JSON.stringify(metadate);
 
   // Deploy
-  return deploy(profile, "Presearch", name, async (grid) => {
+  return deploy(profile, "Presearch", name, async grid => {
+    await grid.zos.pingNode({ nodeId: machine.node_id });
     await checkVMExist(grid, "presearch", name);
 
     return grid.machines

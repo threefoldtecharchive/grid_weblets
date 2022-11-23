@@ -125,6 +125,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
+    await grid.zos.pingNode({ nodeId: gw.node_id });
     await checkGW(grid, domainName, "discourse");
     return grid.gateway
       .deploy_name(gw)

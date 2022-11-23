@@ -126,6 +126,7 @@ function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: num
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", name, async grid => {
+    await grid.zos.pingNode({ nodeId: gw.node_id });
     await checkGW(grid, name, "mastodon");
     return grid.gateway
       .deploy_name(gw)
