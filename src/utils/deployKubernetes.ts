@@ -3,21 +3,18 @@ import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 
-export default async function deployKubernetes(
-  data: Kubernetes,
-  profile: IProfile
-) {
+export default async function deployKubernetes(data: Kubernetes, profile: IProfile) {
   const { master, workers, network, ...base } = data;
   const { secret, description, metadata, name } = base;
 
   const masterNodes = [createNode(master)];
   const workerNodes = workers.map(createNode);
-  const _network = createNetwork(network, true)  
+  const _network = createNetwork(network, true);
 
   const k8s = new window.configs.grid3_client.K8SModel();
   k8s.name = name;
   k8s.secret = secret;
-  k8s.network = _network
+  k8s.network = _network;
   k8s.masters = masterNodes;
   k8s.workers = workerNodes;
   k8s.metadata = metadata;
@@ -31,19 +28,15 @@ export default async function deployKubernetes(
   };
   k8s.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "Kubernetes", name, async (grid) => {
-    try {
-      // ping master node
-      await grid.zos.pingNode({ nodeId: k8s.masters[0].node_id });
-      //ping worker nodes
-      k8s.workers?.forEach(async (node) => {
-        await grid.zos.pingNode({ nodeId: node.node_id });
-      });
-      await grid.k8s.deploy(k8s);
-      return await grid.k8s.getObj(name);
-    } catch (error) {
-      throw error;
-    }
+  return deploy(profile, "Kubernetes", name, async grid => {
+    // ping master node
+    await grid.zos.pingNode({ nodeId: k8s.masters[0].node_id });
+    //ping worker nodes
+    k8s.workers.forEach(async node => {
+      await grid.zos.pingNode({ nodeId: node.node_id });
+    });
+    await grid.k8s.deploy(k8s);
+    return await grid.k8s.getObj(name);
   });
 }
 

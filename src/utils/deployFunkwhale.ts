@@ -2,28 +2,19 @@ import type { default as Funkwhale } from "../types/funkwhale";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  GatewayNodes,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployFunkwhale(
-  data: Funkwhale,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
+export default async function deployFunkwhale(data: Funkwhale, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "funkwhale");
+  const domainName = await getUniqueDomainName(profile, data.name, "funkwhale");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   const deploymentInfo = await deployFunkwhaleVM(profile, data);
@@ -43,8 +34,7 @@ export default async function deployFunkwhale(
 }
 
 async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
-  const { DiskModel, MachineModel, MachinesModel, generateString } =
-    window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {
     name,
@@ -61,7 +51,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // Network Specs
   const net = new Network();
@@ -106,26 +96,17 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   };
   vms.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "Funkwhale", name, async (grid) => {
+  return deploy(profile, "Funkwhale", name, async grid => {
+    await grid.zos.pingNode({ nodeId: vm.node_id });
     await checkVMExist(grid, "funkwhale", name);
-    try {
-      await grid.zos.pingNode({ nodeId: vm.node_id });
-      return grid.machines
-        .deploy(vms)
-        .then(() => grid.machines.getObj(name))
-        .then(([vm]) => vm);
-    } catch (error) {
-      throw error;
-    }
+    return grid.machines
+      .deploy(vms)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
 
   // Gateway Specs
@@ -142,7 +123,7 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
     await checkGW(grid, domainName, "funkwhale");
     return grid.gateway
       .deploy_name(gw)

@@ -1,10 +1,5 @@
 import type Discourse from "../types/discourse";
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  GatewayNodes,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { selectGatewayNode, getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
@@ -13,14 +8,10 @@ import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployDiscourse(
-  data: Discourse,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
-  let domainName = await getUniqueDomainName(profile, data.name, "discourse");
+export default async function deployDiscourse(data: Discourse, profile: IProfile, gateway: GatewayNodes) {
+  const domainName = await getUniqueDomainName(profile, data.name, "discourse");
 
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   const deploymentInfo = await depoloyDiscourseVM(data, profile);
@@ -43,8 +34,7 @@ export default async function deployDiscourse(
 }
 
 async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
-  const { generateString, MachinesModel, DiskModel, MachineModel } =
-    window.configs.grid3_client;
+  const { generateString, MachinesModel, DiskModel, MachineModel } = window.configs.grid3_client;
 
   const {
     name,
@@ -59,7 +49,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
     domain,
   } = data;
 
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   const network = createNetwork(new Network(`nw${randomSuffix}`));
 
@@ -108,26 +98,17 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   };
   machines.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "Discourse", name, async (grid) => {
+  return deploy(profile, "Discourse", name, async grid => {
+    await grid.zos.pingNode({ nodeId: machine.node_id });
     await checkVMExist(grid, "discourse", name);
-    try {
-      await grid.zos.pingNode({ nodeId: machine.node_id });
-      return grid.machines
-        .deploy(machines)
-        .then(() => grid.machines.getObj(name))
-        .then(([vm]) => vm);
-    } catch (error) {
-      throw error;
-    }
+    return grid.machines
+      .deploy(machines)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
   // define specs
   const gw = new GatewayNameModel();
@@ -143,7 +124,7 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
     await checkGW(grid, domainName, "discourse");
     return grid.gateway
       .deploy_name(gw)

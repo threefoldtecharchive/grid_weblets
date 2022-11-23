@@ -7,17 +7,13 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 
-export default async function deployAlgorand(
-  data: Algorand,
-  profile: IProfile
-) {
+export default async function deployAlgorand(data: Algorand, profile: IProfile) {
   const deploymentInfo = await depoloyAlgorandVM(data, profile);
   return { deploymentInfo };
 }
 
 async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
-  const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } =
-    window.configs.grid3_client;
+  const { MachinesModel, DiskModel, GridClient, MachineModel, generateString } = window.configs.grid3_client;
   const {
     name,
     cpu,
@@ -34,12 +30,10 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // Private network
-  const network = createNetwork(
-    new Network(`nw${randomSuffix}`, "10.200.0.0/16")
-  );
+  const network = createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16"));
 
   // Disk Specs
   const disk = new DiskModel();
@@ -84,16 +78,12 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   machines.metadata = JSON.stringify(metadate);
 
   // Deploy
-  return deploy(profile, "Algorand", name, async (grid) => {
+  return deploy(profile, "Algorand", name, async grid => {
+    await grid.zos.pingNode({ nodeId: machine.node_id });
     await checkVMExist(grid, "algorand", name);
-    try {
-      await grid.zos.pingNode({ nodeId: machine.node_id });
-      return grid.machines
-        .deploy(machines)
-        .then(() => grid.machines.getObj(name))
-        .then(([vm]) => vm);
-    } catch (error) {
-      throw error;
-    }
+    return grid.machines
+      .deploy(machines)
+      .then(() => grid.machines.getObj(name))
+      .then(([vm]) => vm);
   });
 }
