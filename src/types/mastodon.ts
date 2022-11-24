@@ -57,7 +57,7 @@ export default class Mastodon implements IMastodon {
     SMTP_PASSWORD,
   }: Partial<IMastodon> = {}) {
     this.name = name || "MD" + this.id.split("-")[0];    
-    this.adminUsername = adminUsername || "adminusername";
+    this.adminUsername = adminUsername || "adminuser";
     this.adminPassword = adminPassword || generatePassword(10);
     this.adminEmail = adminEmail;
     this.domain = domain || "";
