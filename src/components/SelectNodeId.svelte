@@ -30,16 +30,18 @@
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
-  export let exclusiveFor: string = "";
+  export let exclusiveFor = "";
 
   export let profile: IProfile;
-  let loadingNodes: boolean = false;
+  let loadingNodes = false;
 
   // for multiple options
   export let multiple: number = undefined;
   export let count: number = undefined;
-  let disabledMultiSelect: boolean = false;
-
+  let disabledMultiSelect = false;
+  let downNodes,
+    upNodes = [];
+  let aliveNode = false;
   const configs = window.configs?.baseConfig;
 
   // prettier-ignore
@@ -113,11 +115,9 @@
           nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
-          await pingNode(data);
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
-          await pingNode(data);
         }
       })
       .catch(err => {
@@ -126,7 +126,8 @@
         status = null;
         nodeIdSelectField.options[0].label = "No nodes available";
       })
-      .finally(() => {
+      .finally(async() => {
+        if(!multiple) await pingNode(data);
         loadingNodes = false;
       });
   }
@@ -136,7 +137,7 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, oldLabel: string, label: string = "Loading...") {
+  function _setLabel(index: number, oldLabel: string, label = "Loading...") {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
@@ -153,7 +154,7 @@
     );
   }
 
-  function _setCountriesOptions(index: number, items: Map<string, Number>) {
+  function _setCountriesOptions(index: number, items: Map<string, number>) {
     const [option] = filtersFields[index].options;
     filtersFields[index].options = Object.entries(items).map(function ([name, code]) {
       const op = { label: name, value: name } as ISelectOption;
@@ -230,7 +231,7 @@
 
   let _ctrl: AbortController;
   let _nodeId: number;
-  let validating: boolean = false;
+  let validating = false;
   $: {
     if (nodeSelection === "manual")
       if (profile && _nodeId !== data) {
@@ -346,22 +347,19 @@
   }
 
   async function pingNode(node: number) {
-    {
-      if (node) {
-        console.log("Ping node alive ");
-        console.log(node);
-        console.log(status);
-        if (status == "valid") {
-          let grid = await getGrid(profile, grid => grid, false);
-          try {
-            validating = true;
-            await grid.zos.pingNode({ nodeId: node });
-            validating = false;
-          } catch (e) {
-            nodeIdField.disabled = validating = false;
-            status = "down";
-          }
-        }
+    if (node && status == "valid") {
+      let grid = await getGrid(profile, grid => grid, false);
+      try {
+        validating = true;
+        await grid.zos.pingNode({ nodeId: node });
+        aliveNode = true;
+        validating = false;
+        return true;
+      } catch (e) {
+        nodeIdField.disabled = validating = false;
+        status = "down";
+        aliveNode = false;
+        return false;
       }
     }
   }
@@ -387,9 +385,9 @@
   {/each}
 
   <button
-    class={"button mt-2 mb-2 " + (loadingNodes ? "is-loading" : "")}
+    class={"button mt-2 mb-2 " + (loadingNodes || validating ? "is-loading" : "")}
     style={`background-color: #1982b1; color: #fff`}
-    disabled={loadingNodes || !profile}
+    disabled={loadingNodes || !profile || validating}
     type="button"
     on:click={onLoadNodesHandler}
   >
@@ -414,8 +412,62 @@
       on:select={e => {
         dispatch("multiple", e.detail);
         disabledMultiSelect = e.detail.length >= multiple;
+        downNodes = upNodes = [];
+        if (e.detail.length >= multiple) {
+          e.detail.forEach(async node => {
+            let k = await pingNode(node);
+            if (!k) downNodes = [...downNodes, node];
+            else upNodes = [...upNodes, node];
+          });
+        }
       }}
     />
+    {#if validating && disabledMultiSelect}
+      <p class="help" style={`color: #1982b1`}>Validating nodes</p>
+    {:else if status === "down"}
+        {#if downNodes.length >1}
+          <p class="help is-danger">
+            Nodes ( <strong>
+            {#each downNodes as node, i}
+              {node}
+              {#if i != upNodes.length - 1}
+                {","}
+              {/if}
+          {/each})</strong> are down.
+          </p>
+        {:else}
+          <p class="help is-danger">
+            Node ( <strong>
+              {#each downNodes as node}
+                <span>{node}</span>
+              {/each}</strong>
+              ) is down.
+          </p>
+        {/if}
+    {:else if status == "valid" && aliveNode && upNodes.length == multiple}
+      {#if upNodes.length >1}
+          <p class="help" style={`color: #1982b1`}>
+            Nodes
+            <strong>
+              (
+              {#each upNodes as node, i}
+                {node}
+                {#if i != upNodes.length - 1}
+                  {","}
+                {/if}
+              {/each})
+            </strong> are up.
+          </p>
+      {:else}
+      <p class="help" style={`color: #1982b1`}>
+        Node ( <strong>
+          {#each upNodes as node}
+            <span>{node}</span>
+          {/each}</strong>
+          ) is up.
+      </p>
+      {/if}
+    {/if}
   {:else}
     <Input
       bind:data
@@ -433,15 +485,15 @@
         validating = false;
       }}
     />
-    {#if status === "down"}
-      <p class="help is-danger">
-        Node (<strong>{data}</strong>) is down.
-      </p>
-    {:else if validating && data}
+    {#if validating && data}
       <p class="help" style={`color: #1982b1`}>
         Validating node {data}
       </p>
-    {:else if status == "valid"}
+    {:else if status === "down"}
+      <p class="help is-danger">
+        Node (<strong>{data}</strong>) is down.
+      </p>
+    {:else if status == "valid" && aliveNode}
       <p class="help" style={`color: #1982b1`}>
         Node (<strong>{data}</strong>) is up.
       </p>
@@ -455,7 +507,7 @@
     </p>
   {/if}
   {#if !validating && data}
-    {#if status == "valid"}
+    {#if status == "valid" && aliveNode}
       <p class="help" style={`color: #1982b1`}>
         Node(<strong>{data}</strong>) is up and has enough resources.
       </p>
