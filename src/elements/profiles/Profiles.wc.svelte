@@ -29,7 +29,7 @@
   let selectedIdx: string = "0";
   let bridgeAddress: string = "";
   let editable: boolean;
-  let mnIsInvalid: boolean = true;
+  let mnIsValid: boolean = true;
 
   // if (activeProfileId === activeProfile.id) {
   //   console.log("disabled is true");
@@ -50,7 +50,12 @@
       const sshIsValid = activeProfile.sshKey == "";
       _updateError("sshKey", sshIsValid, "");
     }
+  console.log("input", input);
+
   }
+  
+  console.log("checked", checked);
+  
 
   let tabs: ITab[] = [];
   $: {
@@ -121,6 +126,18 @@
     activating = true;
     let invalid = false;
 
+    try {
+      const mnemonicsIsValid = activeProfile.mnemonics !== "";
+      invalid = invalid || !mnemonicsIsValid;
+      validateMnemonics({...activeProfile,  storeSecret: password}).then(((res) => mnIsValid = res))
+      console.log({mnemonicsIsValid});
+      if (!mnemonicsIsValid){
+      _updateError("mnemonics", mnemonicsIsValid, "No twin exists for this account on this network. Are you using the correct network?");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
     if (checked) {
       const sshIsValid = activeProfile.sshKey !== "";
       invalid = invalid || !sshIsValid;
@@ -162,13 +179,12 @@
   function syncValidateMnemonics(mnemonics: string){
     if (!window.configs.bip39.validateMnemonic(mnemonics)) {
       return "Invalid Mnemonics.";
-    }else{
-      validateMnemonics({...activeProfile,  storeSecret: password}).then(((res) => mnIsInvalid = res))
-      console.log({mnIsInvalid});
-      if (mnIsInvalid){
-        return "No twin exists for this account on this network. Are you using the correct network?";
-      }
     }
+    validateMnemonics({...activeProfile,  storeSecret: password}).then(((res) => mnIsValid = res))
+    if(!mnIsValid){
+    return "No twin exists for this account on this network. Are you using the correct network?";
+    }
+    console.log({mnIsValidsync: mnIsValid});
   }
 </script>
 
@@ -290,7 +306,7 @@
             style={`background-color: #1982b1; color: #fff`}
             disabled={activating ||
             activeProfileId === activeProfile?.id ||
-            mnIsInvalid ||
+            !mnIsValid ||
             Boolean(validateProfileName(activeProfile.name)) ||
             Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
             checked
