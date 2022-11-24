@@ -3,3 +3,4 @@
 
 # Ignore built files except build/index.js
 playground/public/build/elements/*
+src/components/*

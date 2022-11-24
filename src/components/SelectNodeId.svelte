@@ -11,7 +11,8 @@
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
-  import MultiSelect from "./MultiSelect.svelte"
+  import MultiSelect from "./MultiSelect.svelte";
+  import getGrid from "../utils/getGrid";
 
   const { GridClient } = window.configs?.grid3_client ?? {};
 
@@ -21,12 +22,11 @@
   }>();
   export let cpu: number;
   export let memory: number;
-  export let disk: number= undefined;
+  export let disk: number = undefined;
   export let ssd: number;
   export let publicIp: boolean;
   export let data: number = undefined;
-  export let status: "valid" | "invalid" | "dedicated" | "not found" =
-    undefined;
+  export let status: "valid" | "invalid" | "dedicated" | "not found" | "down" = undefined;
   export let nodes: ISelectOption[] = [];
   // export let error: string = null;
 
@@ -101,24 +101,26 @@
     };
 
     findNodes(_filters, profile, exclusiveFor)
-      .then((_nodes) => {
+      .then(async _nodes => {
         dispatch("fetch", _nodes);
         if (_nodes.length <= 0) {
           data = null;
           status = null;
-          nodes= _nodes
+          nodes = _nodes;
           nodeIdSelectField.options[0].label = "No nodes available";
-        } else if (!_nodes.some((node) => node.value === data)) {
+        } else if (!_nodes.some(node => node.value === data)) {
           nodeIdSelectField.options[0].label = label;
           nodes = _nodes;
           data = +_nodes[0].value;
           status = "valid";
+          await pingNode(data);
         } else {
           nodeIdSelectField.options[0].label = label;
           status = "valid";
+          await pingNode(data);
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Error", err);
         data = null;
         status = null;
@@ -134,15 +136,12 @@
     nodeIdSelectField.options = [option, ...nodes];
   }
 
-  function _setLabel(index: number, oldLabel: string,  label: string = "Loading...") {
+  function _setLabel(index: number, oldLabel: string, label: string = "Loading...") {
     filtersFields[index].options[0].label = label;
     return oldLabel;
   }
 
-  function _setOptions(
-    index: number,
-    items: Array<{ name: string; code?: string }>
-  ) {
+  function _setOptions(index: number, items: Array<{ name: string; code?: string }>) {
     const [option] = filtersFields[index].options;
     filtersFields[index].options = items.reduce(
       (res, { name, code }) => {
@@ -150,30 +149,22 @@
         res.push(op);
         return res;
       },
-      [option]
+      [option],
     );
   }
 
-  function _setCountriesOptions(
-    index: number,
-    items: Map< string, Number >
-  ) {
+  function _setCountriesOptions(index: number, items: Map<string, Number>) {
     const [option] = filtersFields[index].options;
-    filtersFields[index].options = Object.entries(items).map( function ([name, code]) {
-        const op = { label: name, value: name } as ISelectOption;
-        return op;
-      },
-    );
+    filtersFields[index].options = Object.entries(items).map(function ([name, code]) {
+      const op = { label: name, value: name } as ISelectOption;
+      return op;
+    });
     filtersFields[index].options.unshift(option);
   }
 
   let _network: string;
   $: {
-    if (
-      (nodeSelection === "automatic" || multiple) &&
-      profile &&
-      profile.networkEnv !== _network
-    ) {
+    if ((nodeSelection === "automatic" || multiple) && profile && profile.networkEnv !== _network) {
       /* Cache last used network */
       _network = profile.networkEnv;
 
@@ -181,7 +172,7 @@
     }
   }
 
-  function onLoadFarmsHandler(){
+  function onLoadFarmsHandler() {
     /* Loading farms & countries */
     const old_farm_label = "Please select a farm";
     const old_countries_label = "Please select a country";
@@ -194,7 +185,7 @@
         farms.sort((f0, f1) => f0.name.localeCompare(f1.name));
         _setOptions(0, farms);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Error", err);
       })
       .finally(() => {
@@ -202,10 +193,10 @@
       });
 
     fetchCountries(profile)
-      .then(( countries ) => {
+      .then(countries => {
         _setCountriesOptions(1, countries);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Error", err);
       })
       .finally(() => {
@@ -231,6 +222,7 @@
     symbol: "nodeId",
     type: "number",
     placeholder: "Your Node ID",
+    disabled: false,
   };
 
   interface IResources { cru: number; sru: number; hru: number; mru: number; ipv4u: number; } // prettier-ignore
@@ -247,7 +239,6 @@
             _ctrl.abort();
             _ctrl = null;
           }
-          validating = false;
           status = null;
         } else {
           _nodeId = data;
@@ -264,9 +255,9 @@
             method: "GET",
             signal: _ctrl.signal,
           })
-            .then<{ capacity: ICapacity }>((res) => res.json())
+            .then<{ capacity: ICapacity }>(res => res.json())
             .then((node: any) => {
-              if (node.error){
+              if (node.error) {
                 status = "not found";
                 return;
               }
@@ -281,8 +272,7 @@
                 return;
               }
 
-              const { total_resources: total, used_resources: used } =
-                node.capacity;
+              const { total_resources: total, used_resources: used } = node.capacity;
               // prettier-ignore
               let hasEnoughResources = ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
                         ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
@@ -295,7 +285,7 @@
                 return gqlApi<{ nodes: { id: number }[] }>(
                   profile,
                   "query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}",
-                  { id: data }
+                  { id: data },
                 )
                   .then(({ nodes: [{ id }] }) => {
                     return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
@@ -306,6 +296,12 @@
               } else {
                 status = "valid";
               }
+              return node["nodeId"];
+            })
+            .then(async (node: any) => {
+              nodeIdField.disabled = validating = node;
+              await pingNode(node);
+              nodeIdField.disabled = validating = false;
             })
             .catch((err: Error) => {
               console.log("Error", err);
@@ -324,7 +320,7 @@
   let _memory = memory;
   let _ssd = ssd;
   let _publicIp = publicIp;
-  let _disk= disk;
+  let _disk = disk;
 
   const _reset = () => {
     requestAnimationFrame(() => {
@@ -343,10 +339,31 @@
     else if (_memory !== memory) _memory = memory;
     else if (_ssd !== ssd) _ssd = ssd;
     else if (_publicIp !== publicIp) _publicIp = publicIp;
-    else if (_disk !== disk|| multiple || count) _disk = disk;
+    else if (_disk !== disk || multiple || count) _disk = disk;
     else _update = false;
 
     if (_update) _reset();
+  }
+
+  async function pingNode(node: number) {
+    {
+      if (node) {
+        console.log("Ping node alive ");
+        console.log(node);
+        console.log(status);
+        if (status == "valid") {
+          let grid = await getGrid(profile, grid => grid, false);
+          try {
+            validating = true;
+            await grid.zos.pingNode({ nodeId: node });
+            validating = false;
+          } catch (e) {
+            nodeIdField.disabled = validating = false;
+            status = "down";
+          }
+        }
+      }
+    }
   }
 </script>
 
@@ -364,12 +381,8 @@
 {#if nodeSelection === "automatic" || multiple}
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
-    {#if nodeSelection === "automatic" || (multiple  && field.symbol !== "country")}
-      <Input
-        data={filters[field.symbol]}
-        {field}
-        on:input={_update(field.symbol)}
-      />
+    {#if nodeSelection === "automatic" || (multiple && field.symbol !== "country")}
+      <Input data={filters[field.symbol]} {field} on:input={_update(field.symbol)} />
     {/if}
   {/each}
 
@@ -383,27 +396,26 @@
     Apply Filters and Suggest Nodes
   </button>
   {#if multiple}
-  <h5 class="label pt-2 ">
-    {#if (nodeIdSelectField.options.length-1 == 1)}
-      Found one Node
-    {:else}
-      Found {nodeIdSelectField.options.length - 1} Nodes
-    {/if}
-  </h5>
-  <MultiSelect
-    options={nodeIdSelectField.options.reduce((out, { label, value }) => {
-      if (label && value) {
-        out[label] = value;
-      }
-      return out;
+    <h5 class="label pt-2 ">
+      {#if nodeIdSelectField.options.length - 1 == 1}
+        Found one Node
+      {:else}
+        Found {nodeIdSelectField.options.length - 1} Nodes
+      {/if}
+    </h5>
+    <MultiSelect
+      options={nodeIdSelectField.options.reduce((out, { label, value }) => {
+        if (label && value) {
+          out[label] = value;
+        }
+        return out;
       }, {})}
-    bind:disabled={disabledMultiSelect}
-    on:select={(e) => {
-      dispatch("multiple", e.detail)
-      disabledMultiSelect= e.detail.length >=multiple
+      bind:disabled={disabledMultiSelect}
+      on:select={e => {
+        dispatch("multiple", e.detail);
+        disabledMultiSelect = e.detail.length >= multiple;
       }}
     />
-
   {:else}
     <Input
       bind:data
@@ -412,9 +424,28 @@
         type: "select",
         symbol: "nodeId",
         options: nodeIdSelectField.options,
+        disabled: validating,
       }}
-      on:input={() => (status = "valid")}
+      on:input={async () => {
+        status = "valid";
+        validating = true;
+        await pingNode(data);
+        validating = false;
+      }}
     />
+    {#if status === "down"}
+      <p class="help is-danger">
+        Node (<strong>{data}</strong>) is down.
+      </p>
+    {:else if validating && data}
+      <p class="help" style={`color: #1982b1`}>
+        Validating node {data}
+      </p>
+    {:else if status == "valid"}
+      <p class="help" style={`color: #1982b1`}>
+        Node (<strong>{data}</strong>) is up.
+      </p>
+    {/if}
   {/if}
 {:else if nodeSelection === "manual"}
   <Input bind:data field={nodeIdField} />
@@ -430,8 +461,7 @@
       </p>
     {:else if status === "invalid"}
       <p class="help is-danger">
-        Node(<strong>{data}</strong>) might be down or doesn't have enough
-        resources.
+        Node(<strong>{data}</strong>) might be down or doesn't have enough resources.
       </p>
     {:else if status === "not found"}
       <p class="help is-danger">
@@ -439,8 +469,11 @@
       </p>
     {:else if status === "dedicated"}
       <p class="help is-danger">
-        Node(<strong>{data}</strong>) is dedicated and not reserved for your
-        account, please check the dashboard.
+        Node(<strong>{data}</strong>) is dedicated and not reserved for your account, please check the dashboard.
+      </p>
+    {:else if status === "down"}
+      <p class="help is-danger">
+        Node (<strong>{data}</strong>) is down.
       </p>
     {/if}
   {/if}
