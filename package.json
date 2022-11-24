@@ -9,7 +9,7 @@
     "dev": "webpack serve --content-base public",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "check-eslint": "eslint .eslintrc.json .",
+    "check-eslint": "eslint .eslintrc.js .",
     "check-prettier": "npx prettier .prettierrc .",
     "deps": "sh scripts/install_deps.sh",
     "serve": "serve ./dist",
