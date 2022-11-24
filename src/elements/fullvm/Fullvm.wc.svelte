@@ -55,6 +55,7 @@
     { name: "Ubuntu-18.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist", entryPoint: "/init.sh" },
     { name: "Ubuntu-20.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist", entryPoint: "/init.sh" },
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist", entryPoint: "/init.sh" },
+    { name: "Nixos-22.11", url: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist", entryPoint: "/init.sh" },
 
   ];
 
@@ -67,6 +68,7 @@
       { label: "Ubuntu-18.04", value: "0" },
       { label: "Ubuntu-20.04", value: "1" },
       { label: "Ubuntu-22.04", value: "2", selected: true },
+      { label: "Nixos-22.11", value: "3" },
       { label: "Other", value: "other" }
     ]
   };
@@ -94,10 +96,9 @@
   data.disks = [
     new DiskFullVm(undefined, undefined, data.diskSize, "/"),
     ...data.disks,
-  ];  
+  ];
 
   function _isInvalidDisks() {
-
     const names = data.disks.map(({ name }) => name.trim());
     const nameSet = new Set(names);
     return names.length !== nameSet.size;
@@ -106,14 +107,15 @@
   function _isInvalidDefaultDisk(value: number): string | void {
     const NUM_REGEX = /^[1-9](\d?|\d+)$/;
     if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Disk size must be a valid number.";
+      return "Disk size must be a valid number.";
     value = +value;
-    if (+value.toFixed(0) !== value) return "Disk size must be a valid integer.";
+    if (+value.toFixed(0) !== value)
+      return "Disk size must be a valid integer.";
     if (value < 15) return "Minimum allowed disk size is 15 GB.";
     if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields]) || _isInvalidDisks(); // prettier-ignore  
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -165,7 +167,6 @@
       });
   }
 
- 
   function validateDiskName({ id, name }: DiskFullVm) {
     if (!name) return "Disk name is required";
     const valid = data.disks.reduce((v, disk) => {
@@ -287,9 +288,10 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-     
       {:else if active === "disks"}
-        <AddBtn on:click={() => (data.disks = [...data.disks, new DiskFullVm()])} />
+        <AddBtn
+          on:click={() => (data.disks = [...data.disks, new DiskFullVm()])}
+        />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
             {#if index > 0}
@@ -300,7 +302,6 @@
                     (data.disks = data.disks.filter((_, i) => index !== i))}
                 />
                 {#each disk.diskFields as field (field.symbol)}
-  
                   {#if field.symbol === "name"}
                     <Input
                       bind:data={disk[field.symbol]}
