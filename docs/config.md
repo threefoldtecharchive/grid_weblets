@@ -45,12 +45,23 @@ sudo apt-get install libtool gcc g++ make
 
 To avoid the `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` run the following command:
 
+For Linux
+```
+export NODE_OPTIONS="--max-old-space-size=8192 "
+```
+
+For Macos
 ```bash
 export NODE_OPTIONS="--max-old-space-size=8192 -openssl-legacy-provider"
 ```
 
 Or to make it permanent:
 
+for Linux
 ```bash
 echo "export NODE_OPTIONS=\"--max-old-space-size=8192 -openssl-legacy-provider\"" >> ~/.bashrc
+```
+For Macos
+```bash
+echo "export NODE_OPTIONS=\"--max-old-space-size=8192\"" >> ~/.bashrc
 ```
