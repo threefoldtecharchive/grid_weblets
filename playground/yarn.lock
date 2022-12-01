@@ -1115,7 +1115,7 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@jimber/pkid@^1.0.4":
+"@jimber/pkid@1.0.4":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@jimber/pkid/-/pkid-1.0.4.tgz#aefbb02ef14b2a562ce813eccb24dde7462d9b74"
   integrity sha512-A60gh/HSqNgbFWEaDamWSfrciBLC9FrYxrcCDmS515fu7XmIUHSmNNEyCO7QG+gYJ5hECcV47AblILYR6L2ZEg==
@@ -6064,12 +6064,12 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@1.5.0-rc1:
-  version "1.5.0-rc1"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.5.0-rc1.tgz#db3fad3730cc21634a6381a5fac2b2dfd7761c5d"
-  integrity sha512-whQBvg4otlbDXkEwFTmhzXoaqQFxP48/ixdlPV6OiMES6mwxB+I2GhzzPiTv3TC1AXbzX8F81S+hRvdpcU3c1w==
+grid3_client@1.5.0-rc3:
+  version "1.5.0-rc3"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.5.0-rc3.tgz#42707fcf57ade96fb55d4dfe246602a097abb3b1"
+  integrity sha512-NLDyJtZFUQ0pc5TGz/QUswxequumkWcWlBr9ZwiXWEFjhar4rS8+a/PzG1HrD0gb+mF8tfIMhrsqBR98JZ79hw==
   dependencies:
-    "@jimber/pkid" "^1.0.4"
+    "@jimber/pkid" "1.0.4"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.1.0"

@@ -55,6 +55,7 @@
     { name: "Ubuntu-18.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist", entryPoint: "/init.sh" },
     { name: "Ubuntu-20.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist", entryPoint: "/init.sh" },
     { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist", entryPoint: "/init.sh" },
+    { name: "Nixos-22.11", url: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist", entryPoint: "/init.sh" },
 
   ];
 
@@ -67,11 +68,12 @@
       { label: "Ubuntu-18.04", value: "0" },
       { label: "Ubuntu-20.04", value: "1" },
       { label: "Ubuntu-22.04", value: "2", selected: true },
+      { label: "Nixos-22.11", value: "3" },
       { label: "Other", value: "other" }
     ]
   };
-  let selectedFlist: number = 2;
-  let flistSelectValue: string = "2";
+  let selectedFlist = 2;
+  let flistSelectValue = "2";
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
@@ -82,22 +84,18 @@
   }
 
   const deploymentStore = window.configs?.deploymentStore;
-  let active: string = "config";
+  let active = "config";
   let loading = false;
   let success = false;
   let failed = false;
   let profile: IProfile;
   let message: string;
-  let modalData: Object;
+  let modalData: Record<string, unknown>;
   let status: "valid" | "invalid";
 
-  data.disks = [
-    new DiskFullVm(undefined, undefined, data.diskSize, "/"),
-    ...data.disks,
-  ];  
+  data.disks = [new DiskFullVm(undefined, undefined, data.diskSize, "/"), ...data.disks];
 
   function _isInvalidDisks() {
-
     const names = data.disks.map(({ name }) => name.trim());
     const nameSet = new Set(names);
     return names.length !== nameSet.size;
@@ -105,15 +103,14 @@
 
   function _isInvalidDefaultDisk(value: number): string | void {
     const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-    if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Disk size must be a valid number.";
+    if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Disk size must be a valid number.";
     value = +value;
     if (+value.toFixed(0) !== value) return "Disk size must be a valid integer.";
     if (value < 15) return "Minimum allowed disk size is 15 GB.";
     if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields]) || _isInvalidDisks(); // prettier-ignore  
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -139,8 +136,7 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -150,7 +146,7 @@
 
     data.disks[0].size = data.diskSize;
     deployVM(data, profile, "Fullvm")
-      .then((data) => {
+      .then(data => {
         deploymentStore.set(0);
         success = true;
         modalData = data;
@@ -165,7 +161,6 @@
       });
   }
 
- 
   function validateDiskName({ id, name }: DiskFullVm) {
     if (!name) return "Disk name is required";
     const valid = data.disks.reduce((v, disk) => {
@@ -192,10 +187,7 @@
     <h4 class="is-size-4">Deploy a Full Virtual Machine</h4>
     <p>
       Deploy a new full virtual machine on the Threefold Grid
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_fullvm"
-      >
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_fullvm">
         Quick start documentation</a
       >
     </p>
@@ -206,22 +198,14 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed a VM."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed a VM." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy a VM."} />
     {:else}
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
+        <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
           bind:data={flistSelectValue}
@@ -261,11 +245,7 @@
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -275,10 +255,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFs
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, data.rootFs)}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
@@ -287,20 +264,14 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-     
       {:else if active === "disks"}
         <AddBtn on:click={() => (data.disks = [...data.disks, new DiskFullVm()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
             {#if index > 0}
               <div class="box">
-                <DeleteBtn
-                  name={disk.name}
-                  on:click={() =>
-                    (data.disks = data.disks.filter((_, i) => index !== i))}
-                />
+                <DeleteBtn name={disk.name} on:click={() => (data.disks = data.disks.filter((_, i) => index !== i))} />
                 {#each disk.diskFields as field (field.symbol)}
-  
                   {#if field.symbol === "name"}
                     <Input
                       bind:data={disk[field.symbol]}
@@ -310,11 +281,7 @@
                       }}
                     />
                   {:else}
-                    <Input
-                      bind:data={disk[field.symbol]}
-                      {field}
-                      bind:invalid={field.invalid}
-                    />
+                    <Input bind:data={disk[field.symbol]} {field} bind:invalid={field.invalid} />
                   {/if}
                 {/each}
               </div>
@@ -329,7 +296,7 @@
       loading={loading || validateFlist.loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;
