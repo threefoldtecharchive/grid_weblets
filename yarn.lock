@@ -9540,6 +9540,11 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
+web-ssh-keygen@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/web-ssh-keygen/-/web-ssh-keygen-0.1.2.tgz#d01ba786874632035b58eb2661e22ed9fe2432e3"
+  integrity sha512-NbhsaT0c9xD0dASNN7ox1SvjH7DXUdIZRU/RFinlM/w4Yinkn3yzBr8tDkoMzVOV/VuwVfEKooH88Rn83VaoUg==
+
 web-streams-polyfill@^3.0.3:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"

@@ -100,6 +100,7 @@
     "tf-svelte-rx-forms": "^1.0.2",
     "ts-rmb-http-client": "1.0.6",
     "uuid": "^8.3.2",
+    "web-ssh-keygen": "^0.1.2",
     "yarn": "^1.22.17"
   }
 }

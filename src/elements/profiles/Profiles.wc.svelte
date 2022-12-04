@@ -14,6 +14,7 @@
   import Input from "../../components/Input.svelte";
   import { fb, form, validators } from "tf-svelte-rx-forms";
   import getGrid from "../../utils/getGrid";
+  import { generateKeyPair } from "web-ssh-keygen";
   import getBalance from "../../utils/getBalance";
 
   let init = false;
@@ -41,12 +42,12 @@
           return { message: "Couldn't load grid using these mnemonic." };
         }
       },
-      async ctrl => {
-        const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
-        if (userBalance.free < 1) {
-          return { message: noBalanceMessage };
-        }
-      },
+      // async ctrl => {
+      //   const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
+      //   if (userBalance.free < 1) {
+      //     return { message: noBalanceMessage };
+      //   }
+      // },
     ],
   );
   let mnemonicsInput: Input;
@@ -65,7 +66,20 @@
   $: sshKey$ = $sshKey;
   let __sshKey: string;
   let __mnemonic: string;
-  $: if (init && mnemonics$.valid && sshKey$.valid && __sshKey !== sshKey$.value && __mnemonic !== mnemonics$.value) {
+  $: if (!mnemonics$.valid) __mnemonic = undefined;
+  $: if (init && mnemonics$.valid && !sshKey$.valid && __mnemonic !== mnemonics$.value) {
+    __mnemonic = mnemonics$.value;
+    readSSH().then(key => {
+      if (key) {
+        __sshKey = key;
+        sshKey.setValue(key);
+      }
+    });
+  }
+  $: if (init && mnemonics$.valid && sshKey$.valid && (__sshKey !== sshKey$.value || __mnemonic !== mnemonics$.value)) {
+    __sshKey = sshKey$.value;
+    __mnemonic = mnemonics$.value;
+    storeSSH(sshKey$.value);
   }
 
   onMount(() => {
@@ -76,23 +90,86 @@
     if (mn) {
       mnemonics.setValue(mn);
       requestAnimationFrame(() => {
-        readSSH().finally(() => {
-          init = true;
-        });
+        readSSH()
+          .then(key => {
+            sshKey.setValue(key);
+          })
+          .finally(() => {
+            init = true;
+          });
       });
     } else {
       init = true;
     }
   });
 
+  let sshStatus: "read" | "write" = undefined;
   async function readSSH() {
+    sshStatus = "read";
     const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
     const metadata = await grid.kvstore.get({ key: "metadata" });
+    sshStatus = undefined;
     if (metadata) {
-      sshKey.setValue(JSON.parse(metadata).sshkey);
+      return JSON.parse(metadata).sshkey;
     }
   }
-  function storeSSH(key: string) {}
+
+  async function storeSSH(sshkey: string) {
+    if (sshkey === (await readSSH())) return;
+    sshStatus = "write";
+    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
+    await grid.kvstore.set({ key: "metadata", value: JSON.stringify({ sshkey }) });
+    sshStatus = undefined;
+  }
+
+  let creatingAccount = false;
+  async function onCreateAccount() {
+    creatingAccount = true;
+    const grid = new window.configs.grid3_client.GridClient(
+      process.env.NETWORK as any,
+      "",
+      "test",
+      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+    );
+    grid._connect();
+    const createdAccount = await grid.tfchain.createAccount("::1");
+    mnemonics.setValue(createdAccount.mnemonic);
+    mnemonics.markAsDirty();
+    mnemonics.markAsTouched();
+    await mnemonics.validate();
+    creatingAccount = false;
+  }
+
+  let generatingSSH = false;
+  async function onGenerateSSH() {
+    generatingSSH = true;
+
+    const keys = await generateKeyPair({
+      alg: "RSASSA-PKCS1-v1_5",
+      hash: "SHA-256",
+      name: "Threefold",
+      size: 4096,
+    });
+
+    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
+    await grid.kvstore.set({
+      key: "metadata",
+      value: JSON.stringify({ sshkey: keys.publicKey }),
+    });
+
+    sshKey.setValue(keys.publicKey);
+    await sshKey.validate();
+
+    const data = `data:text/raw;charset=utf-8,${encodeURIComponent(keys.privateKey)}`;
+    const a = document.createElement("a");
+    a.download = "id_rsa";
+    a.href = data;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    generatingSSH = false;
+  }
 </script>
 
 <div class="profile-menu" on:mousedown={setShow(true)}>
@@ -139,6 +216,7 @@
               type: "password",
               error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
               placeholder: "Mnemonics",
+              disabled: mnemonics$.pending || creatingAccount,
             }}
             data={mnemonics$.value}
             invalid={!mnemonics$.valid}
@@ -147,11 +225,11 @@
 
         <button
           class="button is-primary ml-2 is-small"
-          class:is-loading={mnemonics$.pending}
-          disabled={true || mnemonics$.valid}
+          disabled={mnemonics$.valid || mnemonics$.pending || creatingAccount}
           style:margin-top="36px"
+          on:click={onCreateAccount}
         >
-          Create Account
+          {mnemonics$.pending ? "Validating Mnemonics..." : creatingAccount ? "Creating Account..." : "Create Account"}
         </button>
       </div>
 
@@ -165,13 +243,23 @@
               type: "textarea",
               error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
               placeholder: "Your public SSH Key",
+              loading: sshStatus !== undefined || generatingSSH,
+              disabled: sshStatus !== undefined,
             }}
             data={sshKey$.value}
             invalid={!sshKey$.valid}
           />
         </div>
 
-        <button class="button is-primary ml-2 is-small" style:margin-top="32px" disabled> Generate SSH Keys </button>
+        <button
+          class="button is-primary ml-2 is-small"
+          class:is-loading={generatingSSH}
+          style:margin-top="32px"
+          disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
+          on:click={onGenerateSSH}
+        >
+          {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
+        </button>
       </div>
     </div>
   </section>
