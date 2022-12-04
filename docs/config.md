@@ -38,8 +38,8 @@ yarn --version
 
 ```bash
 sudo npm install -g node-gyp
-sudo apt-get update
-sudo apt-get install libtool gcc g++ make
+sudo apt update
+sudo apt install autoconf automake g++ libtool libtool-bin
 ```
 
 ## Increase the Max Memory for Node and for nodejs version newer than 16
