@@ -1,21 +1,14 @@
 <svelte:options tag="tf-farming-calculator" />
 
 <script lang="ts">
-  import FarmingProfile, {
-    Certification,
-    ProfileTypes,
-  } from "../../types/FarmingProfile";
+  import FarmingProfile, { Certification, ProfileTypes } from "../../types/FarmingProfile";
   import { onMount } from "svelte";
   import { Chart, registerables } from "chart.js";
-  import {
-    buildPieChart,
-    buildLineChart,
-  } from "../../utils/FarmingCalculatorCharts";
+  import { buildPieChart, buildLineChart } from "../../utils/FarmingCalculatorCharts";
 
   // Components
   import Input from "../../components/Input.svelte";
   import type { IFormField } from "../../types";
-
 
   const profiles = [
     new FarmingProfile({
@@ -41,12 +34,11 @@
     }),
   ];
 
-  let profileChoosing: boolean = true;
+  let profileChoosing = true;
   let activeProfile: FarmingProfile = null;
 
   function onSelectProfile(e: Event) {
     activeProfile = profiles[e.target["selectedIndex"] - 1];
-
   }
 
   const tabFields = ["Basic", "Advanced"];
@@ -61,7 +53,7 @@
     { label: "SSD (GB)", symbol: "ssd" ,disabled},
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu",disabled },
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
-    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
+    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price"},
     // { label: "Token price after 5 years (USD)", symbol: "priceAfter5Years" },
     { label: "Power Utilization (Watt)", symbol: "powerUtilization",disabled },
     { label: "Power Cost (USD)", symbol: "powerCost" },
@@ -77,7 +69,7 @@
     { label: "SSD (GB)", symbol: "ssd" ,disabled},
     { label: "NU Required Per CU", symbol: "nuRequiredPerCu" ,disabled},
     { label: "Hardware Cost (USD)", symbol: "investmentCostHW" },
-    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price" },
+    { label: "Price of TFT at point of registration on blockchain (USD)", symbol: "price"},
     { label: "Maximum Token Price", symbol: "maximumTokenPrice" },
     { label: "Power Utilization (Watt)", symbol: "powerUtilization" ,disabled},
     { label: "Power Cost (USD)", symbol: "powerCost"},
@@ -158,13 +150,13 @@
     _initCharts();
   }
 
-  let showChartRoi: boolean = false;
+  let showChartRoi = false;
   function _updateLineCanvas() {
     const price = active === "Basic" ? activeProfile.maximumTokenPrice : activeProfile.priceAfter5Years; // prettier-ignore
     if (_lineCanvas && activeProfile) {
       const X = (price - 0.15) / 19;
       const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
-      _lineCanvas.data.labels = xs.map((i) => i.toFixed(2));
+      _lineCanvas.data.labels = xs.map(i => i.toFixed(2));
 
       if (showChartRoi) {
         _lineCanvas.data.datasets[0].label = "ROI";
@@ -203,6 +195,9 @@
       val = +val;
       if (isNaN(val)) return "Invalid Number";
       if (val < 0) return "Value must be positive";
+      if (symbol === "price"){
+        if (val < 0.08) return "Minimum TFT price allowed is 0.08 USD.";
+      }
     }  
   });
 
@@ -219,14 +214,11 @@
       value: Certification.GOLD_CERTIFIED,
     },
   ];
-
 </script>
 
 <section class="farming-container">
   <div class="box">
-    <div
-      style="display: flex; justify-content: space-between; align-items: center;"
-    >
+    <div style="display: flex; justify-content: space-between; align-items: center;">
       <h4 class="is-size-4 mb-4">
         Farming Calculator
         {#if activeProfile && !profileChoosing}
@@ -280,11 +272,7 @@
         <ul>
           {#each tabFields as tab (tab)}
             <li class={tab === active ? "is-active" : ""}>
-              <a
-                on:click|preventDefault={onSelectTab.bind(undefined, tab)}
-                href="#!"
-                >{tab}
-              </a>
+              <a on:click|preventDefault={onSelectTab.bind(undefined, tab)} href="#!">{tab} </a>
             </li>
           {/each}
         </ul>
@@ -294,7 +282,10 @@
         <div class="farming-content">
           <div class="farming-content--left">
             <div class="mb-2">
-              <p><strong>Note:</strong> Make sure to use base 1024 while filling in the simulator, otherwise there might be a different payout.</p>
+              <p>
+                <strong>Note:</strong> Make sure to use base 1024 while filling in the simulator, otherwise there might be
+                a different payout.
+              </p>
             </div>
             {#each basicInputFields as field (field.symbol)}
               {#if !field.only || field.only === activeProfile.name}
@@ -306,7 +297,6 @@
                         {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
                           <label style="display: block;">
                             <input
-                              
                               type="radio"
                               name="cert"
                               value={cert.value}
@@ -319,18 +309,11 @@
                     {:else if field.type === "checkbox"}
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
-                        <input
-                         
-                          type="checkbox"
-                          bind:checked={activeProfile[field.symbol]}
-                        />
+                        <input type="checkbox" bind:checked={activeProfile[field.symbol]} />
                         {field.label}
                       </label>
                     {:else}
-                      <Input
-                        bind:data={activeProfile[field.symbol]}
-                        field={{...createNumberField(field)}}
-                      />
+                      <Input bind:data={activeProfile[field.symbol]} field={{ ...createNumberField(field) }} />
                     {/if}
                   </div>
                 </div>
@@ -344,13 +327,7 @@
               </div>
               <div class="chart chart-2">
                 <div style="display: flex; align-items: center;">
-                  <label
-                    for="roi-checkbox"
-                    class="label mr-2 mb-0"
-                    style="cursor: pointer;"
-                  >
-                    Net Profit
-                  </label>
+                  <label for="roi-checkbox" class="label mr-2 mb-0" style="cursor: pointer;"> Net Profit </label>
                   <label class="switch">
                     <input
                       type="checkbox"
@@ -363,13 +340,7 @@
                     />
                     <span class="slider" />
                   </label>
-                  <label
-                    for="roi-checkbox"
-                    class="label ml-2"
-                    style="cursor: pointer;"
-                  >
-                    Return On Investment
-                  </label>
+                  <label for="roi-checkbox" class="label ml-2" style="cursor: pointer;"> Return On Investment </label>
                 </div>
                 <canvas bind:this={lineCanvas} />
               </div>
@@ -380,12 +351,7 @@
                   <div class="control">
                     <label class="label">
                       <p>{field.label}</p>
-                      <input
-                        disabled
-                        class="input"
-                        type="text"
-                        value={activeProfile[field.symbol].toFixed(2)}
-                      />
+                      <input disabled class="input" type="text" value={activeProfile[field.symbol].toFixed(2)} />
                     </label>
                   </div>
                 </div>
@@ -420,18 +386,11 @@
                     {:else if field.type === "checkbox"}
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
-                        <input
-                          type="checkbox"
-                          bind:checked={activeProfile[field.symbol]}
-                        />
+                        <input type="checkbox" bind:checked={activeProfile[field.symbol]} />
                         {field.label}
                       </label>
                     {:else}
-                      <Input
-                     
-                        bind:data={activeProfile[field.symbol]}
-                        field={{...createNumberField(field)}}
-                      />
+                      <Input bind:data={activeProfile[field.symbol]} field={{ ...createNumberField(field) }} />
                     {/if}
                   </div>
                 </div>
@@ -460,23 +419,15 @@
                   <div class="field">
                     <div class="control">
                       <label class="label">
-                        <p
-                          style={field.big
-                            ? "font-size: 20px; font-weight: bold;"
-                            : ""}
-                        >
+                        <p style={field.big ? "font-size: 20px; font-weight: bold;" : ""}>
                           {field.label}
                         </p>
                         <input
-                          style={field.big
-                            ? "font-size: 20px; font-weight: bold;"
-                            : ""}
+                          style={field.big ? "font-size: 20px; font-weight: bold;" : ""}
                           disabled
                           class="input"
                           type="text"
-                          value={field.skip
-                            ? activeProfile[field.symbol]
-                            : activeProfile[field.symbol].toFixed(2)}
+                          value={field.skip ? activeProfile[field.symbol] : activeProfile[field.symbol].toFixed(2)}
                         />
                       </label>
                     </div>
@@ -490,12 +441,7 @@
                   <div class="control">
                     <label class="label">
                       <p>{field.label}</p>
-                      <input
-                        disabled
-                        class="input"
-                        type="text"
-                        value={activeProfile[field.symbol].toFixed(2)}
-                      />
+                      <input disabled class="input" type="text" value={activeProfile[field.symbol].toFixed(2)} />
                     </label>
                   </div>
                 </div>
@@ -508,13 +454,11 @@
     <hr />
     <p class="is-size-4 has-text-weight-bold">Disclaimer</p>
     <p>
-      Simulations are NOT investment advice nor should they be looked at in this
-      way. The scenarios shown are by no means a guarantee and no one can
-      predict the future of yields exactly as they are heavily dependent on
-      factors beyond anyone’s control. The <strong>DAO</strong> could also
-      decide to change parameters or farming, which could have a different
-      result. We invite the community to review and give feedback and make
-      proposals for necessary changes
+      Simulations are NOT investment advice nor should they be looked at in this way. The scenarios shown are by no
+      means a guarantee and no one can predict the future of yields exactly as they are heavily dependent on factors
+      beyond anyone’s control. The <strong>DAO</strong> could also decide to change parameters or farming, which could
+      have a different result. We invite the community to review and give feedback and make proposals for necessary
+      changes
       <a
         href="https://forum.threefold.io/t/the-new-farming-calculator-a-much-simpler-way-to-calculate-your-potential-farming-rewards/1773/4"
         target="_blank"
