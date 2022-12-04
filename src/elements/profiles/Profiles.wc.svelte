@@ -4,157 +4,104 @@
   import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import validateMnemonics from "../../utils/validateMnemonics";
-  import validateProfileName, {
-    isInvalid,
-    validateSSH,
-  } from "../../utils/validateName";
+  import validateProfileName, { isInvalid, SSH_REGEX, validateSSH } from "../../utils/validateName";
   // Components
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import Alert from "../../components/Alert.svelte";
   import QrCode from "../../components/QrCode.svelte";
   import { onDestroy, onMount } from "svelte";
   import { set_store_value } from "svelte/internal";
+  import Input from "../../components/Input.svelte";
+  import { fb, form, validators } from "tf-svelte-rx-forms";
+  import getGrid from "../../utils/getGrid";
+  import getBalance from "../../utils/getBalance";
 
-  const configs = window.configs?.baseConfig;
-  const _balanceStore = window.configs?.balanceStore;
-  let password: string = "";
-  let configured: boolean = false;
+  let init = false;
+  let show = false;
+  function setShow(value: boolean) {
+    return () => (show = value);
+  }
 
-  let profiles: IProfile[];
-  let activeProfile: IProfile;
-  let activeProfileId: string;
-  let opened: boolean = false;
-  let currentProfile: IProfile;
-  let selectedIdx: string = "0";
-  let bridgeAddress: string = "";
-
-  let tabs: ITab[] = [];
-  $: {
-    let s = $configs;
-    if (s) {
-      profiles = s.profiles;
-      activeProfile = profiles[selectedIdx];
-      activeProfileId = s.activeProfile;
-      currentProfile = configs.getActiveProfile();
-      tabs = profiles.map((profile, i) => {
-        return { label: profile.name || `Profile${i + 1}`, value: i.toString(), removable: i !== 0 }; // prettier-ignore
-      });
-
-      if (currentProfile) {
-        if (
-          currentProfile.networkEnv == "dev" ||
-          currentProfile.networkEnv == "qa"
-        ) {
-          bridgeAddress =
-            "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
-        } else if (currentProfile.networkEnv == "test") {
-          bridgeAddress =
-            "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4";
-        } else {
-          bridgeAddress =
-            "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC";
+  export const noBalanceMessage = "Your balance is not enough.";
+  const mnemonics = fb.control<string>(
+    "",
+    [
+      validators.required("Mnemonics is required."),
+      ctrl => {
+        if (!window.configs.bip39.validateMnemonic(ctrl.value)) {
+          return { message: "Mnemonic doesn't seem to be valid." };
         }
+      },
+    ],
+    [
+      async ctrl => {
+        try {
+          await getGrid({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any, _ => _);
+        } catch {
+          return { message: "Couldn't load grid using these mnemonic." };
+        }
+      },
+      async ctrl => {
+        const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
+        if (userBalance.free < 1) {
+          return { message: noBalanceMessage };
+        }
+      },
+    ],
+  );
+  let mnemonicsInput: Input;
+  $: mnemonics$ = $mnemonics;
+  $: if (init) sessionStorage.setItem("mnemonics", mnemonics$.valid ? mnemonics$.value : "");
+
+  const sshKey = fb.control<string>("", [
+    validators.required("Public SSH Key is required."),
+    ctrl => {
+      if (!SSH_REGEX.test(ctrl.value)) {
+        return { message: "Public SSH Key doesn't seem to be valid." };
       }
-    }
+    },
+  ]);
+  let sshKeyInput: Input;
+  $: sshKey$ = $sshKey;
+  let __sshKey: string;
+  let __mnemonic: string;
+  $: if (init && mnemonics$.valid && sshKey$.valid && __sshKey !== sshKey$.value && __mnemonic !== mnemonics$.value) {
   }
 
-  // prettier-ignore
-  const fields: IFormField[] = [
-    { label: "Profile Name", symbol: "name", placeholder: "Profile Name", type: "text" },
-    // { label: "Network Environment", symbol: "networkEnv", type: "select", disabled: true, options: [
-    //   { label: "Testnet", value: "test" },
-    //   { label: "Devnet", value: "dev" }
-    // ] },
-    { label: "Mnemonics", symbol: "mnemonics", placeholder: "Enter Your Polkadot Mnemonics", type: "password" },
-    // { label: "TFChain Configurations Secret", symbol: "storeSecret", placeholder: "  Secret key used to encrypt your data on TFChain", type: "password" },
-    { label: "Public SSH Key", symbol: "sshKey", placeholder: "Your public SSH key will be added as default to all deployments.", type: "text" },
-  ];
-
-  const twinField: IFormField = { label: "Twin ID", type: "number", symbol: "twinId", placeholder: "Loading Twin ID...", disabled: true }; // prettier-ignore
-  const addressField: IFormField = { label: "Address", type: "text", symbol: "address", placeholder: "Loading Address...", disabled: true }; // prettier-ignore
-
-  let message: string;
-  function onEventHandler(event: "create" | "load" | "save") {
-    message = configs[event](password);
-    if (!message) {
-      configured = true;
-    }
-  }
-
-  function _updateError(symbol: string, valid: boolean, msg: string) {
-    const idx = fields.findIndex((f) => f.symbol === symbol);
-    fields[idx].error = valid ? null : msg;
-  }
-
-  let activating: boolean = false;
-  async function onActiveProfile() {
-    activating = true;
-
-    let invalid = false;
-    try {
-      const mnIsValid = await validateMnemonics({...activeProfile, storeSecret: password }); // prettier-ignore
-      invalid = !mnIsValid;
-
-      _updateError(
-        "mnemonics",
-        mnIsValid,
-        "No twin exists for this account on this network. Are you using the correct network?"
-      );
-    } catch (err) {
-      console.log("Error", err);
-    }
-
-    const sshIsValid = activeProfile.sshKey !== "";
-    invalid = invalid || !sshIsValid;
-    _updateError("sshKey", sshIsValid, "Invalid SSH Key");
-
-    const nameIsValid = activeProfile.name !== "";
-    invalid = invalid || !nameIsValid;
-    _updateError("name", nameIsValid, "Please provide a profile name");
-
-    activating = false;
-    if (invalid) return;
-
-    configs.setActiveProfile(activeProfile.id, password);
-  }
-
-  const onClickHandler = () => (opened = false);
   onMount(() => {
-    window.addEventListener("click", onClickHandler);
-    const session_password = sessionStorage.getItem("session_password");
-    if (session_password) {
-      password = session_password;
-      configs.load(password);
-      configured = true;
-      // requestAnimationFrame(() => onActiveProfile());
+    form(mnemonicsInput.getInput(), mnemonics);
+    form(sshKeyInput.getInput(), sshKey);
+
+    const mn = sessionStorage.getItem("mnemonics");
+    if (mn) {
+      mnemonics.setValue(mn);
+      requestAnimationFrame(() => {
+        readSSH().finally(() => {
+          init = true;
+        });
+      });
+    } else {
+      init = true;
     }
   });
-  onDestroy(() => window.removeEventListener("click", onClickHandler));
 
-  //  bind:active={activePassword} tabs={tabsPassword}
-  const tabsPassword: ITab[] = [
-    { label: "Activate Profile Manager", value: "load" },
-    { label: "Create Profile Manager", value: "create" },
-  ];
-  let activePassword: string = "load";
-
-  $: balanceStore = $_balanceStore;
-
-  function syncValidateMnemonics(mnemonics: string): string | void {
-    if (!window.configs.bip39.validateMnemonic(mnemonics)) {
-      return "Invalid Mnemonics.";
+  async function readSSH() {
+    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
+    const metadata = await grid.kvstore.get({ key: "metadata" });
+    if (metadata) {
+      sshKey.setValue(JSON.parse(metadata).sshkey);
     }
   }
+  function storeSSH(key: string) {}
 </script>
 
-<div class="profile-menu" on:click|stopPropagation={() => (opened = !opened)}>
+<div class="profile-menu" on:mousedown={setShow(true)}>
   <button type="button">
     <span class="icon is-small">
       <i class="fas fa-user-cog" />
     </span>
   </button>
-  {#if currentProfile}
+  <!-- {#if currentProfile}
     <div class="profile-active">
       <p style="margin-bottom: 1%;">{currentProfile.name}</p>
       {#if balanceStore.loading}
@@ -164,72 +111,13 @@
         <p>Locked: <span style="padding-left: 2%;">{balanceStore.locked}</span> TFT</p>
       {/if}
     </div>
-  {/if}
+  {/if} -->
 </div>
 
-<div class={"profile-overlay" + (opened ? " is-active" : "")}>
-  <section
-    class={"profile-container" + (opened ? " is-active" : "")}
-    on:click|stopPropagation
-  >
+<div class="profile-overlay" class:is-active={show} on:mousedown={setShow(false)}>
+  <section class="profile-container" class:is-active={show} on:mousedown|stopPropagation>
     <div class="box">
-      <div
-        style="display: flex; justify-content: space-between; align-items: center;"
-      >
-        <h4 class="is-size-4">Profile Manager</h4>
-        <!-- <p>
-          <a
-            target="_blank"
-            href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
-          >
-            Quick start documentation</a
-          >
-        </p> -->
-
-        {#if configured}
-          <div>
-            <button
-              class="button is-outlined mr-2"
-              style={`border-color: #1982b1; color: #1982b1`}
-              type="button"
-              disabled={Boolean(validateProfileName(activeProfile.name)) ||
-                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-                Boolean(validateSSH(activeProfile.sshKey))}
-              on:click={() => {
-                selectedIdx = configs.addProfile();
-                fields.forEach((_, i) => (fields[i].error = null));
-              }}
-            >
-              + Add Profile
-            </button>
-            <button
-              class="button mr-2"
-              style={`background-color: #1982b1; color: #fff`}
-              type="button"
-              disabled={Boolean(validateProfileName(activeProfile.name)) ||
-                Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-                Boolean(validateSSH(activeProfile.sshKey))}
-              on:click={onEventHandler.bind(undefined, "save")}
-            >
-              Save
-            </button>
-            <button
-              class="button is-danger"
-              style={`background-color: #FF5151; color: #fff`}
-              type="button"
-              on:click={() => {
-                configured = false;
-                sessionStorage.removeItem("session_password");
-                configs.setActiveProfile(null, password);
-                password = "";
-              }}
-            >
-              Deactivate
-            </button>
-          </div>
-        {/if}
-      </div>
-
+      <h4 class="is-size-4">Profile Manager</h4>
       <p class="mt-4">
         Please visit <a
           href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
@@ -241,150 +129,50 @@
       </p>
       <hr />
 
-      {#if configured}
-        <Tabs
-          active={selectedIdx}
-          {tabs}
-          centered={false}
-          on:removed={({ detail }) => {
-            selectedIdx = configs.deleteProfile(detail, selectedIdx);
-          }}
-          on:select={(p) => {
-            fields.forEach((_, i) => (fields[i].error = null));
-            selectedIdx = p.detail;
-          }}
-          on:init={() => (selectedIdx = "0")}
-        />
-
-        <div class="is-flex is-justify-content-flex-end">
-          <button
-            class={"button" + (activating ? " is-loading" : "")}
-            style={`background-color: #1982b1; color: #fff`}
-            disabled={activating ||
-              activeProfileId === activeProfile?.id ||
-              Boolean(validateProfileName(activeProfile.name)) ||
-              Boolean(syncValidateMnemonics(activeProfile.mnemonics)) ||
-              Boolean(validateSSH(activeProfile.sshKey))}
-            on:click={onActiveProfile}
-          >
-            {activeProfileId === activeProfile?.id ? "Active" : "Activate"}
-          </button>
+      <div class="is-flex is-justify-content-space-between">
+        <div style:width="100%">
+          <Input
+            bind:this={mnemonicsInput}
+            field={{
+              label: "Mnemonics",
+              symbol: "mnemonics",
+              type: "password",
+              error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
+              placeholder: "Mnemonics",
+            }}
+            data={mnemonics$.value}
+            invalid={!mnemonics$.valid}
+          />
         </div>
 
-        {#if activeProfile}
-          <div style="display: flex; justify-content: space-between;">
-            <div
-              style={activeProfileId === activeProfile?.id
-                ? "width: 75%;"
-                : "width: 100%;"}
-            >
-              <Input
-                bind:data={activeProfile.name}
-                field={{
-                  ...fields[0],
-                  error:
-                    activeProfile.name == ""
-                      ? null
-                      : validateProfileName(activeProfile.name),
-                  disabled: activeProfileId === activeProfile.id,
-                }}
-                on:input={() => {
-                  fields[0].error = validateProfileName(activeProfile.name);
-                }}
-              />
-
-              <Input
-                bind:data={activeProfile.mnemonics}
-                field={{
-                  ...fields[1],
-                  error:
-                    activeProfile.mnemonics == ""
-                      ? null
-                      : syncValidateMnemonics(activeProfile.mnemonics),
-                  disabled: activeProfileId === activeProfile.id,
-                }}
-              />
-
-              {#if activeProfileId === activeProfile?.id}
-                <Input data={$configs.twinId} field={twinField} />
-                <Input data={$configs.address} field={addressField} />
-              {/if}
-              <Input
-                bind:data={activeProfile.sshKey}
-                field={{
-                  ...fields[2],
-                  error:
-                    activeProfile.sshKey == ""
-                      ? null
-                      : validateSSH(activeProfile.sshKey),
-                  disabled: activeProfileId === activeProfile.id,
-                }}
-              />
-            </div>
-
-            {#if activeProfileId === activeProfile?.id}
-              <div style="margin: 10px; border-left: 1px solid #afafaf;" />
-              <div style="width: 25%; padding: 3% 1%; text-align: center;">
-                <p class="label">
-                  Scan code using Threefold connect to send tokens
-                </p>
-                {#if $configs.twinId}
-                  <QrCode
-                    value="TFT:{bridgeAddress}?message=twin_{$configs.twinId}&sender=me&amount=100"
-                    size="250"
-                  />
-                {:else}
-                  <p class="label">Loading scan code...</p>
-                {/if}
-              </div>
-            {/if}
-          </div>
-        {/if}
-      {:else}
-        <Tabs
-          bind:active={activePassword}
-          tabs={tabsPassword}
-          centered={false}
-        />
-
-        <form
-          on:submit|preventDefault={onEventHandler.bind(
-            undefined,
-            activePassword
-          )}
+        <button
+          class="button is-primary ml-2 is-small"
+          class:is-loading={mnemonics$.pending}
+          disabled={true || mnemonics$.valid}
+          style:margin-top="36px"
         >
+          Create Account
+        </button>
+      </div>
+
+      <div class="is-flex is-justify-content-space-between">
+        <div style:width="100%">
           <Input
-            bind:data={password}
+            bind:this={sshKeyInput}
             field={{
-              label: "Password",
-              type: "password",
-              placeholder: "Profile Manager Password",
-              symbol: "secret",
-              tooltip:
-                activePassword === "load"
-                  ? "Password to activate a previously configured profile manager"
-                  : "Password will be used to encrypt data in the browser",
+              label: "Public SSH Key",
+              symbol: "sshKey",
+              type: "textarea",
+              error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
+              placeholder: "Your public SSH Key",
             }}
+            data={sshKey$.value}
+            invalid={!sshKey$.valid}
           />
+        </div>
 
-          {#if message}
-            <Alert type="danger" {message} />
-          {/if}
-
-          <div style="display: flex; justify-content: center;">
-            <button
-              class="button"
-              style={`background-color: #1982b1; color: #fff`}
-              type="submit"
-              disabled={password === ""}
-            >
-              {activePassword === "load"
-                ? "Load Profiles"
-                : "Create New Profile Manager"}
-            </button>
-          </div>
-        </form>
-      {/if}
+        <button class="button is-primary ml-2 is-small" style:margin-top="32px" disabled> Generate SSH Keys </button>
+      </div>
     </div>
   </section>
 </div>

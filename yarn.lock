@@ -1279,6 +1279,11 @@
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.3.4.tgz#bd86a43617df0594787d38b735f55c805becf1bc"
   integrity sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==
 
+"@types/validator@^13.7.7":
+  version "13.7.10"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.7.10.tgz#f9763dc0933f8324920afa9c0790308eedf55ca7"
+  integrity sha512-t1yxFAR2n0+VO6hd/FJ9F2uezAZVWHLmpmlJzm1eX03+H7+HsuTAp7L8QJs+2pQCfWkP1+EXsGK9Z9v7o/qPVQ==
+
 "@types/websocket@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/websocket/-/websocket-1.0.5.tgz#3fb80ed8e07f88e51961211cd3682a3a4a81569c"
@@ -8978,6 +8983,14 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==
+
+tf-svelte-rx-forms@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/tf-svelte-rx-forms/-/tf-svelte-rx-forms-1.0.2.tgz#a1352ffdc2d910c198edaf3e75fddee2868135b2"
+  integrity sha512-kq2jfws89lv9OWOvL45lNcaCBegyJCUXRK3I2cr6Vgr5jxL+Im3Z7BAVU4FqfnrJYZ0i4OGEWqaIJ4mcSoDcZA==
+  dependencies:
+    "@types/validator" "^13.7.7"
+    validator "^13.7.0"
 
 tfgrid-api-client@1.16.4:
   version "1.16.4"
