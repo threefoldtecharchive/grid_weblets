@@ -1,44 +1,22 @@
 <template>
   <section class="editor">
-    <aside
-      class="editor__side menu"
-      style="padding-bottom: 100px"
-    >
-      <img
-        class="logo"
-        src="/images/logoTF.png"
-      />
+    <aside class="editor__side menu" style="padding-bottom: 100px">
+      <img class="logo" src="/images/logoTF.png" />
       <div class="network">{{ envs[network] }}</div>
 
       <template v-for="section in sections">
-        <p
-          class="menu-label"
-          :key="section + 'label'"
-        >{{ section }}</p>
-        <ul
-          class="menu-list"
-          :key="section + 'items'"
-        >
+        <p class="menu-label" :key="section + 'label'">{{ section }}</p>
+        <ul class="menu-list" :key="section + 'items'">
           <template v-for="(el, idx) in weblets">
-            <li
-              :key="el.name"
-              @click="
-                section === 'coming soon' || idx === active
-                  ? null
-                  : route(el.symbol)
-              "
-              v-if="el.section === section"
-            >
+            <li :key="el.name" @click="
+              section === 'coming soon' || idx === active
+                ? null
+                : route(el.symbol)
+            " v-if="el.section === section">
               <a v-bind:class="{ 'is-active': idx === active }">
                 <span class="icon-text">
-                  <span
-                    class="icon"
-                    v-if="el.img"
-                  >
-                    <img
-                      :src="'/icons/' + el.img"
-                      alt="logo"
-                    />
+                  <span class="icon" v-if="el.img">
+                    <img :src="'/icons/' + el.img" alt="logo" />
                   </span>
                   <span class="ml-2">
                     {{ el.name }}
@@ -49,8 +27,7 @@
           </template>
         </ul>
       </template>
-      <span
-        style="
+      <span style="
           position: fixed;
           bottom: 15px;
           left: 245px;
@@ -59,27 +36,15 @@
           font-size: 0.9rem;
           background-color: #1982b1;
           color: white;
-        "
-        class="tag is-light"
-      >
+        " class="tag is-light">
         <tf-version></tf-version>
       </span>
     </aside>
 
-    <div
-      class="editor__content"
-      v-if="active >= 0"
-    >
+    <div class="editor__content" v-if="active >= 0">
       <tf-disclaimer></tf-disclaimer>
-      <nav
-        class="navbar"
-        role="navigation"
-        aria-label="main navigation"
-      >
-        <div
-          class="navbar-end mt-2 mb-2 mr-2"
-          style="height: 112px"
-        >
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-end mt-2 mb-2 mr-2" style="height: 112px">
           <tf-profiles></tf-profiles>
         </div>
       </nav>
@@ -94,6 +59,11 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { parse } from "marked";
+let userAgent = navigator.userAgent;
+
+if (!userAgent.match(/chrome|chromium|crios/i)) {
+  window.alert("Please notice that only Chrome based browsers are supported.");
+}
 
 class Weblet {
   private _md: string;
@@ -327,6 +297,7 @@ export default class Editor extends Vue {
   width: 185px;
   margin: 15px 15px 30px;
 }
+
 .network {
   font-size: 18px;
   display: block;
@@ -337,6 +308,7 @@ export default class Editor extends Vue {
   border-radius: 5px;
   font-weight: 400;
 }
+
 .menu {
   background-color: #333;
 }
