@@ -17,6 +17,9 @@
   import { generateKeyPair } from "web-ssh-keygen";
   import getBalance from "../../utils/getBalance";
 
+  const balanceStore = window.configs.balanceStore;
+  const baseConfigStore = window.configs.baseConfig;
+
   let init = false;
   let show = false;
   function setShow(value: boolean) {
@@ -190,12 +193,22 @@
       })
       .then(twin => {
         twinId = twin;
+        window.configs.baseConfig.set({
+          mnemonics: mnemonics$.value,
+          sshKey: sshKey$.value,
+          address,
+          twinId,
+        });
       });
   } else if (!mnemonics$.valid) {
     __validMnemonic = false;
     twinId = undefined;
     address = undefined;
+    window.configs.baseConfig.set(null);
   }
+
+  $: profile$ = $baseConfigStore;
+  $: balanceStore$ = $balanceStore;
 </script>
 
 <div class="profile-menu" on:mousedown={setShow(true)}>
@@ -204,17 +217,16 @@
       <i class="fas fa-user-cog" />
     </span>
   </button>
-  <!-- {#if currentProfile}
+  {#if profile$}
     <div class="profile-active">
-      <p style="margin-bottom: 1%;">{currentProfile.name}</p>
-      {#if balanceStore.loading}
+      {#if balanceStore$.loading}
         <p>Loading Account Balance</p>
-      {:else if balanceStore.balance !== null}
-        <p>Balance: <span style="font-weight: bold;">{balanceStore.balance}</span> TFT</p>
-        <p>Locked: <span style="padding-left: 2%;">{balanceStore.locked}</span> TFT</p>
+      {:else if balanceStore$.balance !== null}
+        <p>Balance: <span style="font-weight: bold;">{balanceStore$.balance}</span> TFT</p>
+        <p>Locked: <span style="padding-left: 2%;">{balanceStore$.locked}</span> TFT</p>
       {/if}
     </div>
-  {/if} -->
+  {/if}
 </div>
 
 <div class="profile-overlay" class:is-active={show} on:mousedown={setShow(false)}>
