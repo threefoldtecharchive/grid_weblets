@@ -1,6 +1,6 @@
 # Install nodejs ^16.0.0
 
-You may need to remove old versions of nodejs and install latest stable version.
+You may need to remove old versions of nodejs
 
 ```bash
 sudo rm -rf /usr/local/bin/npm /usr/local/share/man/man1/node* ~/.npm
@@ -25,6 +25,14 @@ Verify your installation.
 ```bash
 node -v
 npm -v
+```
+
+## Make sure to install the latest stable Node version to avoid errors while installing node_modules
+
+```bash
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
 ```
 
 ## Install yarn
