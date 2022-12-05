@@ -23,6 +23,13 @@
     return () => (show = value);
   }
 
+  const bridge =
+    process.env.NETWORK === "main"
+      ? "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
+      : process.env.NETWORK === "test"
+      ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
+      : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+
   export const noBalanceMessage = "Your balance is not enough.";
   const mnemonics = fb.control<string>(
     "",
@@ -170,6 +177,25 @@
 
     generatingSSH = false;
   }
+
+  let twinId: number;
+  let address: string;
+  let __validMnemonic = false;
+  $: if (mnemonics$.valid && !__validMnemonic) {
+    __validMnemonic = true;
+    getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _)
+      .then(grid => {
+        address = grid.twins.client.client.address;
+        return grid.twins.get_my_twin_id();
+      })
+      .then(twin => {
+        twinId = twin;
+      });
+  } else if (!mnemonics$.valid) {
+    __validMnemonic = false;
+    twinId = undefined;
+    address = undefined;
+  }
 </script>
 
 <div class="profile-menu" on:mousedown={setShow(true)}>
@@ -261,6 +287,16 @@
           {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
         </button>
       </div>
+
+      {#if twinId !== undefined && address !== undefined}
+        <div class="is-flex is-justify-content-space-between">
+          <div class="is-flex-grow-1 mr-5">
+            <Input field={{ label: "Twin ID", disabled: true, symbol: "twinId", type: "text" }} data={twinId} />
+            <Input field={{ label: "Address", disabled: true, symbol: "address", type: "text" }} data={address} />
+          </div>
+          <QrCode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+        </div>
+      {/if}
     </div>
   </section>
 </div>
