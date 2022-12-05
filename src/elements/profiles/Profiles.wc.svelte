@@ -16,9 +16,13 @@
   import getGrid from "../../utils/getGrid";
   import { generateKeyPair } from "web-ssh-keygen";
   import getBalance from "../../utils/getBalance";
+  import md5 from "crypto-js/md5";
+  import { enc } from "crypto-js";
+  import { encrypt, decrypt } from "crypto-js/aes";
 
   const balanceStore = window.configs.balanceStore;
   const baseConfigStore = window.configs.baseConfig;
+  const { events } = window.configs.grid3_client;
 
   let init = false;
   let show = false;
@@ -91,27 +95,6 @@
     __mnemonic = mnemonics$.value;
     storeSSH(sshKey$.value);
   }
-
-  onMount(() => {
-    form(mnemonicsInput.getInput(), mnemonics);
-    form(sshKeyInput.getInput(), sshKey);
-
-    const mn = sessionStorage.getItem("mnemonics");
-    if (mn) {
-      mnemonics.setValue(mn);
-      requestAnimationFrame(() => {
-        readSSH()
-          .then(key => {
-            sshKey.setValue(key);
-          })
-          .finally(() => {
-            init = true;
-          });
-      });
-    } else {
-      init = true;
-    }
-  });
 
   let sshStatus: "read" | "write" = undefined;
   async function readSSH() {
@@ -209,6 +192,83 @@
 
   $: profile$ = $baseConfigStore;
   $: balanceStore$ = $balanceStore;
+
+  let migrateMode = false;
+  const PREFIX = "v2";
+  let passwordInput: Input;
+  const password = fb.control<string>("", [
+    validators.required("Password is required."),
+    ctrl => {
+      if (`${PREFIX}.${md5(ctrl.value).toString()}` in localStorage) return;
+      return { message: "Password doesn't exist." };
+    },
+  ]);
+  $: password$ = $password;
+
+  let migrating = false;
+  async function onMigrate() {
+    migrating = true;
+
+    const key = `${PREFIX}.${md5(password.value).toString()}`;
+    const encodedData = localStorage.getItem(key);
+    const data = JSON.parse(decrypt(encodedData, password.value).toString(enc.Utf8));
+    const profiles: IProfile[] = data.profiles;
+
+    try {
+      await Promise.all(
+        profiles.map(profile => {
+          const newData = { networkEnv: profile.networkEnv, mnemonics: profile.mnemonics } as any;
+          const oldData = { ...newData, storeSecret: password.value } as any;
+          try {
+            return Promise.all([getGrid(oldData, _ => _), getGrid(newData, _ => _)]).then(
+              async ([oldGrid, newGrid]) => {
+                const keys: string[] = await oldGrid.kvstore.list();
+                const values = await Promise.all(keys.map(key => oldGrid.kvstore.get({ key }).catch(() => null)));
+                const promises = keys.map((key, i) =>
+                  values[i] ? newGrid.kvstore.set({ key, value: values[i] }) : Promise.resolve(null),
+                );
+                promises.push(
+                  newGrid.kvstore.set({
+                    key: "metadata",
+                    value: JSON.stringify({
+                      sshkey: profile.sshKey,
+                    }),
+                  }),
+                );
+                return Promise.all(promises);
+              },
+            );
+          } catch {}
+        }),
+      );
+    } catch (e) {
+      console.log(e);
+    }
+
+    migrating = false;
+  }
+
+  onMount(() => {
+    form(mnemonicsInput.getInput(), mnemonics);
+    form(sshKeyInput.getInput(), sshKey);
+    form(passwordInput.getInput(), password);
+
+    const mn = sessionStorage.getItem("mnemonics");
+    if (mn) {
+      mnemonics.setValue(mn);
+      requestAnimationFrame(() => {
+        readSSH()
+          .then(key => {
+            sshKey.setValue(key);
+          })
+          .finally(() => {
+            init = true;
+          });
+      });
+    } else {
+      init = true;
+    }
+  });
 </script>
 
 <div class="profile-menu" on:mousedown={setShow(true)}>
@@ -232,7 +292,16 @@
 <div class="profile-overlay" class:is-active={show} on:mousedown={setShow(false)}>
   <section class="profile-container" class:is-active={show} on:mousedown|stopPropagation>
     <div class="box">
-      <h4 class="is-size-4">Profile Manager</h4>
+      <div class="is-flex is-justify-content-space-between">
+        <h4 class="is-size-4">Profile Manager</h4>
+        <button
+          class="button"
+          class:is-link={migrateMode}
+          class:is-loading={migrating}
+          disabled={migrating}
+          on:click={() => (migrateMode = !migrateMode)}>Migrate</button
+        >
+      </div>
       <p class="mt-4">
         Please visit <a
           href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
@@ -244,71 +313,101 @@
       </p>
       <hr />
 
-      <div class="is-flex is-justify-content-space-between">
-        <div style:width="100%">
+      <section style:display={migrateMode ? "block" : "none"}>
+        <form on:submit|preventDefault={onMigrate}>
           <Input
-            bind:this={mnemonicsInput}
+            bind:this={passwordInput}
             field={{
-              label: "Mnemonics",
-              symbol: "mnemonics",
+              label: "Password",
+              placeholder: "Store Secret",
+              symbol: "password",
+              error: password$.touched ? password$.error : undefined,
               type: "password",
-              error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
-              placeholder: "Mnemonics",
-              disabled: mnemonics$.pending || creatingAccount,
+              disabled: migrating,
             }}
-            data={mnemonics$.value}
-            invalid={!mnemonics$.valid}
+            data={password$.value}
+            invalid={!password$.valid}
           />
-        </div>
 
-        <button
-          class="button is-primary ml-2 is-small"
-          disabled={mnemonics$.valid || mnemonics$.pending || creatingAccount}
-          style:margin-top="36px"
-          on:click={onCreateAccount}
-        >
-          {mnemonics$.pending ? "Validating Mnemonics..." : creatingAccount ? "Creating Account..." : "Create Account"}
-        </button>
-      </div>
-
-      <div class="is-flex is-justify-content-space-between">
-        <div style:width="100%">
-          <Input
-            bind:this={sshKeyInput}
-            field={{
-              label: "Public SSH Key",
-              symbol: "sshKey",
-              type: "textarea",
-              error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
-              placeholder: "Your public SSH Key",
-              loading: sshStatus !== undefined || generatingSSH,
-              disabled: sshStatus !== undefined,
-            }}
-            data={sshKey$.value}
-            invalid={!sshKey$.valid}
-          />
-        </div>
-
-        <button
-          class="button is-primary ml-2 is-small"
-          class:is-loading={generatingSSH}
-          style:margin-top="32px"
-          disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
-          on:click={onGenerateSSH}
-        >
-          {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
-        </button>
-      </div>
-
-      {#if twinId !== undefined && address !== undefined}
-        <div class="is-flex is-justify-content-space-between">
-          <div class="is-flex-grow-1 mr-5">
-            <Input field={{ label: "Twin ID", disabled: true, symbol: "twinId", type: "text" }} data={twinId} />
-            <Input field={{ label: "Address", disabled: true, symbol: "address", type: "text" }} data={address} />
+          <div class="is-flex is-justify-content-center">
+            <button class="button is-success" disabled={!password$.valid || migrating} class:is-loading={migrating}>
+              Migrate
+            </button>
           </div>
-          <QrCode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+        </form>
+      </section>
+
+      <section style:display={migrateMode ? "none" : "block"}>
+        <div class="is-flex is-justify-content-space-between">
+          <div style:width="100%">
+            <Input
+              bind:this={mnemonicsInput}
+              field={{
+                label: "Mnemonics",
+                symbol: "mnemonics",
+                type: "password",
+                error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
+                placeholder: "Mnemonics",
+                disabled: mnemonics$.pending || creatingAccount,
+              }}
+              data={mnemonics$.value}
+              invalid={!mnemonics$.valid}
+            />
+          </div>
+
+          <button
+            class="button is-primary ml-2 is-small"
+            disabled={mnemonics$.valid || mnemonics$.pending || creatingAccount}
+            style:margin-top="36px"
+            on:click={onCreateAccount}
+          >
+            {mnemonics$.pending
+              ? "Validating Mnemonics..."
+              : creatingAccount
+              ? "Creating Account..."
+              : "Create Account"}
+          </button>
         </div>
-      {/if}
+
+        <div class="is-flex is-justify-content-space-between">
+          <div style:width="100%">
+            <Input
+              bind:this={sshKeyInput}
+              field={{
+                label: "Public SSH Key",
+                symbol: "sshKey",
+                type: "textarea",
+                error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
+                placeholder: "Your public SSH Key",
+                loading: sshStatus !== undefined || generatingSSH,
+                disabled: sshStatus !== undefined,
+              }}
+              data={sshKey$.value}
+              invalid={!sshKey$.valid}
+            />
+          </div>
+
+          <button
+            class="button is-primary ml-2 is-small"
+            class:is-loading={generatingSSH}
+            style:margin-top="32px"
+            disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
+            on:click={onGenerateSSH}
+          >
+            {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
+          </button>
+        </div>
+
+        {#if twinId !== undefined && address !== undefined}
+          <div class="is-flex is-justify-content-space-between">
+            <div class="is-flex-grow-1 mr-5">
+              <Input field={{ label: "Twin ID", disabled: true, symbol: "twinId", type: "text" }} data={twinId} />
+              <Input field={{ label: "Address", disabled: true, symbol: "address", type: "text" }} data={address} />
+            </div>
+            <QrCode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+          </div>
+        {/if}
+      </section>
     </div>
   </section>
 </div>

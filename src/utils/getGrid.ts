@@ -11,7 +11,7 @@ export default async function getGrid<T>(
   const grid = new window.configs.grid3_client.GridClient(
     networkEnv as any,
     mnemonics,
-    mnemonics,
+    profile.storeSecret || mnemonics,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     undefined,
     window.configs.grid3_client.BackendStorageType.tfkvstore,
