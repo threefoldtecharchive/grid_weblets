@@ -60,7 +60,7 @@
       type: "text",
       placeholder: "SMTP Email",
       validator: validateRequiredEmail,
-      invalid: true,
+      invalid: false,
     },
     {
       label: "SMTP Password",
@@ -95,7 +95,7 @@
       type: "text",
       placeholder: "Admin Email",
       validator: validateMastodonAdminEmail,
-      invalid: true,
+      invalid: false,
     },
     {
       label: "Admin Username",
@@ -113,6 +113,12 @@
       validator: validateRequiredPassword,
       invalid: false,
     },
+    {
+      label: "Login via Threefold connect",
+      symbol: "tfConnect",
+      invalid: false,
+      type: 'checkbox'
+    }
   ];
 
   // define this solution packages
@@ -137,7 +143,7 @@
     data.invalid ||
     data.status !== "valid" ||
     selectCapacity.invalid ||
-    isInvalid([adminFields[0]]) ||
+    isInvalid([...adminFields]) ||
     isInvalid([...baseFields]);
 
   function onDeployMastodon() {
@@ -243,9 +249,8 @@
       <section style:display={active === "admin_credentials" ? null : "none"}>
         <div class="notification is-warning is-light">
           <p>
-            Mastodon requires admin credentials to set up your admin account
-            which is all mastodon functionality depends on, so you can configure
-            it.
+            Mastodon requires admin credentials to set up your admin account which is all mastodon functionality depends on,
+            so you can configure it, Enable the checkbox below to log in via threefold connect.
           </p>
         </div>
         {#each adminFields as field (field.symbol)}
