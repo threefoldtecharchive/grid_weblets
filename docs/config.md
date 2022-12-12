@@ -1,6 +1,6 @@
 # Install nodejs ^16.0.0
 
-You may need to remove old versions of nodejs and install latest stable version.
+You may need to remove old versions of nodejs
 
 ```bash
 sudo rm -rf /usr/local/bin/npm /usr/local/share/man/man1/node* ~/.npm
@@ -27,6 +27,14 @@ node -v
 npm -v
 ```
 
+## Make sure to install the latest stable Node version to avoid errors while installing node_modules
+
+```bash
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+```
+
 ## Install yarn
 
 ```bash
@@ -38,8 +46,8 @@ yarn --version
 
 ```bash
 sudo npm install -g node-gyp
-sudo apt-get update
-sudo apt-get install libtool gcc g++ make
+sudo apt update
+sudo apt install autoconf automake g++ libtool libtool-bin
 ```
 
 ## Increase the Max Memory for Node and for nodejs version newer than 16
@@ -54,4 +62,5 @@ Or to make it permanent:
 
 ```bash
 echo "export NODE_OPTIONS='--max-old-space-size=8192 --openssl-legacy-provider'" >> ~/.bashrc
+source ~/.bashrc
 ```
