@@ -5,16 +5,16 @@ export default async function getGrid<T>(
   profile: IProfile,
   cb: (grid: GridClient) => T,
   disconnect: boolean = true,
-  solutionType?: string
+  solutionType?: string,
 ): Promise<T> {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+  const { networkEnv, mnemonics } = profile;
   const grid = new window.configs.grid3_client.GridClient(
     networkEnv as any,
     mnemonics,
-    storeSecret,
+    profile.storeSecret || mnemonics,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     undefined,
-    window.configs.grid3_client.BackendStorageType.tfkvstore
+    window.configs.grid3_client.BackendStorageType.tfkvstore,
   );
 
   try {

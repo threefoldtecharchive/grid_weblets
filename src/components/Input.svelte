@@ -13,6 +13,11 @@
   export let min: string | number = undefined;
   export let max: string | number = undefined;
 
+  let __input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+  export function getInput<T>(): T {
+    return __input as T;
+  }
+
   $: numericData = data?.toString();
 
   const id = v4();
@@ -43,7 +48,7 @@
       if (!invalid) {
         (e as any).target.value = +(e as any).target.value;
       }
-      
+
       data = !invalid ? +numericData : numericData;
     }
 
@@ -51,7 +56,6 @@
   }
 
   let showPassword: boolean = false;
-  let _password: HTMLInputElement;
 
   const selectStyle = `
 <style>
@@ -163,6 +167,7 @@
         >
           {#if field.type === "textarea"}
             <textarea
+              bind:this={__input}
               class={"textarea" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
               placeholder={field.placeholder}
               bind:value={data}
@@ -171,6 +176,7 @@
             />
           {:else if field.type === "text"}
             <input
+              bind:this={__input}
               type="text"
               class={"input" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
               placeholder={field.placeholder}
@@ -180,6 +186,7 @@
             />
           {:else if field.type === "number"}
             <input
+              bind:this={__input}
               type="text"
               data-type="number"
               class={"input" + (!field.disabled && (field.error || _error) ? " is-danger" : "")}
@@ -199,18 +206,18 @@
               bind:value={data}
               on:input={_onInput}
               disabled={field.disabled}
-              bind:this={_password}
+              bind:this={__input}
             />
             <span
               style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"
               on:click={() => {
                 showPassword = !showPassword;
-                _password.type = showPassword ? "text" : "password";
+                if (__input instanceof HTMLInputElement) {
+                  __input.type = showPassword ? "text" : "password";
+                }
               }}
             >
-              <i
-                class={"fas " + (!showPassword ? "far fa-eye-slash" : "fa-eye")}
-              />
+              <i class={"fas " + (!showPassword ? "far fa-eye-slash" : "fa-eye")} />
             </span>
           {/if}
         </div>
@@ -224,6 +231,7 @@
       <div style="display: flex; align-items: center;" class="mb-2">
         <label class="switch">
           <input
+            bind:this={__input}
             class="switch__input"
             type="checkbox"
             bind:checked={data}
@@ -247,17 +255,14 @@
         {id}
       >
         <select
+          bind:this={__input}
           disabled={field.disabled}
           style="width: 100%;"
           bind:value={data}
           on:change={_onSelectChange}
         >
           {#each field.options as option (option.value)}
-            <option
-              value={option.value}
-              selected={option.selected}
-              disabled={option.disabled}
-            >
+            <option value={option.value} selected={option.selected} disabled={option.disabled}>
               {option.label}
             </option>
           {/each}
