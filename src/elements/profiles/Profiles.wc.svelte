@@ -18,7 +18,7 @@
   const baseConfigStore = window.configs.baseConfig;
 
   let init = false;
-  let show = true;
+  let show = false;
   function setShow(value: boolean) {
     return () => (show = value);
   }
