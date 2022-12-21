@@ -170,6 +170,7 @@
       .then(twin => {
         twinId = twin;
         window.configs.baseConfig.set({
+          networkEnv: process.env.NETWORK,
           mnemonics: mnemonics$.value,
           sshKey: sshKey$.value,
           address,
