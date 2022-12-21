@@ -1,28 +1,21 @@
 <svelte:options tag="tf-profiles" />
 
 <script lang="ts">
-  import type { IFormField, ITab } from "../../types";
   import type { IProfile } from "../../types/Profile";
-  import validateMnemonics from "../../utils/validateMnemonics";
-  import validateProfileName, { isInvalid, SSH_REGEX, validateSSH } from "../../utils/validateName";
+  import { SSH_REGEX } from "../../utils/validateName";
   // Components
-  import Tabs from "../../components/Tabs.svelte";
-  import Alert from "../../components/Alert.svelte";
   import QrCode from "../../components/QrCode.svelte";
-  import { onDestroy, onMount } from "svelte";
-  import { set_store_value } from "svelte/internal";
+  import { onMount } from "svelte";
   import Input from "../../components/Input.svelte";
   import { fb, form, validators } from "tf-svelte-rx-forms";
   import getGrid from "../../utils/getGrid";
   import { generateKeyPair } from "web-ssh-keygen";
-  import getBalance from "../../utils/getBalance";
   import md5 from "crypto-js/md5";
   import { enc } from "crypto-js";
-  import { encrypt, decrypt } from "crypto-js/aes";
+  import { decrypt } from "crypto-js/aes";
 
   const balanceStore = window.configs.balanceStore;
   const baseConfigStore = window.configs.baseConfig;
-  const { events } = window.configs.grid3_client;
 
   let init = false;
   let show = false;
@@ -64,7 +57,7 @@
       // },
     ],
   );
-  let mnemonicsInput: Input;
+  let mnemonicsInput: HTMLDivElement;
   $: mnemonics$ = $mnemonics;
   $: if (init) sessionStorage.setItem("mnemonics", mnemonics$.valid ? mnemonics$.value : "");
 
@@ -76,7 +69,7 @@
       }
     },
   ]);
-  let sshKeyInput: Input;
+  let sshKeyInput: HTMLDivElement;
   $: sshKey$ = $sshKey;
   let __sshKey: string;
   let __mnemonic: string;
@@ -100,7 +93,7 @@
   async function readSSH() {
     sshStatus = "read";
     const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    const metadata = await grid.kvstore.get({ key: "metadata" });
+    const metadata = await grid.kvstore?.get({ key: "metadata" });
     sshStatus = undefined;
     if (metadata) {
       return JSON.parse(metadata).sshkey;
@@ -167,7 +160,7 @@
   let twinId: number;
   let address: string;
   let __validMnemonic = false;
-  $: if (mnemonics$.valid && !__validMnemonic) {
+  $: if (mnemonics$.valid && !__validMnemonic && sshKey$.valid) {
     __validMnemonic = true;
     getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _)
       .then(grid => {
@@ -177,6 +170,7 @@
       .then(twin => {
         twinId = twin;
         window.configs.baseConfig.set({
+          networkEnv: process.env.NETWORK,
           mnemonics: mnemonics$.value,
           sshKey: sshKey$.value,
           address,
@@ -195,7 +189,7 @@
 
   let migrateMode = false;
   const PREFIX = "v2";
-  let passwordInput: Input;
+  let passwordInput: HTMLFormElement;
   const password = fb.control<string>("", [
     validators.required("Password is required."),
     ctrl => {
@@ -248,27 +242,31 @@
     migrating = false;
   }
 
-  onMount(() => {
-    form(mnemonicsInput.getInput(), mnemonics);
-    form(sshKeyInput.getInput(), sshKey);
-    form(passwordInput.getInput(), password);
+  let mounted: 0 | 1 | 2 = 0;
+  onMount(() => (mounted = 1));
 
+  $: if (mounted === 1 && mnemonicsInput && sshKeyInput && passwordInput) {
+    mounted = 2;
+
+    form(mnemonicsInput.querySelector("input"), mnemonics);
+    form(sshKeyInput.querySelector("textarea"), sshKey);
+    form(passwordInput.querySelector("input"), password);
     const mn = sessionStorage.getItem("mnemonics");
     if (mn) {
-      mnemonics.setValue(mn);
       requestAnimationFrame(() => {
         readSSH()
           .then(key => {
             sshKey.setValue(key);
           })
           .finally(() => {
+            mnemonics.setValue(mn);
             init = true;
           });
       });
     } else {
       init = true;
     }
-  });
+  }
 </script>
 
 <div class="profile-menu" on:mousedown={setShow(true)}>
@@ -314,9 +312,8 @@
       <hr />
 
       <section style:display={migrateMode ? "block" : "none"}>
-        <form on:submit|preventDefault={onMigrate}>
+        <form on:submit|preventDefault={onMigrate} bind:this={passwordInput}>
           <Input
-            bind:this={passwordInput}
             field={{
               label: "Password",
               placeholder: "Store Secret",
@@ -338,65 +335,67 @@
       </section>
 
       <section style:display={migrateMode ? "none" : "block"}>
-        <div class="is-flex is-justify-content-space-between">
-          <div style:width="100%">
-            <Input
-              bind:this={mnemonicsInput}
-              field={{
-                label: "Mnemonics",
-                symbol: "mnemonics",
-                type: "password",
-                error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
-                placeholder: "Mnemonics",
-                disabled: mnemonics$.pending || creatingAccount,
-              }}
-              data={mnemonics$.value}
-              invalid={!mnemonics$.valid}
-            />
+        <form on:submit|preventDefault>
+          <div class="is-flex is-justify-content-space-between">
+            <div style:width="100%" bind:this={mnemonicsInput}>
+              <Input
+                field={{
+                  label: "Mnemonics",
+                  symbol: "mnemonics",
+                  type: "password",
+                  error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
+                  placeholder: "Mnemonics",
+                  disabled: mnemonics$.pending || creatingAccount,
+                }}
+                data={mnemonics$.value}
+                invalid={!mnemonics$.valid}
+              />
+            </div>
+
+            <button
+              class="button is-primary ml-2 is-small"
+              disabled={mnemonics$.valid || mnemonics$.pending || creatingAccount}
+              style:margin-top="36px"
+              on:click={onCreateAccount}
+              type="button"
+            >
+              {mnemonics$.pending
+                ? "Validating Mnemonics..."
+                : creatingAccount
+                ? "Creating Account..."
+                : "Create Account"}
+            </button>
           </div>
 
-          <button
-            class="button is-primary ml-2 is-small"
-            disabled={mnemonics$.valid || mnemonics$.pending || creatingAccount}
-            style:margin-top="36px"
-            on:click={onCreateAccount}
-          >
-            {mnemonics$.pending
-              ? "Validating Mnemonics..."
-              : creatingAccount
-              ? "Creating Account..."
-              : "Create Account"}
-          </button>
-        </div>
+          <div class="is-flex is-justify-content-space-between">
+            <div style:width="100%" bind:this={sshKeyInput}>
+              <Input
+                field={{
+                  label: "Public SSH Key",
+                  symbol: "sshKey",
+                  type: "textarea",
+                  error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
+                  placeholder: "Your public SSH Key",
+                  loading: sshStatus !== undefined || generatingSSH,
+                  disabled: sshStatus !== undefined,
+                }}
+                data={sshKey$.value}
+                invalid={!sshKey$.valid}
+              />
+            </div>
 
-        <div class="is-flex is-justify-content-space-between">
-          <div style:width="100%">
-            <Input
-              bind:this={sshKeyInput}
-              field={{
-                label: "Public SSH Key",
-                symbol: "sshKey",
-                type: "textarea",
-                error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
-                placeholder: "Your public SSH Key",
-                loading: sshStatus !== undefined || generatingSSH,
-                disabled: sshStatus !== undefined,
-              }}
-              data={sshKey$.value}
-              invalid={!sshKey$.valid}
-            />
+            <button
+              class="button is-primary ml-2 is-small"
+              class:is-loading={generatingSSH}
+              style:margin-top="32px"
+              disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
+              type="button"
+              on:click={onGenerateSSH}
+            >
+              {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
+            </button>
           </div>
-
-          <button
-            class="button is-primary ml-2 is-small"
-            class:is-loading={generatingSSH}
-            style:margin-top="32px"
-            disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
-            on:click={onGenerateSSH}
-          >
-            {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
-          </button>
-        </div>
+        </form>
 
         {#if twinId !== undefined && address !== undefined}
           <div class="is-flex is-justify-content-space-between">
