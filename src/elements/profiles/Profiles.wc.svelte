@@ -93,7 +93,7 @@
   async function readSSH() {
     sshStatus = "read";
     const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    const metadata = await grid.kvstore.get({ key: "metadata" });
+    const metadata = await grid.kvstore?.get({ key: "metadata" });
     sshStatus = undefined;
     if (metadata) {
       return JSON.parse(metadata).sshkey;
@@ -160,7 +160,7 @@
   let twinId: number;
   let address: string;
   let __validMnemonic = false;
-  $: if (mnemonics$.valid && !__validMnemonic) {
+  $: if (mnemonics$.valid && !__validMnemonic && sshKey$.valid) {
     __validMnemonic = true;
     getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _)
       .then(grid => {
