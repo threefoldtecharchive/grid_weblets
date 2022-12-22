@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import type { IFormField } from "../types";
 import { getResources } from "./getAlgoResources";
 import isPrivateIP from "private-ip"
@@ -133,7 +134,7 @@ export function validatePortNumber(value: string): string | void {
   if (value === "") return null;
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
     return "Port must be a valid number.";
-  let port = +value;
+  const port = +value;
   if (port.toFixed(0) !== value) return "Port must be a valid integer.";
   if (port < 1) return "Minimum allowed port is 1.";
   if (port > 65535) return "Maximum allowed port is 65535.";
@@ -187,6 +188,7 @@ export function validateIPRange(value: string): string | void {
 }
 
 export function validatePrivateIPRange(value: string): string | void {
+  if (value.split(".").length !== 4) return "Invalid private IP range.";
   if (!value.includes("/")) return "IP range must contain subnet";
   if (value.split("/")[1] !== "16") return "Subnet must be /16";
   if (!isPrivateIP(value.split("/")[0])) return "Invalid private IP range.";
@@ -263,7 +265,7 @@ export function validateethereumRpc(value: string): string | void {
 }
 
 export function validateAlgoCpu(value: string, net, type): string | void {
-  let [cpu, memory, storage] = getResources(net, type);
+  const [cpu, memory, storage] = getResources(net, type);
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
   return "CPU must be a valid number.";
   if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}.`;
@@ -271,7 +273,7 @@ export function validateAlgoCpu(value: string, net, type): string | void {
 
 }
 export function validateAlgoMemory(value: string, net, type): string | void {
-  let [cpu, memory, storage] = getResources(net, type);
+  const [cpu, memory, storage] = getResources(net, type);
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
   return "Memory must be a valid number.";
   if (+value < memory) return `Minimum Memory for this deployment is ${memory}.`;
@@ -279,7 +281,7 @@ export function validateAlgoMemory(value: string, net, type): string | void {
 
 }
 export function validateAlgoStorage(value: string, net, type): string | void {
-  let [cpu, memory, storage] = getResources(net, type);
+  const [cpu, memory, storage] = getResources(net, type);
   if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
   return "Storage must be a valid number.";
   if (+value < storage)
