@@ -5,7 +5,7 @@ export default function validateMnemonics(profile: IProfile) {
   const { networkEnv, mnemonics, storeSecret } = profile;
   const http = new window.configs.client.HTTPMessageBusClient(0, "", "", "");
   const grid = new window.configs.grid3_client.GridClient(
-    networkEnv as NetworkEnv,
+    networkEnv as unknown as NetworkEnv,
     mnemonics,
     storeSecret,
     http,
