@@ -3,10 +3,9 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from "svelte";
 
-  const dispatch =
-    createEventDispatcher<{ removed: number; select: string; init: void }>();
+  const dispatch = createEventDispatcher<{ removed: number; select: string; init: void }>();
 
-  export let opened: boolean = false;
+  export let opened = false;
   export let name: string = null;
   export let selectedID: number = null;
 
@@ -29,13 +28,9 @@
         <button
           class="button is-danger"
           style="background-color: #FF5151; color: #fff"
-          on:click|preventDefault|stopPropagation={onRemove(selectedID)}
-          >Delete</button
+          on:click|preventDefault|stopPropagation={onRemove(selectedID)}>Delete</button
         >
-        <button
-          class="button"
-          on:click|stopPropagation={() => (opened = !opened)}>Cancel</button
-        >
+        <button class="button" on:click|stopPropagation={() => (opened = !opened)}>Cancel</button>
       </div>
     </section>
   </div>

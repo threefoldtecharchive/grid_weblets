@@ -4,14 +4,13 @@
   import type { ITab } from "../types";
   import { createEventDispatcher, onMount } from "svelte";
 
-  const dispatch =
-    createEventDispatcher<{ removed: number; select: string; init: void }>();
+  const dispatch = createEventDispatcher<{ removed: number; select: string; init: void }>();
 
   export let tabs: ITab[];
   export let active: string;
-  export let centered: boolean = true;
-  export let disabled: boolean = false;
-  export let opened: boolean = false;
+  export let centered = true;
+  export let disabled = false;
+  export let opened = false;
   export let selectedTab: string = null;
   export let selectedID: number = null;
 
@@ -36,10 +35,7 @@
     {#if tabs}
       {#each tabs as tab, index (tab.label)}
         <li class={active === tab.value ? "is-active" : ""}>
-          <a
-            href="#!"
-            on:click|preventDefault={onSelectTab.bind(undefined, tab.value)}
-          >
+          <a href="#!" on:click|preventDefault={onSelectTab.bind(undefined, tab.value)}>
             <span>{tab.label}</span>
             {#if tab.removable}
               <button
@@ -66,13 +62,9 @@
         <button
           class="button is-danger"
           style="background-color: #FF5151; color: #fff"
-          on:click|preventDefault|stopPropagation={onRemove(selectedID)}
-          >Delete</button
+          on:click|preventDefault|stopPropagation={onRemove(selectedID)}>Delete</button
         >
-        <button
-          class="button"
-          on:click|stopPropagation={() => (opened = !opened)}>Cancel</button
-        >
+        <button class="button" on:click|stopPropagation={() => (opened = !opened)}>Cancel</button>
       </div>
     </section>
   </div>

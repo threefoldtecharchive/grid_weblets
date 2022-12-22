@@ -8,7 +8,7 @@
   const dispatch = createEventDispatcher<{ input: Event }>();
   export let field: IFormField;
   export let data: any;
-  export let selected: number = 0;
+  export let selected = 0;
   export let invalid = false;
   export let min: string | number = undefined;
   export let max: string | number = undefined;
@@ -50,7 +50,7 @@
     dispatch("input", e);
   }
 
-  let showPassword: boolean = false;
+  let showPassword = false;
 
   const selectStyle = `
 <style>
