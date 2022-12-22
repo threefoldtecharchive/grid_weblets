@@ -1,20 +1,16 @@
+import type { NetworkEnv } from "grid3_client";
 import type { IProfile } from "../types/Profile";
 
 export default function gqlApi<T>(
   profile: IProfile,
   // name: string,
   query: string,
-  variables: Object = {}
+  variables: object = {},
 ): Promise<T> {
   const { networkEnv } = profile;
-  const grid = new window.configs.grid3_client.GridClient(
-    "" as any,
-    "",
-    "",
-    null
-  );
+  const grid = new window.configs.grid3_client.GridClient("" as NetworkEnv, "", "", null);
 
-  const { graphql } = grid.getDefaultUrls(networkEnv as any);
+  const { graphql } = grid.getDefaultUrls(networkEnv as NetworkEnv);
 
   return fetch(graphql, {
     method: "POST",
@@ -23,6 +19,6 @@ export default function gqlApi<T>(
     },
     body: JSON.stringify({ query, variables }),
   })
-    .then((res) => res.json())
+    .then(res => res.json())
     .then<T>(({ data }) => data);
 }
