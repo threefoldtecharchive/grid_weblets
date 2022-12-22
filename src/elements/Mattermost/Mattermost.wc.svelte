@@ -1,35 +1,30 @@
 <svelte:options tag="tf-mattermost" />
 
 <script lang="ts">
-  import DeployBtn from '../../components/DeployBtn.svelte';
-  import Input from '../../components/Input.svelte';
-  import SelectProfile from '../../components/SelectProfile.svelte';
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from '../../types';
-  import type { IProfile } from '../../types/Profile';
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import type { IProfile } from "../../types/Profile";
 
-  import Modal from '../../components/DeploymentModal.svelte';
-  import Mattermost from '../../types/mattermost';
-  import Alert from '../../components/Alert.svelte';
-  import { noActiveProfile } from '../../utils/message';
-  import SelectNodeId from '../../components/SelectNodeId.svelte';
-  import deployMattermost from '../../utils/deployMattermost';
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Mattermost from "../../types/mattermost";
+  import Alert from "../../components/Alert.svelte";
+  import { noActiveProfile } from "../../utils/message";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import deployMattermost from "../../utils/deployMattermost";
   import validateName, {
     isInvalid,
     validateRequiredEmail,
     validateRequiredPortNumber,
     validateRequiredPassword,
-  } from '../../utils/validateName';
-  import { validateRequiredHostName } from '../../utils/validateDomainName';
-  import SelectCapacity from '../../components/SelectCapacity.svelte';
-  import rootFs from '../../utils/rootFs';
-  import Tabs from '../../components/Tabs.svelte';
-  import type { GatewayNodes } from '../../utils/gatewayHelpers';
-  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
+  } from "../../utils/validateName";
+  import { validateRequiredHostName } from "../../utils/validateDomainName";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import rootFs from "../../utils/rootFs";
+  import Tabs from "../../components/Tabs.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -40,10 +35,10 @@
   let editable = false;
 
   const tabs: ITab[] = [
-    { label: 'Base', value: 'base' },
-    { label: 'SMTP Server', value: 'smtp' },
+    { label: "Base", value: "base" },
+    { label: "SMTP Server", value: "smtp" },
   ];
-  let active = 'base';
+  let active = "base";
 
   // prettier-ignore
   const baseFields: IFormField[] = [
@@ -52,34 +47,34 @@
 
   const smtpFields: IFormField[] = [
     {
-      label: 'SMTP Username',
-      symbol: 'username',
-      type: 'text',
-      placeholder: 'SMTP Username',
+      label: "SMTP Username",
+      symbol: "username",
+      type: "text",
+      placeholder: "SMTP Username",
       validator: validateRequiredEmail,
       invalid: true,
     },
     {
-      label: 'SMTP Password',
-      symbol: 'smtpPassword',
-      type: 'password',
+      label: "SMTP Password",
+      symbol: "smtpPassword",
+      type: "password",
       validator: validateRequiredPassword,
-      placeholder: 'SMTP Password',
+      placeholder: "SMTP Password",
       invalid: false,
     },
     {
-      label: 'SMTP Server',
-      symbol: 'server',
-      type: 'text',
-      placeholder: 'SMTP server',
+      label: "SMTP Server",
+      symbol: "server",
+      type: "text",
+      placeholder: "SMTP server",
       validator: validateRequiredHostName,
       invalid: false,
     },
     {
-      label: 'SMTP Port',
-      symbol: 'port',
-      type: 'text',
-      placeholder: 'SMTP Port',
+      label: "SMTP Port",
+      symbol: "port",
+      type: "text",
+      placeholder: "SMTP Port",
       validator: validateRequiredPortNumber,
       invalid: false,
     },
@@ -87,38 +82,38 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: 'Minimum', cpu: 1, memory: 1024 * 2, diskSize: 10 },
-    { name: 'Standard', cpu: 2, memory: 1024 * 4, diskSize: 50 },
-    { name: 'Recommended', cpu: 4, memory: 1024 * 4, diskSize: 100 },
+    { name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 10 },
+    { name: "Standard", cpu: 2, memory: 1024 * 4, diskSize: 50 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
   let profile: IProfile;
-  let loading: boolean = false;
-  let failed: boolean = false;
-  let success: boolean = false;
+  let loading = false;
+  let failed = false;
+  let success = false;
   let message: string;
 
-  let modalData: Object;
+  let modalData: object;
 
   $: disabled =
     (editable && isInvalid([...smtpFields])) ||
     invalid ||
     data.invalid ||
-    data.status !== 'valid' ||
+    data.status !== "valid" ||
     selectCapacity.invalid ||
     isInvalid([...baseFields]);
 
   function onDeployMattermost() {
     loading = true;
     deployMattermost(profile, data, gateway)
-      .then((data) => {
+      .then(data => {
         modalData = data;
         deploymentStore.set(0);
         success = true;
       })
-      .catch((err) => {
-        console.log('Error', err);
+      .catch(err => {
+        console.log("Error", err);
         failed = true;
         message = err.message || err;
       })
@@ -136,42 +131,27 @@
   <form class="box" on:submit|preventDefault={onDeployMattermost}>
     <h4 class="is-size-4">Deploy a Mattermost Instance</h4>
     <p>
-      Mattermost A single point of collaboration. Designed specifically for
-      digital operations.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost"
-      >
+      Mattermost A single point of collaboration. Designed specifically for digital operations.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost">
         Quick start documentation</a
       >
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === 'VM')}
-      <Alert type="info" message={logs?.message ?? 'Loading...'} />
+    {#if loading || (logs !== null && logs.type === "VM")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed Mattermost."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed Mattermost." deployed={true} />
     {:else if failed}
-      <Alert
-        type="danger"
-        message={message || 'Failed to deploy Mattermost.'}
-      />
+      <Alert type="danger" message={message || "Failed to deploy Mattermost."} />
     {:else}
       <Tabs {tabs} bind:active />
 
-      <section style:display={active === 'base' ? null : 'none'}>
+      <section style:display={active === "base" ? null : "none"}>
         {#each baseFields as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {/each}
 
         <SelectCapacity
@@ -198,10 +178,7 @@
           bind:nodeSelection={data.selection.type}
           {profile}
           cpu={data.cpu}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, rootFs(data.cpu, data.memory))}
           memory={data.memory}
           publicIp={data.publicIp}
           nodes={data.selection.nodes}
@@ -209,21 +186,18 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
         />
       </section>
-      <section style:display={active === 'smtp' ? null : 'none'}>
+      <section style:display={active === "smtp" ? null : "none"}>
         <div class="notification is-warning is-light">
-          <p>
-            Mattermost does not require an SMTP server. If you want to use an
-            SMTP server, you can configure it.
-          </p>
+          <p>Mattermost does not require an SMTP server. If you want to use an SMTP server, you can configure it.</p>
         </div>
         <div class="is-flex is-justify-content-flex-end">
           <div style="display: inline-block;">
             <Input
               bind:data={editable}
               field={{
-                label: '',
-                symbol: 'editable',
-                type: 'checkbox',
+                label: "",
+                symbol: "editable",
+                type: "checkbox",
               }}
             />
           </div>
@@ -243,7 +217,7 @@
       {loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;
@@ -259,5 +233,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

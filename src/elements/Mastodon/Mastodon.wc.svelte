@@ -4,12 +4,7 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from "../../types";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   import Modal from "../../components/DeploymentModal.svelte";
@@ -24,7 +19,7 @@
     validateRequiredPortNumber,
     validateRequiredPassword,
     validateMastodonAdminEmail,
-    validateMastodonAdminUsername
+    validateMastodonAdminUsername,
   } from "../../utils/validateName";
   import { validateRequiredHostName } from "../../utils/validateDomainName";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
@@ -117,8 +112,8 @@
       label: "Login via Threefold connect",
       symbol: "tfConnect",
       invalid: false,
-      type: 'checkbox'
-    }
+      type: "checkbox",
+    },
   ];
 
   // define this solution packages
@@ -130,12 +125,12 @@
   let selectCapacity = new SelectCapacityUpdate();
 
   let profile: IProfile;
-  let loading: boolean = false;
-  let failed: boolean = false;
-  let success: boolean = false;
+  let loading = false;
+  let failed = false;
+  let success = false;
   let message: string;
 
-  let modalData: Object;
+  let modalData: object;
 
   $: disabled =
     (editable && isInvalid([...smtpFields])) ||
@@ -149,12 +144,12 @@
   function onDeployMastodon() {
     loading = true;
     deployMastodon(profile, data, gateway)
-      .then((data) => {
+      .then(data => {
         modalData = data;
         deploymentStore.set(0);
         success = true;
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Error", err);
         failed = true;
         message = err.message || err;
@@ -173,15 +168,10 @@
   <form class="box" on:submit|preventDefault={onDeployMastodon}>
     <h4 class="is-size-4">Deploy a Mastodon Instance</h4>
     <p>
-      Mastodon is free and open-source software for running self-hosted social
-      networking services. It has microblogging features similar to the Twitter
-      service, which are offered by a large number of independently run nodes,
-      known as instances, each with its own code of conduct, terms of service,
-      privacy options, and moderation policies.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_mastodon"
-      >
+      Mastodon is free and open-source software for running self-hosted social networking services. It has microblogging
+      features similar to the Twitter service, which are offered by a large number of independently run nodes, known as
+      instances, each with its own code of conduct, terms of service, privacy options, and moderation policies.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_mastodon">
         Quick start documentation</a
       >
     </p>
@@ -192,11 +182,7 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed Mastodon."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed Mastodon." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy Mastodon."} />
     {:else}
@@ -204,11 +190,7 @@
 
       <section style:display={active === "base" ? null : "none"}>
         {#each baseFields as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {/each}
 
         <SelectCapacity
@@ -235,10 +217,7 @@
           bind:nodeSelection={data.selection.type}
           {profile}
           cpu={data.cpu}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, rootFs(data.cpu, data.memory))}
           memory={data.memory}
           publicIp={data.publicIp}
           nodes={data.selection.nodes}
@@ -249,25 +228,18 @@
       <section style:display={active === "admin_credentials" ? null : "none"}>
         <div class="notification is-warning is-light">
           <p>
-            Mastodon requires admin credentials to set up your admin account which is all mastodon functionality depends on,
-            so you can configure it, Enable the checkbox below to log in via threefold connect.
+            Mastodon requires admin credentials to set up your admin account which is all mastodon functionality depends
+            on, so you can configure it, Enable the checkbox below to log in via threefold connect.
           </p>
         </div>
         {#each adminFields as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {/each}
       </section>
 
       <section style:display={active === "smtp" ? null : "none"}>
         <div class="notification is-warning is-light">
-          <p>
-            Mastodon does not require an SMTP server. If you want to use an SMTP
-            server, you can configure it.
-          </p>
+          <p>Mastodon does not require an SMTP server. If you want to use an SMTP server, you can configure it.</p>
         </div>
         <div class="is-flex is-justify-content-flex-end">
           <div style="display: inline-block;">
@@ -296,7 +268,7 @@
       {loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

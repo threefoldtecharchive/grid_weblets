@@ -71,8 +71,8 @@
       { label: "Other", value: "other" }
     ]
   };
-  let selectedFlist: number = 0;
-  let flistSelectValue: string = "0";
+  let selectedFlist = 0;
+  let flistSelectValue = "0";
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
@@ -89,13 +89,13 @@
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
-  let active: string = "config";
+  let active = "config";
   let loading = false;
   let success = false;
   let failed = false;
   let profile: IProfile;
   let message: string;
-  let modalData: Object;
+  let modalData: object;
   let status: "valid" | "invalid";
 
   function _isInvalidDisks() {
@@ -133,8 +133,7 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -143,7 +142,7 @@
     message = undefined;
 
     deployVM(data, profile, "VM")
-      .then((data) => {
+      .then(data => {
         deploymentStore.set(0);
         success = true;
         modalData = data;
@@ -193,10 +192,7 @@
     <h4 class="is-size-4">Deploy a Micro Virtual Machine</h4>
     <p>
       Deploy a new micro virtual machine on the Threefold Grid
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
-      >
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_vm">
         Quick start documentation</a
       >
     </p>
@@ -207,22 +203,14 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed VM."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed VM." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy VM."} />
     {:else}
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
+        <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
           bind:data={flistSelectValue}
@@ -271,11 +259,7 @@
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -285,10 +269,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFs
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, data.rootFs)}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
@@ -302,11 +283,7 @@
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
             <div class="box">
-              <DeleteBtn
-                name={env.key}
-                on:click={() =>
-                  (data.envs = data.envs.filter((_, i) => index !== i))}
-              />
+              <DeleteBtn name={env.key} on:click={() => (data.envs = data.envs.filter((_, i) => index !== i))} />
               {#each envFields as field (field.symbol)}
                 <Input bind:data={env[field.symbol]} {field} />
               {/each}
@@ -318,21 +295,14 @@
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
             <div class="box">
-              <DeleteBtn
-                name={disk.name}
-                on:click={() =>
-                  (data.disks = data.disks.filter((_, i) => index !== i))}
-              />
+              <DeleteBtn name={disk.name} on:click={() => (data.disks = data.disks.filter((_, i) => index !== i))} />
               {#each disk.diskFields as field (field.symbol)}
                 {#if field.symbol === "mountpoint"}
                   <Input
                     bind:data={disk[field.symbol]}
                     field={{
                       ...field,
-                      error:
-                        !field.invalid && !field.error
-                          ? validateMountPoint(disk)
-                          : null,
+                      error: !field.invalid && !field.error ? validateMountPoint(disk) : null,
                     }}
                   />
                 {:else if field.symbol === "name"}
@@ -344,11 +314,7 @@
                     }}
                   />
                 {:else}
-                  <Input
-                    bind:data={disk[field.symbol]}
-                    {field}
-                    bind:invalid={field.invalid}
-                  />
+                  <Input bind:data={disk[field.symbol]} {field} bind:invalid={field.invalid} />
                 {/if}
               {/each}
             </div>
@@ -362,7 +328,7 @@
       loading={loading || validateFlist.loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

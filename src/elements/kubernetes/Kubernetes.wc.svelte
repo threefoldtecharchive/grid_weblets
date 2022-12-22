@@ -62,7 +62,7 @@
   let data = new Kubernetes();
   const currentDeployment = window.configs?.currentDeploymentStore;
 
-  let active: string = "config";
+  let active = "config";
   let loading = false;
   let success = false;
   let failed = false;
@@ -72,14 +72,11 @@
     ((loading || !data.valid) && !(success || failed)) ||
     !profile ||
     data.master.status !== "valid" ||
-    data.workers.reduce(
-      (res, { status }) => res || status !== "valid",
-      false
-    ) ||
+    data.workers.reduce((res, { status }) => res || status !== "valid", false) ||
     isInvalid([...baseFields, ...kubernetesFields, ...networkFields]);
 
   // prettier-ignore
-  let modalData: Object;
+  let modalData: object;
 
   async function onDeployKubernetes() {
     loading = true;
@@ -87,8 +84,7 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -97,7 +93,7 @@
     message = undefined;
 
     deployKubernetes(data, profile)
-      .then((data) => {
+      .then(data => {
         modalData = data;
         deploymentStore.set(0);
         success = true;
@@ -133,17 +129,12 @@
   <form on:submit|preventDefault={onDeployKubernetes} class="box">
     <h4 class="is-size-4">Deploy a Kubernetes</h4>
     <p>
-      Kubernetes is the standard container orchestration tool. On the TF grid,
-      Kubernetes clusters can be deployed out of the box. We have implemented
-      K3S, a full-blown Kubernetes offering that uses only half of the memory
-      footprint. It is packaged as a single binary and made more lightweight to
-      run workloads in resource-constrained locations (fits e.g. IoT, edge, ARM
-      workloads).
+      Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out
+      of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.
+      It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations
+      (fits e.g. IoT, edge, ARM workloads).
 
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_k8s"
-      >
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_k8s">
         Quick start documentation</a
       >
     </p>
@@ -155,11 +146,7 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed K8S."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed K8S." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy K8S."} />
     {:else}
@@ -168,11 +155,7 @@
       {#if active === "config"}
         {#each kubernetesFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -183,11 +166,7 @@
       {:else if active === "master"}
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data.master[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data.master[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data.master[field.symbol]} {field} />
           {/if}
@@ -199,8 +178,7 @@
           cpu={data.master.cpu}
           memory={data.master.memory}
           on:update={({ detail }) => (data.master.rootFs = detail)}
-          on:editableUpdate={({ detail }) =>
-            (data.master.rootFsEditable = detail)}
+          on:editableUpdate={({ detail }) => (data.master.rootFsEditable = detail)}
         />
 
         <SelectNodeId
@@ -217,24 +195,17 @@
           nodes={data.master.selection.nodes}
         />
       {:else if active === "workers"}
-        <AddBtn
-          on:click={() => (data.workers = [...data.workers, new Worker()])}
-        />
+        <AddBtn on:click={() => (data.workers = [...data.workers, new Worker()])} />
         <div class="nodes-container">
           {#each data.workers as worker, index (worker.id)}
             <div class="box">
               <DeleteBtn
                 name={worker.name}
-                on:click={() =>
-                  (data.workers = data.workers.filter((_, i) => index !== i))}
+                on:click={() => (data.workers = data.workers.filter((_, i) => index !== i))}
               />
               {#each baseFields as field (field.symbol)}
                 {#if field.invalid !== undefined}
-                  <Input
-                    bind:data={worker[field.symbol]}
-                    bind:invalid={field.invalid}
-                    {field}
-                  />
+                  <Input bind:data={worker[field.symbol]} bind:invalid={field.invalid} {field} />
                 {:else}
                   <Input bind:data={worker[field.symbol]} {field} />
                 {/if}
@@ -246,8 +217,7 @@
                 cpu={worker.cpu}
                 memory={worker.memory}
                 on:update={({ detail }) => (worker.rootFs = detail)}
-                on:editableUpdate={({ detail }) =>
-                  (worker.rootFsEditable = detail)}
+                on:editableUpdate={({ detail }) => (worker.rootFsEditable = detail)}
               />
 
               <SelectNodeId
@@ -269,13 +239,7 @@
       {/if}
     {/if}
 
-    <DeployBtn
-      {disabled}
-      {loading}
-      {failed}
-      {success}
-      on:click={onResetHandler}
-    />
+    <DeployBtn {disabled} {loading} {failed} {success} on:click={onResetHandler} />
   </form>
 </div>
 {#if modalData}
