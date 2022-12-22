@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import type { IFormField } from "../types";
 import { getResources } from "./getAlgoResources";
 import isPrivateIP from "private-ip";
@@ -179,6 +180,7 @@ export function validateIPRange(value: string): string | void {
 }
 
 export function validatePrivateIPRange(value: string): string | void {
+  if (value.split(".").length !== 4) return "Invalid private IP range.";
   if (!value.includes("/")) return "IP range must contain subnet";
   if (value.split("/")[1] !== "16") return "Subnet must be /16";
   if (!isPrivateIP(value.split("/")[0])) return "Invalid private IP range.";
