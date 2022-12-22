@@ -17,7 +17,7 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  rules: {},
+  rules: { "@typescript-eslint/no-explicit-any": "off" },
   settings: {
     "svelte3/typescript": true, // load TypeScript as peer dependency
   },

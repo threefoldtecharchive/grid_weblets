@@ -4,24 +4,15 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
 
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  GatewayNodes,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 
-export default async function deployOwncloud(
-  data: Owncloud,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
+export default async function deployOwncloud(data: Owncloud, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "owncloud");
+  const domainName = await getUniqueDomainName(profile, data.name, "owncloud");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the owncloud
@@ -42,16 +33,9 @@ export default async function deployOwncloud(
 }
 
 async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
-  const {
-    DiskModel,
-    MachineModel,
-    MachinesModel,
-    NetworkModel,
-    generateString,
-  } = window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, NetworkModel, generateString } = window.configs.grid3_client;
 
   const {
-    envs,
     adminUsername,
     adminPassword,
     smtpFromEmail,
@@ -70,7 +54,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // define a network
   const network = new NetworkModel();
@@ -106,7 +90,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   }
   // check if smtpFromEmail parameter is not empty then extract the name and domain
   if (smtpFromEmail) {
-    let email = smtpFromEmail.split("@");
+    const email = smtpFromEmail.split("@");
     emailName = email[0];
     emailDomain = email[1];
   }
@@ -138,7 +122,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vms.metadata = JSON.stringify(metadate);
 
   // deploy
-  return deploy(profile, "Owncloud", name, async (grid) => {
+  return deploy(profile, "Owncloud", name, async grid => {
     await checkVMExist(grid, "owncloud", name);
 
     return grid.machines
@@ -148,12 +132,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
   // define specs
   const gw = new GatewayNameModel();
@@ -169,7 +148,7 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
     await checkGW(grid, domainName, "owncloud");
     return grid.gateway
       .deploy_name(gw)

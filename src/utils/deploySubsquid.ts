@@ -2,28 +2,19 @@ import type { default as Subsquid } from "../types/subsquid";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  GatewayNodes,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deploySubsquid(
-  data: Subsquid,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
+export default async function deploySubsquid(data: Subsquid, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "subsquid");
+  const domainName = await getUniqueDomainName(profile, data.name, "subsquid");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
 
   data.domain = `${domainName}.${nodeDomain}`;
 
@@ -45,8 +36,7 @@ export default async function deploySubsquid(
 }
 
 async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
-  const { DiskModel, MachineModel, MachinesModel, generateString } =
-    window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {
     name,
@@ -56,12 +46,11 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
     publicIp,
     nodeId,
     endPoint,
-    envs,
     domain,
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // Network Specs
   const net = new Network();
@@ -106,7 +95,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   vms.metadata = JSON.stringify(metadate);
 
   // deploy
-  return deploy(profile, "Subsquid", name, async (grid) => {
+  return deploy(profile, "Subsquid", name, async grid => {
     await checkVMExist(grid, "subsquid", name); // change the project name of the grid to be subsquid
     return grid.machines
       .deploy(vms)
@@ -115,12 +104,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
   // Gateway Specs
   const gw = new GatewayNameModel();
@@ -136,7 +120,7 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
     await checkGW(grid, domainName, "subsquid");
     return grid.gateway
       .deploy_name(gw)

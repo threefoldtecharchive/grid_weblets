@@ -6,57 +6,42 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
-import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf"
+import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf";
 
-
-export default async function deployTFhubValidator(
-  profile: IProfile,
-  tfhubValidator: TFhubValidator
-  ) {
-    
-  const validatorVm = await _deployTfHubValidator(
-    profile, tfhubValidator
-    );
+export default async function deployTFhubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
+  const validatorVm = await _deployTfHubValidator(profile, tfhubValidator);
 
   return validatorVm;
 }
 
-function _deployTfHubValidator(
-        profile: IProfile, tfhubValidator: TFhubValidator
-    ) {
+function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
+  const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
-    const {
-        DiskModel,
-        MachineModel,
-        MachinesModel,
-        generateString,
-    } = window.configs.grid3_client;
+  const {
+    name,
+    nodeId,
+    disks: [{ size }],
+    publicIp,
+    cpu,
+    memory,
 
-    const {
-        name,
-        nodeId,
-        disks: [{ size }],
-        publicIp,
-        cpu,
-        memory,
+    mnemonics,
+    stakeAmount,
+    ethereumAddress,
+    ethereumPrivKey,
+    keyName,
+    moniker,
+    chainId,
+    gravityAddress,
+    ethereumRpc,
+    persistentPeers,
+    genesisUrl,
+    gas_prices,
+    gas_adjustment,
+    orchestrator_fees,
+  } = tfhubValidator;
 
-        mnemonics,
-        stakeAmount,
-        ethereumAddress,
-        ethereumPrivKey,
-        keyName,
-        moniker,
-        chainId,
-        gravityAddress,
-        ethereumRpc,
-        persistentPeers,
-        genesisUrl,
-        gas_prices,
-        gas_adjustment,
-        orchestrator_fees,
-    } = tfhubValidator;
-
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
   const vm = new MachineModel();
   const disk = new DiskModel();
 
@@ -98,14 +83,13 @@ function _deployTfHubValidator(
   vms.machines = [vm];
 
   const metadate = {
-    "type":  "vm",  
-    "name": name,
-    "projectName": "TFhubValidator"
+    type: "vm",
+    name: name,
+    projectName: "TFhubValidator",
   };
   vms.metadata = JSON.stringify(metadate);
 
-
-  return deploy(profile, "TFhubValidator", name, async (grid) => {
+  return deploy(profile, "TFhubValidator", name, async grid => {
     await checkVMExist(grid, "tfhubValidator", name);
 
     return grid.machines

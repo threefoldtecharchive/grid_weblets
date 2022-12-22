@@ -39,13 +39,9 @@ interface IQueryData {
   farms: Array<{ name: string }>;
 }
 
-export default function fetchFarms(
-  profile: IProfile,
-  filters: FilterOptions,
-  exclusiveFor: string
-) {
-  var query = queryCount;
-  var queryDataSelect = queryData;
+export default function fetchFarms(profile: IProfile, filters: FilterOptions, exclusiveFor: string) {
+  let query = queryCount;
+  let queryDataSelect = queryData;
   if (filters.publicIPs) {
     query = queryCountIPFilter;
     queryDataSelect = queryDataIPFilter;
@@ -55,50 +51,32 @@ export default function fetchFarms(
     .then(({ farms: { farms_limit } }) => {
       return { farms_limit };
     })
-    .then(async (vars) => {
+    .then(async vars => {
       let { farms } = await gqlApi<IQueryData>(profile, queryDataSelect, vars);
 
-      farms = await getOnlineFarms(
-        profile,
-        farms,
-        exclusiveFor,
-        filters.publicIPs
-      );
+      farms = await getOnlineFarms(profile, farms, exclusiveFor, filters.publicIPs);
 
       return { farms };
     });
 }
 
 export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
-  const grid = new window.configs.grid3_client.GridClient(
-    "" as any,
-    "",
-    "",
-    null
-  );
+  const grid = new window.configs.grid3_client.GridClient("" as any, "", "", null);
 
   const { graphql, rmbProxy } = grid.getDefaultUrls(profile.networkEnv);
 
   let blockedFarms = [];
-  let onlineFarmsSet = new Set();
+  const onlineFarmsSet = new Set();
   let onlineFarmsArr = [];
 
   if (exclusiveFor && !publicIp) {
     // no need for exclusive for if we have an ip
-    blockedFarms = await getBlockedFarmsIDs(
-      exclusiveFor,
-      rmbProxy,
-      graphql
-    );
+    blockedFarms = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
   }
 
-  const upNodes = await paginatedFetcher(
-    `${rmbProxy}/nodes?&status=up`,
-    0,
-    50
-  );
+  const upNodes = await paginatedFetcher(`${rmbProxy}/nodes?&status=up`, 0, 50);
 
-  for (let node of upNodes) {
+  for (const node of upNodes) {
     if (!blockedFarms.includes(node.farmId)) {
       onlineFarmsSet.add(node.farmId);
     }
@@ -106,9 +84,7 @@ export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
 
   onlineFarmsArr = Array.from(onlineFarmsSet);
 
-  const onlineFarms = farms.filter((farm) =>
-    onlineFarmsArr.includes(farm.farmID)
-  );
+  const onlineFarms = farms.filter(farm => onlineFarmsArr.includes(farm.farmID));
 
   return onlineFarms;
 }
