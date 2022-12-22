@@ -11,13 +11,7 @@ export interface ISidenavRoute {
   children?: ISidenavRoute[];
 }
 
-export type Colors =
-  | "primary"
-  | "link"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
+export type Colors = "primary" | "link" | "info" | "success" | "warning" | "danger";
 
 export interface ISelectOption {
   label: string;
@@ -65,5 +59,5 @@ export interface IPackage {
 export class SelectCapacityUpdate {
   selectedPackage: Packages = "Minimum";
   package: IPackage = undefined;
-  invalid: boolean = true;
+  invalid = true;
 }

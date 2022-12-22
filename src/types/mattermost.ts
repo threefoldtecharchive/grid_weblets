@@ -33,16 +33,7 @@ export default class Mattermost implements IMattermost {
   public memory = 1024 * 2;
   public disks = [new Disk(undefined, undefined, 20, undefined)];
 
-  constructor({
-    name,
-    username,
-    password,
-    nodeId,
-    domain,
-    server,
-    port,
-    smtpPassword,
-  }: Partial<IMattermost> = {}) {
+  constructor({ name, username, password, nodeId, domain, server, port, smtpPassword }: Partial<IMattermost> = {}) {
     this.name = name || "MM" + this.id.split("-")[0];
     this.username = username || "";
     this.password = password || this.id.split("-")[0];
@@ -54,8 +45,7 @@ export default class Mattermost implements IMattermost {
   }
 
   get invalid(): boolean {
-    const { name, username, password, nodeId } = this;
-    const { domain, server, port } = this;
+    const { name, nodeId } = this;
     return (
       name.trim() === "" ||
       // username.trim() === "" ||
