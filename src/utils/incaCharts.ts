@@ -1,4 +1,4 @@
-export function build3DChart(canvas: HTMLDivElement) {
+export function build3DChart() {
   // constants
   const MAX_NO_OF_TFS = 50; // D42
   const TFS_PRICE = 10; // C3
@@ -14,15 +14,15 @@ export function build3DChart(canvas: HTMLDivElement) {
   // values
   const tfs /* L */ = techMarketCap.map((b) => Math.max(b / MAX_NO_OF_TFS, TFS_PRICE)); // prettier-ignore
   const inca /* M */ = tftPrice.map((c) => c * INCA_GENERATED_TFT_OVER_5Y); // prettier-ignore
-  const tfsIncome /* O */ = tfs.map((l) => l * NO_TFS);
-  const incaIncome /* P */ = inca.map((m) => m * NO_INCA);
+  const tfsIncome /* O */ = tfs.map(l => l * NO_TFS);
+  const incaIncome /* P */ = inca.map(m => m * NO_INCA);
   const exit /* Q */ = tfsIncome.map((t, i) => t + incaIncome[i]);
-  const multiple /* D */ = exit.map((q) => q / INVESTMENT);
+  const multiple /* D */ = exit.map(q => q / INVESTMENT);
 
   // To be drawn
-  const x = techMarketCap.map((a) => +a.toFixed(3));
-  const y = tftPrice.map((a) => +a.toFixed(3));
-  const z = multiple.map((a) => +a.toFixed(3));
+  const x = techMarketCap.map(a => +a.toFixed(3));
+  const y = tftPrice.map(a => +a.toFixed(3));
+  const z = multiple.map(a => +a.toFixed(3));
 
   return { x, y, z };
 

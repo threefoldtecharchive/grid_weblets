@@ -1,7 +1,6 @@
 <svelte:options tag="tf-inca" />
 
 <script lang="ts">
-  import { onMount } from "svelte";
   // import { build3DChart } from "../../utils/incaCharts";
   // import Plotly from "plotly.js-dist";
 

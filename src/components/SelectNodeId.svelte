@@ -126,8 +126,8 @@
         status = null;
         nodeIdSelectField.options[0].label = "No nodes available";
       })
-      .finally(async() => {
-        if(!multiple) await pingNode(data);
+      .finally(async () => {
+        if (!multiple) await pingNode(data);
         loadingNodes = false;
       });
   }
@@ -145,7 +145,7 @@
   function _setOptions(index: number, items: Array<{ name: string; code?: string }>) {
     const [option] = filtersFields[index].options;
     filtersFields[index].options = items.reduce(
-      (res, { name, code }) => {
+      (res, { name }) => {
         const op = { label: name, value: name } as ISelectOption;
         res.push(op);
         return res;
@@ -156,7 +156,7 @@
 
   function _setCountriesOptions(index: number, items: Map<string, number>) {
     const [option] = filtersFields[index].options;
-    filtersFields[index].options = Object.entries(items).map(function ([name, code]) {
+    filtersFields[index].options = Object.entries(items).map(function ([name]) {
       const op = { label: name, value: name } as ISelectOption;
       return op;
     });
@@ -425,47 +425,50 @@
     {#if validating && disabledMultiSelect}
       <p class="help" style={`color: #1982b1`}>Validating nodes</p>
     {:else if status === "down"}
-        {#if downNodes.length >1}
-          <p class="help is-danger">
-            Nodes ( <strong>
+      {#if downNodes.length > 1}
+        <p class="help is-danger">
+          Nodes ( <strong>
             {#each downNodes as node, i}
               {node}
               {#if i != upNodes.length - 1}
                 {","}
               {/if}
-          {/each})</strong> are down.
-          </p>
-        {:else}
-          <p class="help is-danger">
-            Node ( <strong>
-              {#each downNodes as node}
-                <span>{node}</span>
-              {/each}</strong>
-              ) is down.
-          </p>
-        {/if}
-    {:else if status == "valid" && aliveNode && upNodes.length == multiple}
-      {#if upNodes.length >1}
-          <p class="help" style={`color: #1982b1`}>
-            Nodes
-            <strong>
-              (
-              {#each upNodes as node, i}
-                {node}
-                {#if i != upNodes.length - 1}
-                  {","}
-                {/if}
-              {/each})
-            </strong> are up.
-          </p>
+            {/each})</strong
+          > are down.
+        </p>
       {:else}
-      <p class="help" style={`color: #1982b1`}>
-        Node ( <strong>
-          {#each upNodes as node}
-            <span>{node}</span>
-          {/each}</strong>
+        <p class="help is-danger">
+          Node ( <strong>
+            {#each downNodes as node}
+              <span>{node}</span>
+            {/each}</strong
+          >
+          ) is down.
+        </p>
+      {/if}
+    {:else if status == "valid" && aliveNode && upNodes.length == multiple}
+      {#if upNodes.length > 1}
+        <p class="help" style={`color: #1982b1`}>
+          Nodes
+          <strong>
+            (
+            {#each upNodes as node, i}
+              {node}
+              {#if i != upNodes.length - 1}
+                {","}
+              {/if}
+            {/each})
+          </strong> are up.
+        </p>
+      {:else}
+        <p class="help" style={`color: #1982b1`}>
+          Node ( <strong>
+            {#each upNodes as node}
+              <span>{node}</span>
+            {/each}</strong
+          >
           ) is up.
-      </p>
+        </p>
       {/if}
     {/if}
   {:else}

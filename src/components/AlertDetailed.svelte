@@ -5,7 +5,7 @@
   export let message: string;
   export let domain: string;
   export let planetaryIP: string;
-  export let deployed: boolean = false;
+  export let deployed = false;
 
   function selectColor(t: typeof type): string {
     switch (t) {
@@ -20,13 +20,12 @@
     }
   }
 
-  setTimeout(() => { deployed = false; }, 120000);
+  setTimeout(() => {
+    deployed = false;
+  }, 120000);
 </script>
 
-<div
-  class="notification"
-  style={`background-color: ${selectColor(type)}; color: white`}
->
+<div class="notification" style={`background-color: ${selectColor(type)}; color: white`}>
   {message}
   <hr />
   <h3 style="font-weight: bold;">Deployment Info:</h3>
@@ -40,10 +39,7 @@
   </ul>
 </div>
 {#if deployed}
-  <div
-    class={"notification"}
-    style={`background-color: ${selectColor(type)}; color: white`}
-  >
+  <div class={"notification"} style={`background-color: ${selectColor(type)}; color: white`}>
     Your solution is now starting. Please be patient
   </div>
 {/if}

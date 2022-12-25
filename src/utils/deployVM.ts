@@ -7,16 +7,12 @@ import type { IStore } from "../stores/currentDeployment";
 import checkVMExist from "./prepareDeployment";
 import { Network } from "../types/kubernetes";
 
-export default async function deployVM(
-  data: VM,
-  profile: IProfile,
-  type: IStore["type"]
-) {
+export default async function deployVM(data: VM, profile: IProfile, type: IStore["type"]) {
   const { MachineModel, MachinesModel, QSFSDiskModel } = window.configs.grid3_client;
   const { envs, disks, rootFs, qsfsDisk, ...base } = data;
-  const { name, flist, cpu, memory, entrypoint, network: nw } = base;
+  const { name, flist, cpu, memory, entrypoint } = base;
   const { publicIp, planetary, nodeId, publicIp6 } = base;
-  const qsfs= new QSFSDiskModel
+  const qsfs = new QSFSDiskModel();
 
   const vm = new MachineModel();
   vm.name = name;
@@ -30,20 +26,19 @@ export default async function deployVM(
   vm.rootfs_size = rootFs;
   vm.flist = flist;
   vm.entrypoint = entrypoint;
-  vm.env = type == "VM" ?createEnvs(envs) :{SSH_KEY: profile.sshKey,};
-  
-/*QSFS*/
-  if(qsfsDisk){
-    qsfs.name = qsfsDisk.name;
-    qsfs.cache= qsfsDisk.cache;
-    qsfs.mountpoint= qsfsDisk.mountpoint;
-    qsfs.encryption_key= qsfsDisk.name;
-    qsfs.prefix= qsfsDisk.name;
-    qsfs.qsfs_zdbs_name= qsfsDisk.name;
-    //add qsfs to vm
-    vm.qsfs_disks = [qsfs]
-    }
+  vm.env = type == "VM" ? createEnvs(envs) : { SSH_KEY: profile.sshKey };
 
+  /*QSFS*/
+  if (qsfsDisk) {
+    qsfs.name = qsfsDisk.name;
+    qsfs.cache = qsfsDisk.cache;
+    qsfs.mountpoint = qsfsDisk.mountpoint;
+    qsfs.encryption_key = qsfsDisk.name;
+    qsfs.prefix = qsfsDisk.name;
+    qsfs.qsfs_zdbs_name = qsfsDisk.name;
+    //add qsfs to vm
+    vm.qsfs_disks = [qsfs];
+  }
 
   const vms = new MachinesModel();
   vms.name = name;
@@ -56,7 +51,7 @@ export default async function deployVM(
   };
   vms.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, type, name, async (grid) => {
+  return deploy(profile, type, name, async grid => {
     if (type != "VM") await checkVMExist(grid, type.toLocaleLowerCase(), name);
     return grid.machines
       .deploy(vms)

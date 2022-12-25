@@ -232,7 +232,9 @@
                 return Promise.all(promises);
               },
             );
-          } catch {}
+          } catch {
+            //
+          }
         }),
       );
     } catch (e) {

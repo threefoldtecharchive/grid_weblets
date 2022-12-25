@@ -4,7 +4,7 @@
   // libs
   import type { IProfile } from "../types/Profile";
   import { Worker } from "../types/kubernetes";
-  import type { IFormField, ITab } from "../types";
+  import type { IFormField } from "../types";
   import validateName, { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -19,7 +19,7 @@
   import Table from "./Table.svelte";
   import RootFsSize from "./RootFsSize.svelte";
   import rootFs from "../utils/rootFs";
-  import DialogueMsg from './DialogueMsg.svelte';
+  import DialogueMsg from "./DialogueMsg.svelte";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -29,11 +29,11 @@
   let workers: any[] = [];
   $: if (k8s) workers = k8s.details.workers;
 
-  let shouldBeUpdated: boolean = false;
-  let loading: boolean = false;
+  let shouldBeUpdated = false;
+  let loading = false;
   let message: string;
-  let success: boolean = false;
-  let failed: boolean = false;
+  let success = false;
+  let failed = false;
   let removing: string = null;
   let name: string = null;
   let opened = false;
@@ -56,7 +56,7 @@
   function onAddWorker() {
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
-    getGrid(profile, (grid) => {
+    getGrid(profile, grid => {
       const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node, rootFs } = worker; // prettier-ignore
       const workerModel = new AddWorkerModel();
       workerModel.deployment_name = k8s.name;
@@ -82,11 +82,11 @@
             failed = true;
           }
         })
-        .then((data) => {
+        .then(data => {
           if (!data) return;
           workers = data.workers;
         })
-        .catch((err) => {
+        .catch(err => {
           failed = true;
           console.log("Error", err);
           message = err.message || err;
@@ -103,14 +103,14 @@
     removing = worker.name;
     loading = true;
     currentDeployment.deploy("Remove Worker", worker.name);
-    getGrid(profile, (grid) => {
+    getGrid(profile, grid => {
       const workerModel = new DeleteWorkerModel();
       workerModel.deployment_name = k8s.name;
       workerModel.name = removing;
       grid.k8s
         .delete_worker(workerModel)
         .then(({ deleted, updated }) => {
-          if (deleted.length > 0 ||updated.length > 0) {
+          if (deleted.length > 0 || updated.length > 0) {
             shouldBeUpdated = true;
             let r = removing;
             requestAnimationFrame(() => {
@@ -121,7 +121,7 @@
             message = "Failed to remove worker";
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("Error", err);
           message = err.message || err;
         })
@@ -176,15 +176,7 @@
         capacity: { cpu, memory },
         mounts: [{ size }],
       } = worker;
-      return [
-        i + 1,
-        contractId,
-        name,
-        planetary,
-        cpu,
-        memory,
-        size / (1024 * 1024 * 1024),
-      ];
+      return [i + 1, contractId, name, planetary, cpu, memory, size / (1024 * 1024 * 1024)];
     });
   }
 </script>
@@ -204,11 +196,7 @@
   />
 
   {#if k8s}
-    <div
-      class="modal-content"
-      style="width: fit-content"
-      on:click|stopPropagation
-    >
+    <div class="modal-content" style="width: fit-content" on:click|stopPropagation>
       <div class="box">
         <h4 class="is-size-4">
           Manage K8S({k8s.name}) Workers
@@ -218,22 +206,14 @@
           <hr />
           <Table
             rowsData={workers}
-            headers={[
-              "#",
-              "Contract ID",
-              "Name",
-              "Planetary Network IP",
-              "CPU(vCores)",
-              "Memory(MB)",
-              "Disk(GB)",
-            ]}
+            headers={["#", "Contract ID", "Name", "Planetary Network IP", "CPU(vCores)", "Memory(MB)", "Disk(GB)"]}
             rows={_createWorkerRows(workers)}
             selectable={false}
             actions={[
               {
                 label: "Delete",
                 type: "danger",
-                loading: (i) => loading && removing === workers[i].name,
+                loading: i => loading && removing === workers[i].name,
                 click: (_, i) => {
                   workerIndex = i;
                   name = `worker ${workers[i].name}`;
@@ -243,11 +223,7 @@
               },
             ]}
           />
-          <DialogueMsg 
-          bind:opened 
-          on:removed={onDeleteWorker(workerIndex)}
-          {name}
-        />
+          <DialogueMsg bind:opened on:removed={onDeleteWorker(workerIndex)} {name} />
           <hr />
         {:else}
           <hr style="width: 1200px" />
@@ -263,11 +239,7 @@
           {:else}
             {#each workerFields as field (field.symbol)}
               {#if field.invalid !== undefined}
-                <Input
-                  bind:data={worker[field.symbol]}
-                  bind:invalid={field.invalid}
-                  {field}
-                />
+                <Input bind:data={worker[field.symbol]} bind:invalid={field.invalid} {field} />
               {:else}
                 <Input bind:data={worker[field.symbol]} {field} />
               {/if}
@@ -279,8 +251,7 @@
               cpu={worker.cpu}
               memory={worker.memory}
               on:update={({ detail }) => (worker.rootFs = detail)}
-              on:editableUpdate={({ detail }) =>
-                (worker.rootFsEditable = detail)}
+              on:editableUpdate={({ detail }) => (worker.rootFsEditable = detail)}
             />
 
             <SelectNodeId
@@ -303,7 +274,7 @@
             {success}
             {failed}
             disabled={disabled && !failed && !success}
-            on:click={(e) => {
+            on:click={e => {
               if (success || failed) {
                 e.preventDefault();
                 success = false;
