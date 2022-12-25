@@ -23,11 +23,7 @@ export function buildPieChart(canvas: HTMLCanvasElement) {
       datasets: [
         {
           data: [300, 50, 100],
-          backgroundColor: [
-            "rgb(255, 99, 132)",
-            "rgb(54, 162, 235)",
-            "rgb(255, 205, 86)",
-          ],
+          backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
           hoverOffset: 4,
         },
       ],
@@ -44,11 +40,11 @@ export function buildLineChart(canvas: HTMLCanvasElement, fp: FarmingProfile) {
   return new Chart(ctx, {
     type: "line",
     data: {
-      labels: xs.map((i) => i.toFixed(2)),
+      labels: xs.map(i => i.toFixed(2)),
       datasets: [
         {
           label: "Margin",
-          data: xs.map((x) => fp.getTotalReward(x)),
+          data: xs.map(x => fp.getTotalReward(x)),
           backgroundColor: "rgb(255, 99, 132)",
           borderColor: "rgba(255, 99, 132, 0.5)",
           pointRadius: 3,

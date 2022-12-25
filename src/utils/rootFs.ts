@@ -3,10 +3,7 @@ import { validateCpu, validateMemory } from "./validateName";
 
 const GB = 1024;
 
-export default function rootFs(
-  cpu_in_cores: number,
-  mem_in_mb: number
-): number {
+export default function rootFs(cpu_in_cores: number, mem_in_mb: number): number {
   cpu_in_cores = !validateCpu(cpu_in_cores) ? +cpu_in_cores : 0;
   mem_in_mb = !validateMemory(mem_in_mb) ? +mem_in_mb : 0;
 

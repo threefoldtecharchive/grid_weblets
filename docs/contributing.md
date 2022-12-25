@@ -37,11 +37,11 @@ We are going to add new weblet called `demo` .
 
 5. Build `Demo.wc.svelte`.
 
-    ```sh
-    yarn build
-    ```
+   ```sh
+   yarn build
+   ```
 
-    Find the output in the `.build/` directory.
+   Find the output in the `.build/` directory.
 
 ## Add Weblet To Plain HTML File
 
@@ -87,6 +87,6 @@ The `index.html` file should be like the following.
 ```
 
 ## Add Weblet to The Playground
+
 1. Deploy the weblet in the playground app by appending the weblet to the elements list in `playground/src/App.vue`
 2. Create new tab in the sideNav by appending the weblet list with new class of `Weblet` in `playground/src/views/Editor.vue`
-

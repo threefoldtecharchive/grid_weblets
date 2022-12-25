@@ -1,1 +1,1 @@
-import "./Version.wc.svelte"
+import "./Version.wc.svelte";

@@ -9,8 +9,8 @@ export default new Vuex.Store({
     activePage: "/",
   },
   getters: {
-    activeRoute: (state) => state.activeRoute,
-    activePage: (state) => state.activePage,
+    activeRoute: state => state.activeRoute,
+    activePage: state => state.activePage,
   },
   mutations: {},
   actions: {
