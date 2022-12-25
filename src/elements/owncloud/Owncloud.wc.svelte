@@ -2,38 +2,33 @@
 
 <script lang="ts">
   // Types
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from '../../types';
-  import type { IProfile } from '../../types/Profile';
-  import { Disk, Env } from '../../types/vm';
-  import Owncloud from '../../types/owncloud';
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from "../../types/vm";
+  import Owncloud from "../../types/owncloud";
   // Modules
-  import deployOwncloud from '../../utils/deployOwncloud';
+  import deployOwncloud from "../../utils/deployOwncloud";
   // Components
-  import SelectProfile from '../../components/SelectProfile.svelte';
-  import Input from '../../components/Input.svelte';
-  import Tabs from '../../components/Tabs.svelte';
-  import SelectNodeId from '../../components/SelectNodeId.svelte';
-  import DeployBtn from '../../components/DeployBtn.svelte';
-  import Alert from '../../components/Alert.svelte';
-  import Modal from '../../components/DeploymentModal.svelte';
-  import hasEnoughBalance from '../../utils/hasEnoughBalance';
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Input from "../../components/Input.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, {
     isInvalid,
     validateRequiredPassword,
     validateRequiredEmail,
     validateRequiredPortNumber,
-  } from '../../utils/validateName';
-  import { validateRequiredHostName } from '../../utils/validateDomainName';
+  } from "../../utils/validateName";
+  import { validateRequiredHostName } from "../../utils/validateDomainName";
 
-  import { noActiveProfile } from '../../utils/message';
-  import SelectCapacity from '../../components/SelectCapacity.svelte';
-  import type { GatewayNodes } from '../../utils/gatewayHelpers';
-  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
+  import { noActiveProfile } from "../../utils/message";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
 
   let data = new Owncloud();
   let gateway: GatewayNodes;
@@ -41,21 +36,21 @@
   let editable: boolean;
   data.disks = [new Disk()];
   let profile: IProfile;
-  let active: string = 'base';
+  let active = "base";
   let loading = false;
   let success = false;
   let failed = false;
 
   const tabs: ITab[] = [
-    { label: 'Base', value: 'base' },
-    { label: 'Mail Server', value: 'mail' },
+    { label: "Base", value: "base" },
+    { label: "Mail Server", value: "mail" },
   ];
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: 'Minimum', cpu: 2, memory: 1024 * 16, diskSize: 250 },
-    { name: 'Standard', cpu: 2, memory: 1024 * 16, diskSize: 500 },
-    { name: 'Recommended', cpu: 4, memory: 1024 * 16, diskSize: 1000 },
+    { name: "Minimum", cpu: 2, memory: 1024 * 16, diskSize: 250 },
+    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 16, diskSize: 1000 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
@@ -63,18 +58,18 @@
 
   let adminFields: IFormField[] = [
     {
-      label: 'Username',
-      symbol: 'adminUsername',
-      placeholder: 'Admin Username',
-      type: 'text',
+      label: "Username",
+      symbol: "adminUsername",
+      placeholder: "Admin Username",
+      type: "text",
       validator: validateName,
       invalid: false,
     },
     {
-      label: 'Password',
-      symbol: 'adminPassword',
-      placeholder: 'Admin Password',
-      type: 'password',
+      label: "Password",
+      symbol: "adminPassword",
+      placeholder: "Admin Password",
+      type: "password",
       validator: validateRequiredPassword,
       invalid: false,
     },
@@ -82,52 +77,52 @@
 
   let mailFields: IFormField[] = [
     {
-      label: 'From Email Address',
-      symbol: 'smtpFromEmail',
-      placeholder: 'support@example.com',
-      type: 'text',
+      label: "From Email Address",
+      symbol: "smtpFromEmail",
+      placeholder: "support@example.com",
+      type: "text",
       validator: validateRequiredEmail,
       invalid: true,
     },
     {
-      label: 'Port',
-      symbol: 'smtpPort',
-      placeholder: '587',
-      type: 'text',
+      label: "Port",
+      symbol: "smtpPort",
+      placeholder: "587",
+      type: "text",
       validator: validateRequiredPortNumber,
       invalid: true,
     },
     {
-      label: 'Host Name',
-      symbol: 'smtpHost',
-      placeholder: 'smtp.example.com',
-      type: 'text',
+      label: "Host Name",
+      symbol: "smtpHost",
+      placeholder: "smtp.example.com",
+      type: "text",
       validator: validateRequiredHostName,
       invalid: true,
     },
     {
-      label: 'Username',
-      symbol: 'smtpHostUser',
-      placeholder: 'user@example.com',
-      type: 'text',
+      label: "Username",
+      symbol: "smtpHostUser",
+      placeholder: "user@example.com",
+      type: "text",
       validator: validateRequiredEmail,
       invalid: true,
     },
     {
-      label: 'Password',
-      symbol: 'smtpHostPassword',
-      placeholder: 'password',
-      type: 'password',
+      label: "Password",
+      symbol: "smtpHostPassword",
+      placeholder: "password",
+      type: "password",
       validator: validateRequiredPassword,
       invalid: true,
     },
-    { label: 'Use TLS', symbol: 'smtpUseTLS', type: 'checkbox' },
-    { label: 'Use SSL', symbol: 'smtpUseSSL', type: 'checkbox' },
+    { label: "Use TLS", symbol: "smtpUseTLS", type: "checkbox" },
+    { label: "Use SSL", symbol: "smtpUseSSL", type: "checkbox" },
   ];
 
   let message: string;
-  let modalData: Object;
-  let status: 'valid' | 'invalid';
+  let modalData: object;
+  let status: "valid" | "invalid";
 
   const deploymentStore = window.configs?.deploymentStore;
 
@@ -153,19 +148,18 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
     deployOwncloud(data, profile, gateway)
-      .then((data) => {
+      .then(data => {
         deploymentStore.set(0);
         success = true;
         modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
-        message = typeof err === 'string' ? err : err.message;
+        message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
         loading = false;
@@ -179,7 +173,7 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      data.envs[0] = new Env(undefined, 'SSH_KEY', detail?.sshKey);
+      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
     }
   }}
 />
@@ -188,47 +182,31 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy an Owncloud Instance</h4>
     <p>
-      Owncloud develops and provides open-source software for content
-      collaboration, allowing teams to easily share and work on files seamlessly
-      regardless of device or location.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud"
-      >
+      Owncloud develops and provides open-source software for content collaboration, allowing teams to easily share and
+      work on files seamlessly regardless of device or location.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud">
         Quick start documentation</a
       >
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === 'VM')}
-      <Alert type="info" message={logs?.message ?? 'Loading...'} />
+    {#if loading || (logs !== null && logs.type === "VM")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed owncloud."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed owncloud." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || 'Failed to deploy owncloud.'} />
+      <Alert type="danger" message={message || "Failed to deploy owncloud."} />
     {:else}
       <Tabs bind:active {tabs} />
 
-      <section style:display={active === 'base' ? null : 'none'}>
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
+      <section style:display={active === "base" ? null : "none"}>
+        <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         {#each adminFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -267,21 +245,18 @@
         />
       </section>
 
-      <section style:display={active === 'mail' ? null : 'none'}>
+      <section style:display={active === "mail" ? null : "none"}>
         <div class="notification is-warning is-light">
-          <p>
-            configure these settings only If you have an smtp service and you
-            know what you’re doing.
-          </p>
+          <p>configure these settings only If you have an smtp service and you know what you’re doing.</p>
         </div>
         <div class="is-flex is-justify-content-flex-end">
           <div style="display: inline-block;">
             <Input
               bind:data={editable}
               field={{
-                label: '',
-                symbol: 'editable',
-                type: 'checkbox',
+                label: "",
+                symbol: "editable",
+                type: "checkbox",
               }}
             />
           </div>
@@ -294,10 +269,7 @@
               field={{ ...field, disabled: !editable }}
             />
           {:else}
-            <Input
-              bind:data={data[field.symbol]}
-              field={{ ...field, disabled: !editable }}
-            />
+            <Input bind:data={data[field.symbol]} field={{ ...field, disabled: !editable }} />
           {/if}
         {/each}
       </section>
@@ -308,7 +280,7 @@
       {loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;
@@ -324,5 +296,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

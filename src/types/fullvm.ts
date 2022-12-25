@@ -5,14 +5,14 @@ import validateName, {
   validateDiskName,
   validateEntryPoint,
   validateFlistvalue,
-} from '../utils/validateName';
+} from "../utils/validateName";
 import isValidInteger from "../utils/isValidInteger";
 import type { IFormField } from ".";
 
 export default class FullVM extends VM {
   public name = `VM${v4().split("-")[0]}`;
   public rootFs = 0;
-  public diskSize: number = 50;
+  public diskSize = 50;
   public get valid(): boolean {
     const { name, diskSize, flist, entrypoint, envs, disks } = this;
     return (
@@ -33,12 +33,12 @@ export class DiskFullVm {
     { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
     { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
   ]
- 
+
   constructor(
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
     public size = 50,
-    public mountpoint = `/mnt/${id.split("-")[0]}`
+    public mountpoint = `/mnt/${id.split("-")[0]}`,
   ) {}
 
   get _diskFieldsValid(): boolean {
@@ -49,14 +49,8 @@ export class DiskFullVm {
   }
 
   public get valid(): boolean {
-    const { name, size, mountpoint } = this;
-    let point = mountpoint.trim();
+    const { name, size } = this;
 
-    return (
-      name !== "" &&
-      isValidInteger(size) &&
-      validateDiskName(name) === undefined &&
-      this._diskFieldsValid
-    );
+    return name !== "" && isValidInteger(size) && validateDiskName(name) === undefined && this._diskFieldsValid;
   }
 }

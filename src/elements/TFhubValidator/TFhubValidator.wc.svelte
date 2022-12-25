@@ -4,12 +4,7 @@
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Input from "../../components/Input.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from "../../types";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
   import type { IProfile } from "../../types/Profile";
 
   import Modal from "../../components/DeploymentModal.svelte";
@@ -96,27 +91,24 @@
   let selectCapacity = new SelectCapacityUpdate();
 
   let profile: IProfile;
-  let loading: boolean = false;
-  let failed: boolean = false;
-  let success: boolean = false;
+  let loading = false;
+  let failed = false;
+  let success = false;
   let message: string;
-  let modalData: Object;
+  let modalData: object;
 
   $: disabled =
-    data.invalid ||
-    data.status !== "valid" ||
-    selectCapacity.invalid ||
-    isInvalid([...baseFields, ...valConf]);
+    data.invalid || data.status !== "valid" || selectCapacity.invalid || isInvalid([...baseFields, ...valConf]);
 
   function onDeployTFhubValidator() {
     loading = true;
     deployTFhubValidator(profile, data)
-      .then((data) => {
+      .then(data => {
         modalData = data;
         deploymentStore.set(0);
         success = true;
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Error", err);
         failed = true;
         message = err.message || err;
@@ -142,12 +134,8 @@
   <form class="box" on:submit|preventDefault={onDeployTFhubValidator}>
     <h4 class="is-size-4">Deploy a TFhub Validator Instance</h4>
     <p>
-      TFhub Validator A single point of collaboration. Designed specifically for
-      digital operations.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_TFhubValidator"
-      >
+      TFhub Validator A single point of collaboration. Designed specifically for digital operations.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_TFhubValidator">
         Quick start documentation
       </a>
     </p>
@@ -157,25 +145,14 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed TFhubValidator."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed TFhubValidator." deployed={true} />
     {:else if failed}
-      <Alert
-        type="danger"
-        message={message || "Failed to deploy TFhubValidator."}
-      />
+      <Alert type="danger" message={message || "Failed to deploy TFhubValidator."} />
     {:else}
       <Tabs {tabs} bind:active />
       {#if active === "base"}
         {#each baseFields as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {/each}
         <SelectCapacity
           {packages}
@@ -199,10 +176,7 @@
           bind:nodeSelection={data.selection.type}
           {profile}
           cpu={data.cpu}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            rootFs(data.cpu, data.memory)
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, rootFs(data.cpu, data.memory))}
           memory={data.memory}
           publicIp={data.publicIp}
           nodes={data.selection.nodes}
@@ -214,11 +188,7 @@
           <p>please provide the required values for the validator</p>
         </div>
         {#each valConf as field (field.symbol)}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {/each}
       {/if}
     {/if}
@@ -227,7 +197,7 @@
       {loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

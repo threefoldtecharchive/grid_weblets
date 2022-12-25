@@ -1,12 +1,7 @@
 <svelte:options tag="tf-caprover" />
 
 <script lang="ts">
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from "../../types";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
   import { CapWorker, default as Caprover } from "../../types/caprover";
   import deployCaprover from "../../utils/deployCaprover";
   import type { IProfile } from "../../types/Profile";
@@ -20,10 +15,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, {
-    isInvalid,
-    validatePassword,
-  } from "../../utils/validateName";
+  import validateName, { isInvalid, validatePassword } from "../../utils/validateName";
   import validateDomainName from "../../utils/validateDomainName";
   import { noActiveProfile } from "../../utils/message";
   import rootFs from "../../utils/rootFs";
@@ -71,8 +63,8 @@
 
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || selectCapacity.invalid || data.workers.some(({ selectCapacity }) => selectCapacity.invalid) || isInvalid([...fields, ...baseFields]); // prettier-ignore
   let message: string;
-  let modalData: Object;
-  let workerData: boolean = false;
+  let modalData: object;
+  let workerData = false;
   let workerIp = "";
   let domain = "";
   async function deployCaproverHandler() {
@@ -81,8 +73,7 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -91,13 +82,13 @@
     message = undefined;
 
     deployCaprover(data, profile)
-      .then(async (vm) => {
+      .then(async () => {
         let vms = await grid.machines.getObj(data.name);
         success = true;
         modalData = vms;
         deploymentStore.set(0);
 
-        vms.forEach((machine) => {
+        vms.forEach(machine => {
           let firstWorker = true;
           if (machine.env["SWM_NODE_MODE"] == "worker") {
             if (firstWorker) {
@@ -106,9 +97,7 @@
             } else workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
           }
         });
-        domain = vms.filter(
-          (machine) => machine.env["SWM_NODE_MODE"] == "leader"
-        )[0].env["CAPROVER_ROOT_DOMAIN"];
+        domain = vms.filter(machine => machine.env["SWM_NODE_MODE"] == "leader")[0].env["CAPROVER_ROOT_DOMAIN"];
 
         if (data.workers.length > 0) workerData = true;
       })
@@ -124,7 +113,7 @@
   $: logs = $currentDeployment;
 
   onMount(async () => {
-    grid = await getGrid(profile, (grid) => grid, false);
+    grid = await getGrid(profile, grid => grid, false);
     grid.projectName = "caprover";
     grid._connect();
   });
@@ -143,13 +132,9 @@
   <form class="box" on:submit|preventDefault={deployCaproverHandler}>
     <h4 class="is-size-4 mb-4">CapRover Deployer</h4>
     <p>
-      CapRover is an extremely easy to use app/database deployment & web server
-      manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB,
-      Postgres, WordPress (and etc…) applications!
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
-      >
+      CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP,
+      ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_caprover">
         Quick start documentation</a
       >
     </p>
@@ -160,11 +145,7 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully Deployed Caprover."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully Deployed Caprover." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
     {:else}
@@ -173,27 +154,20 @@
       {#if active === "config"}
         {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
           {#if field.symbol === "domain"}
             <div class="notification is-warning is-light">
               <p>
-                You will need to point a wildcard DNS entry for the domain you
-                entered above to this CapRover instance IP Address after
-                deployment,<br />
-                otherwise, you won't be able to access the CapRover dashboard using
-                this domain.
+                You will need to point a wildcard DNS entry for the domain you entered above to this CapRover instance
+                IP Address after deployment,<br />
+                otherwise, you won't be able to access the CapRover dashboard using this domain.
               </p>
               <br />
               <strong>
-                If you don't know what Captain root domain is, make sure to
-                visit <a
+                If you don't know what Captain root domain is, make sure to visit <a
                   target="_blank"
                   href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
                 >
@@ -206,11 +180,7 @@
       {:else if active === "leader"}
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -247,24 +217,17 @@
           nodes={data.selection.nodes}
         />
       {:else if active === "workers"}
-        <AddBtn
-          on:click={() => (data.workers = [...data.workers, new CapWorker()])}
-        />
+        <AddBtn on:click={() => (data.workers = [...data.workers, new CapWorker()])} />
         <div class="nodes-container">
           {#each data.workers as worker, index (worker.id)}
             <div class="box">
               <DeleteBtn
                 name={worker.name}
-                on:click={() =>
-                  (data.workers = data.workers.filter((_, i) => index !== i))}
+                on:click={() => (data.workers = data.workers.filter((_, i) => index !== i))}
               />
               {#each baseFields as field (field.symbol)}
                 {#if field.invalid !== undefined}
-                  <Input
-                    bind:data={worker[field.symbol]}
-                    bind:invalid={field.invalid}
-                    {field}
-                  />
+                  <Input bind:data={worker[field.symbol]} bind:invalid={field.invalid} {field} />
                 {:else}
                   <Input bind:data={worker[field.symbol]} {field} />
                 {/if}
@@ -311,7 +274,7 @@
       {loading}
       {success}
       {failed}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;
@@ -337,24 +300,16 @@
       2- Go to the <strong>cluster</strong> tab<br />
       3- Click <strong>Add Self-Hosted Registry</strong> button then
       <strong>Enable Self-Hosted Registry</strong><br />
-      4- Insert worker node public IP <strong>{workerIp}</strong> and add your
-      private SSH Key<br />
+      4- Insert worker node public IP <strong>{workerIp}</strong> and add your private SSH Key<br />
       5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
-        <a
-          target="_blank"
-          href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker"
-        >
+        <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker">
           Click here for the documentation
         </a>
       </strong>
       <div style="float: right; margin-top: 50px;">
-        <button
-          class="button is-danger"
-          on:click|stopPropagation={() => (workerData = !workerData)}
-          >Close</button
-        >
+        <button class="button is-danger" on:click|stopPropagation={() => (workerData = !workerData)}>Close</button>
       </div>
     </section>
   </div>

@@ -11,16 +11,16 @@ export default class Algorand extends VM {
   public memory;
   public rootSize;
 
-  public customCapacity: boolean = false;
-  
+  public customCapacity = false;
+
   // algo nodes config
   public nodeNetwork = "mainnet";
   public nodeType: "default" | "participant" | "relay" | "indexer" = "default";
 
   // the participation fields
   public mnemonics = "";
-  public firstRound: number = 24000000;
-  public lastRound: number = 26000000;
+  public firstRound = 24000000;
+  public lastRound = 26000000;
 
   // public participantNode = false
   // public relay: boolean = false

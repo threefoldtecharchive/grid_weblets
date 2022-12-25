@@ -3,7 +3,7 @@ import type { IFormField } from ".";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
 import {
-  validateFlistvalue, 
+  validateFlistvalue,
   validateKey,
   validateDisk,
   validateDiskName,
@@ -11,11 +11,9 @@ import {
   validateEntryPoint,
   validateKeyValue,
 } from "../utils/validateName";
-import type { DiskFullVm } from "./fullvm";
 import { Network } from "./kubernetes";
 import NodeID from "./nodeId";
 import type QSFS from "./qsfs";
-
 
 export class Env {
   constructor(public id = v4(), public key = "", public value = "") {}
@@ -33,13 +31,12 @@ export class Disk {
     { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
     { label: "Mount Point", symbol: "mountpoint", placeholder: "Disk Mount Point", type: "text", validator: validateMountPoint, invalid: false},
   ]
- 
-  
+
   constructor(
     public id = v4(),
     public name = "DISK" + id.split("-")[0],
     public size = 50,
-    public mountpoint = `/mnt/${id.split("-")[0]}`
+    public mountpoint = `/mnt/${id.split("-")[0]}`,
   ) {}
 
   get _diskFieldsValid(): boolean {
@@ -51,7 +48,7 @@ export class Disk {
 
   public get valid(): boolean {
     const { name, size, mountpoint } = this;
-    let point = mountpoint.trim();
+    const point = mountpoint.trim();
 
     return (
       name !== "" &&
@@ -91,7 +88,7 @@ export default class VM {
     public rootFsEditable = false,
 
     /* QSFS */
-    public qsfsDisk:QSFS = undefined,
+    public qsfsDisk: QSFS = undefined,
   ) {}
 
   public get valid(): boolean {

@@ -2,31 +2,18 @@ import type Mattermost from "../types/mattermost";
 import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
 
-import {
-  GatewayNodes,
-  getUniqueDomainName,
-  selectGatewayNode,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { GatewayNodes, getUniqueDomainName, selectSpecificGatewayNode } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployMattermost(
-  profile: IProfile,
-  mattermost: Mattermost,
-  gateway: GatewayNodes
-) {
+export default async function deployMattermost(profile: IProfile, mattermost: Mattermost, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(
-    profile,
-    mattermost.name,
-    "mattermost"
-  );
+  const domainName = await getUniqueDomainName(profile, mattermost.name, "mattermost");
 
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   mattermost.domain = `${domainName}.${nodeDomain}`;
 
   const matterMostVm = await _deployMatterMost(profile, mattermost);
@@ -43,25 +30,9 @@ export default async function deployMattermost(
 }
 
 function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
-  const { MachineModel, MachinesModel, generateString } =
-    window.configs.grid3_client;
+  const { MachineModel, MachinesModel } = window.configs.grid3_client;
 
-  const {
-    name,
-    username,
-    password,
-    server,
-    domain,
-    port,
-    nodeId,
-    cpu,
-    memory,
-    disks,
-    publicIp,
-    smtpPassword,
-  } = mattermost;
-
-  let randomSuffix = generateString(10).toLowerCase();
+  const { name, username, password, server, domain, port, nodeId, cpu, memory, publicIp, smtpPassword } = mattermost;
 
   const vm = new MachineModel();
   vm.name = name;
@@ -96,7 +67,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   };
   vms.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "Mattermost", name, async (grid) => {
+  return deploy(profile, "Mattermost", name, async grid => {
     await checkVMExist(grid, "mattermost", name);
 
     return grid.machines
@@ -106,12 +77,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   });
 }
 
-function _deployGateway(
-  profile: IProfile,
-  name: string,
-  ip: string,
-  nodeId: number
-) {
+function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
 
   const gw = new GatewayNameModel();
@@ -127,7 +93,7 @@ function _deployGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", name, async (grid) => {
+  return deploy(profile, "GatewayName", name, async grid => {
     await checkGW(grid, name, "mattermost");
     return grid.gateway
       .deploy_name(gw)

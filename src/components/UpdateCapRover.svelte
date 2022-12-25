@@ -18,7 +18,7 @@
   import { CapWorker } from "../types/caprover";
   import SelectCapacity from "./SelectCapacity.svelte";
   import getGrid from "../utils/getGrid";
-    import DialogueMsg from './DialogueMsg.svelte';
+  import DialogueMsg from "./DialogueMsg.svelte";
   const { AddMachineModel, DeleteMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
@@ -28,22 +28,21 @@
 
   let workers: any[] = [];
 
-  let shouldBeUpdated: boolean = false;
-  let loading: boolean = false;
-  let workers_loading: boolean = true;
+  let shouldBeUpdated = false;
+  let loading = false;
+  let workers_loading = true;
   let message: string;
-  let success: boolean = false;
-  let failed: boolean = false;
+  let success = false;
+  let failed = false;
   let removing: string = null;
-  let domain: string = "";
+  let domain = "";
   let opened = false;
-  let workerIndex:number = 0;
+  let workerIndex = 0;
   let name: string = null;
   let worker = new CapWorker();
   let grid;
 
-  const CAPROVER_FLIST =
-    "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
+  const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist";
 
   // prettier-ignore
   const workerFields: IFormField[] = [ 
@@ -66,13 +65,13 @@
     worker.publicKey = capRover.details.env.PUBLIC_KEY;
     domain = capRover.details.env.CAPROVER_ROOT_DOMAIN;
 
-    grid = await getGrid(profile, (grid) => grid, false);
+    grid = await getGrid(profile, grid => grid, false);
     grid.projectName = "caprover";
     grid._connect();
 
     if (capRover)
       workers = (await grid.machines.getObj(capRover["name"])).filter(
-        (machine) => machine.env["SWM_NODE_MODE"] == "worker"
+        machine => machine.env["SWM_NODE_MODE"] == "worker",
       );
 
     workers_loading = false;
@@ -118,15 +117,13 @@
           failed = true;
         }
       })
-      .then((data) => {
+      .then(data => {
         if (!data) return;
-        workers = data.filter(
-          (machine) => machine.env["SWM_NODE_MODE"] == "worker"
-        );
+        workers = data.filter(machine => machine.env["SWM_NODE_MODE"] == "worker");
         workerData = true;
         workerIp = workers[data.length - 1].publicIP["ip"];
       })
-      .catch((err) => {
+      .catch(err => {
         failed = true;
         console.log("Error", err);
         message = err.message || err;
@@ -159,7 +156,7 @@
           message = "Failed to remove worker";
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("Error", err);
         message = err.message || err;
       })
@@ -213,15 +210,7 @@
         capacity: { cpu, memory },
         mounts: [{ size }],
       } = worker;
-      return [
-        i + 1,
-        contractId,
-        name,
-        ip,
-        cpu,
-        memory,
-        size / (1024 * 1024 * 1024),
-      ];
+      return [i + 1, contractId, name, ip, cpu, memory, size / (1024 * 1024 * 1024)];
     });
   }
 </script>
@@ -241,11 +230,7 @@
   />
 
   {#if capRover}
-    <div
-      class="modal-content"
-      style="width: fit-content"
-      on:click|stopPropagation
-    >
+    <div class="modal-content" style="width: fit-content" on:click|stopPropagation>
       <div class="box">
         <h4 class="is-size-4">
           Manage CapRover({capRover.name}) Workers
@@ -255,36 +240,23 @@
           <hr />
           <Table
             rowsData={workers}
-            headers={[
-              "#",
-              "Contract ID",
-              "Name",
-              "Public IP",
-              "CPU(vCores)",
-              "Memory(MB)",
-              "Disk(GB)",
-            ]}
+            headers={["#", "Contract ID", "Name", "Public IP", "CPU(vCores)", "Memory(MB)", "Disk(GB)"]}
             rows={_createWorkerRows(workers)}
             selectable={false}
             actions={[
               {
                 label: "Delete",
                 type: "danger",
-                loading: (i) => loading && removing === workers[i].name,
+                loading: i => loading && removing === workers[i].name,
                 click: (_, i) => {
-                  workerIndex = i,
-                  name = `worker ${workers[i].name}`;
+                  (workerIndex = i), (name = `worker ${workers[i].name}`);
                   opened = !opened;
                 },
                 disabled: () => loading || removing !== null,
               },
             ]}
           />
-          <DialogueMsg 
-            bind:opened 
-            on:removed={onDeleteWorker(workerIndex)}
-            {name}
-          />
+          <DialogueMsg bind:opened on:removed={onDeleteWorker(workerIndex)} {name} />
           <hr />
         {:else if workers_loading}
           <Alert type="info" message={logs?.message ?? "Loading..."} />
@@ -301,11 +273,7 @@
             <Alert type="danger" message={message || "Failed to Add Worker."} />
           {:else}
             {#each workerFields as field (field.symbol)}
-              <Input
-                bind:data={worker[field.symbol]}
-                bind:invalid={field.invalid}
-                {field}
-              />
+              <Input bind:data={worker[field.symbol]} bind:invalid={field.invalid} {field} />
             {/each}
 
             <SelectCapacity
@@ -345,7 +313,7 @@
             {success}
             {failed}
             disabled={disabled && !failed && !success}
-            on:click={(e) => {
+            on:click={e => {
               if (success || failed) {
                 e.preventDefault();
                 success = false;
@@ -372,24 +340,16 @@
       2- Go to the <strong>cluster</strong> tab<br />
       3- Click <strong>Add Self-Hosted Registry</strong> button then
       <strong>Enable Self-Hosted Registry</strong><br />
-      4- Insert worker node public IP <strong>{workerIp}</strong> and add your
-      private SSH Key<br />
+      4- Insert worker node public IP <strong>{workerIp}</strong> and add your private SSH Key<br />
       5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
-        <a
-          target="_blank"
-          href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker"
-        >
+        <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker">
           Click here for the documentation
         </a>
       </strong>
       <div style="float: right; margin-top: 50px;">
-        <button
-          class="button is-danger"
-          on:click|stopPropagation={() => (workerData = !workerData)}
-          >Close</button
-        >
+        <button class="button is-danger" on:click|stopPropagation={() => (workerData = !workerData)}>Close</button>
       </div>
     </section>
   </div>

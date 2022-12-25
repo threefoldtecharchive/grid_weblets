@@ -1,31 +1,18 @@
 import { getUniqueDomainName } from "./gatewayHelpers";
 
-
 interface IConfig {
   mnemonics: string;
   storeSecret: string;
   networkEnv: string;
 }
 
-export default async function deleteDeployment(
-  configs: IConfig,
-  key: "k8s" | "machines",
-  name: string,
-  type: string
-  ) {
+export default async function deleteDeployment(configs: IConfig, key: "k8s" | "machines", name: string, type: string) {
   const { GridClient } = window.configs.grid3_client;
   const { HTTPMessageBusClient } = window.configs.client;
-  
+
   const { mnemonics, networkEnv, storeSecret } = configs;
   const http = new HTTPMessageBusClient(0, "", "", "");
-  const grid = new GridClient(
-    networkEnv as any,
-    mnemonics,
-    storeSecret,
-    http,
-    type,
-    "tfkvstore" as any
-  );
+  const grid = new GridClient(networkEnv as any, mnemonics, storeSecret, http, type, "tfkvstore" as any);
 
   // remove deployment in namespace `type`
   console.log({ grid });
@@ -46,9 +33,9 @@ export default async function deleteDeployment(
 
 async function _deleteDeployments(grid, name, configs, type, key) {
   const domainName = await getUniqueDomainName(configs, name, type);
-  if(type === "qvm"){
-    let qvm =await grid.machines.getObj(name)
-    await grid.qsfs_zdbs.delete({name:qvm[0].mounts[0].name})
+  if (type === "qvm") {
+    const qvm = await grid.machines.getObj(name);
+    await grid.qsfs_zdbs.delete({ name: qvm[0].mounts[0].name });
   }
   await grid.gateway.delete_name({ name: domainName });
   return await grid[key].delete({ name });

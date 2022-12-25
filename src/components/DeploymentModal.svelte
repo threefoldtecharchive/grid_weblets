@@ -14,7 +14,7 @@
     { label: "Details", value: "details" },
     { label: "JSON", value: "json" },
   ];
-  let active: string = "details";
+  let active = "details";
   export let data: any;
   $: json = data ? JSON.stringify(data, undefined, 4) : "";
   export let onlyJSON = false;
@@ -53,12 +53,12 @@
 `;
 
   let vms: Array<any> = [];
-  $: if (data) vms = data.masters ? [data.masters[0], ...data.workers] : Array.isArray(data)? data : [data];
+  $: if (data) vms = data.masters ? [data.masters[0], ...data.workers] : Array.isArray(data) ? data : [data];
 
   let vmTabs: ITab[] = [];
   $: if (data && vms.length) vmTabs = vms.map(({ name }, i) => ({ label: name, value: i.toString() } as ITab)); // prettier-ignore
 
-  let vmActiveTab: string = "0";
+  let vmActiveTab = "0";
 </script>
 
 <div>
@@ -66,14 +66,11 @@
 </div>
 
 <div class="modal is-active">
-  <div
-    class="modal-background"
-    on:click|preventDefault={() => dispatch("closed")}
-  />
+  <div class="modal-background" on:click|preventDefault={() => dispatch("closed")} />
   <div class="modal-content" on:click|stopPropagation>
     <div class="box">
       {#if !onlyJSON}
-      <Tabs bind:active {tabs} />
+        <Tabs bind:active {tabs} />
       {/if}
       <section class="content">
         {#if active === "details" && !onlyJSON}
@@ -88,19 +85,13 @@
 
           <hr />
           <div class="is-flex is-justify-content-flex-end">
-            <button class="button " on:click={() => copy(json)}>
-              Copy
-            </button>
+            <button class="button " on:click={() => copy(json)}> Copy </button>
           </div>
         {/if}
       </section>
     </div>
   </div>
-  <button
-    class="modal-close is-large"
-    aria-label="close"
-    on:click|preventDefault={() => dispatch("closed")}
-  />
+  <button class="modal-close is-large" aria-label="close" on:click|preventDefault={() => dispatch("closed")} />
 </div>
 
 <style lang="scss" scoped>

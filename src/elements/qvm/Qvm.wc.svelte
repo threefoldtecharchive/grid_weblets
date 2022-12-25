@@ -1,11 +1,10 @@
 <svelte:options tag="tf-qvm" />
 
 <script lang="ts">
-  import VM, { Disk, Env } from "../../types/vm";
+  import VM, { Env } from "../../types/vm";
   import QSFS from "../../types/qsfs";
-  import type { IFlist, IFormField, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployQVM from "../../utils/deployQVM";
-  // import {delete_qsfs} from '../../utils/deployQVM'
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -24,7 +23,6 @@
     validateCpu,
     validateDisk,
     validateDiskName,
-    validateEntryPoint,
     validateFlistvalue,
     validateKey,
     validateKeyValue,
@@ -107,12 +105,9 @@
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   // prettier-ignore
-  const flists: IFlist[] = [
-    { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist", entryPoint: "/sbin/zinit init" },
-  ];
   const flistField: IFormField = { label: "VM Image", placeholder: "Ubuntu-22.04", symbol: "flist", type: "text", disabled:true}; // prettier-ignore
-  let selectedFlist: number = 0;
-  let flistSelectValue: string = "Ubuntu-22.04";
+  let selectedFlist = 0;
+  let flistSelectValue = "Ubuntu-22.04";
 
   // prettier-ignore
   const envFields: IFormField[] = [
@@ -121,13 +116,13 @@
   ];
 
   const deploymentStore = window.configs?.deploymentStore;
-  let active: string = "config";
+  let active = "config";
   let loading = false;
   let success = false;
   let failed = false;
   let profile: IProfile;
   let message: string;
-  let modalData: Object;
+  let modalData: object;
   let status: "valid" | "invalid";
 
   function _isInvalidDisks() {
@@ -164,8 +159,7 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -174,7 +168,7 @@
     message = undefined;
 
     deployQVM(data, qsfs, profile)
-      .then((data) => {
+      .then(data => {
         deploymentStore.set(0);
         success = true;
         modalData = data;
@@ -203,10 +197,7 @@
     <h4 class="is-size-4">Deploy a QSFS Virtual Machine</h4>
     <p>
       Deploy a new QSFS enabled virtual machine on the Threefold Grid
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
-      >
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_vm">
         Quick start documentation
       </a>
     </p>
@@ -217,21 +208,13 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed QVM."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed QVM." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy QVM."} />
     {:else}
       <Tabs bind:active {tabs} />
       <section style:display={active === "config" ? null : "none"}>
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
+        <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
           bind:data={flistSelectValue}
@@ -243,11 +226,7 @@
         />
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -257,10 +236,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFs
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, data.rootFs)}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
@@ -275,11 +251,7 @@
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
             <div class="box">
-              <DeleteBtn
-                name={env.key}
-                on:click={() =>
-                  (data.envs = data.envs.filter((_, i) => index !== i))}
-              />
+              <DeleteBtn name={env.key} on:click={() => (data.envs = data.envs.filter((_, i) => index !== i))} />
               {#each envFields as field (field.symbol)}
                 <Input bind:data={env[field.symbol]} {field} />
               {/each}
@@ -291,11 +263,7 @@
       <section style:display={active === "qsfs" ? null : "none"}>
         {#each qsfsFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={qsfs[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={qsfs[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={qsfs[field.symbol]} {field} />
           {/if}
@@ -311,7 +279,7 @@
           ssd={null}
           filters={qsfs.filters}
           {profile}
-          on:multiple={(e) => (qsfs.nodeIds = e.detail)}
+          on:multiple={e => (qsfs.nodeIds = e.detail)}
         />
       </section>
     {/if}
@@ -321,7 +289,7 @@
       loading={loading || validateFlist.loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

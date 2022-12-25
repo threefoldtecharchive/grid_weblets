@@ -39,7 +39,7 @@
   import UpdateK8s from "../../components/UpdateK8s.svelte";
   import UpdateCapRover from "../../components/UpdateCapRover.svelte";
   import type { IAction } from "../../types/table-action";
-  import DialogueMsg from '../../components/DialogueMsg.svelte';
+  import DialogueMsg from "../../components/DialogueMsg.svelte";
   import getGrid from "../../utils/getGrid";
 
   // prettier-ignore
@@ -64,7 +64,7 @@
     { label: "QSFS Virtual Machine", value: "qvm"}
   ];
   let grid;
-  let active: string = "vm";
+  let active = "vm";
   $: active = tab || active;
 
   let loading = false;
@@ -77,7 +77,7 @@
   let opened = false;
   function get_solution_label(active: string) {
     return (
-      tabs.find((item) => {
+      tabs.find(item => {
         return item.value == active;
       })?.label ?? "Not Found!"
     );
@@ -87,7 +87,7 @@
     configed = true;
     loading = true;
     DeployedList.init(profile)
-      .then((_list) => {
+      .then(_list => {
         list = _list;
       })
       .finally(() => (loading = false));
@@ -106,15 +106,11 @@
   }
 
   let removing: string = null;
-  function onRemoveHandler(
-    key: "k8s" | "machines",
-    name: string,
-    type: string
-  ) {
+  function onRemoveHandler(key: "k8s" | "machines", name: string, type: string) {
     removing = name;
     window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
     return deleteDeployment(profile, key, name, type)
-      .catch((err) => {
+      .catch(err => {
         console.log("Error while removing", err);
         message = err.message || err;
       })
@@ -124,7 +120,7 @@
       });
   }
 
-  let infoToShow: Object;
+  let infoToShow: object;
   let k8sToUpdate: any;
   let capRoverToUpdate: any;
 
@@ -134,7 +130,7 @@
       _reloadTab();
     });
 
-    grid = await getGrid(profile, (grid) => grid, false);
+    grid = await getGrid(profile, grid => grid, false);
   });
 
   onDestroy(() => {
@@ -146,8 +142,8 @@
     return rows.map((row, i) => {
       const { name, master, workers, consumption } = row;
       let publicIp = master.publicIP ?? ({} as any);
-      master.publicIP? publicIp.ip = publicIp.ip.split("/")[0] : publicIp.ip = "None";
-      master.publicIP? publicIp.ip6 = publicIp.ip6.split("/")[0] : publicIp.ip6 = "None";
+      master.publicIP ? (publicIp.ip = publicIp.ip.split("/")[0]) : (publicIp.ip = "None");
+      master.publicIP ? (publicIp.ip6 = publicIp.ip6.split("/")[0]) : (publicIp.ip6 = "None");
       return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
     });
   }
@@ -156,18 +152,16 @@
     return rows.map((row, i) => {
       let { name, publicIp, publicIp6, planetary, flist, consumption } = row;
       const _flist =
-        typeof flist === "string"
-          ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "")
-          : flist;
-          publicIp = publicIp != "None"? publicIp.split("/")[0] : "None";
-          publicIp6 = publicIp6 != "None"? publicIp6.split("/")[0] : "None";
+        typeof flist === "string" ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "") : flist;
+      publicIp = publicIp != "None" ? publicIp.split("/")[0] : "None";
+      publicIp6 = publicIp6 != "None" ? publicIp6.split("/")[0] : "None";
       return [i + 1, name, publicIp, publicIp6, planetary, _flist, consumption];
     });
   }
 
   let selectedRows: any[] = [];
-  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore  
-  
+  const _onSelectRowHandler = ({ detail }: { detail: number[] }) => selectedRows = detail; // prettier-ignore
+
   async function onDeleteHandler() {
     message = null;
 
@@ -179,34 +173,30 @@
     _reloadTab();
   }
 
-  const _vmHeader = [
-    "#",
-    "Name",
-    "Public IPv4",
-    "Public IPv6",
-    "Planetary Network IP",
-    "Flist",
-    "Billing Rate",
-  ];
+  const _vmHeader = ["#", "Name", "Public IPv4", "Public IPv6", "Planetary Network IP", "Flist", "Billing Rate"];
 
   const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = new Proxy(
     {
-      vm: (rows) => [
+      vm: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
       ],
-      caprover: (rows) => [
+      caprover: rows => [
         {
           type: "info",
           label: "Show Details",
-          click: async (_, i) => {grid.projectName = active; grid._connect(); infoToShow = (await grid.machines.getObj(rows[i]["name"]))},
+          click: async (_, i) => {
+            grid.projectName = active;
+            grid._connect();
+            infoToShow = await grid.machines.getObj(rows[i]["name"]);
+          },
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -221,19 +211,19 @@
             const domain = rows[i].details.env.CAPROVER_ROOT_DOMAIN;
             window.open("http://captain." + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.CAPROVER_ROOT_DOMAIN || removing !== null;
           },
         },
       ],
-      peertube: (rows) => [
+      peertube: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -242,21 +232,19 @@
             const domain = rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
             window.open("https://" + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
-            return (
-              !env || !env.PEERTUBE_WEBSERVER_HOSTNAME || removing !== null
-            );
+            return !env || !env.PEERTUBE_WEBSERVER_HOSTNAME || removing !== null;
           },
         },
       ],
-      funkwhale: (rows) => [
+      funkwhale: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -265,19 +253,19 @@
             const domain = rows[i].details.env.FUNKWHALE_HOSTNAME;
             window.open("https://" + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.FUNKWHALE_HOSTNAME || removing !== null;
           },
         },
       ],
-      taiga: (rows) => [
+      taiga: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -286,7 +274,7 @@
             const domain = rows[i].details.env.DOMAIN_NAME;
             window.open("https://" + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.DOMAIN_NAME || removing !== null;
           },
@@ -298,19 +286,19 @@
             const domain = rows[i].details.env.DOMAIN_NAME;
             window.open("http://" + domain + "/admin/", "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.DOMAIN_NAME || removing !== null;
           },
         },
       ],
-      mattermost: (rows) => [
+      mattermost: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -319,19 +307,19 @@
             const domain = rows[i].details.env.SITE_URL;
             window.open(domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.SITE_URL || removing !== null;
           },
         },
       ],
-      mastodon: (rows) => [
+      mastodon: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -340,28 +328,28 @@
             const domain = "https://" + rows[i].details.env.LOCAL_DOMAIN;
             window.open(domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.SITE_URL || removing !== null;
           },
         },
       ],
-      tfhubValidator: (rows) => [
+      tfhubValidator: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
       ],
-      discourse: (rows) => [
+      discourse: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -370,19 +358,19 @@
             const domain = rows[i].details.env.DISCOURSE_HOSTNAME;
             window.open("https://" + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.DISCOURSE_HOSTNAME || removing !== null;
           },
         },
       ],
-      casperlabs: (rows) => [
+      casperlabs: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -391,19 +379,19 @@
             const domain = rows[i].details.env.CASPERLABS_HOSTNAME;
             window.open("https://" + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.CASPERLABS_HOSTNAME || removing !== null;
           },
         },
       ],
-      owncloud: (rows) => [
+      owncloud: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -412,28 +400,28 @@
             const domain = rows[i].details.env.OWNCLOUD_DOMAIN;
             window.open("https://" + domain, "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
             return !env || !env.OWNCLOUD_DOMAIN || removing !== null;
           },
         },
       ],
-      presearch: (rows) => [
+      presearch: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
       ],
-      subsquid: (rows) => [
+      subsquid: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
@@ -442,65 +430,58 @@
             const domain = rows[i].details.env.SUBSQUID_WEBSERVER_HOSTNAME;
             window.open("https://" + domain + "/graphql", "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const env = rows[i].details.env;
-            return (
-              !env || !env.SUBSQUID_WEBSERVER_HOSTNAME || removing !== null
-            );
+            return !env || !env.SUBSQUID_WEBSERVER_HOSTNAME || removing !== null;
           },
         },
       ],
-      nodepilot: (rows) => [
+      nodepilot: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
         {
           type: "warning",
           label: "Visit",
           click: (_, i) => {
             const domain = rows[i].details.publicIP.ip;
-            window
-              .open(
-                "https://" + domain.substr(0, domain.indexOf("/")),
-                "_blank"
-              )
-              .focus();
+            window.open("https://" + domain.substr(0, domain.indexOf("/")), "_blank").focus();
           },
-          disabled: (i) => {
+          disabled: i => {
             const publicIP = rows[i].details.publicIP;
             return !publicIP || !publicIP.ip || removing !== null;
           },
         },
       ],
-      fullvm: (rows) => [
+      fullvm: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
       ],
-      qvm: (rows) => [
+      qvm: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
       ],
-      algorand: (rows) => [
+      algorand: rows => [
         {
           type: "info",
           label: "Show Details",
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
-          loading: (i) => removing === rows[i].name,
+          loading: i => removing === rows[i].name,
         },
       ],
     },
@@ -508,7 +489,7 @@
       get(target, prop) {
         return prop in target ? target[prop] : () => [];
       },
-    }
+    },
   );
 </script>
 
@@ -536,17 +517,10 @@
       <Alert type="info" message="Initializing..." />
     {:else}
       {#if !tab}
-        <Tabs
-          bind:active
-          {tabs}
-          disabled={removing !== null}
-          on:select={() => (selectedRows = [])}
-        />
+        <Tabs bind:active {tabs} disabled={removing !== null} on:select={() => (selectedRows = [])} />
       {/if}
 
-      <div
-        class="is-flex is-justify-content-space-between is-align-items-center mt-2 mb-2"
-      >
+      <div class="is-flex is-justify-content-space-between is-align-items-center mt-2 mb-2">
         <div style="width: 100%;">
           {#if message}
             <Alert type="danger" {message} />
@@ -565,11 +539,7 @@
           Delete
         </button>
       </div>
-      <DialogueMsg 
-        bind:opened 
-        on:removed={onDeleteHandler}
-        {name}
-      />
+      <DialogueMsg bind:opened on:removed={onDeleteHandler} {name} />
 
       <!-- K8S -->
       {#if active === "k8s"}
@@ -588,15 +558,7 @@
             {/if}
             <Table
               rowsData={rows.data}
-              headers={[
-                "#",
-                "Name",
-                "Public IPv4",
-                "Public IPv6",
-                "Planetary Network IP",
-                "Workers",
-                "Billing Rate",
-              ]}
+              headers={["#", "Name", "Public IPv4", "Public IPv6", "Planetary Network IP", "Workers", "Billing Rate"]}
               rows={_createK8sRows(rows.data)}
               actions={[
                 {
@@ -604,7 +566,7 @@
                   label: "Show Details",
                   click: (_, i) => (infoToShow = rows.data[i].details),
                   disabled: () => removing !== null,
-                  loading: (i) => removing === rows.data[i].name,
+                  loading: i => removing === rows.data[i].name,
                 },
                 {
                   type: "warning",
@@ -619,18 +581,13 @@
             <Alert type="gray" message="No Kubernetes found on this profile." />
           {/if}
         {:catch err}
-          <Alert
-            type="danger"
-            message={err.message || err || "Failed to list Kubernetes"}
-          />
+          <Alert type="danger" message={err.message || err || "Failed to list Kubernetes"} />
         {/await}
       {:else}
         {#await list?.loadDeployments(active === "vm" ? undefined : active)}
           <Alert
             type="info"
-            message={`Listing ${
-              active == "casperlabs" ? "Casperlab" : get_solution_label(active)
-            }s...`}
+            message={`Listing ${active == "casperlabs" ? "Casperlab" : get_solution_label(active)}s...`}
           />
         {:then rows}
           {#if rows.data.length}
@@ -654,9 +611,7 @@
             <Alert
               type="gray"
               message={`No ${
-                active == "casperlabs"
-                  ? "Casperlab"
-                  : get_solution_label(active)
+                active == "casperlabs" ? "Casperlab" : get_solution_label(active)
               }s found on this profile.`}
             />
           {/if}
@@ -665,11 +620,7 @@
             type="danger"
             message={err.message ||
               err ||
-              `Failed to list ${
-                active == "casperlabs"
-                  ? "Casperlab"
-                  : get_solution_label(active)
-              }s`}
+              `Failed to list ${active == "casperlabs" ? "Casperlab" : get_solution_label(active)}s`}
           />
         {/await}
       {/if}

@@ -16,16 +16,16 @@
 
   let profile: IProfile;
   let contracts: IContract[] = [];
-  let loading: boolean = false;
+  let loading = false;
   let selectedContracts: IContract[] = [];
-  let deleting: boolean = false;
+  let deleting = false;
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
   let name: string = null;
   let opened = false;
-  let deleteAllopened: boolean = false;
+  let deleteAllopened = false;
   let loadingDetails: string = null;
-  let infoToShow: Object;
+  let infoToShow: object;
 
   function jsonParser(str: string) {
     str = str.replaceAll("'", '"');
@@ -44,7 +44,7 @@
     profile = _profile;
     if (profile) {
       loading = true;
-      return getGrid(profile, (grid) => {
+      return getGrid(profile, grid => {
         grid.contracts
           .listMyContracts()
           .then(({ nameContracts, nodeContracts, rentContracts }) => {
@@ -56,7 +56,7 @@
                   state: state,
                   createdAt: new Date(+createdAt),
                   nodeID: nodeID,
-                } as IContract)
+                } as IContract),
             );
             const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
               id: contractID, 
@@ -73,7 +73,7 @@
                   createdAt: new Date(+createdAt),
                   nodeID: nodeID,
                   deploymentData: jsonParser(deploymentData),
-                } as IContract)
+                } as IContract),
             );
             contracts = [...names, ...nodes, ...rents];
           })
@@ -83,14 +83,13 @@
                 const res = await grid.contracts.getDeletionTime({
                   id: +contract.id,
                 });
-                contract.expiration =
-                  res === 0 ? "-" : new Date(res).toLocaleString();
+                contract.expiration = res === 0 ? "-" : new Date(res).toLocaleString();
               } else {
                 contract.expiration = "-";
               }
             }
           })
-          .catch((err) => {
+          .catch(err => {
             console.log("Error", err);
           })
           .finally(() => {
@@ -102,28 +101,31 @@
     }
   }
 
-  async function getContractDetails(contractId: number){
+  async function getContractDetails(contractId: number) {
     loadingDetails = contractId as unknown as string;
-    let deployment = await getGrid(profile, (grid) => grid.zos
-        .getDeployment({contractId})
-        .then((res) => res)
-        .catch((err) => {
-            console.log("Deployment Error", err);
-        }).finally(() => loadingDetails = null))
-    return deployment
+    let deployment = await getGrid(profile, grid =>
+      grid.zos
+        .getDeployment({ contractId })
+        .then(res => res)
+        .catch(err => {
+          console.log("Deployment Error", err);
+        })
+        .finally(() => (loadingDetails = null)),
+    );
+    return deployment;
   }
   let message: string;
   function onDeleteHandler() {
     message = null;
     deleting = true;
     deletingType = "all";
-    return getGrid(profile, (grid) => {
+    return getGrid(profile, grid => {
       grid.contracts
         .cancelMyContracts()
         .then(() => {
           contracts = [];
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("Error", err);
           message = err.message || err;
         })
@@ -142,7 +144,7 @@
     message = null;
     deleting = true;
     deletingType = "selected";
-    return getGrid(profile, async (grid) => {
+    return getGrid(profile, async grid => {
       for (const contract of selectedContracts) {
         try {
           await grid.contracts.cancel({ id: +contract.id });
@@ -151,8 +153,8 @@
           message = err.message || err;
         }
       }
-      contracts = contracts.filter((c) => {
-        return selectedContracts.findIndex((sc) => sc.id === c.id) === -1;
+      contracts = contracts.filter(c => {
+        return selectedContracts.findIndex(sc => sc.id === c.id) === -1;
       });
       selectedRows = [];
       deleting = false;
@@ -160,16 +162,16 @@
     });
   }
 
-  let loadingConsumption: boolean = false;
+  let loadingConsumption = false;
   let consumptions: string[] = [];
   $: {
     if (profile) {
       loadingConsumption = true;
       getContractsConsumption(profile, contracts)
-        .then((res) => {
+        .then(res => {
           consumptions = res as unknown as string[];
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("Error", err);
         })
         .finally(() => {
@@ -184,10 +186,7 @@
 <div style="padding: 15px;">
   <div class="box">
     <h4 class="is-size-4 mb-4">Contracts List</h4>
-    <a
-      target="_blank"
-      href="https://library.threefold.me/info/manual/#/manual__tfchain_home"
-    >
+    <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__tfchain_home">
       Quick start documentation</a
     >
     <hr />
@@ -208,44 +207,38 @@
           "Created at",
           "Expiration",
         ]}
-        rows={contracts.map(
-          (
-            { id, type, nodeID, state, expiration, deploymentData, createdAt },
-            idx
-          ) => [
-            id.toString(),
-            type,
-            nodeID ?? " - ",
-            state,
-            loadingConsumption ? "Loading..." : consumptions[idx],
-            deploymentData
-              ? (deploymentData.type == "vm"
-                  ? deploymentData.projectName == ""
-                    ? "virtual machine"
-                    : deploymentData.projectName.toLowerCase()
-                  : deploymentData.type) ?? "- "
-              : "-",
-            deploymentData ? deploymentData.name ?? "-" : "-",
-            createdAt.toLocaleString(),
-            expiration,
-          ]
-        )}
+        rows={contracts.map(({ id, type, nodeID, state, expiration, deploymentData, createdAt }, idx) => [
+          id.toString(),
+          type,
+          nodeID ?? " - ",
+          state,
+          loadingConsumption ? "Loading..." : consumptions[idx],
+          deploymentData
+            ? (deploymentData.type == "vm"
+                ? deploymentData.projectName == ""
+                  ? "virtual machine"
+                  : deploymentData.projectName.toLowerCase()
+                : deploymentData.type) ?? "- "
+            : "-",
+          deploymentData ? deploymentData.name ?? "-" : "-",
+          createdAt.toLocaleString(),
+          expiration,
+        ])}
         actions={[
           {
             type: "info",
             label: "Show JSON",
-            click: async (_, i) => contracts[i].type !== "node"? "" : (infoToShow = await getContractDetails(+contracts[i].id)),
-            disabled: (i) => contracts[i].type !== "node" || loadingDetails !== null,
-            loading: (i) => loadingDetails == contracts[i].id.toString(),
-            show: (i) => contracts[i].type === "node"? true : false,
-          }
+            click: async (_, i) =>
+              contracts[i].type !== "node" ? "" : (infoToShow = await getContractDetails(+contracts[i].id)),
+            disabled: i => contracts[i].type !== "node" || loadingDetails !== null,
+            loading: i => loadingDetails == contracts[i].id.toString(),
+            show: i => (contracts[i].type === "node" ? true : false),
+          },
         ]}
         on:selected={({ detail }) => (selectedContracts = detail)}
         {selectedRows}
       />
-      <div
-        class="is-flex is-justify-content-space-between is-align-items-center"
-      >
+      <div class="is-flex is-justify-content-space-between is-align-items-center">
         <div style="flex-grow: 1;" class="mr-2">
           {#if message}
             <Alert type="danger" style={`color: #FF5151`} {message} />
@@ -253,14 +246,9 @@
         </div>
         <div class="mt-5">
           <button
-            class={"button is-danger is-outlined mr-2 " +
-              (deleting && deletingType === "selected" ? "is-loading" : "")}
+            class={"button is-danger is-outlined mr-2 " + (deleting && deletingType === "selected" ? "is-loading" : "")}
             style={`border-color: #FF5151; color: #FF5151; background: white;`}
-            disabled={!profile ||
-              loading ||
-              deleting ||
-              contracts.length === 0 ||
-              selectedContracts.length === 0}
+            disabled={!profile || loading || deleting || contracts.length === 0 || selectedContracts.length === 0}
             on:click={() => {
               name = "selected contracts";
               opened = !opened;
@@ -268,14 +256,9 @@
           >
             Delete Selected
           </button>
-          <DialogueMsg
-            bind:opened
-            on:removed={onDeleteSelectedHandler}
-            {name}
-          />
+          <DialogueMsg bind:opened on:removed={onDeleteSelectedHandler} {name} />
           <button
-            class={"button is-danger" +
-              (deleting && deletingType === "all" ? " is-loading" : "")}
+            class={"button is-danger" + (deleting && deletingType === "all" ? " is-loading" : "")}
             style={`background-color: #FF5151; color: #fff`}
             disabled={!profile || loading || deleting || contracts.length === 0}
             on:click={() => {
@@ -285,18 +268,11 @@
           >
             Delete All
           </button>
-          <DialogueMsg
-            bind:opened={deleteAllopened}
-            on:removed={onDeleteHandler}
-            {name}
-          />
+          <DialogueMsg bind:opened={deleteAllopened} on:removed={onDeleteHandler} {name} />
         </div>
       </div>
     {:else}
-      <Alert
-        type="info"
-        message={!profile ? noActiveProfile : "No contracts were found"}
-      />
+      <Alert type="info" message={!profile ? noActiveProfile : "No contracts were found"} />
     {/if}
   </div>
 </div>

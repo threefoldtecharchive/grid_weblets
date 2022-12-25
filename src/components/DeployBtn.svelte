@@ -7,7 +7,7 @@
   export let success: boolean;
   export let failed: boolean;
   export let disabled: boolean;
-  export let label: string = "Deploy";
+  export let label = "Deploy";
   $: deployment = $currentDeployment;
 </script>
 
@@ -15,8 +15,7 @@
   <div style="width: 100%; padding-right: 15px;">
     {#if loading}
       <div class="notification is-warning is-light">
-        <strong>Warning!</strong> Make sure to not leave the page if there is an
-        in-progress deployment or deletion.
+        <strong>Warning!</strong> Make sure to not leave the page if there is an in-progress deployment or deletion.
       </div>
     {:else if deployment}
       <div class="notification is-warning is-light">
