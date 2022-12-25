@@ -29,7 +29,7 @@
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
   const data = new Mattermost();
-  const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null; // prettier-ignore
+  // const validator = (x: string) => x.trim().length === 0 ? "Value can't be empty." : null;
   let gateway: GatewayNodes;
   let invalid = true;
   let editable = false;

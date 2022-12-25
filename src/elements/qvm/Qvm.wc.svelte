@@ -3,9 +3,8 @@
 <script lang="ts">
   import VM, { Env } from "../../types/vm";
   import QSFS from "../../types/qsfs";
-  import type { IFlist, IFormField, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployQVM from "../../utils/deployQVM";
-  // import {delete_qsfs} from '../../utils/deployQVM'
   import type { IProfile } from "../../types/Profile";
 
   // Components
@@ -106,9 +105,6 @@
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   // prettier-ignore
-  const flists: IFlist[] = [
-    { name: "Ubuntu-22.04", url: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist", entryPoint: "/sbin/zinit init" },
-  ];
   const flistField: IFormField = { label: "VM Image", placeholder: "Ubuntu-22.04", symbol: "flist", type: "text", disabled:true}; // prettier-ignore
   let selectedFlist = 0;
   let flistSelectValue = "Ubuntu-22.04";

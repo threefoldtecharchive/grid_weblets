@@ -3,7 +3,7 @@
 <script lang="ts">
   import Presearch from "../../types/presearch";
   import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployPresearch from "../../utils/deployPresearch";
   import rootFs from "../../utils/rootFs";
 

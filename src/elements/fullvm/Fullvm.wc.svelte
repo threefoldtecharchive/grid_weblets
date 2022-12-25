@@ -23,8 +23,6 @@
     validateCpu,
     validateEntryPoint,
     validateFlistvalue,
-    validateKey,
-    validateKeyValue,
     validateMemory,
     validateDisk,
   } from "../../utils/validateName";

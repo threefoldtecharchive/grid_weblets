@@ -82,7 +82,7 @@
     message = undefined;
 
     deployCaprover(data, profile)
-      .then(async vm => {
+      .then(async () => {
         let vms = await grid.machines.getObj(data.name);
         success = true;
         modalData = vms;

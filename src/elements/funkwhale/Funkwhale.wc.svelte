@@ -6,7 +6,7 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  import VM, { Disk, Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
   import deployFunkwhale from "../../utils/deployFunkwhale";
 
   // Components

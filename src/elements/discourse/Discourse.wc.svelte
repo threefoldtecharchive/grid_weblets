@@ -15,13 +15,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, {
-    isInvalid,
-    validateCpu,
-    validateDisk,
-    validateEmail,
-    validateMemory,
-  } from "../../utils/validateName";
+  import validateName, { isInvalid, validateEmail } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
