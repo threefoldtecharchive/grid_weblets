@@ -23,10 +23,9 @@
     validateCpu,
     validateEntryPoint,
     validateFlistvalue,
-    validateKey,
-    validateKeyValue,
     validateMemory,
     validateDisk,
+    validatePrivateIPRange,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
@@ -34,6 +33,7 @@
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
     { label: "Disks", value: "disks" },
+    { label: "Advanced", value: "advanced" },
   ];
 
   let data = new Fullvm();
@@ -49,6 +49,12 @@
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+
+  // prettier-ignore
+  const networkFields: IFormField[] = [
+    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xxx.0.0/16", type: "text", validator: validatePrivateIPRange, invalid: false },
+  ];
 
   // prettier-ignore
   const flists: IFlist[] = [
@@ -72,8 +78,8 @@
       { label: "Other", value: "other" }
     ]
   };
-  let selectedFlist: number = 2;
-  let flistSelectValue: string = "2";
+  let selectedFlist = 2;
+  let flistSelectValue = "2";
   $: {
     const option = flistField.options[selectedFlist];
     if (option.value !== "other") {
@@ -84,13 +90,13 @@
   }
 
   const deploymentStore = window.configs?.deploymentStore;
-  let active: string = "config";
+  let active = "config";
   let loading = false;
   let success = false;
   let failed = false;
   let profile: IProfile;
   let message: string;
-  let modalData: Object;
+  let modalData: Record<string, unknown>;
   let status: "valid" | "invalid";
 
   data.disks = [
@@ -115,7 +121,8 @@
     if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields]) || _isInvalidDisks(); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields, ...networkFields]) || _isInvalidDisks(); // prettier-ignore
+
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -322,6 +329,10 @@
             {/if}
           {/each}
         </div>
+      {:else if active === "advanced"}
+        {#each networkFields as field (field.symbol)}
+        <Input bind:data={data.network[field.symbol]} {field} />
+        {/each}  
       {/if}
     {/if}
 
