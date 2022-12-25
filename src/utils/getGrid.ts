@@ -17,9 +17,11 @@ export default async function getGrid<T>(
     window.configs.grid3_client.BackendStorageType.tfkvstore,
   );
 
-  try {
-    await grid.connect();
-  } catch {}
-
+  await grid.connect();
   return cb(grid);
+  
+  // try {
+  //   await grid.connect();
+  // } catch {}
+  // return cb(grid);
 }
