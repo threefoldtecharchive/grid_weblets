@@ -226,7 +226,7 @@
       }
       if (extrinsics.length > 0) {
         try {
-          await newClient.utility.batch({ extrinsics });
+          await newClient.utility.batchAll({ extrinsics });
         } catch (e) {
           throw Error(`All or part of the keys are not migrated due to: ${e}`);
         }
