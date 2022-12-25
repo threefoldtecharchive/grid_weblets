@@ -16,5 +16,5 @@ export const solutionList = {
   fullvm: "fvm",
   subsquid: "ss",
   algorand: "al",
-  qvm : "qvm"
+  qvm: "qvm",
 };

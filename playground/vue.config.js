@@ -4,22 +4,20 @@ const { DefinePlugin } = require("webpack");
 const network = process.env.NETWORK || "dev";
 
 module.exports = {
-  transpileDependencies: [
-    'vuetify'
-  ],
-  outputDir: join(__dirname, '..', 'dist'),
-  publicPath: '/',
+  transpileDependencies: ["vuetify"],
+  outputDir: join(__dirname, "..", "dist"),
+  publicPath: "/",
   configureWebpack: {
     plugins: [
       new DefinePlugin({
-        "process.env.NETWORK": JSON.stringify(network)
-      })
+        "process.env.NETWORK": JSON.stringify(network),
+      }),
     ],
     module: {
       rules: [
         {
           test: /\.js$/,
-          loader: require.resolve('@open-wc/webpack-import-meta-loader'),
+          loader: require.resolve("@open-wc/webpack-import-meta-loader"),
           exclude: /\.vue$/,
         },
 
@@ -27,21 +25,18 @@ module.exports = {
           test: /\.m?js$/,
           include: /node_modules[/\\|]@polkadot/i,
           use: {
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: {
-              presets: [
-                '@babel/preset-env',
-                '@vue/cli-plugin-babel/preset',
-              ],
+              presets: ["@babel/preset-env", "@vue/cli-plugin-babel/preset"],
               plugins: [
                 "@babel/plugin-proposal-private-methods",
                 "@babel/plugin-proposal-class-properties",
-                '@babel/plugin-proposal-object-rest-spread',
-              ]
-            }
-          }
+                "@babel/plugin-proposal-object-rest-spread",
+              ],
+            },
+          },
         },
-      ]
-    }
+      ],
+    },
   },
-}
+};

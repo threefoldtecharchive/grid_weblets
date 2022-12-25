@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import NodeID from "./nodeId";
 import { Disk } from "./vm";
 import isValidInteger from "../utils/isValidInteger";
-import { getNetwork, configVariables} from "../utils/tfhubValidatorConf"
+import { getNetwork, configVariables } from "../utils/tfhubValidatorConf";
 
 interface ITFHubValidator {
   name: string;
@@ -83,12 +83,7 @@ export default class TFHubValidator implements ITFHubValidator {
   }
 
   get invalid(): boolean {
-    const { 
-      mnemonics,
-      stakeAmount,
-      ethereumAddress,
-      ethereumPrivKey,
-    } = this;
+    const { mnemonics, stakeAmount, ethereumAddress, ethereumPrivKey } = this;
     return (
       mnemonics.trim() === "" ||
       !isValidInteger(stakeAmount) ||
