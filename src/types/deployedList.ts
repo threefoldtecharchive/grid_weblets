@@ -142,7 +142,7 @@ export default class DeployedList {
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {
-    return new DeployedList(await getGrid(profile, grid => grid, false));
+    return new DeployedList(await getGrid(profile, grid => grid));
   }
 
   public static __filterNames(names: string[]): string[] {
