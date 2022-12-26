@@ -21,6 +21,6 @@ export default class NodeID {
         this.filters[key] = value;
       },
     },
-    public nodes: ISelectOption[] = []
+    public nodes: ISelectOption[] = [],
   ) {}
 }

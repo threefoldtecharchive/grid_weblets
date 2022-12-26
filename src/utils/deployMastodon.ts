@@ -1,29 +1,17 @@
 import type Mastodon from "../types/mastodon";
 import type { IProfile } from "../types/Profile";
 
-import {
-  GatewayNodes,
-  getUniqueDomainName,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { GatewayNodes, getUniqueDomainName, selectSpecificGatewayNode } from "./gatewayHelpers";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployMastodon(
-  profile: IProfile,
-  mastodon: Mastodon,
-  gateway: GatewayNodes
-) {
+export default async function deployMastodon(profile: IProfile, mastodon: Mastodon, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(
-    profile,
-    mastodon.name,
-    "mastodon"
-  );
+  const domainName = await getUniqueDomainName(profile, mastodon.name, "mastodon");
 
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   mastodon.domain = `${domainName}.${nodeDomain}`;
 
   const mastodonVm = await _deployMastodon(profile, mastodon);
@@ -40,13 +28,7 @@ export default async function deployMastodon(
 }
 
 function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
-  const { 
-    DiskModel,
-    MachineModel,
-    MachinesModel,
-    NetworkModel,
-    generateString
-  } = window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, NetworkModel, generateString } = window.configs.grid3_client;
 
   const {
     name,
@@ -55,7 +37,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
     adminEmail,
     domain,
     nodeId,
-    
+
     tfConnect,
     SMTP_PORT,
     SMTP_EMAIL,
@@ -68,7 +50,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
     publicIp,
   } = mastodon;
 
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   const network = new NetworkModel();
   network.name = `net${randomSuffix}`;
@@ -102,7 +84,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
     SUPERUSER_EMAIL: adminEmail,
     SUPERUSER_PASSWORD: adminPassword,
     SSH_KEY: profile.sshKey,
-    IS_TF_CONNECT: `${tfConnect}`
+    IS_TF_CONNECT: `${tfConnect}`,
   };
 
   const vms = new MachinesModel();
@@ -117,7 +99,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
   };
   vms.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "Mastodon", name, async (grid) => {
+  return deploy(profile, "Mastodon", name, async grid => {
     await checkVMExist(grid, "mastodon", name);
 
     return grid.machines
@@ -127,12 +109,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
   });
 }
 
-function _deployGateway(
-  profile: IProfile,
-  name: string,
-  ip: string,
-  nodeId: number
-) {
+function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
 
   const gw = new GatewayNameModel();
@@ -148,7 +125,7 @@ function _deployGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", name, async (grid) => {
+  return deploy(profile, "GatewayName", name, async grid => {
     await checkGW(grid, name, "mastodon");
     return grid.gateway
       .deploy_name(gw)

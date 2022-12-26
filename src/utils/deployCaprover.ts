@@ -6,15 +6,10 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 
-const CAPROVER_FLIST =
-  "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist";
+const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist";
 
-export default async function deployCaprover(
-  data: Caprover,
-  profile: IProfile
-) {
-  const { MachinesModel, DiskModel, MachineModel } =
-    window.configs.grid3_client;
+export default async function deployCaprover(data: Caprover, profile: IProfile) {
+  const { MachinesModel, DiskModel, MachineModel } = window.configs.grid3_client;
   const { name, workers, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
 
   const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
@@ -87,7 +82,7 @@ export default async function deployCaprover(
   };
   machines.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "CapRover", name, async (grid) => {
+  return deploy(profile, "CapRover", name, async grid => {
     await checkVMExist(grid, "caprover", name);
     return grid.machines
       .deploy(machines)

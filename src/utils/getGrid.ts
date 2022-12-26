@@ -1,5 +1,5 @@
 import type { IProfile } from "../types/Profile";
-import type { GridClient } from "grid3_client";
+import type { GridClient, NetworkEnv } from "grid3_client";
 
 export default async function getGrid<T>(
   profile: IProfile,
@@ -9,7 +9,7 @@ export default async function getGrid<T>(
 ): Promise<T> {
   const { networkEnv, mnemonics } = profile;
   const grid = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
+    networkEnv as unknown as NetworkEnv,
     mnemonics,
     profile.storeSecret || mnemonics,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),

@@ -19,8 +19,8 @@
   import NodePilot from "./elements/nodePilot/NodePilot.wc.svelte";
   import DeployedList from "./elements/DeployedList/DeployedList.wc.svelte";
   import ContractsList from "./elements/ContractsList/ContractsList.wc.svelte";
-  import Algorand from "./elements/algorand/Algorand.wc.svelte"
-  import QVM from "./elements/qvm/Qvm.wc.svelte"
+  import Algorand from "./elements/algorand/Algorand.wc.svelte";
+  import QVM from "./elements/qvm/Qvm.wc.svelte";
 
   const weblets = [
     { name: "Full VM", cmp: Fullvm },
@@ -38,7 +38,7 @@
     { name: "Subsquid", cmp: Subsquid },
     { name: "Casperlabs", cmp: Casperlabs },
     { name: "NodePilot", cmp: NodePilot },
-    {name: "QVM", cmp: QVM},
+    { name: "QVM", cmp: QVM },
     { name: "Algorand", cmp: Algorand },
     { name: "Deployed List", cmp: DeployedList },
     { name: "Contracts List", cmp: ContractsList },
@@ -52,8 +52,7 @@
 <div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}
     <p
-      style={"cursor: pointer; margin: 0 5px;" +
-        (selectedWebletIndex === i ? `color: steelblue` : undefined)}
+      style={"cursor: pointer; margin: 0 5px;" + (selectedWebletIndex === i ? `color: steelblue` : undefined)}
       on:click={() => (selectedWebletIndex = i)}
     >
       {weblet.name}

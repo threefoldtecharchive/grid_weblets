@@ -29,20 +29,20 @@ export interface FarmingProfileOptions {
 
 export default class FarmingProfile implements FarmingProfileOptions {
   public type: ProfileTypes = ProfileTypes.DIY;
-  public name: string = "DIY";
-  public memory: number = 0;
-  public cpu: number = 0;
-  public hdd: number = 0;
-  public ssd: number = 0;
-  public price: number = 0.09;
-  public priceAfter5Years: number = 2;
-  public maximumTokenPrice: number = 2;
-  public powerUtilization: number = 40;
-  public powerCost: number = 0.15;
+  public name = "DIY";
+  public memory = 0;
+  public cpu = 0;
+  public hdd = 0;
+  public ssd = 0;
+  public price = 0.09;
+  public priceAfter5Years = 2;
+  public maximumTokenPrice = 2;
+  public powerUtilization = 40;
+  public powerCost = 0.15;
   public certified: Certification = Certification.NONE;
-  public publicIp: boolean = false;
-  public investmentCostHW: number = 2200;
-  public nuRequiredPerCu: number = 30;
+  public publicIp = false;
+  public investmentCostHW = 2200;
+  public nuRequiredPerCu = 30;
 
   // prettier-ignore
   constructor(options: Partial<FarmingProfileOptions> = {}) {
@@ -117,11 +117,13 @@ export default class FarmingProfile implements FarmingProfileOptions {
 
   public get tftRewardPerCu(): number {
     const { rewardPerCu, price, tftRewardPer } = this;
+    if (price < 0.08) return NaN;
     return (rewardPerCu / price) * tftRewardPer;
   }
 
   public get tftRewardPerSu(): number {
     const { rewardPerSu, price, tftRewardPer } = this;
+    if (price < 0.08) return NaN;
     return (rewardPerSu / price) * tftRewardPer;
   }
 
@@ -146,8 +148,7 @@ export default class FarmingProfile implements FarmingProfileOptions {
   }
 
   public get totalFarmingRewardInTft(): number {
-    const { cuFarmingRewardInTft, suFarmingRewardInTft, nuFarmingRewardInTft } =
-      this;
+    const { cuFarmingRewardInTft, suFarmingRewardInTft, nuFarmingRewardInTft } = this;
     return cuFarmingRewardInTft + suFarmingRewardInTft + nuFarmingRewardInTft;
   }
 
@@ -179,7 +180,8 @@ export default class FarmingProfile implements FarmingProfileOptions {
   }
 
   public get totalCosts(): number {
-    const { powerUtilization, powerCost, investmentCostHW } = this;
+    const { powerUtilization, powerCost, price, investmentCostHW } = this;
+    if (price < 0.08) return NaN;
     const powerCostOver5Years /* D33 */ = powerUtilization * 24 * .365 * 5 * powerCost; // prettier-ignore
     return powerCostOver5Years + investmentCostHW;
   }

@@ -1,20 +1,10 @@
 <svelte:options tag="tf-select-capacity" />
 
 <script lang="ts">
-  import { createEventDispatcher, onMount } from "svelte";
-  import type {
-    IFormField,
-    IPackage,
-    Packages,
-    SelectCapacityUpdate,
-  } from "../types";
+  import { createEventDispatcher } from "svelte";
+  import type { IFormField, IPackage, Packages, SelectCapacityUpdate } from "../types";
   import Input from "./Input.svelte";
-  import {
-    isInvalid,
-    validateCpu,
-    validateDisk,
-    validateMemory,
-  } from "../utils/validateName";
+  import { isInvalid, validateCpu, validateDisk, validateMemory } from "../utils/validateName";
 
   const dispatch = createEventDispatcher<{ update: SelectCapacityUpdate }>();
 

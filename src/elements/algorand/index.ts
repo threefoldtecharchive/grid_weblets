@@ -1,1 +1,1 @@
-import "./Algorand.wc.svelte"
+import "./Algorand.wc.svelte";

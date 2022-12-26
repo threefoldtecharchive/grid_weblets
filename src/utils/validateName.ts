@@ -1,23 +1,23 @@
 /* eslint-disable no-useless-escape */
 import type { IFormField } from "../types";
 import { getResources } from "./getAlgoResources";
-import isPrivateIP from "private-ip"
+import isPrivateIP from "private-ip";
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;
-const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/16$/;
-const EMAIL_REGEX =
-  /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+// const IP_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}\/16$/;
+// eslint-disable-next-line no-useless-escape
+const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
 // const UNIX_PATH_REGEX = /^\/([A-z0-9-_+]+\/)*([A-z0-9]+)$/;
 const ALPHA_ONLY_REGEX = /[A-Za-z]/; // Alphabets only
 const NAME_REGEX = /^[^0-9][a-zA-Z0-9]+$/; // Alphabets + digits + not start with digit
 const ALPHANUMERIC_UNDERSCORE_REGEX = /^[^0-9_\s][a-zA-Z0-9_]+$/; // Alphabets + digits + underscore + not start with digit
 const PROFILE_NAME_REGEX = /^[\w\-\s]+$/;
-const URL_REGEX =
-  /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
+// eslint-disable-next-line no-useless-escape
+const URL_REGEX = /^((?:(?:http?|ftp)[s]*:\/\/)?[a-z0-9-%\/\&=?\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?)/;
 const WHITE_SPACE_REGEX = /^\S*$/;
 const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-const MNEMONICS_LENGTH_REGEX= /^([a-zA-Z]+\s){24}[a-zA-Z]+$/;
+const MNEMONICS_LENGTH_REGEX = /^([a-zA-Z]+\s){24}[a-zA-Z]+$/;
 
 // const SSH_REGEX = /ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?/;
 
@@ -35,12 +35,13 @@ export default function validateName(name: string): string | void {
 }
 export function validateMastodonAdminEmail(email: string): string | void {
   if (email == "") return "Email is required";
-  if (email.slice(0, 6).toLowerCase() == "admin@") return "The email is reserved, use different email."; 
+  if (email.slice(0, 6).toLowerCase() == "admin@") return "The email is reserved, use different email.";
   return validateEmail(email);
 }
 export function validateMastodonAdminUsername(username: string): string | void {
   if (username.length < 5) return "username must be at least 5 characters";
-  if (!ALPHA_ONLY_REGEX.test(username[0])) return "username can't start with a number, a non-alphanumeric character or a whitespace.";
+  if (!ALPHA_ONLY_REGEX.test(username[0]))
+    return "username can't start with a number, a non-alphanumeric character or a whitespace.";
   if (!NAME_REGEX.test(username)) return "username can only include alphanumeric characters.";
   if (username.toLowerCase() == "admin") return "The username is reserved, use different username.";
 }
@@ -54,7 +55,6 @@ export function validateMnemonicsAlgorand(mnemonics: string): string | void {
   if (!mnemonics.length) return "Mnemonics required";
   if (!MNEMONICS_LENGTH_REGEX.test(mnemonics))
     return "Mnemonics should be 25 words and should contain alphabetic characters with only one space between the words.";
-
 }
 export function validateEmail(email: string): string | void {
   if (!EMAIL_REGEX.test(email)) return "Invalid email format.";
@@ -85,8 +85,7 @@ export function isInvalid(fields: IFormField[]) {
 }
 
 export function validateMemory(value: number): string | void {
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Memory must be a valid number.";
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Memory must be a valid number.";
   value = +value;
   if (+value.toFixed(0) !== value) return "Memory must be a valid integer.";
   if (value < 256) return "Minimum allowed memory is 256 MB.";
@@ -99,8 +98,7 @@ export function validateNPMemory(value: number): string | void {
 }
 
 export function validateKubernetesMemory(value: number): string | void {
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Memory must be a valid number.";
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Memory must be a valid number.";
   value = +value;
   if (+value.toFixed(0) !== value) return "Memory must be a valid integer.";
   if (value < 1024) return "Minimum allowed memory is 1024 MB.";
@@ -108,8 +106,7 @@ export function validateKubernetesMemory(value: number): string | void {
 }
 
 export function validateDisk(value: number): string | void {
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Disk size must be a valid number.";
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Disk size must be a valid number.";
   value = +value;
   if (+value.toFixed(0) !== value) return "Disk size must be a valid integer.";
   if (value < 1) return "Minimum allowed disk size is 1 GB.";
@@ -117,8 +114,7 @@ export function validateDisk(value: number): string | void {
 }
 
 export function validateCpu(value: number): string | void {
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "CPU must be a valid number.";
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "CPU must be a valid number.";
   value = +value;
   if (+value.toFixed(0) !== value) return "CPU cores must be a valid integer.";
   if (value < 1) return "Minimum allowed CPU cores is 1.";
@@ -132,8 +128,7 @@ export function validateNPCpu(value: number): string | void {
 
 export function validatePortNumber(value: string): string | void {
   if (value === "") return null;
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-    return "Port must be a valid number.";
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Port must be a valid number.";
   const port = +value;
   if (port.toFixed(0) !== value) return "Port must be a valid integer.";
   if (port < 1) return "Minimum allowed port is 1.";
@@ -148,16 +143,14 @@ export function validateRequiredPortNumber(value: string): string | void {
 export function validatePreCode(value: string): string | void {
   if (value === "") return "Presearch registration code is required.";
   if (!PRECODE_REGEX.test(value)) return "Invalid presearch registration code.";
-  if (value.length !== 32)
-    return "Presearch registration code must be 32 characters long.";
+  if (value.length !== 32) return "Presearch registration code must be 32 characters long.";
 }
 
 export function validateProfileName(name: string): string | void {
   if (name.length < 2) return "Name must be at least 2 characters.";
   if (!ALPHA_ONLY_REGEX.test(name[0]))
     return "Name can't start with a number, a non-alphanumeric character or a whitespace.";
-  if (!PROFILE_NAME_REGEX.test(name))
-    return "Name can only include alphanumeric characters and spaces.";
+  if (!PROFILE_NAME_REGEX.test(name)) return "Name can only include alphanumeric characters and spaces.";
   if (name.length > 15) return "Name must be at most 15 characters.";
 }
 
@@ -173,13 +166,12 @@ export function validateRequiredPassword(value: string): string | void {
 
 export function validateToken(token: string): string | void {
   if (token.length < 6) return "Token must be at least 6 characters";
-  if (!ALPHA_NUMS_ONLY_REGEX.test(token))
-    return "Token can't contain any characters other than alphabets and numbers.";
+  if (!ALPHA_NUMS_ONLY_REGEX.test(token)) return "Token can't contain any characters other than alphabets and numbers.";
   if (token.length > 15) return "Token must be at most 15 characters";
 }
 
 export function validateIPRange(value: string): string | void {
-  const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+  const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
   const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
   const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
   if (!ipRegex.test(value)) {
@@ -222,8 +214,7 @@ export function validateKeyValue(value: string): string | void {
 }
 
 export function validateFlistvalue(value: string): string | void {
-  if (!WHITE_SPACE_REGEX.test(value))
-    return "Please remove white spaces from flist";
+  if (!WHITE_SPACE_REGEX.test(value)) return "Please remove white spaces from flist";
   if (value === "") return "Flist Value is required";
   if (!URL_REGEX.test(value)) return "Invalid flist";
 }
@@ -239,25 +230,21 @@ export function validateEntryPoint(value: string): string | void {
 
 export function validateStakeAmount(value: string): string | void {
   if (value === "") return "Stake amount is required";
-  if (+value < 1e-5 || +value <= 0 || value.startsWith("0"))
-    return "Amount must be positive";
-  if (isNaN(+value) || value.startsWith("+") || value.includes("e"))
-    return "Stake amount must be a number.";
+  if (+value < 1e-5 || +value <= 0 || value.startsWith("0")) return "Amount must be positive";
+  if (isNaN(+value) || value.startsWith("+") || value.includes("e")) return "Stake amount must be a number.";
 }
 
 export function validateBSCAddress(value: string) {
   if (value === "") return "Ethereum address is required";
   if (value.length != 42) return "Address length must be 42";
   if (!value.startsWith("0x")) return "Address must start with 0x";
-  if (!/^(0x)?[0-9a-f]{40}$/i.test(value))
-    return "Address must consist only of valid hex characters after 0x";
+  if (!/^(0x)?[0-9a-f]{40}$/i.test(value)) return "Address must consist only of valid hex characters after 0x";
 }
 
 export function validateBSCPrivateKey(value: string): string | void {
   if (value === "") return "Private key is required";
   if (value.length != 64) return "Private key length must be 64";
-  if (!/^[0-9a-f]{64}$/i.test(value))
-    return "Private key must consist only of valid hex characters.";
+  if (!/^[0-9a-f]{64}$/i.test(value)) return "Private key must consist only of valid hex characters.";
 }
 
 export function validateethereumRpc(value: string): string | void {
@@ -265,38 +252,29 @@ export function validateethereumRpc(value: string): string | void {
 }
 
 export function validateAlgoCpu(value: string, net, type): string | void {
-  const [cpu, memory, storage] = getResources(net, type);
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "CPU must be a valid number.";
+  const [cpu] = getResources(net, type);
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "CPU must be a valid number.";
   if (+value < cpu) return `Minimum CPU for this deployment is ${cpu}.`;
   if (+value > 32) return "Maximum allowed CPU cores is 32.";
-
 }
 export function validateAlgoMemory(value: string, net, type): string | void {
-  const [cpu, memory, storage] = getResources(net, type);
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "Memory must be a valid number.";
+  const [memory] = getResources(net, type);
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Memory must be a valid number.";
   if (+value < memory) return `Minimum Memory for this deployment is ${memory}.`;
   if (+value > 256 * 1024) return "Maximum allowed memory is 256 GB.";
-
 }
 export function validateAlgoStorage(value: string, net, type): string | void {
-  const [cpu, memory, storage] = getResources(net, type);
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "Storage must be a valid number.";
-  if (+value < storage)
-    return `Minimum Storage for this deployment is ${storage}`;
-  if (+value > storage+200)
-    return `Maximum Storage for this deployment is ${storage+200}.`;
+  const [storage] = getResources(net, type);
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Storage must be a valid number.";
+  if (+value < storage) return `Minimum Storage for this deployment is ${storage}`;
+  if (+value > storage + 200) return `Maximum Storage for this deployment is ${storage + 200}.`;
 }
 
-export function validateQsfsSecret(value: string): string | void{
-  if (!value.length) return `ZDB password is required`
+export function validateQsfsSecret(value: string): string | void {
+  if (!value.length) return `ZDB password is required`;
 }
 
-export function validateZdbCount(value:number): string| void{
-  if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-  return "ZDB count must be a valid number.";
-  else if(value < 3) return `Minimum allowed ZDB is 3 ZDBs`;
-  
+export function validateZdbCount(value: number): string | void {
+  if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "ZDB count must be a valid number.";
+  else if (value < 3) return `Minimum allowed ZDB is 3 ZDBs`;
 }

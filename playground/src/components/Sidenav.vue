@@ -6,11 +6,7 @@
           {{ route.label }}
         </p>
 
-        <SidenavRoute
-          :key="route.label + '/children'"
-          :activeRoute="activeRoute"
-          :routes="route.children"
-        />
+        <SidenavRoute :key="route.label + '/children'" :activeRoute="activeRoute" :routes="route.children" />
       </template>
     </aside>
   </nav>

@@ -2,32 +2,27 @@
 
 <script lang="ts">
   // Types
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from '../../types';
-  import type { IProfile } from '../../types/Profile';
-  import { Disk, Env } from '../../types/vm';
-  import Casperlabs from '../../types/casperlabs';
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from "../../types/vm";
+  import Casperlabs from "../../types/casperlabs";
   // Modules
-  import deployCasperlabs from '../../utils/deployCasperlabs';
+  import deployCasperlabs from "../../utils/deployCasperlabs";
   // Components
-  import SelectProfile from '../../components/SelectProfile.svelte';
-  import Input from '../../components/Input.svelte';
-  import Tabs from '../../components/Tabs.svelte';
-  import SelectNodeId from '../../components/SelectNodeId.svelte';
-  import DeployBtn from '../../components/DeployBtn.svelte';
-  import Alert from '../../components/Alert.svelte';
-  import Modal from '../../components/DeploymentModal.svelte';
-  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
-  import hasEnoughBalance from '../../utils/hasEnoughBalance';
-  import validateName, { isInvalid } from '../../utils/validateName';
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Input from "../../components/Input.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import validateName, { isInvalid } from "../../utils/validateName";
 
-  import { noActiveProfile } from '../../utils/message';
-  import SelectCapacity from '../../components/SelectCapacity.svelte';
-  import type { GatewayNodes } from '../../utils/gatewayHelpers';
+  import { noActiveProfile } from "../../utils/message";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
 
   let data = new Casperlabs();
   let invalid = true;
@@ -35,26 +30,26 @@
 
   // define this solution packages
   const packages: IPackage[] = [
-    { name: 'Minimum', cpu: 1, memory: 1024 * 4, diskSize: 100 },
-    { name: 'Standard', cpu: 2, memory: 1024 * 16, diskSize: 500 },
-    { name: 'Recommended', cpu: 4, memory: 1024 * 32, diskSize: 1000 },
+    { name: "Minimum", cpu: 1, memory: 1024 * 4, diskSize: 100 },
+    { name: "Standard", cpu: 2, memory: 1024 * 16, diskSize: 500 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 32, diskSize: 1000 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
   data.disks = [new Disk()];
   let profile: IProfile;
-  let active: string = 'base';
+  let active = "base";
   let loading = false;
   let success = false;
   let failed = false;
 
-  const tabs: ITab[] = [{ label: 'Base', value: 'base' }];
+  const tabs: ITab[] = [{ label: "Base", value: "base" }];
 
   const nameField: IFormField = { label: "Name", placeholder: "Casperlabs Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
   let message: string;
-  let modalData: Object;
-  let status: 'valid' | 'invalid';
+  let modalData: object;
+  let status: "valid" | "invalid";
 
   const deploymentStore = window.configs?.deploymentStore;
 
@@ -70,19 +65,18 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
     deployCasperlabs(data, profile, gateway)
-      .then((data) => {
+      .then(data => {
         deploymentStore.set(0);
         success = true;
         modalData = data.deploymentInfo;
       })
       .catch((err: Error) => {
         failed = true;
-        message = typeof err === 'string' ? err : err.message;
+        message = typeof err === "string" ? err : err.message;
       })
       .finally(() => {
         loading = false;
@@ -96,7 +90,7 @@
   on:profile={({ detail }) => {
     profile = detail;
     if (detail) {
-      data.envs[0] = new Env(undefined, 'SSH_KEY', detail?.sshKey);
+      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
     }
   }}
 />
@@ -105,40 +99,26 @@
   <form on:submit|preventDefault={onDeployVM} class="box">
     <h4 class="is-size-4">Deploy a Casperlabs Instance</h4>
     <p>
-      Casper Network is a blockchain protocol built from the ground up to remain
-      true to core Web3 principles and adapt to the needs of our evolving world.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_casper"
-      >
+      Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt
+      to the needs of our evolving world.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_casper">
         Quick start documentation</a
       >
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === 'VM')}
-      <Alert type="info" message={logs?.message ?? 'Loading...'} />
+    {#if loading || (logs !== null && logs.type === "VM")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed casperlabs."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed casperlabs." deployed={true} />
     {:else if failed}
-      <Alert
-        type="danger"
-        message={message || 'Failed to deploy casperlabs.'}
-      />
+      <Alert type="danger" message={message || "Failed to deploy casperlabs."} />
     {:else}
       <Tabs bind:active {tabs} />
 
-      <Input
-        bind:data={data.name}
-        bind:invalid={nameField.invalid}
-        field={nameField}
-      />
+      <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
       <SelectCapacity
         {packages}
@@ -178,7 +158,7 @@
       {loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;
@@ -194,5 +174,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

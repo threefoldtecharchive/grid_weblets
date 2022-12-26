@@ -20,11 +20,8 @@ function _getConsumption(id: number, grid: GridClient) {
     .catch(() => formatConsumption(0));
 }
 
-export default function getContractsConsumption(
-  profile: IProfile,
-  contracts: { id: number }[]
-) {
-  return getGrid(profile, (grid) => {
+export default function getContractsConsumption(profile: IProfile, contracts: { id: number }[]) {
+  return getGrid(profile, grid => {
     return Promise.all(contracts.map(({ id }) => _getConsumption(+id, grid)));
   });
 }

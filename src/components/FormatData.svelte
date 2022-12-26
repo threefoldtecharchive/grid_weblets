@@ -88,9 +88,7 @@
         symbol: "domain",
         type: "text",
         disabled: true,
-        tooltip: `Default Password: ${
-          vm.env.DEFAULT_PASSWORD ? vm.env.DEFAULT_PASSWORD : "captain42"
-        }`,
+        tooltip: `Default Password: ${vm.env.DEFAULT_PASSWORD ? vm.env.DEFAULT_PASSWORD : "captain42"}`,
       }}
     />
   {/if}

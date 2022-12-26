@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
 import NodeID from "./nodeId";
-import validateName, { validatePrivateIPRange } from '../utils/validateName';
+import validateName, { validatePrivateIPRange } from "../utils/validateName";
 
 export abstract class Base {
   public constructor(
@@ -19,8 +19,8 @@ export abstract class Base {
     public selection = new NodeID(),
     public status: "valid" | "invalid" = null,
     public rootFs = 2,
-    public rootFsEditable = false
-  ) { }
+    public rootFsEditable = false,
+  ) {}
 
   public get valid(): boolean {
     const { name, node, cpu, diskSize, memory, rootFs: rFs } = this;
@@ -36,24 +36,20 @@ export abstract class Base {
   }
 }
 
-export class Master extends Base { 
+export class Master extends Base {
   public id = v4();
   public name: string = "MR" + this.id.split("-")[0];
- }
-export class Worker extends Base { }
+}
+export class Worker extends Base {}
 
 export class Network {
-  constructor(
-    public name: string = "NW" + v4().split("-")[0],
-    public ipRange: string = "10.20.0.0/16"
-  ) { }
+  constructor(public name: string = "NW" + v4().split("-")[0], public ipRange: string = "10.20.0.0/16") {}
 
   public get valid(): boolean {
     const { name, ipRange } = this;
-    return name !== "" &&
-      ipRange !== "" &&
-      validateName(name) === undefined &&
-      validatePrivateIPRange(ipRange) === undefined
+    return (
+      name !== "" && ipRange !== "" && validateName(name) === undefined && validatePrivateIPRange(ipRange) === undefined
+    );
   }
 }
 
@@ -66,16 +62,11 @@ export default class Kubernetes {
     public name: string = "K8S" + id.split("-")[0],
     public secret: string = v4().split("-")[0],
     public metadata: string = "",
-    public description: string = ""
-  ) { }
+    public description: string = "",
+  ) {}
 
   public get valid(): boolean {
     const { secret, master, workers, network } = this;
-    return (
-      secret !== "" &&
-      master.valid &&
-      network.valid &&
-      workers.reduce((res, w) => res && w.valid, true)
-    );
+    return secret !== "" && master.valid && network.valid && workers.reduce((res, w) => res && w.valid, true);
   }
 }

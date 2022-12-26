@@ -20,13 +20,13 @@ function createNotificationStore() {
     subscribe,
     notify(type: INotification["type"], message: string, time_ms = 3000) {
       const notification: INotification = { type, message };
-      update((value) => {
+      update(value => {
         value.notifications.push(notification);
         return value;
       });
 
       setTimeout(() => {
-        update((value) => {
+        update(value => {
           value.notifications = value.notifications.filter(n => n !== notification); // prettier-ignore
           return value;
         });

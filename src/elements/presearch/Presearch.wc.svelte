@@ -3,7 +3,7 @@
 <script lang="ts">
   import Presearch from "../../types/presearch";
   import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployPresearch from "../../utils/deployPresearch";
   import rootFs from "../../utils/rootFs";
 
@@ -69,7 +69,7 @@
   $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
 
   let message: string;
-  let modalData: Object;
+  let modalData: object;
 
   async function deployPresearchHandler() {
     loading = true;
@@ -80,13 +80,12 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
     deployPresearch(data, profile)
-      .then((data) => {
+      .then(data => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;
@@ -113,11 +112,10 @@
   <form class="box" on:submit|preventDefault={deployPresearchHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Presearch Instance</h4>
     <p>
-      Presearch is a community-powered, decentralized search engine that provides better results while protecting your privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_presearch"
-      >
+      Presearch is a community-powered, decentralized search engine that provides better results while protecting your
+      privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to
+      process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_presearch">
         Quick start documentation</a
       >
     </p>
@@ -129,11 +127,7 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully Deployed Presearch."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully Deployed Presearch." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to Deploy Presearch."} />
     {:else}
@@ -142,11 +136,7 @@
       {#if active === "base"}
         {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -169,8 +159,7 @@
       {:else if active === "restore"}
         <div class="notification is-warning is-light">
           <p>
-            Only configure these Presearch Restore Keys fields if you want to
-            restore previous node. see backup steps <a
+            Only configure these Presearch Restore Keys fields if you want to restore previous node. see backup steps <a
               href="https://docs.presearch.org/nodes/backing-up-and-migrating-nodes"
               target="_blank">here</a
             >.
@@ -178,11 +167,7 @@
         </div>
         {#each restoreFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -195,7 +180,7 @@
       {loading}
       {success}
       {failed}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

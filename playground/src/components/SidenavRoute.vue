@@ -1,12 +1,7 @@
 <template>
   <ul class="menu-list">
     <li v-for="route in routes" :key="route.to">
-      <a
-        v-bind:class="{ 'is-active': activeRoute === route.to }"
-        @click="navigate(route)"
-      >
-        {{ route.label }}</a
-      >
+      <a v-bind:class="{ 'is-active': activeRoute === route.to }" @click="navigate(route)"> {{ route.label }}</a>
       <SidenavRoute
         :activeRoute="activeRoute"
         :routes="route.children"

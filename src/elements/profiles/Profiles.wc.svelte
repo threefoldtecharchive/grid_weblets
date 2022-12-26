@@ -49,7 +49,7 @@
           return { message: e.message };
         }
       },
-     
+
       // async ctrl => {
       //   const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
       //   if (userBalance.free < 1) {
@@ -233,7 +233,9 @@
                 return Promise.all(promises);
               },
             );
-          } catch {}
+          } catch {
+            //
+          }
         }),
       );
     } catch (e) {

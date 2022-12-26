@@ -7,18 +7,18 @@
   export let path: string;
 
   let html: string;
-  let loading: boolean = true;
+  let loading = true;
 
   onMount(() => {
     fetch(path)
-      .then((res) => res.text())
-      .then((md) => {
+      .then(res => res.text())
+      .then(md => {
         return parse(md, {
           sanitize: false,
         });
       })
-      .then((_) => (html = _))
-      .catch((err) => console.log("Error", err))
+      .then(_ => (html = _))
+      .catch(err => console.log("Error", err))
       .finally(() => (loading = false));
   });
 </script>

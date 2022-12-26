@@ -8,11 +8,11 @@
         <p class="menu-label" :key="section + 'label'">{{ section }}</p>
         <ul class="menu-list" :key="section + 'items'">
           <template v-for="(el, idx) in weblets">
-            <li :key="el.name" @click="
-              section === 'coming soon' || idx === active
-                ? null
-                : route(el.symbol)
-            " v-if="el.section === section">
+            <li
+              :key="el.name"
+              @click="section === 'coming soon' || idx === active ? null : route(el.symbol)"
+              v-if="el.section === section"
+            >
               <a v-bind:class="{ 'is-active': idx === active }">
                 <span class="icon-text">
                   <span class="icon" v-if="el.img">
@@ -27,7 +27,8 @@
           </template>
         </ul>
       </template>
-      <span style="
+      <span
+        style="
           position: fixed;
           bottom: 15px;
           left: 245px;
@@ -36,7 +37,9 @@
           font-size: 0.9rem;
           background-color: #1982b1;
           color: white;
-        " class="tag is-light">
+        "
+        class="tag is-light"
+      >
         <tf-version></tf-version>
       </span>
     </aside>
@@ -73,7 +76,7 @@ class Weblet {
     public symbol: string,
     deployment = "",
     public section: "deployment" | "calculator" | "my account",
-    public img: string | null = null
+    public img: string | null = null,
   ) {
     this._md = `<tf-${symbol}></tf-${symbol}>`;
     if (deployment) {
@@ -108,51 +111,15 @@ class Weblet {
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
-    new Weblet(
-      "Full Virtual Machine",
-      "fullvm",
-      "fullvm",
-      "deployment",
-      "vm.png"
-    ),
+    new Weblet("Full Virtual Machine", "fullvm", "fullvm", "deployment", "vm.png"),
     new Weblet("Micro Virtual Machine", "vm", "vm", "deployment", "vm.png"),
-    new Weblet(
-      "Kubernetes",
-      `kubernetes`,
-      "k8s",
-      "deployment",
-      "kubernetes.png"
-    ),
-    new Weblet(
-      "CapRover",
-      "caprover",
-      "caprover",
-      "deployment",
-      "caprover.png"
-    ),
+    new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment", "kubernetes.png"),
+    new Weblet("CapRover", "caprover", "caprover", "deployment", "caprover.png"),
 
-    new Weblet(
-      "Peertube",
-      "peertube",
-      "peertube",
-      "deployment",
-      "peertube.png"
-    ),
-    new Weblet(
-      "Funkwhale",
-      "funkwhale",
-      "funkwhale",
-      "deployment",
-      "funkwhale.png"
-    ),
+    new Weblet("Peertube", "peertube", "peertube", "deployment", "peertube.png"),
+    new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment", "funkwhale.png"),
 
-    new Weblet(
-      "Mattermost",
-      "mattermost",
-      "mattermost",
-      "deployment",
-      "mattermost.png"
-    ),
+    new Weblet("Mattermost", "mattermost", "mattermost", "deployment", "mattermost.png"),
     // new Weblet(
     //   "Mastodon",
     //   "mastodon",
@@ -160,50 +127,14 @@ export default class Editor extends Vue {
     //   "deployment",
     //   "mastodon.png"
     // ),
-    new Weblet(
-      "Discourse",
-      "discourse",
-      "discourse",
-      "deployment",
-      "discourse.png"
-    ),
+    new Weblet("Discourse", "discourse", "discourse", "deployment", "discourse.png"),
 
     new Weblet("Taiga", "taiga", "taiga", "deployment", "taiga.png"),
-    new Weblet(
-      "Owncloud",
-      "owncloud",
-      "owncloud",
-      "deployment",
-      "owncloud.png"
-    ),
-    new Weblet(
-      "Presearch",
-      "presearch",
-      "presearch",
-      "deployment",
-      "presearch.png"
-    ),
-    new Weblet(
-      "Subsquid",
-      "subsquid",
-      "subsquid",
-      "deployment",
-      "subsquid.png"
-    ),
-    new Weblet(
-      "Casperlabs",
-      "casperlabs",
-      "casperlabs",
-      "deployment",
-      "casperlabs.png"
-    ),
-    new Weblet(
-      "Algorand",
-      "algorand",
-      "algorand",
-      "deployment",
-      "algorand.png"
-    ),
+    new Weblet("Owncloud", "owncloud", "owncloud", "deployment", "owncloud.png"),
+    new Weblet("Presearch", "presearch", "presearch", "deployment", "presearch.png"),
+    new Weblet("Subsquid", "subsquid", "subsquid", "deployment", "subsquid.png"),
+    new Weblet("Casperlabs", "casperlabs", "casperlabs", "deployment", "casperlabs.png"),
+    new Weblet("Algorand", "algorand", "algorand", "deployment", "algorand.png"),
     /*new Weblet(
       "TFhub Validator",
       "validator",
@@ -223,7 +154,7 @@ export default class Editor extends Vue {
 
   @Watch("$route.params", { deep: true, immediate: true })
   public onRouterChange(to: { component?: string }) {
-    const idx = this.weblets.findIndex((w) => w.symbol === to.component);
+    const idx = this.weblets.findIndex(w => w.symbol === to.component);
     this.active = idx > -1 ? idx : 0;
   }
 
