@@ -28,6 +28,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
+  import { display } from "../../utils/display";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -202,7 +203,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      <section style:display={active === "config" ? "block" : "initial"}>
+      <section style={display(active, "config")}>
         <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
@@ -264,7 +265,7 @@
         />
       </section>
 
-      <section style:display={active === "disks" ? "block" : "initial"}>
+      <section style={display(active, "disks")}>
         <AddBtn on:click={() => (data.disks = [...data.disks, new DiskFullVm()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
