@@ -4,7 +4,7 @@ import type { GridClient } from "grid3_client";
 export default async function getGrid<T>(
   profile: IProfile,
   cb: (grid: GridClient) => T,
-  disconnect: boolean = true,
+  disconnect = true,
   solutionType?: string,
 ): Promise<T> {
   const { networkEnv, mnemonics } = profile;
@@ -19,9 +19,4 @@ export default async function getGrid<T>(
 
   await grid.connect();
   return cb(grid);
-  
-  // try {
-  //   await grid.connect();
-  // } catch {}
-  // return cb(grid);
 }
