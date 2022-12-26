@@ -33,7 +33,7 @@ export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
         });
     });
   } catch (err) {
-    getGrid(profile, grid => grid, false).then(async grid => {
+    getGrid(profile, grid => grid).then(async grid => {
       await grid.qsfs_zdbs.delete(qsfs);
       throw err;
     });

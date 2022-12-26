@@ -508,8 +508,8 @@
     pointer-events: all;
   }
 
-  .vertical-line {
-    border-left: 4px solid black;
-    height: 100%;
-  }
+  // .vertical-line {
+  //   border-left: 4px solid black;
+  //   height: 100%;
+  // }
 </style>
