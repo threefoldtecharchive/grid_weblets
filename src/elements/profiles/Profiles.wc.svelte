@@ -191,57 +191,62 @@
   let migrateMode = false;
   const PREFIX = "v2";
   let passwordInput: HTMLFormElement;
-  const password = fb.control<string>("", [
-    validators.required("Password is required."),
-    ctrl => {
-      if (`${PREFIX}.${md5(ctrl.value).toString()}` in localStorage) return;
-      return { message: "Password doesn't exist." };
-    },
-  ]);
+  const password = fb.control<string>("", [validators.required("Password is required.")]);
   $: password$ = $password;
 
   let migrating = false;
   async function onMigrate() {
     migrating = true;
 
-    const key = `${PREFIX}.${md5(password.value).toString()}`;
-    const encodedData = localStorage.getItem(key);
-    const data = JSON.parse(decrypt(encodedData, password.value).toString(enc.Utf8));
-    const profiles: IProfile[] = data.profiles;
+    const __getGrid = (secret = mnemonics$.value) => getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value, storeSecret: secret } as any, _ => _); // prettier-ignore
+
+    const oldClient = await __getGrid(password$.value);
+    const newClient = await __getGrid();
+    const oldDB = oldClient.kvstore;
+    const newDB = newClient.kvstore;
 
     try {
-      await Promise.all(
-        profiles.map(profile => {
-          const newData = { networkEnv: profile.networkEnv, mnemonics: profile.mnemonics } as any;
-          const oldData = { ...newData, storeSecret: password.value } as any;
+      const oldKeys = await oldClient.kvstore.list();
+      let failedCount = 0;
+      let alreadyMigratedCount = 0;
+      const extrinsics = [];
+      for (const oldKey of oldKeys) {
+        try {
+          const oldValue = await oldDB.get({ key: oldKey });
+          const newValue = newDB.client.kvStore.encrypt(oldValue);
+          extrinsics.push(newDB.client.client.api.tx.tfkvStore.set(oldKey, newValue));
+        } catch {
           try {
-            return Promise.all([getGrid(oldData, _ => _), getGrid(newData, _ => _)]).then(
-              async ([oldGrid, newGrid]) => {
-                const keys: string[] = await oldGrid.kvstore.list();
-                const values = await Promise.all(keys.map(key => oldGrid.kvstore.get({ key }).catch(() => null)));
-                const promises = keys.map((key, i) =>
-                  values[i] ? newGrid.kvstore.set({ key, value: values[i] }) : Promise.resolve(null),
-                );
-                promises.push(
-                  newGrid.kvstore.set({
-                    key: "metadata",
-                    value: JSON.stringify({
-                      sshkey: profile.sshKey,
-                    }),
-                  }),
-                );
-                return Promise.all(promises);
-              },
-            );
-          } catch {
-            //
+            await newDB.get({ key: oldKey });
+            alreadyMigratedCount++;
+            console.log(`${oldKey} key is migrated`);
+          } catch (error) {
+            failedCount++;
           }
-        }),
+        }
+      }
+      if (extrinsics.length > 0) {
+        try {
+          await newClient.utility.batchAll({ extrinsics });
+        } catch (e) {
+          throw Error(`keys are not migrated due to: ${e}`);
+        }
+      }
+      console.log(
+        `Migrated keys: ${extrinsics.length}, already migrated keys: ${alreadyMigratedCount}, failed keys: ${failedCount}`,
       );
-    } catch (e) {
-      console.log(e);
+      if (failedCount > 0 && extrinsics.length === 0) {
+        throw Error("storeSecret is wrong. Please enter the right storeSecret.");
+      } else if (failedCount > 0 && extrinsics.length !== 0) {
+        throw Error(
+          "Part of the keys are migrated successfully, but still some keys are not migrated. Maybe they are encrypted with different password or not encrypted",
+        );
+      }
+    } catch {
+      /* pass */
     }
 
+    await oldClient.disconnect();
     migrating = false;
   }
 
@@ -299,7 +304,7 @@
           class="button"
           class:is-link={migrateMode}
           class:is-loading={migrating}
-          disabled={migrating}
+          disabled={migrating || !mnemonics$.valid}
           on:click={() => (migrateMode = !migrateMode)}>Migrate</button
         >
       </div>
