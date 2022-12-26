@@ -1,6 +1,5 @@
 import type { GridClient } from "grid3_client";
 
-
 export function isValidName(name: string) {
   const filter1 = new RegExp(/[^a-z\d]/i);
   const filter2 = new RegExp(/^\d/);
@@ -9,13 +8,11 @@ export function isValidName(name: string) {
 
 export async function checkSuitableName(name: string) {
   if (isValidName(name)) {
-
     return name;
   } else {
     throw Error(`Name should be alphanumeric only`);
   }
 }
-
 
 export async function getSuitableGateway(client: GridClient, name: string) {
   const info = await client.gateway.getObj(name);

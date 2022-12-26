@@ -2,8 +2,7 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  const dispatch =
-    createEventDispatcher<{ update: number; editableUpdate: boolean }>();
+  const dispatch = createEventDispatcher<{ update: number; editableUpdate: boolean }>();
 
   import rootFsUtil from "../utils/rootFs";
   import Input from "./Input.svelte";

@@ -7,12 +7,12 @@ export default function deploy<T>(
   profile: IProfile,
   type: IStore["type"],
   name: string,
-  deployer: (grid: GridClient) => Promise<T>
+  deployer: (grid: GridClient) => Promise<T>,
 ) {
   window.configs.currentDeploymentStore.deploy(type, name);
-  return getGrid(profile, (grid) => {
+  return getGrid(profile, grid => {
     return deployer(grid)
-      .then((res) => {
+      .then(res => {
         window.configs.balanceStore.updateBalance();
         return res;
       })

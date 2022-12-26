@@ -1,1 +1,1 @@
-import './TFhubValidator.wc.svelte';
+import "./TFhubValidator.wc.svelte";

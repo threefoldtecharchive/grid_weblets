@@ -56,7 +56,7 @@ export default class App extends Vue {
     "nodepilot",
     "fullvm",
     "algorand",
-    "qvm"
+    "qvm",
   ];
   sidenav: ISidenav | null = null;
 
@@ -71,10 +71,7 @@ export default class App extends Vue {
   onRouteChange(route: Route) {
     if (this.sidenav) {
       this.$store.dispatch("setActiveRoute", route.path);
-      this.$store.dispatch(
-        "setActivePage",
-        findInitialPage(this.sidenav as any, route.path)
-      );
+      this.$store.dispatch("setActivePage", findInitialPage(this.sidenav as any, route.path));
     }
 
     /* Load new page */
