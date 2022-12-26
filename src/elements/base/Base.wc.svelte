@@ -10,7 +10,6 @@
   import currentDeploymentStore from "../../stores/currentDeployment";
   import LogsInfo from "../../components/LogsInfo.svelte";
   import balanceStore from "../../stores/balance";
-import Disclaimer from "../disclaimer/Disclaimer.wc.svelte";
 
   window.configs = window.configs || ({} as any);
   window.configs.baseConfig = baseConfigStore;
@@ -34,6 +33,7 @@ import Disclaimer from "../disclaimer/Disclaimer.wc.svelte";
 </script>
 
 <LogsInfo />
+
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

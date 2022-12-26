@@ -5,7 +5,7 @@ export default class Presearch extends VM {
   public id = v4().split("-")[0];
   public name = `PS${this.id}`;
   public cpu = 1;
-  public memory = 1024 * .5;
+  public memory = 1024 * 0.5;
   public preCode = "";
   public publicIp = false;
   public privateRestoreKey = "";

@@ -1,33 +1,28 @@
 <svelte:options tag="tf-subsquid" />
 
 <script lang="ts">
-  import Subsquid from '../../types/subsquid';
-  import type { IProfile } from '../../types/Profile';
-  import {
-    IFormField,
-    IPackage,
-    ITab,
-    SelectCapacityUpdate,
-  } from '../../types';
-  import deploySubsquid from '../../utils/deploySubsquid';
-  import { Disk } from '../../types/vm';
+  import Subsquid from "../../types/subsquid";
+  import type { IProfile } from "../../types/Profile";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import deploySubsquid from "../../utils/deploySubsquid";
+  import { Disk } from "../../types/vm";
 
   // Components
-  import SelectProfile from '../../components/SelectProfile.svelte';
-  import Input from '../../components/Input.svelte';
-  import Tabs from '../../components/Tabs.svelte';
-  import DeployBtn from '../../components/DeployBtn.svelte';
-  import Alert from '../../components/Alert.svelte';
-  import SelectNodeId from '../../components/SelectNodeId.svelte';
-  import Modal from '../../components/DeploymentModal.svelte';
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Input from "../../components/Input.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
 
   // utils
-  import hasEnoughBalance from '../../utils/hasEnoughBalance';
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
-  import { noActiveProfile } from '../../utils/message';
-  import SelectGatewayNode from '../../components/SelectGatewayNode.svelte';
-  import type { GatewayNodes } from '../../utils/gatewayHelpers';
-  import SelectCapacity from '../../components/SelectCapacity.svelte';
+  import { noActiveProfile } from "../../utils/message";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -38,7 +33,7 @@
   let failed = false;
   let invalid = true;
 
-  let status: 'valid' | 'invalid';
+  let status: "valid" | "invalid";
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
@@ -48,14 +43,14 @@
   // define this solution packages
 
   const packages: IPackage[] = [
-    { name: 'Minimum', cpu: 1, memory: 1024, diskSize: 50 },
-    { name: 'Standard', cpu: 2, memory: 1024 * 2, diskSize: 100 },
-    { name: 'Recommended', cpu: 4, memory: 1024 * 4, diskSize: 250 },
+    { name: "Minimum", cpu: 1, memory: 1024, diskSize: 50 },
+    { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 100 },
+    { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 250 },
   ];
   let selectCapacity = new SelectCapacityUpdate();
 
-  const tabs: ITab[] = [{ label: 'Base', value: 'base' }];
-  let active = 'base';
+  const tabs: ITab[] = [{ label: "Base", value: "base" }];
+  let active = "base";
 
   // Fields
   // prettier-ignore
@@ -68,7 +63,7 @@
   $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
-  let modalData: Object;
+  let modalData: object;
 
   async function deploySubsquidHandler() {
     loading = true;
@@ -79,13 +74,12 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        'No enough balance to execute! Transaction requires 2 TFT at least in your wallet.';
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
     deploySubsquid(data, profile, gateway)
-      .then((data) => {
+      .then(data => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;
@@ -112,41 +106,29 @@
   <form class="box" on:submit|preventDefault={deploySubsquidHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Subsquid Archive(s)</h4>
     <p>
-      Subsquid indexer is a piece of software that reads all the blocks from a
-      Substrate based blockchain, decodes and stores them for processing in a
-      later stage.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_subsquid"
-      >
+      Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and
+      stores them for processing in a later stage.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_subsquid">
         Quick start documentation</a
       >
     </p>
 
     <hr />
 
-    {#if loading || (logs !== null && logs.type === 'Subsquid')}
-      <Alert type="info" message={logs?.message ?? 'Loading...'} />
+    {#if loading || (logs !== null && logs.type === "Subsquid")}
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully Deployed Subsquid."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully Deployed Subsquid." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || 'Failed to Deploy Subsquid.'} />
+      <Alert type="danger" message={message || "Failed to Deploy Subsquid."} />
     {:else}
       <Tabs bind:active {tabs} />
 
       {#each fields as field (field.symbol)}
         {#if field.invalid !== undefined}
-          <Input
-            bind:data={data[field.symbol]}
-            bind:invalid={field.invalid}
-            {field}
-          />
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {:else}
           <Input bind:data={data[field.symbol]} {field} />
         {/if}
@@ -188,7 +170,7 @@
       {loading}
       {success}
       {failed}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;
@@ -205,5 +187,5 @@
 {/if}
 
 <style lang="scss" scoped>
-  @import url('https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css');
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

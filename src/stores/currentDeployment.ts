@@ -2,29 +2,29 @@ import { writable } from "svelte/store";
 
 export interface IStore {
   type:
-  | "Kubernetes"
-  | "VM"
-  | "CapRover"
-  | "Discourse"
-  | "Peertube"
-  | "Funkwhale"
-  | "GatewayName"
-  | "Add Worker"
-  | "Remove Worker"
-  | "Deleting Deployment"
-  | "Taiga"
-  | "Owncloud"
-  | "Presearch"
-  | "Subsquid"
-  | "Mattermost"
-  | "Mastodon"
-  | "TFhubValidator"
-  | "Casperlabs"
-  | "NodePilot"
-  | "Fullvm"
-  | "Algorand"
-  | "Qvm"
-  | "QSFS"
+    | "Kubernetes"
+    | "VM"
+    | "CapRover"
+    | "Discourse"
+    | "Peertube"
+    | "Funkwhale"
+    | "GatewayName"
+    | "Add Worker"
+    | "Remove Worker"
+    | "Deleting Deployment"
+    | "Taiga"
+    | "Owncloud"
+    | "Presearch"
+    | "Subsquid"
+    | "Mattermost"
+    | "Mastodon"
+    | "TFhubValidator"
+    | "Casperlabs"
+    | "NodePilot"
+    | "Fullvm"
+    | "Algorand"
+    | "Qvm"
+    | "QSFS";
   name: string;
   message: string;
 }
@@ -34,7 +34,7 @@ function createCurrentDeploymentStore() {
 
   const _onLogMessage = (msg: string) => {
     if (typeof msg === "string") {
-      update((value) => {
+      update(value => {
         value.message = msg;
         return value;
       });

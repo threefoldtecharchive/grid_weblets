@@ -1,9 +1,9 @@
 <svelte:options tag="tf-select-gateway-node" />
 
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { LoadGatewayNodes, GatewayNodes } from '../utils/gatewayHelpers';
-  import Input from './Input.svelte';
+  import { onMount } from "svelte";
+  import { LoadGatewayNodes, GatewayNodes } from "../utils/gatewayHelpers";
+  import Input from "./Input.svelte";
 
   let gateways: GatewayNodes[] = [];
   export let gateway: GatewayNodes;
@@ -12,7 +12,7 @@
 
   async function init() {
     LoadGatewayNodes()
-      .then((_gateways) => {
+      .then(_gateways => {
         gateways = _gateways.map((gw, idx) => ({ ...gw, idx }));
         loading = false;
         invalid = true;
@@ -37,13 +37,13 @@
 
 <Input
   field={{
-    type: 'select',
-    symbol: 'gateway-selector',
-    label: 'Select Gateway Node',
+    type: "select",
+    symbol: "gateway-selector",
+    label: "Select Gateway Node",
     invalid: true,
     options: [
       {
-        label: loading ? 'Loading gateways...' : 'Please select a domain.',
+        label: loading ? "Loading gateways..." : "Please select a domain.",
         value: null,
         selected: true,
         disabled: true,

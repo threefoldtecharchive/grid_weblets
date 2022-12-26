@@ -3,7 +3,7 @@
 <script lang="ts">
   export let type: "info" | "success" | "danger" | "warning" | "gray";
   export let message: string;
-  export let deployed:Boolean = false;
+  export let deployed = false;
 
   function selectColor(t: typeof type): string {
     switch (t) {
@@ -18,15 +18,13 @@
     }
   }
 
-  setTimeout(() => { deployed = false; }, 120000);
-
+  setTimeout(() => {
+    deployed = false;
+  }, 120000);
 </script>
 
 {#if type == "gray"}
-  <div
-    class="notification"
-    style={`background-color: transparent; color: #333`}
-  >
+  <div class="notification" style={`background-color: transparent; color: #333`}>
     {@html message}
   </div>
 {:else if type == "warning"}
@@ -34,22 +32,17 @@
     {@html message}
   </div>
 {:else}
-  <div
-    class={"notification"}
-    style={`background-color: ${selectColor(type)}; color: white`}
-  >
+  <div class={"notification"} style={`background-color: ${selectColor(type)}; color: white`}>
     {@html message}
   </div>
 {/if}
 
 {#if deployed}
-  <div
-    class={"notification"}
-    style={`background-color: ${selectColor(type)}; color: white`}
-  >
+  <div class={"notification"} style={`background-color: ${selectColor(type)}; color: white`}>
     Your solution is now starting. Please be patient
   </div>
 {/if}
+
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
 </style>

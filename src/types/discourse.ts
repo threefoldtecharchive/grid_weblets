@@ -8,11 +8,9 @@ import { validateRequiredHostName } from "../utils/validateDomainName";
 import TweetNACL from "tweetnacl";
 import { Disk } from "./vm";
 
-function generatePubKey(): String {
+function generatePubKey(): string {
   const keypair = TweetNACL.box.keyPair();
-  return window.configs.buffer.Buffer.from(keypair.publicKey).toString(
-    "base64"
-  );
+  return window.configs.buffer.Buffer.from(keypair.publicKey).toString("base64");
 }
 
 class SMTP {
@@ -56,15 +54,10 @@ class SMTP {
     public userName = "",
     public address = "smtp.gmail.com",
     public enableTLS = true,
-    public port = "587"
+    public port = "587",
   ) {}
   public get valid(): boolean {
-    return (
-      this.password != "" &&
-      this.userName != "" &&
-      this.address != "" &&
-      this.port != ""
-    );
+    return this.password != "" && this.userName != "" && this.address != "" && this.port != "";
   }
 }
 
@@ -88,18 +81,11 @@ export default class Discourse {
     public flaskSecretKey = v4().split("-")[0],
 
     public nodeId: number = null,
-    public selection = new NodeID()
+    public selection = new NodeID(),
   ) {}
 
   public get valid(): boolean {
-    const { name, cpu, memory, nodeId, smtp, developerEmail, threebotPRKey } =
-      this;
-    return (
-      name !== "" &&
-      isValidInteger(cpu) &&
-      isValidInteger(memory) &&
-      isValidInteger(nodeId) &&
-      smtp.valid
-    );
+    const { name, cpu, memory, nodeId, smtp } = this;
+    return name !== "" && isValidInteger(cpu) && isValidInteger(memory) && isValidInteger(nodeId) && smtp.valid;
   }
 }

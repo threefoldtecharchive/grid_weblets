@@ -50,8 +50,7 @@ export class DiskFullVm {
   }
 
   public get valid(): boolean {
-    const { name, size, mountpoint } = this;
-    mountpoint.trim();
+    const { name, size } = this;
 
     return name !== "" && isValidInteger(size) && validateDiskName(name) === undefined && this._diskFieldsValid;
   }

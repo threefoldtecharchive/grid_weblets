@@ -4,9 +4,7 @@ export default async function checkVMExist(grid, type, name) {
   if (oldVM.length != 0) {
     const flist = oldVM[0]["flist"] as string;
     if (flist.includes(type)) {
-      throw Error(
-        `Another ${type} deployment with the same name ${name} already exists`
-      );
+      throw Error(`Another ${type} deployment with the same name ${name} already exists`);
     }
   }
 

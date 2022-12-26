@@ -2,26 +2,17 @@ import type { default as Taiga } from "../types/taiga";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  selectSpecificGatewayNode,
-  GatewayNodes,
-} from "./gatewayHelpers";
+import { getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployTaiga(
-  data: Taiga,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
+export default async function deployTaiga(data: Taiga, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "taiga");
+  const domainName = await getUniqueDomainName(profile, data.name, "taiga");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   const deploymentInfo = await deployTaigaVM(profile, data);
@@ -41,17 +32,10 @@ export default async function deployTaiga(
 }
 
 async function deployTaigaVM(profile: IProfile, data: Taiga) {
-  const {
-    DiskModel,
-    MachineModel,
-    MachinesModel,
-    NetworkModel,
-    generateString,
-  } = window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, NetworkModel, generateString } = window.configs.grid3_client;
 
   const {
     name,
-    envs,
     disks: [{ size }],
     cpu,
     memory,
@@ -71,7 +55,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // define network
   const network = new NetworkModel();
@@ -92,8 +76,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist =
-    "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
@@ -122,7 +105,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   };
   vms.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "Taiga", name, async (grid) => {
+  return deploy(profile, "Taiga", name, async grid => {
     await checkVMExist(grid, "taiga", name);
 
     return grid.machines
@@ -132,12 +115,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
 
   const gw = new GatewayNameModel();
@@ -153,7 +131,7 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
     await checkGW(grid, domainName, "taiga");
     return grid.gateway
       .deploy_name(gw)

@@ -99,10 +99,7 @@
   let modalData: Record<string, unknown>;
   let status: "valid" | "invalid";
 
-  data.disks = [
-    new DiskFullVm(undefined, undefined, data.diskSize, "/"),
-    ...data.disks,
-  ];
+  data.disks = [new DiskFullVm(undefined, undefined, data.diskSize, "/"), ...data.disks];
 
   function _isInvalidDisks() {
     const names = data.disks.map(({ name }) => name.trim());
@@ -112,11 +109,9 @@
 
   function _isInvalidDefaultDisk(value: number): string | void {
     const NUM_REGEX = /^[1-9](\d?|\d+)$/;
-    if (!NUM_REGEX.test(value.toString()) || isNaN(+value))
-      return "Disk size must be a valid number.";
+    if (!NUM_REGEX.test(value.toString()) || isNaN(+value)) return "Disk size must be a valid number.";
     value = +value;
-    if (+value.toFixed(0) !== value)
-      return "Disk size must be a valid integer.";
+    if (+value.toFixed(0) !== value) return "Disk size must be a valid integer.";
     if (value < 15) return "Minimum allowed disk size is 15 GB.";
     if (value > 10000) return "Maximum allowed disk size is 10000 GB.";
   }
@@ -148,8 +143,7 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
@@ -159,7 +153,7 @@
 
     data.disks[0].size = data.diskSize;
     deployVM(data, profile, "Fullvm")
-      .then((data) => {
+      .then(data => {
         deploymentStore.set(0);
         success = true;
         modalData = data;
@@ -200,10 +194,7 @@
     <h4 class="is-size-4">Deploy a Full Virtual Machine</h4>
     <p>
       Deploy a new full virtual machine on the Threefold Grid
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_fullvm"
-      >
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_fullvm">
         Quick start documentation</a
       >
     </p>
@@ -214,22 +205,14 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully deployed a VM."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully deployed a VM." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to deploy a VM."} />
     {:else}
       <Tabs bind:active {tabs} />
 
       {#if active === "config"}
-        <Input
-          bind:data={data.name}
-          bind:invalid={nameField.invalid}
-          field={nameField}
-        />
+        <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
           bind:data={flistSelectValue}
@@ -269,11 +252,7 @@
 
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -283,10 +262,7 @@
           publicIp={data.publicIp}
           cpu={data.cpu}
           memory={data.memory}
-          ssd={data.disks.reduce(
-            (total, disk) => total + disk.size,
-            data.rootFs
-          )}
+          ssd={data.disks.reduce((total, disk) => total + disk.size, data.rootFs)}
           bind:nodeSelection={data.selection.type}
           bind:data={data.nodeId}
           filters={data.selection.filters}
@@ -296,18 +272,12 @@
           nodes={data.selection.nodes}
         />
       {:else if active === "disks"}
-        <AddBtn
-          on:click={() => (data.disks = [...data.disks, new DiskFullVm()])}
-        />
+        <AddBtn on:click={() => (data.disks = [...data.disks, new DiskFullVm()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
             {#if index > 0}
               <div class="box">
-                <DeleteBtn
-                  name={disk.name}
-                  on:click={() =>
-                    (data.disks = data.disks.filter((_, i) => index !== i))}
-                />
+                <DeleteBtn name={disk.name} on:click={() => (data.disks = data.disks.filter((_, i) => index !== i))} />
                 {#each disk.diskFields as field (field.symbol)}
                   {#if field.symbol === "name"}
                     <Input
@@ -318,11 +288,7 @@
                       }}
                     />
                   {:else}
-                    <Input
-                      bind:data={disk[field.symbol]}
-                      {field}
-                      bind:invalid={field.invalid}
-                    />
+                    <Input bind:data={disk[field.symbol]} {field} bind:invalid={field.invalid} />
                   {/if}
                 {/each}
               </div>
@@ -331,8 +297,8 @@
         </div>
       {:else if active === "advanced"}
         {#each networkFields as field (field.symbol)}
-        <Input bind:data={data.network[field.symbol]} {field} />
-        {/each}  
+          <Input bind:data={data.network[field.symbol]} {field} />
+        {/each}
       {/if}
     {/if}
 
@@ -341,7 +307,7 @@
       loading={loading || validateFlist.loading}
       {failed}
       {success}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

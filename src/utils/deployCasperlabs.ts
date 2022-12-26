@@ -3,28 +3,19 @@ import type { default as Casperlabs } from "../types/casperlabs";
 import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 
-import {
-  selectGatewayNode,
-  getUniqueDomainName,
-  GatewayNodes,
-  selectSpecificGatewayNode,
-} from "./gatewayHelpers";
+import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import rootFs from "./rootFs";
 import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
-export default async function deployCasperlabs(
-  data: Casperlabs,
-  profile: IProfile,
-  gateway: GatewayNodes
-) {
+export default async function deployCasperlabs(data: Casperlabs, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  let domainName = await getUniqueDomainName(profile, data.name, "casperlabs");
+  const domainName = await getUniqueDomainName(profile, data.name, "casperlabs");
 
   // Dynamically select node to deploy the gateway
-  let [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
   // deploy the casper labs
@@ -46,22 +37,19 @@ export default async function deployCasperlabs(
 }
 
 async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
-  const { DiskModel, MachineModel, MachinesModel, generateString } =
-    window.configs.grid3_client;
+  const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {
     name,
     cpu,
     memory,
     disks: [{ size }],
-    publicIp,
     nodeId,
-    envs,
     domain,
   } = data;
 
   // sub deployments model (vm, disk, net): <type><random_suffix>
-  let randomSuffix = generateString(10).toLowerCase();
+  const randomSuffix = generateString(10).toLowerCase();
 
   // define a network
   const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
@@ -104,7 +92,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   vms.metadata = JSON.stringify(metadate);
 
   // deploy
-  return deploy(profile, "Casperlabs", name, async (grid) => {
+  return deploy(profile, "Casperlabs", name, async grid => {
     await checkVMExist(grid, "casperlabs", name);
     return grid.machines
       .deploy(vms)
@@ -113,12 +101,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   });
 }
 
-async function deployPrefixGateway(
-  profile: IProfile,
-  domainName: string,
-  backend: string,
-  publicNodeId: number
-) {
+async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
 
   // define specs
@@ -135,7 +118,7 @@ async function deployPrefixGateway(
   };
   gw.metadata = JSON.stringify(metadate);
 
-  return deploy(profile, "GatewayName", domainName, async (grid) => {
+  return deploy(profile, "GatewayName", domainName, async grid => {
     await checkGW(grid, domainName, "casperlabs");
     return grid.gateway
       .deploy_name(gw)

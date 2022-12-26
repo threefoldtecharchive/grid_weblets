@@ -3,7 +3,7 @@
 <script lang="ts">
   import Algorand from "../../types/algorand";
   import type { IProfile } from "../../types/Profile";
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import type { IFormField, ITab } from "../../types";
   import deployAlgorand from "../../utils/deployAlgorand";
   import rootFs from "../../utils/rootFs";
 
@@ -18,7 +18,7 @@
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonics, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
+  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getAlgoResources";
 
@@ -116,8 +116,7 @@
       symbol: "cpu",
       placeholder: "CPU Cores",
       type: "text",
-      validator: () =>
-        validateAlgoCpu(data.cpu, data.nodeNetwork, data.nodeType),
+      validator: () => validateAlgoCpu(data.cpu, data.nodeNetwork, data.nodeType),
       invalid: false,
     },
     {
@@ -125,8 +124,7 @@
       symbol: "memory",
       placeholder: "Your Memory in MB",
       type: "text",
-      validator: () =>
-        validateAlgoMemory(data.memory, data.nodeNetwork, data.nodeType),
+      validator: () => validateAlgoMemory(data.memory, data.nodeNetwork, data.nodeType),
       invalid: false,
     },
     {
@@ -135,11 +133,7 @@
       placeholder: "Storage",
       type: "text",
       validator: () => {
-        return validateAlgoStorage(
-          data.rootSize,
-          data.nodeNetwork,
-          data.nodeType
-        );
+        return validateAlgoStorage(data.rootSize, data.nodeNetwork, data.nodeType);
       },
       invalid: false,
     },
@@ -149,15 +143,12 @@
 
   const setResouces = () => {
     console.log("setting resources");
-    [data.cpu, data.memory, data.rootSize] = getResources(
-      data.nodeNetwork,
-      data.nodeType
-    );
+    [data.cpu, data.memory, data.rootSize] = getResources(data.nodeNetwork, data.nodeType);
   };
   setResouces(); // initial setting
 
   let message: string;
-  let modalData: Object;
+  let modalData: object;
 
   async function deployAlgorandHandler() {
     loading = true;
@@ -168,13 +159,12 @@
     if (!hasEnoughBalance()) {
       failed = true;
       loading = false;
-      message =
-        "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
 
     deployAlgorand(data, profile)
-      .then((data) => {
+      .then(data => {
         modalData = data.deploymentInfo;
         deploymentStore.set(0);
         success = true;
@@ -201,12 +191,8 @@
   <form class="box" on:submit|preventDefault={deployAlgorandHandler}>
     <h4 class="is-size-4 mb-4">Deploy a Algorand Instance</h4>
     <p>
-      Algorand (ALGO) is a blockchain platform and cryptocurrency designed to
-      function like a major payments processor.
-      <a
-        target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_algorand"
-      >
+      Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major payments processor.
+      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_algorand">
         Quick start documentation</a
       >
     </p>
@@ -218,11 +204,7 @@
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert
-        type="success"
-        message="Successfully Deployed Algorand."
-        deployed={true}
-      />
+      <Alert type="success" message="Successfully Deployed Algorand." deployed={true} />
     {:else if failed}
       <Alert type="danger" message={message || "Failed to Deploy Algorand."} />
     {:else}
@@ -231,11 +213,7 @@
       {#if active === "base"}
         {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
@@ -243,28 +221,16 @@
 
         {#each nodeFields as field (field.symbol)}
           {#if field.invalid !== undefined}
-            <Input
-              bind:data={data[field.symbol]}
-              bind:invalid={field.invalid}
-              {field}
-            />
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
           {:else}
-            <Input
-              bind:data={data[field.symbol]}
-              {field}
-              on:input={setResouces}
-            />
+            <Input bind:data={data[field.symbol]} {field} on:input={setResouces} />
           {/if}
         {/each}
 
         {#if data.nodeType == "participant"}
           {#each participantFields as field (field.symbol)}
             {#if field.invalid !== undefined}
-              <Input
-                bind:data={data[field.symbol]}
-                bind:invalid={field.invalid}
-                {field}
-              />
+              <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
             {:else}
               <Input bind:data={data[field.symbol]} {field} />
             {/if}
@@ -274,11 +240,7 @@
         {#if data.customCapacity}
           {#each customCapacityFields as field (field.symbol)}
             {#if field.invalid !== undefined}
-              <Input
-                bind:data={data[field.symbol]}
-                bind:invalid={field.invalid}
-                {field}
-              />
+              <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
             {:else}
               <Input bind:data={data[field.symbol]} {field} />
             {/if}
@@ -306,7 +268,7 @@
       {loading}
       {success}
       {failed}
-      on:click={(e) => {
+      on:click={e => {
         if (success || failed) {
           e.preventDefault();
           success = false;

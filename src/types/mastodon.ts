@@ -50,13 +50,13 @@ export default class Mastodon implements IMastodon {
     domain,
     nodeId,
     tfConnect,
-    
+
     SMTP_SERVER,
     SMTP_PORT,
     SMTP_EMAIL,
     SMTP_PASSWORD,
   }: Partial<IMastodon> = {}) {
-    this.name = name || "MD" + this.id.split("-")[0];    
+    this.name = name || "MD" + this.id.split("-")[0];
     this.adminUsername = adminUsername || "adminuser";
     this.adminPassword = adminPassword || generatePassword(10);
     this.adminEmail = adminEmail;
@@ -72,9 +72,6 @@ export default class Mastodon implements IMastodon {
 
   get invalid(): boolean {
     const { name, nodeId } = this;
-    return (
-      name.trim() === "" ||
-      !isValidInteger(nodeId)
-    );
+    return name.trim() === "" || !isValidInteger(nodeId);
   }
 }

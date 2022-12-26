@@ -1,17 +1,19 @@
 import VM from "./vm";
 import generatePassword from "../utils/generatePassword";
 import isValidInteger from "../utils/isValidInteger";
-import { validateEmail, validateOptionalEmail } from "../utils/validateName";
+import { validateOptionalEmail } from "../utils/validateName";
 import validateName from "../utils/validateName";
 import validateDomainName from "../utils/validateDomainName";
 import { v4 } from "uuid";
+const length = Math.floor(Math.random() * 5) + 10;
 export default class Owncloud extends VM {
   /* Superuser settings */
   public id = v4();
-  public name = "OC" +this.id.split("-")[0];
+  public name = "OC" + this.id.split("-")[0];
   public adminEmail = "";
   public adminUsername = "admin";
-  public adminPassword = generatePassword((length = Math.floor(Math.random() * 5) + 10)); // prettier-ignore
+
+  public adminPassword = generatePassword(length); // prettier-ignore
 
   /* Mail server settings */
   public smtpFromEmail = "";
@@ -29,16 +31,10 @@ export default class Owncloud extends VM {
   public domain = "";
 
   public get valid(): boolean {
-    const { name, flist, cpu, memory, diskSize, entrypoint, nodeId } = this;
+    const { name, flist, cpu, memory, entrypoint, nodeId } = this;
     const { network, envs, disks } = this;
     const { adminUsername, adminPassword } = this;
-    const {
-      smtpFromEmail,
-      smtpHost,
-      smtpPort,
-      smtpHostUser,
-      smtpHostPassword,
-    } = this;
+    const { smtpFromEmail, smtpHost, smtpPort, smtpHostUser } = this;
 
     return (
       name !== "" &&

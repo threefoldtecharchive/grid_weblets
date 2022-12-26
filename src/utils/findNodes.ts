@@ -5,16 +5,11 @@ import type { FilterOptions } from "grid3_client";
 export default function findNodes(
   filters: FilterOptions,
   profile: IProfile,
-  exclusiveFor = ""
+  exclusiveFor = "",
 ): Promise<ISelectOption[]> {
-  return new Promise(async (res) => {
+  async function resolver(res: (x: ISelectOption[]) => void) {
     const { networkEnv } = profile;
-    const grid = new window.configs.grid3_client.GridClient(
-      "" as any,
-      "",
-      "",
-      null
-    );
+    const grid = new window.configs.grid3_client.GridClient("" as any, "", "", null);
 
     const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
     const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy, grid.rmbClient);
@@ -23,11 +18,7 @@ export default function findNodes(
       let avilableNodes = await nodes.filterNodes(filters);
 
       if (!filters.publicIPs && exclusiveFor != "") {
-        const blockedNodes = await getBlockedNodesIDs(
-          exclusiveFor,
-          rmbProxy,
-          graphql
-        );
+        const blockedNodes = await getBlockedNodesIDs(exclusiveFor, rmbProxy, graphql);
 
         // remove the blocked nodes from the nodes the first page
         avilableNodes = exclude(blockedNodes, avilableNodes);
@@ -49,7 +40,7 @@ export default function findNodes(
         }
       }
 
-      const resNodes = avilableNodes.map((node) => {
+      const resNodes = avilableNodes.map(node => {
         return {
           label: `NodeID(${node.nodeId})`,
           value: node.nodeId,
@@ -60,43 +51,32 @@ export default function findNodes(
       console.log("Error findNodes", err);
       res([]);
     }
-  });
+  }
+  return new Promise(resolver);
 }
 
-async function getBlockedNodesIDs(
-  exclusiveFor: string,
-  rmbProxy: string,
-  graphql: string
-): Promise<number[]> {
+async function getBlockedNodesIDs(exclusiveFor: string, rmbProxy: string, graphql: string): Promise<number[]> {
   // This step for preventing select a node that already has a deployment of the same type.
   // For now, it is only used with presearch.
   const gqlClient = new window.configs.grid3_client.Graphql(graphql);
 
-  let blockedFarmsIDs = await getBlockedFarmsIDs(
-    exclusiveFor,
-    rmbProxy,
-    graphql
-  );
+  const blockedFarmsIDs = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
 
   // get all the nodeIds of all the farms
-  let farmsIDs = `[${blockedFarmsIDs.join(", ")}]`;
+  const farmsIDs = `[${blockedFarmsIDs.join(", ")}]`;
   const res = await gqlClient.query(
     `query MyQuery {
       nodes(where: {farmID_in: ${farmsIDs}}) {
         nodeID
       }
-    }`
+    }`,
   );
-  let farmNodesIDs = [...res.data["nodes"]];
+  const farmNodesIDs = [...res.data["nodes"]];
 
   return farmNodesIDs;
 }
 
-export async function getBlockedFarmsIDs(
-  exclusiveFor: string,
-  rmbProxy: string,
-  graphql: string
-): Promise<number[]> {
+export async function getBlockedFarmsIDs(exclusiveFor: string, rmbProxy: string, graphql: string): Promise<number[]> {
   const gqlClient = new window.configs.grid3_client.Graphql(graphql);
 
   // get the total number of deployment of the same type
@@ -113,22 +93,22 @@ export async function getBlockedFarmsIDs(
               nodeID
             }
           }`)) as any;
-  const nodeIds = res2.data.nodeContracts.map((n) => n.nodeID);
+  const nodeIds = res2.data.nodeContracts.map(n => n.nodeID);
 
   // get the farmIds of all the used nodes. "in Set to remove duplicates"
-  let farmIds = new Set<number>();
-  for (let nodeId of nodeIds) {
+  const farmIds = new Set<number>();
+  for (const nodeId of nodeIds) {
     const res = await fetch(`${rmbProxy}/nodes/${nodeId}`);
     farmIds.add((await res.json())["farmId"]);
   }
-  let farmIdsarr = Array.from(farmIds);
+  const farmIdsarr = Array.from(farmIds);
 
   return farmIdsarr;
 }
 
 function exclude(blocked, all) {
   // make a list of ids for the blocked nodes
-  const blockedNodesIds = blocked.map((n) => n.nodeID);
+  const blockedNodesIds = blocked.map(n => n.nodeID);
 
-  return all.filter((item) => !blockedNodesIds.includes(item.nodeId));
+  return all.filter(item => !blockedNodesIds.includes(item.nodeId));
 }
