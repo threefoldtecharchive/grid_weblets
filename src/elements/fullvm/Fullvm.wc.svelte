@@ -202,7 +202,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "config"}
+      <section style:display={active === "config" ? "block" : "initial"}>
         <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
@@ -262,7 +262,9 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "disks"}
+      </section>
+
+      <section style:display={active === "disks" ? "block" : "initial"}>
         <AddBtn on:click={() => (data.disks = [...data.disks, new DiskFullVm()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
@@ -286,7 +288,7 @@
             {/if}
           {/each}
         </div>
-      {/if}
+      </section>
     {/if}
 
     <DeployBtn
