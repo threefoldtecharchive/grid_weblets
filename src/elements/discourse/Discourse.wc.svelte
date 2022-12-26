@@ -20,6 +20,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import { display } from "../../utils/display";
 
   const data = new Discourse();
 
@@ -123,7 +124,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      <section style:display={active === "config" ? null : "none"}>
+      <section style={display(active, "config")}>
         {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
@@ -164,7 +165,7 @@
         />
       </section>
 
-      <section style:display={active === "mail" ? null : "none"}>
+      <section style={display(active, "mail")}>
         <div class="notification is-warning is-light">
           <p>Discourse needs SMTP service so please configure these settings properly.</p>
         </div>
