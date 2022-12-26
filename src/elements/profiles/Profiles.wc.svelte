@@ -45,10 +45,11 @@
       async ctrl => {
         try {
           await getGrid({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any, _ => _);
-        } catch {
-          return { message: "Couldn't load grid using these mnemonic." };
+        } catch (e) {
+          return { message: e.message };
         }
       },
+
       // async ctrl => {
       //   const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
       //   if (userBalance.free < 1) {

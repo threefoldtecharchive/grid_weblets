@@ -1,7 +1,12 @@
 import type { IProfile } from "../types/Profile";
 import type { GridClient, NetworkEnv } from "grid3_client";
 
-export default async function getGrid<T>(profile: IProfile, cb: (grid: GridClient) => T): Promise<T> {
+export default async function getGrid<T>(
+  profile: IProfile,
+  cb: (grid: GridClient) => T,
+  disconnect = true,
+  solutionType?: string,
+): Promise<T> {
   const { networkEnv, mnemonics } = profile;
   const grid = new window.configs.grid3_client.GridClient(
     networkEnv as unknown as NetworkEnv,
@@ -12,11 +17,6 @@ export default async function getGrid<T>(profile: IProfile, cb: (grid: GridClien
     window.configs.grid3_client.BackendStorageType.tfkvstore,
   );
 
-  try {
-    await grid.connect();
-  } catch {
-    //
-  }
-
+  await grid.connect();
   return cb(grid);
 }
