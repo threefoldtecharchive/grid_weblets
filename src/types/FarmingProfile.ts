@@ -117,11 +117,13 @@ export default class FarmingProfile implements FarmingProfileOptions {
 
   public get tftRewardPerCu(): number {
     const { rewardPerCu, price, tftRewardPer } = this;
+    if (price < 0.08) return NaN;
     return (rewardPerCu / price) * tftRewardPer;
   }
 
   public get tftRewardPerSu(): number {
     const { rewardPerSu, price, tftRewardPer } = this;
+    if (price < 0.08) return NaN;
     return (rewardPerSu / price) * tftRewardPer;
   }
 
@@ -178,7 +180,8 @@ export default class FarmingProfile implements FarmingProfileOptions {
   }
 
   public get totalCosts(): number {
-    const { powerUtilization, powerCost, investmentCostHW } = this;
+    const { powerUtilization, powerCost, price, investmentCostHW } = this;
+    if (price < 0.08) return NaN;
     const powerCostOver5Years /* D33 */ = powerUtilization * 24 * .365 * 5 * powerCost; // prettier-ignore
     return powerCostOver5Years + investmentCostHW;
   }
