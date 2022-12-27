@@ -305,8 +305,12 @@
           class:is-link={migrateMode}
           class:is-loading={migrating}
           disabled={migrating || !mnemonics$.valid}
-          on:click={() => (migrateMode = !migrateMode)}>Migrate</button
+          on:click={() => (migrateMode = !migrateMode)}
+          style:background-color="#1982b1"
+          style:color="white"
         >
+          Migrate
+        </button>
       </div>
       <p class="mt-4">
         Please visit <a
@@ -335,7 +339,13 @@
           />
 
           <div class="is-flex is-justify-content-center">
-            <button class="button is-success" disabled={!password$.valid || migrating} class:is-loading={migrating}>
+            <button
+              class="button is-success"
+              style:background-color="#1982b1"
+              style:color="white"
+              disabled={!password$.valid || migrating}
+              class:is-loading={migrating}
+            >
               Migrate
             </button>
           </div>
@@ -366,6 +376,8 @@
               style:margin-top="36px"
               on:click={onCreateAccount}
               type="button"
+              style:background-color="#1982b1"
+              style:color="white"
             >
               {mnemonics$.pending
                 ? "Validating Mnemonics..."
@@ -399,6 +411,8 @@
               disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
               type="button"
               on:click={onGenerateSSH}
+              style:background-color="#1982b1"
+              style:color="white"
             >
               {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
             </button>
