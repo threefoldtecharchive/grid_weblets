@@ -305,8 +305,12 @@
           class:is-link={migrateMode}
           class:is-loading={migrating}
           disabled={migrating || !mnemonics$.valid}
-          on:click={() => (migrateMode = !migrateMode)}>Migrate</button
+          on:click={() => (migrateMode = !migrateMode)}
+          style:background-color="#1982b1"
+          style:color="white"
         >
+          Migrate
+        </button>
       </div>
       <p class="mt-4">
         Please visit <a
