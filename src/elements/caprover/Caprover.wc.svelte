@@ -24,6 +24,7 @@
   import DeleteBtn from "../../components/DeleteBtn.svelte";
   import { onMount } from "svelte";
   import getGrid from "../../utils/getGrid";
+  import { display } from "../../utils/display";
 
   let data = new Caprover();
   let loading = false;
@@ -151,7 +152,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "config"}
+      <section style={display(active, "config")}>
         {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
@@ -177,7 +178,8 @@
             </div>
           {/if}
         {/each}
-      {:else if active === "leader"}
+      </section>
+      <section style={display(active, "leader")}>
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
@@ -216,7 +218,8 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "workers"}
+      </section>
+      <section style={display(active, "workers")}>
         <AddBtn on:click={() => (data.workers = [...data.workers, new CapWorker()])} />
         <div class="nodes-container">
           {#each data.workers as worker, index (worker.id)}
@@ -266,7 +269,7 @@
             </div>
           {/each}
         </div>
-      {/if}
+      </section>
     {/if}
 
     <DeployBtn

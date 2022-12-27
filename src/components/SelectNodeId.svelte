@@ -348,12 +348,14 @@
 
   async function pingNode(node: number) {
     if (node && status == "valid") {
-      let grid = await getGrid(profile, grid => grid, false);
+      let grid = await getGrid(profile, grid => grid);
       try {
+        status = null;
         validating = true;
         await grid.zos.pingNode({ nodeId: node });
         aliveNode = true;
         validating = false;
+        status = "valid";
         return true;
       } catch (e) {
         nodeIdField.disabled = validating = false;

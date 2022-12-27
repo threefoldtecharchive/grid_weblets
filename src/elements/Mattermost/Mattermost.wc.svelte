@@ -25,6 +25,7 @@
   import Tabs from "../../components/Tabs.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import { display } from "../../utils/display";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -149,7 +150,7 @@
     {:else}
       <Tabs {tabs} bind:active />
 
-      <section style:display={active === "base" ? null : "none"}>
+      <section style={display(active, "base")}>
         {#each baseFields as field (field.symbol)}
           <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
         {/each}
@@ -186,7 +187,7 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
         />
       </section>
-      <section style:display={active === "smtp" ? null : "none"}>
+      <section style={display(active, "smtp")}>
         <div class="notification is-warning is-light">
           <p>Mattermost does not require an SMTP server. If you want to use an SMTP server, you can configure it.</p>
         </div>

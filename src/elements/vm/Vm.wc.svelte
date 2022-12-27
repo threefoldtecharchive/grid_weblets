@@ -30,6 +30,7 @@
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
+  import { display } from "../../utils/display";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -217,7 +218,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "config"}
+      <section style={display(active, "config")}>
         <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
 
         <Input
@@ -286,7 +287,8 @@
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
         />
-      {:else if active === "env"}
+      </section>
+      <section style={display(active, "env")}>
         <AddBtn on:click={() => (data.envs = [...data.envs, new Env()])} />
         <div class="nodes-container">
           {#each data.envs as env, index (env.id)}
@@ -298,7 +300,8 @@
             </div>
           {/each}
         </div>
-      {:else if active === "disks"}
+      </section>
+      <section style={display(active, "disks")}>
         <AddBtn on:click={() => (data.disks = [...data.disks, new Disk()])} />
         <div class="nodes-container">
           {#each data.disks as disk, index (disk.id)}
@@ -328,11 +331,13 @@
             </div>
           {/each}
         </div>
-      {:else if active === "advanced"}
+      </section>
+
+      <section style={display(active, "advanced")}>
         {#each networkFields as field (field.symbol)}
           <Input bind:data={data.network[field.symbol]} {field} />
         {/each}
-      {/if}
+      </section>
     {/if}
 
     <DeployBtn

@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . .
 
 # increase the max memory for node
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=5120"
 
 # install project dependencies
 RUN yarn deps
