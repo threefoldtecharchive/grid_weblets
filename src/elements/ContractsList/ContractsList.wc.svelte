@@ -140,18 +140,18 @@
 
   function onDeleteSelectedHandler() {
     if (selectedContracts.length === contracts.length) return onDeleteHandler();
+    const selectedContractsIDS: number[] = [];
+    selectedContracts.forEach(contract => selectedContractsIDS.push(+contract.id));
 
     message = null;
     deleting = true;
     deletingType = "selected";
     return getGrid(profile, async grid => {
-      for (const contract of selectedContracts) {
-        try {
-          await grid.contracts.cancel({ id: +contract.id });
-        } catch (err) {
-          console.log("Error", err);
-          message = err.message || err;
-        }
+      try {
+        await grid.contracts.batchCancelContracts({ ids: selectedContractsIDS });
+      } catch (err) {
+        console.log("Error", err);
+        message = err.message || err;
       }
       contracts = contracts.filter(c => {
         return selectedContracts.findIndex(sc => sc.id === c.id) === -1;
