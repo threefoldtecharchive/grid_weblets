@@ -14,7 +14,7 @@ export default class FullVM extends VM {
   public rootFs = 0;
   public diskSize = 50;
   public get valid(): boolean {
-    const { name, diskSize, flist, entrypoint, envs, disks } = this;
+    const { network, name, diskSize, flist, entrypoint, envs, disks } = this;
     return (
       name !== "" &&
       flist !== "" &&
@@ -23,7 +23,8 @@ export default class FullVM extends VM {
       validateFlistvalue(flist) === undefined &&
       validateEntryPoint(entrypoint) === undefined &&
       envs.reduce((res, env) => res && env.valid, true) &&
-      disks.slice(1).reduce((res, disk) => res && disk.valid, true)
+      disks.slice(1).reduce((res, disk) => res && disk.valid, true) &&
+      network.valid
     );
   }
 }

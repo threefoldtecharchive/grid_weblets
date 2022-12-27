@@ -42,7 +42,7 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
 
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = createNetwork(new Network());
+  vms.network = { name: data.network.name, ip_range: data.network.ipRange };
   vms.machines = [vm];
   const metadate = {
     type: type == "VM" ? "vm" : type,

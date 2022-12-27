@@ -25,6 +25,7 @@
     validateKey,
     validateKeyValue,
     validateMemory,
+    validatePrivateIPRange,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
@@ -35,6 +36,7 @@
     { label: "Config", value: "config" },
     { label: "Environment Variables", value: "env" },
     { label: "Disks", value: "disks" },
+    { label: "Advanced", value: "advanced" },
   ];
 
   let data = new VM();
@@ -49,6 +51,12 @@
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
+
+  // prettier-ignore
+  const networkFields: IFormField[] = [
+    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
+    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xxx.0.0/16", type: "text", validator: validatePrivateIPRange, invalid: false },
+  ];
 
   // prettier-ignore
   const flists: IFlist[] = [
@@ -96,7 +104,7 @@
   let failed = false;
   let profile: IProfile;
   let message: string;
-  let modalData: object;
+  let modalData: Record<string, unknown>;
   let status: "valid" | "invalid";
 
   function _isInvalidDisks() {
@@ -108,7 +116,7 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields, ...networkFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
@@ -323,6 +331,12 @@
             </div>
           {/each}
         </div>
+      </section>
+
+      <section style={display(active, "advanced")}>
+        {#each networkFields as field (field.symbol)}
+          <Input bind:data={data.network[field.symbol]} {field} />
+        {/each}
       </section>
     {/if}
 
