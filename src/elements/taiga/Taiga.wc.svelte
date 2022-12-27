@@ -29,6 +29,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import { display } from "../../utils/display";
 
   let data = new Taiga();
   let gateway: GatewayNodes;
@@ -205,7 +206,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      <section style:display={active === "base" ? null : "none"}>
+      <section style={display(active, "base")}>
         <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
         <SelectCapacity
           {packages}
@@ -248,7 +249,7 @@
         />
       </section>
 
-      <section style:display={active === "mail" ? null : "none"}>
+      <section style={display(active, "mail")}>
         <div class="notification is-warning is-light">
           <p>configure these settings only If you have an smtp service and you know what you’re doing.</p>
         </div>

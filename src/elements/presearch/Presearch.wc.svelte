@@ -20,6 +20,7 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
+  import { display } from "../../utils/display";
 
   let data = new Presearch();
   let profile: IProfile;
@@ -133,7 +134,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "base"}
+      <section style={display(active, "base")}>
         {#each fields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
@@ -156,7 +157,8 @@
           nodes={data.selection.nodes}
           exclusiveFor="research"
         />
-      {:else if active === "restore"}
+      </section>
+      <section style={display(active, "restore")}>
         <div class="notification is-warning is-light">
           <p>
             Only configure these Presearch Restore Keys fields if you want to restore previous node. see backup steps <a
@@ -172,7 +174,7 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-      {/if}
+      </section>
     {/if}
 
     <DeployBtn

@@ -28,6 +28,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
+  import { display } from "../../utils/display";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -152,7 +153,7 @@
     {:else}
       <Tabs bind:active {tabs} />
 
-      {#if active === "config"}
+      <section style={display(active, "config")}>
         {#each kubernetesFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
@@ -163,7 +164,8 @@
         {#each networkFields as field (field.symbol)}
           <Input bind:data={data.network[field.symbol]} {field} />
         {/each}
-      {:else if active === "master"}
+      </section>
+      <section style={display(active, "master")}>
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data.master[field.symbol]} bind:invalid={field.invalid} {field} />
@@ -194,7 +196,8 @@
           on:fetch={({ detail }) => (data.master.selection.nodes = detail)}
           nodes={data.master.selection.nodes}
         />
-      {:else if active === "workers"}
+      </section>
+      <section style={display(active, "workers")}>
         <AddBtn on:click={() => (data.workers = [...data.workers, new Worker()])} />
         <div class="nodes-container">
           {#each data.workers as worker, index (worker.id)}
@@ -236,7 +239,7 @@
             </div>
           {/each}
         </div>
-      {/if}
+      </section>
     {/if}
 
     <DeployBtn {disabled} {loading} {failed} {success} on:click={onResetHandler} />
