@@ -17,3 +17,5 @@ Read the documentaions for more information.
 - [Prepare the environment](./docs/config.md)
 - [Getting Started](./docs/getting_started.md)
 - [Contributing Guide](./docs/contributing.md)
+- [How to run tests](./docs/cypress.md)
+- [Weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager)
