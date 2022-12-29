@@ -313,7 +313,7 @@
               validating = false;
             });
         }
-      }
+      } else _reset();
   }
 
   /* Update when data change */
