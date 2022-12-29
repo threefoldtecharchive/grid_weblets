@@ -289,7 +289,7 @@
         <p>Loading Account Balance</p>
       {:else if balanceStore$.balance !== null}
         <p>Balance: <span style="font-weight: bold;">{balanceStore$.balance}</span> TFT</p>
-        <p>Locked: <span style="padding-left: 2%;">{balanceStore$.locked}</span> TFT</p>
+        <p>Locked: <span>{balanceStore$.locked}</span> TFT</p>
       {/if}
     </div>
   {/if}
