@@ -19,3 +19,4 @@ Read the documentaions for more information.
 - [Contributing Guide](./docs/contributing.md)
 - [How to run tests](./docs/cypress.md)
 - [Weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager)
+- [Pipelines documentation](./docs/workflows.md)
