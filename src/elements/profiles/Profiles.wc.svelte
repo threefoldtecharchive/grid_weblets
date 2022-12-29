@@ -300,17 +300,22 @@
     <div class="box">
       <div class="is-flex is-justify-content-space-between">
         <h4 class="is-size-4">Profile Manager</h4>
-        <button
-          class="button"
-          class:is-link={migrateMode}
-          class:is-loading={migrating}
-          disabled={migrating || !mnemonics$.valid}
-          on:click={() => (migrateMode = !migrateMode)}
-          style:background-color="#1982b1"
-          style:color="white"
-        >
-          Migrate
-        </button>
+        <div class="d-flex flex-column">
+          <button
+            class="button"
+            class:is-link={migrateMode}
+            class:is-loading={migrating}
+            disabled={migrating || !mnemonics$.valid}
+            on:click={() => (migrateMode = !migrateMode)}
+            style:background-color="#1982b1"
+            style:color="white"
+          >
+            Migrate
+          </button>
+          <button class="button" style:background-color="#e0e0e0" style:color="black" on:click={setShow(false)}>
+            Close
+          </button>
+        </div>
       </div>
       <p class="mt-4">
         Please visit <a
