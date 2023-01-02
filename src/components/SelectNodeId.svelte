@@ -72,6 +72,10 @@
       { label: "Manual", value: "manual" }
     ]
   };
+  $: {
+    nodeSelectionField.disabled = validating;
+    console.log(nodeSelectionField.disabled);
+  }
   export let nodeSelection: string = undefined;
 
   export let filters: any;
@@ -313,7 +317,7 @@
               validating = false;
             });
         }
-      } else _reset();
+      }
   }
 
   /* Update when data change */
@@ -372,8 +376,8 @@
     bind:data={nodeSelection}
     field={nodeSelectionField}
     on:input={() => {
-      if (nodeSelection === "manual") return (status = null);
-      if (data !== null && nodes.length > 0) status = "valid";
+      status = data = undefined;
+      // reset all selection fields
     }}
   />
 {/if}
