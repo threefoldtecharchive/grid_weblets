@@ -34,7 +34,7 @@
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
     { label: "Disks", value: "disks" },
-    { label: "Advanced", value: "advanced" },
+    // { label: "Advanced", value: "advanced" },
   ];
 
   let data = new Fullvm();

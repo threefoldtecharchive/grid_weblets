@@ -36,7 +36,7 @@
     { label: "Config", value: "config" },
     { label: "Environment Variables", value: "env" },
     { label: "Disks", value: "disks" },
-    { label: "Advanced", value: "advanced" },
+    // { label: "Advanced", value: "advanced" },
   ];
 
   let data = new VM();
