@@ -1,4 +1,4 @@
-## Prerequests
+## Perequisites
 
 - Make sure you go through the [getting started](./getting_started.md) guide first.
 - Have some knowledge of [Typescript](https://www.typescriptlang.org/docs/) and [Svelte](https://svelte.dev/docs).
