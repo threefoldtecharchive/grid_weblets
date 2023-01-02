@@ -74,7 +74,6 @@
   };
   $: {
     nodeSelectionField.disabled = validating;
-    console.log(nodeSelectionField.disabled);
   }
   export let nodeSelection: string = undefined;
 
