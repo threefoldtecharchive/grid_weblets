@@ -19,7 +19,7 @@
 
   let init = false;
   let show = false;
-  function setShow(value: boolean) {
+  function profileToggle(value: boolean) {
     return () => (show = value);
   }
 
@@ -277,7 +277,7 @@
   }
 </script>
 
-<div class="profile-menu" on:mousedown={setShow(true)}>
+<div class="profile-menu" on:mousedown={profileToggle(true)}>
   <button type="button">
     <span class="icon is-small">
       <i class="fas fa-user-cog" />
@@ -295,7 +295,7 @@
   {/if}
 </div>
 
-<div class="profile-overlay" class:is-active={show} on:mousedown={setShow(false)}>
+<div class="profile-overlay" class:is-active={show} on:mousedown={profileToggle(false)}>
   <section class="profile-container" class:is-active={show} on:mousedown|stopPropagation>
     <div class="box">
       <div class="is-flex is-justify-content-space-between">
@@ -312,7 +312,7 @@
           >
             Migrate
           </button>
-          <button class="button" style:background-color="#e0e0e0" style:color="black" on:click={setShow(false)}>
+          <button class="button" style:background-color="#e0e0e0" style:color="black" on:click={profileToggle(false)}>
             Close
           </button>
         </div>
