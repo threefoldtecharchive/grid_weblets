@@ -72,9 +72,7 @@
       { label: "Manual", value: "manual" }
     ]
   };
-  $: {
-    nodeSelectionField.disabled = validating;
-  }
+
   export let nodeSelection: string = undefined;
 
   export let filters: any;
@@ -373,7 +371,7 @@
 {#if !multiple}
   <Input
     bind:data={nodeSelection}
-    field={nodeSelectionField}
+    field={{ ...nodeSelectionField, disabled: validating }}
     on:input={() => {
       status = data = undefined;
       // reset all selection fields
