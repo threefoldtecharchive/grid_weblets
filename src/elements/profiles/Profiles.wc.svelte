@@ -205,7 +205,6 @@
     const newClient = await __getGrid();
     const oldDB = oldClient.kvstore;
     const newDB = newClient.kvstore;
-    console.log("oldClient", oldClient);
 
     try {
       loading = true;
