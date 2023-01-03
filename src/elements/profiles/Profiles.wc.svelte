@@ -19,7 +19,7 @@
 
   let init = false;
   let show = false;
-  function setShow(value: boolean) {
+  function profileToggle(value: boolean) {
     return () => (show = value);
   }
 
@@ -277,7 +277,7 @@
   }
 </script>
 
-<div class="profile-menu" on:mousedown={setShow(true)}>
+<div class="profile-menu" on:mousedown={profileToggle(true)}>
   <button type="button">
     <span class="icon is-small">
       <i class="fas fa-user-cog" />
@@ -288,29 +288,34 @@
       {#if balanceStore$.loading}
         <p>Loading Account Balance</p>
       {:else if balanceStore$.balance !== null}
-        <p>Balance: <span style="font-weight: bold;">{balanceStore$.balance}</span> TFT</p>
-        <p>Locked: <span style="padding-left: 2%;">{balanceStore$.locked}</span> TFT</p>
+        <p>Balance: <span style="font-weight: bold;">{balanceStore$.balance.toFixed(2)}</span> TFT</p>
+        <p>Locked: <span>{balanceStore$.locked.toFixed(2)}</span> TFT</p>
       {/if}
     </div>
   {/if}
 </div>
 
-<div class="profile-overlay" class:is-active={show} on:mousedown={setShow(false)}>
+<div class="profile-overlay" class:is-active={show} on:mousedown={profileToggle(false)}>
   <section class="profile-container" class:is-active={show} on:mousedown|stopPropagation>
     <div class="box">
       <div class="is-flex is-justify-content-space-between">
         <h4 class="is-size-4">Profile Manager</h4>
-        <button
-          class="button"
-          class:is-link={migrateMode}
-          class:is-loading={migrating}
-          disabled={migrating || !mnemonics$.valid}
-          on:click={() => (migrateMode = !migrateMode)}
-          style:background-color="#1982b1"
-          style:color="white"
-        >
-          Migrate
-        </button>
+        <div class="d-flex flex-column">
+          <button
+            class="button"
+            class:is-link={migrateMode}
+            class:is-loading={migrating}
+            disabled={migrating || !mnemonics$.valid}
+            on:click={() => (migrateMode = !migrateMode)}
+            style:background-color="#1982b1"
+            style:color="white"
+          >
+            Migrate
+          </button>
+          <button class="button" style:background-color="#e0e0e0" style:color="black" on:click={profileToggle(false)}>
+            Close
+          </button>
+        </div>
       </div>
       <p class="mt-4">
         Please visit <a
