@@ -413,7 +413,7 @@
               class="button is-primary ml-2 is-small"
               class:is-loading={generatingSSH}
               style:margin-top="32px"
-              disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH}
+              disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH || !mnemonics$.valid}
               type="button"
               on:click={onGenerateSSH}
               style:background-color="#1982b1"
