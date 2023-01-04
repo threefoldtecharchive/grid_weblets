@@ -14,9 +14,9 @@ It solves such problem where you had to write complex HTML (and associated style
 - **Get the code**
   To get the code on you machine you need to run the following command in your terminal to clone the repository:
 
-      ````bash
-      git clone https://github.com/threefoldtech/grid_weblets.git`
-      ````
+    ````bash
+    git clone https://github.com/threefoldtech/grid_weblets.git`
+    ````
 
 - [**Prepare the environment**](./docs/config.md)
 
