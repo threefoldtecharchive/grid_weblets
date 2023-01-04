@@ -11,7 +11,11 @@ Weblets is a svelte project for creating web components - which are reusable cus
 It solves such problem where you had to write complex HTML (and associated style and script) to render custom UI controls (eg, to deploy some workload on the TF Grid 3), and how using them multiple times in different projects can be a miss if you are not careful.
 
 ## Installation
-
+- **Prerequisite**
+  - Nodejs 16^
+  - yarn
+  
+  For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
 - **Get the code**
 
   Clone the repository:
@@ -20,7 +24,6 @@ It solves such problem where you had to write complex HTML (and associated style
   git clone https://github.com/threefoldtech/grid_weblets.git
   ```
 
-- [**Prepare the environment**](./docs/config.md)
 
 ## Getting Started
 
