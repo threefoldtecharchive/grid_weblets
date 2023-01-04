@@ -12,17 +12,18 @@ It solves such problem where you had to write complex HTML (and associated style
 ## Installation
 
 - **Get the code**
-  To get the code on you machine you need to run the following command in your terminal to clone the repository:
+
+  Clone the repository:
 
     ````bash
-    git clone https://github.com/threefoldtech/grid_weblets.git`
+    git clone https://github.com/threefoldtech/grid_weblets.git
     ````
 
 - [**Prepare the environment**](./docs/config.md)
 
 ## Getting Started
 
-For detailed information you can read the [Getting Started](./docs/getting_started.md) documentation.
+> For detailed information you can read the [Getting Started](./docs/getting_started.md) documentation.
 
 Before run Weblets, in your terminal move to the project directory.
 
