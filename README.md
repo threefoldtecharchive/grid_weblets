@@ -40,6 +40,15 @@ yarn serve:app
 yarn serve:app
 ```
 
+## Configure the editor/IDE
+
+We recommend VS code as it has many extensions that will help, there are some of them:
+- [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
+- [Svelte 3 Snippets](https://marketplace.visualstudio.com/items?itemName=fivethree.vscode-svelte-snippets)
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- [Vue Language Features](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+
 ## Related Documentations
 
 - [Prepare the environment](./docs/config.md)
