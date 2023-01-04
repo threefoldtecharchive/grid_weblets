@@ -26,15 +26,20 @@ It solves such problem where you had to write complex HTML (and associated style
 
 > For detailed information you can read the [Getting Started](./docs/getting_started.md) documentation.
 
-Before run Weblets, in your terminal move to the project directory.
+Before running the Weblets, in your terminal move to the project directory, then install the required dependencies using `yarn deps`, it runs [install_deps.sh](./scripts/install_deps.sh), that will handle the installation of Weblets and playground dependencies
 
-- **Run Weblets in Development**
+```bash
+cd grid_weblets
+yarn deps
+```
+
+- **Run Weblets in Development mode**
 
 ```bash
 yarn serve:app
 ```
 
-- **Run Weblets in Production**
+- **Run Weblets in Production mode**
 
 ```bash
 yarn build:app
