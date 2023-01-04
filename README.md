@@ -1,7 +1,7 @@
 # Grid Weblets
 
 ![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets)
-![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)
+[![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml)
 
 ## Introduction
 
