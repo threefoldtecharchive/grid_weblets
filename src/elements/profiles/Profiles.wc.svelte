@@ -1,7 +1,6 @@
 <svelte:options tag="tf-profiles" />
 
 <script lang="ts">
-  import type { IProfile } from "../../types/Profile";
   import { SSH_REGEX } from "../../utils/validateName";
   // Components
   import QrCode from "../../components/QrCode.svelte";
@@ -10,15 +9,17 @@
   import { fb, form, validators } from "tf-svelte-rx-forms";
   import getGrid from "../../utils/getGrid";
   import { generateKeyPair } from "web-ssh-keygen";
-  import md5 from "crypto-js/md5";
-  import { enc } from "crypto-js";
-  import { decrypt } from "crypto-js/aes";
+  import Alert from "../../components/Alert.svelte";
 
   const balanceStore = window.configs.balanceStore;
   const baseConfigStore = window.configs.baseConfig;
-
   let init = false;
   let show = false;
+  let alreadyMigratedCount = 0;
+  let loading = false;
+  let success = false;
+  let failed = false;
+
   function profileToggle(value: boolean) {
     return () => (show = value);
   }
@@ -206,9 +207,9 @@
     const newDB = newClient.kvstore;
 
     try {
+      loading = true;
       const oldKeys = await oldClient.kvstore.list();
       let failedCount = 0;
-      let alreadyMigratedCount = 0;
       const extrinsics = [];
       for (const oldKey of oldKeys) {
         try {
@@ -219,9 +220,11 @@
           try {
             await newDB.get({ key: oldKey });
             alreadyMigratedCount++;
+            success = true;
             console.log(`${oldKey} key is migrated`);
           } catch (error) {
             failedCount++;
+            failed = true;
           }
         }
       }
@@ -236,6 +239,7 @@
         `Migrated keys: ${extrinsics.length}, already migrated keys: ${alreadyMigratedCount}, failed keys: ${failedCount}`,
       );
       if (failedCount > 0 && extrinsics.length === 0) {
+        failed = true;
         throw Error("storeSecret is wrong. Please enter the right storeSecret.");
       } else if (failedCount > 0 && extrinsics.length !== 0) {
         throw Error(
@@ -245,9 +249,9 @@
     } catch {
       /* pass */
     }
-
     await oldClient.disconnect();
     migrating = false;
+    loading = false;
   }
 
   let mounted: 0 | 1 | 2 = 0;
@@ -356,6 +360,20 @@
           </div>
         </form>
       </section>
+      <div style="margin-top: 2rem;">
+        {#if loading}
+          <Alert type="info" message={"Migrating..."} />
+        {:else if success}
+          <Alert
+            type="success"
+            message={alreadyMigratedCount
+              ? `${alreadyMigratedCount} keys was already migrated.`
+              : "Successfully migrated keys."}
+          />
+        {:else if failed}
+          <Alert type="danger" message={"Failed to migrate keys."} />
+        {/if}
+      </div>
 
       <section style:display={migrateMode ? "none" : "block"}>
         <form on:submit|preventDefault>
