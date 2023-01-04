@@ -1,6 +1,7 @@
 # Grid Weblets
 
-![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets)
+![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)
 
 ## Introduction
 
@@ -15,9 +16,9 @@ It solves such problem where you had to write complex HTML (and associated style
 
   Clone the repository:
 
-    ````bash
-    git clone https://github.com/threefoldtech/grid_weblets.git
-    ````
+  ```bash
+  git clone https://github.com/threefoldtech/grid_weblets.git
+  ```
 
 - [**Prepare the environment**](./docs/config.md)
 
