@@ -5,7 +5,7 @@
 
 ## Introduction
 
-Weblets are a front-end application helps to deploy solutions on TF Grid v3. A weblet is a compiled javascript web component which can be embedded in HTML page of a web app. The backend for the weblets is introduced with [grid client](https://github.com/threefoldfoundation/info_manual3/blob/development/wiki/manual3_iac/grid3_javascript/grid3_javascript_home.md) which communicate to TF Chain and TF Grid over RMB.
+Weblets is a front-end application helps to deploy solutions on TF Grid v3. A weblet is a compiled javascript web component which can be embedded in HTML page of a web app. The backend for the weblets is introduced with [grid client](https://github.com/threefoldfoundation/info_manual3/blob/development/wiki/manual3_iac/grid3_javascript/grid3_javascript_home.md) which communicate to TF Chain and TF Grid over RMB.
 
 Weblets is a svelte project for creating web components - which are reusable custom elements with their functionality encapsulated away from the rest of the code — that interact with TF Grid 3 and could be utilized from other web apps.
 It solves such problem where you had to write complex HTML (and associated style and script) to render custom UI controls (eg, to deploy some workload on the TF Grid 3), and how using them multiple times in different projects can be a miss if you are not careful.
