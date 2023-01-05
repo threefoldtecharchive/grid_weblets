@@ -9,7 +9,8 @@ In [charts.yaml](../weblets-chart/Chart.yaml) replace the value of `appVersion` 
   ````
  
 ## 2. **Create a new release**
-  create a new release with same value of `appVersion` in `charts.yaml`.
+  Create a new release with same value of `appVersion` in `charts.yaml`.<br>
+  While you're creating a new release you also have to create a new tag the same as the one in the `charts.yaml`
   
   > You can find more details about creating a new release in [Release projects](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release).
   
