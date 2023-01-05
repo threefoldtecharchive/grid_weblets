@@ -48,9 +48,9 @@ yarn serve:app
 
 ```bash
 yarn build:app
-cd dist
-npx lite-server
 ```
+
+This will generate the production build in the `dist` directory, which can be served using [Caddy](https://caddyserver.com/) or [NGINX](https://www.nginx.com/)
 
 ## Testing
 
