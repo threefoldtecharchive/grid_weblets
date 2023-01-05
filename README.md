@@ -50,16 +50,6 @@ yarn serve:app
 yarn build:app
 ```
 
-## Configure the editor/IDE
-
-We recommend [Visual Studio Code](https://code.visualstudio.com/) as it has many extensions that will help, there are some of them:
-
-- [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
-- [Svelte 3 Snippets](https://marketplace.visualstudio.com/items?itemName=fivethree.vscode-svelte-snippets)
-- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-- [Vue Language Features](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
 ## Testing
 
 The main testing tool that is used in Weblets is [Cypress](https://www.cypress.io/).
