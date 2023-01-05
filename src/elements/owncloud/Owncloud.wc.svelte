@@ -127,17 +127,13 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  let diskField: IFormField;
-  let cpuField: IFormField;
-  let memoryField: IFormField;
-
   $: disabled = 
   editable && isInvalid([...mailFields]) ||
   ((loading || !data.valid) && !(success || failed)) || 
   invalid || 
   !profile || 
   status !== "valid" || 
-  isInvalid([...adminFields, nameField, diskField, memoryField, cpuField]); // prettier-ignore
+  isInvalid([...adminFields, nameField]); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   async function onDeployVM() {
