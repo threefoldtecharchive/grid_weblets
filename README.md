@@ -17,7 +17,7 @@ It solves such problem where you had to write complex HTML (and associated style
   - Nodejs 16^
   - yarn
 
-  For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
+   > For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
 
 - **Get the code**
 
@@ -64,3 +64,4 @@ The main testing tool that is used in Weblets is [Cypress](https://www.cypress.i
 - [Weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager)
 - [Troubleshooting](./docs/config.md)
 - [Pipelines documentation](./docs/workflows.md)
+- [Releasing process](./docs/releasing.md)
