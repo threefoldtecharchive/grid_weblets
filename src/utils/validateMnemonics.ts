@@ -2,12 +2,12 @@ import type { BackendStorageType, NetworkEnv } from "grid3_client";
 import type { IProfile } from "../types/Profile";
 
 export default function validateMnemonics(profile: IProfile) {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+  const { networkEnv, mnemonics } = profile;
   const http = new window.configs.client.HTTPMessageBusClient(0, "", "", "");
   const grid = new window.configs.grid3_client.GridClient(
     networkEnv as unknown as NetworkEnv,
     mnemonics,
-    storeSecret,
+    mnemonics,
     http,
     undefined,
     "tfkvstore" as BackendStorageType,

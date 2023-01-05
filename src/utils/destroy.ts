@@ -5,7 +5,7 @@ export default function destroy(profile: IProfile, type: string, name: string) {
   const client = new window.configs.grid3_client.GridClient(
     networkEnv as any,
     mnemonics,
-    storeSecret,
+    mnemonics,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     type,
     window.configs.grid3_client.BackendStorageType.tfkvstore,
