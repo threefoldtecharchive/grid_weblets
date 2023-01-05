@@ -48,6 +48,8 @@ yarn serve:app
 
 ```bash
 yarn build:app
+cd dist
+npx lite-server
 ```
 
 ## Testing
