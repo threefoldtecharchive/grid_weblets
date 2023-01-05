@@ -48,11 +48,11 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
   return gws;
 }
 export async function getUniqueDomainName(profile, name, solutionType) {
-  const { networkEnv, mnemonics, storeSecret } = profile;
+  const { networkEnv, mnemonics } = profile;
   const client = new window.configs.grid3_client.GridClient(
     networkEnv as any,
     mnemonics,
-    storeSecret,
+    mnemonics,
     new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     solutionType,
     window.configs.grid3_client.BackendStorageType.tfkvstore,
