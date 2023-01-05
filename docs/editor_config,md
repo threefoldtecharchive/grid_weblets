@@ -5,8 +5,40 @@ We recommend [Visual Studio Code](https://code.visualstudio.com/) as it has many
 - [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
 - [Svelte 3 Snippets](https://marketplace.visualstudio.com/items?itemName=fivethree.vscode-svelte-snippets)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+
+  Configuration files: 
+  - `grid_weblets/.prettierrc`
+    
+    ````js
+    {
+      "printWidth": 120,
+      "tabWidth": 2,
+      "useTabs": false,
+      "semi": true,
+      "singleQuote": false,
+      "quoteProps": "as-needed",
+      "jsxSingleQuote": false,
+      "trailingComma": "all",
+      "bracketSpacing": true,
+      "arrowParens": "avoid",
+      "endOfLine": "auto",
+      "svelteSortOrder": "options-scripts-markup-styles",
+      "plugins": ["prettier-plugin-svelte"]
+    }
+
+    ````
+    
+  - `grid_weblets/.prettierignore`
+  
+    ````
+    # Ignore artifacts:
+    build
+    coverage
+    weblets-chart
+    ````
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-  Configuration file: 
+
+  Configuration files: 
   - `grid_weblets/.eslinttrc.js`
   
     ````js
@@ -38,7 +70,7 @@ We recommend [Visual Studio Code](https://code.visualstudio.com/) as it has many
 
   - `grid_weblets/.eslintignore`
 
-    ````js
+    ````
     # /node_modules/* and /bower_components/* in the project root are ignored by default
 
     # Ignore built files except build/index.js
