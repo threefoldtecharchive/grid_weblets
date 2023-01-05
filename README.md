@@ -59,6 +59,7 @@ The main testing tool that is used in Weblets is [Cypress](https://www.cypress.i
 
 ## Related Documentations
 
+- [Configure the editor/IDE](./docs/editor_config.md)
 - [Contributing Guide](./docs/contributing.md)
 - [Weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager)
 - [Troubleshooting](./docs/config.md)
