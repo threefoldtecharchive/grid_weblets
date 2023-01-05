@@ -95,11 +95,17 @@
   async function readSSH() {
     sshStatus = "read";
     const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    const metadata = await grid.kvstore?.get({ key: "metadata" });
-    sshStatus = undefined;
-    if (metadata) {
-      return JSON.parse(metadata).sshkey;
-    }
+    return (
+      grid.kvstore
+        ?.get({ key: "metadata" })
+        .then(metadata => {
+          if (metadata) {
+            return JSON.parse(metadata).sshkey;
+          }
+        })
+        .catch(() => null)
+        .finally(() => (sshStatus = undefined)) ?? null
+    );
   }
 
   async function storeSSH(sshkey: string) {
