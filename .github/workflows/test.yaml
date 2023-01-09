@@ -8,15 +8,21 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    container: cypress/browsers:node16.14.2-slim-chrome103-ff102
+    strategy:
+      matrix:
+        node-version: [16.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+      - name: Yarn deps
+        run: yarn deps
       - name: Cypress run
         uses: cypress-io/github-action@v4.2.0
         with:
-          build: yarn add -D cypress
-          start: yarn serve:app
-          wait-on: "http://localhost:8080"
-          wait-on-timeout: 60
+          start: npx cypress run
           browser: chrome
