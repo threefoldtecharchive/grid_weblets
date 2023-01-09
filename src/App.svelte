@@ -44,6 +44,15 @@
     { name: "Contracts List", cmp: ContractsList },
   ];
   let selectedWebletIndex = weblets.findIndex(({ cmp }) => cmp === Fullvm);
+  let self: HTMLDivElement;
+
+  $: if (self && selectedWebletIndex > -1) {
+    for (const child of self.children) child.remove();
+    const Component = weblets[selectedWebletIndex].cmp;
+    new Component({
+      target: self,
+    });
+  }
 </script>
 
 <Base />
@@ -63,4 +72,4 @@
   {/each}
 </div>
 
-<svelte:component this={weblets[selectedWebletIndex].cmp} />
+<div bind:this={self} />
