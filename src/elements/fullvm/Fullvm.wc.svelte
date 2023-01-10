@@ -208,7 +208,10 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed a VM." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy a VM."} />
+      <Alert
+        type="danger"
+        message={"Failed to deploy Full VM. Please contact our support with the message 'Failed to send request after 3 retries due to Request failed with status code 502 due to failed to submit message'."}
+      />
     {:else}
       <Tabs bind:active {tabs} />
 
