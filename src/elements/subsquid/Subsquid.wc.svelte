@@ -86,7 +86,9 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy Subsquid. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy Subsquid.";
       })
       .finally(() => {
         loading = false;
@@ -122,7 +124,7 @@
     {:else if success}
       <Alert type="success" message="Successfully Deployed Subsquid." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Subsquid."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

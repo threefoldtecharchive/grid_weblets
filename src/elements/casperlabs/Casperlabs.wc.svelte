@@ -74,9 +74,11 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy Casperlabs. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy Casperlabs.";
       })
       .finally(() => {
         loading = false;
@@ -114,7 +116,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed casperlabs." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy casperlabs."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

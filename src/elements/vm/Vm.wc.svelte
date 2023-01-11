@@ -156,9 +156,11 @@
         success = true;
         modalData = data;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy VM. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy VM";
       })
       .finally(() => {
         validateFlist.loading = false;
@@ -214,10 +216,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed VM." deployed={true} />
     {:else if failed}
-      <Alert
-        type="danger"
-        message={"Failed to deploy VM. Please contact our support with the message 'Failed to send request after 3 retries due to Request failed with status code 502 due to failed to submit message'."}
-      />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

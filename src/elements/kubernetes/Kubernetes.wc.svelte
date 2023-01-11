@@ -99,9 +99,11 @@
         deploymentStore.set(0);
         success = true;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = err.message;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy K8S. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy K8S.";
       })
       .finally(() => {
         loading = false;
@@ -149,7 +151,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed K8S." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy K8S."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

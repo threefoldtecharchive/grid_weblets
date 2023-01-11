@@ -118,9 +118,11 @@
         success = true;
         modalData = data;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy Node Pilot. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy Node Pilot.";
       })
       .finally(() => {
         validateFlist.loading = false;
@@ -176,7 +178,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed Node pilot." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Node pilot."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

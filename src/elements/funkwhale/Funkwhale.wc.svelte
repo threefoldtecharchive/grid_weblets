@@ -80,9 +80,11 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch(err => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy Funkwhale. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy Funkwhale.";
       })
       .finally(() => {
         loading = false;
@@ -120,7 +122,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed a Funkwhale instance" deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Funkwhale"} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

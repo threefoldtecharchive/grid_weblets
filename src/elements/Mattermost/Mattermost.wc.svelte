@@ -113,10 +113,11 @@
         deploymentStore.set(0);
         success = true;
       })
-      .catch(err => {
-        console.log("Error", err);
+      .catch((err: string) => {
         failed = true;
-        message = err.message || err;
+        message = err.includes("Cannot read properties of undefined")
+          ? "Failed to deploy Mattermost. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+          : "Falied to deploy Mattermost.";
       })
       .finally(() => {
         loading = false;
@@ -146,7 +147,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed Mattermost." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Mattermost."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs {tabs} bind:active />
 
