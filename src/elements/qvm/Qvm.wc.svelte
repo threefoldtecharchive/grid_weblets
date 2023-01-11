@@ -33,6 +33,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -175,9 +176,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy QVM. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy QVM.";
+        message = deploymentErrMsg(err, "QVM");
       })
       .finally(() => {
         validateFlist.loading = false;

@@ -31,6 +31,7 @@
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
   import { display } from "../../utils/display";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -158,9 +159,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy VM. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy VM";
+        message = deploymentErrMsg(err, "VM");
       })
       .finally(() => {
         validateFlist.loading = false;

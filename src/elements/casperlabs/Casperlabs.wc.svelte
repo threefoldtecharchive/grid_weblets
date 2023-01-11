@@ -23,6 +23,7 @@
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   let data = new Casperlabs();
   let invalid = true;
@@ -76,9 +77,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Casperlabs. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Casperlabs.";
+        message = deploymentErrMsg(err, "Casperlabs");
       })
       .finally(() => {
         loading = false;

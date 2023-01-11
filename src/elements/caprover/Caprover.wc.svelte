@@ -25,6 +25,7 @@
   import { onMount } from "svelte";
   import getGrid from "../../utils/getGrid";
   import { display } from "../../utils/display";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   let data = new Caprover();
   let loading = false;
@@ -104,9 +105,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Caprover. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Caprover.";
+        message = deploymentErrMsg(err, "Caprover");
       })
       .finally(async () => {
         loading = false;

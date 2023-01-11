@@ -21,6 +21,7 @@
   import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getAlgoResources";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   let data = new Algorand();
   let profile: IProfile;
@@ -171,9 +172,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy VM. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Algorand.";
+        message = deploymentErrMsg(err, "Algorand");
       })
       .finally(() => {
         loading = false;

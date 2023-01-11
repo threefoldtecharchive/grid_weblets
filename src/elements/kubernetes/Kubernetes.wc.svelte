@@ -29,6 +29,7 @@
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
   import { display } from "../../utils/display";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -101,9 +102,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy K8S. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy K8S.";
+        message = deploymentErrMsg(err, "K8s");
       })
       .finally(() => {
         loading = false;

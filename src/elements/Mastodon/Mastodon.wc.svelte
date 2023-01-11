@@ -27,6 +27,7 @@
   import Tabs from "../../components/Tabs.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -151,9 +152,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Mastodon. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Mastodon.";
+        message = deploymentErrMsg(err, "Mastodon");
       })
       .finally(() => {
         loading = false;

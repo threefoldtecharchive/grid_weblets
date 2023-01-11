@@ -25,6 +25,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   const data = new Funkwhale();
   data.disks = [new Disk()];
@@ -82,9 +83,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Funkwhale. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Funkwhale.";
+        message = deploymentErrMsg(err, "Funkwhale");
       })
       .finally(() => {
         loading = false;

@@ -23,6 +23,7 @@
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -86,9 +87,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Subsquid. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Subsquid.";
+        message = deploymentErrMsg(err, "Subsquid");
       })
       .finally(() => {
         loading = false;

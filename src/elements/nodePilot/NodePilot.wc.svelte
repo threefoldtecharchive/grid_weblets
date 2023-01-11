@@ -28,6 +28,7 @@
     validateNPMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
 
@@ -120,9 +121,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Node Pilot. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Node Pilot.";
+        message = deploymentErrMsg(err, "Node Pilot");
       })
       .finally(() => {
         validateFlist.loading = false;

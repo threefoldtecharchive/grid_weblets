@@ -21,6 +21,7 @@
   import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { display } from "../../utils/display";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   let data = new Presearch();
   let profile: IProfile;
@@ -93,9 +94,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Presearch. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Presearch.";
+        message = deploymentErrMsg(err, "Presearch");
       })
       .finally(() => {
         loading = false;

@@ -24,6 +24,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -80,9 +81,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Peertube. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Peertube.";
+        message = deploymentErrMsg(err, "Peertube");
       })
       .finally(() => {
         loading = false;

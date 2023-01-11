@@ -30,6 +30,7 @@
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import { display } from "../../utils/display";
+  import deploymentErrMsg from "../../utils/deploymentErrMsg";
 
   let data = new Owncloud();
   let gateway: GatewayNodes;
@@ -156,9 +157,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy Owncloud. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy Owncloud.";
+        message = deploymentErrMsg(err, "Owncloud");
       })
       .finally(() => {
         loading = false;
