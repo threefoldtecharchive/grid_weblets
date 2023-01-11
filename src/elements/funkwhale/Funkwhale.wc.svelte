@@ -25,7 +25,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const data = new Funkwhale();
   data.disks = [new Disk()];
@@ -83,7 +83,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "Funkwhale");
+        message = normalizeDeploymentErrorMessage(err, "Funkwhale");
       })
       .finally(() => {
         loading = false;

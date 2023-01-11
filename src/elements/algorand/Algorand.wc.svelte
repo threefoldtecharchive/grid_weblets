@@ -21,7 +21,7 @@
   import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getAlgoResources";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Algorand();
   let profile: IProfile;
@@ -172,7 +172,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "Algorand");
+        message = normalizeDeploymentErrorMessage(err, "Algorand");
       })
       .finally(() => {
         loading = false;

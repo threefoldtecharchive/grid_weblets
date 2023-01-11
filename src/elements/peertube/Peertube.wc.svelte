@@ -24,7 +24,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -81,7 +81,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "Peertube");
+        message = normalizeDeploymentErrorMessage(err, "Peertube");
       })
       .finally(() => {
         loading = false;

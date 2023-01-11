@@ -30,7 +30,7 @@
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import { display } from "../../utils/display";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Taiga();
   let gateway: GatewayNodes;
@@ -166,7 +166,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "Taiga");
+        message = normalizeDeploymentErrorMessage(err, "Taiga");
       })
       .finally(() => {
         loading = false;

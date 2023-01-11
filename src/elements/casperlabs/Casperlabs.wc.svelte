@@ -23,7 +23,7 @@
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Casperlabs();
   let invalid = true;
@@ -77,7 +77,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "Casperlabs");
+        message = normalizeDeploymentErrorMessage(err, "Casperlabs");
       })
       .finally(() => {
         loading = false;

@@ -31,7 +31,7 @@
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
   import { display } from "../../utils/display";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -159,7 +159,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "VM");
+        message = normalizeDeploymentErrorMessage(err, "VM");
       })
       .finally(() => {
         validateFlist.loading = false;

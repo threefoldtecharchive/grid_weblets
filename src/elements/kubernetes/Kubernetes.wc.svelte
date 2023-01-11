@@ -29,7 +29,7 @@
   import { noActiveProfile } from "../../utils/message";
   import RootFsSize from "../../components/RootFsSize.svelte";
   import { display } from "../../utils/display";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -102,7 +102,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "K8s");
+        message = normalizeDeploymentErrorMessage(err, "K8s");
       })
       .finally(() => {
         loading = false;

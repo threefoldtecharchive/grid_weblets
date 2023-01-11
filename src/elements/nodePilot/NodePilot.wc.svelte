@@ -28,7 +28,7 @@
     validateNPMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
 
@@ -121,7 +121,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "Node Pilot");
+        message = normalizeDeploymentErrorMessage(err, "Node Pilot");
       })
       .finally(() => {
         validateFlist.loading = false;

@@ -33,7 +33,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
-  import deploymentErrMsg from "../../utils/deploymentErrMsg";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -176,7 +176,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = deploymentErrMsg(err, "QVM");
+        message = normalizeDeploymentErrorMessage(err, "QVM");
       })
       .finally(() => {
         validateFlist.loading = false;
