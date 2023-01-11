@@ -4,6 +4,15 @@ To create a new release there are some steps is required:
 
 ## 1. Update Charts file
 In [charts.yaml](../weblets-chart/Chart.yaml) replace the value of `appVersion` with the new release tag.
+> NOTE: We use prereleases for Qanet and Testnet and releases for Mainnet.
+### Tags type based on network:
+
+| tag  | network | e.g
+|-----|---------| ---------
+|   --   | mainnet | 1.0.0
+| qa   | qanet   | 1.0.0-qa1
+| rc   | testnet | 1.0.0-rc1
+
   ````yaml
   appVersion: "x.x.x"
   ````
