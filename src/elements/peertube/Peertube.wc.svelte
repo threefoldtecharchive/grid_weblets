@@ -24,6 +24,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -78,9 +79,9 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "Peertube");
       })
       .finally(() => {
         loading = false;
@@ -119,7 +120,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed a Peertube instance" deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

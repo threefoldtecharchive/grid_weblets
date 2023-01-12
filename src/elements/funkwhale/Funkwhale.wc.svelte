@@ -25,6 +25,7 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const data = new Funkwhale();
   data.disks = [new Disk()];
@@ -80,9 +81,9 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch(err => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "Funkwhale");
       })
       .finally(() => {
         loading = false;
@@ -120,7 +121,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed a Funkwhale instance" deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Funkwhale"} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

@@ -30,6 +30,7 @@
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Taiga();
   let gateway: GatewayNodes;
@@ -163,9 +164,9 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "Taiga");
       })
       .finally(() => {
         loading = false;
@@ -202,7 +203,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed Taiga." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Taiga."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

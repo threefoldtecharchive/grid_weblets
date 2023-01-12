@@ -26,6 +26,7 @@
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -113,10 +114,9 @@
         deploymentStore.set(0);
         success = true;
       })
-      .catch(err => {
-        console.log("Error", err);
+      .catch((err: string) => {
         failed = true;
-        message = err.message || err;
+        message = normalizeDeploymentErrorMessage(err, "Mattermost");
       })
       .finally(() => {
         loading = false;
@@ -146,7 +146,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed Mattermost." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Mattermost."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs {tabs} bind:active />
 

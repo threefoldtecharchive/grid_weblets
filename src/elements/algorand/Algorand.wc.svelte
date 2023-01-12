@@ -21,6 +21,7 @@
   import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { getResources } from "../../utils/getAlgoResources";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Algorand();
   let profile: IProfile;
@@ -171,7 +172,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err;
+        message = normalizeDeploymentErrorMessage(err, "Algorand");
       })
       .finally(() => {
         loading = false;
@@ -206,7 +207,7 @@
     {:else if success}
       <Alert type="success" message="Successfully Deployed Algorand." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Algorand."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

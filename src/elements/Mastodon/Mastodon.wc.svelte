@@ -27,6 +27,7 @@
   import Tabs from "../../components/Tabs.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;
@@ -149,10 +150,9 @@
         deploymentStore.set(0);
         success = true;
       })
-      .catch(err => {
-        console.log("Error", err);
+      .catch((err: string) => {
         failed = true;
-        message = err.message || err;
+        message = normalizeDeploymentErrorMessage(err, "Mastodon");
       })
       .finally(() => {
         loading = false;
@@ -184,7 +184,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed Mastodon." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Mastodon."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs {tabs} bind:active />
 

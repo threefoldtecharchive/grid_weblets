@@ -25,6 +25,7 @@
   import { onMount } from "svelte";
   import getGrid from "../../utils/getGrid";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Caprover();
   let loading = false;
@@ -104,7 +105,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err;
+        message = normalizeDeploymentErrorMessage(err, "Caprover");
       })
       .finally(async () => {
         loading = false;
@@ -148,7 +149,7 @@
     {:else if success}
       <Alert type="success" message="Successfully Deployed Caprover." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Caprover."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

@@ -31,6 +31,7 @@
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import RootFsSize from "../../components/RootFsSize.svelte";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -156,9 +157,9 @@
         success = true;
         modalData = data;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "VM");
       })
       .finally(() => {
         validateFlist.loading = false;
@@ -214,7 +215,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed VM." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy VM."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

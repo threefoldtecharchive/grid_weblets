@@ -21,6 +21,7 @@
   import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Presearch();
   let profile: IProfile;
@@ -93,7 +94,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err;
+        message = normalizeDeploymentErrorMessage(err, "Presearch");
       })
       .finally(() => {
         loading = false;
@@ -130,7 +131,7 @@
     {:else if success}
       <Alert type="success" message="Successfully Deployed Presearch." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Presearch."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

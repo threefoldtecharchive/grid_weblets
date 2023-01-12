@@ -33,6 +33,7 @@
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -173,9 +174,9 @@
         success = true;
         modalData = data;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "QVM");
       })
       .finally(() => {
         validateFlist.loading = false;
@@ -210,7 +211,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed QVM." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy QVM."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
       <section style:display={active === "config" ? null : "none"}>

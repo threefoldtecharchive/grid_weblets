@@ -30,6 +30,7 @@
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Owncloud();
   let gateway: GatewayNodes;
@@ -154,9 +155,9 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "Owncloud");
       })
       .finally(() => {
         loading = false;
@@ -194,7 +195,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed owncloud." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy owncloud."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

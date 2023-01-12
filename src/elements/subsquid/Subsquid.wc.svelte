@@ -23,6 +23,7 @@
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -86,7 +87,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = err;
+        message = normalizeDeploymentErrorMessage(err, "Subsquid");
       })
       .finally(() => {
         loading = false;
@@ -122,7 +123,7 @@
     {:else if success}
       <Alert type="success" message="Successfully Deployed Subsquid." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to Deploy Subsquid."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

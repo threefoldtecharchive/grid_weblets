@@ -28,6 +28,7 @@
     validateNPMemory,
   } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
 
@@ -118,9 +119,9 @@
         success = true;
         modalData = data;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "Node Pilot");
       })
       .finally(() => {
         validateFlist.loading = false;
@@ -176,7 +177,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed Node pilot." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy Node pilot."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 

@@ -23,6 +23,7 @@
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Casperlabs();
   let invalid = true;
@@ -74,9 +75,9 @@
         success = true;
         modalData = data.deploymentInfo;
       })
-      .catch((err: Error) => {
+      .catch((err: string) => {
         failed = true;
-        message = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(err, "Casperlabs");
       })
       .finally(() => {
         loading = false;
@@ -114,7 +115,7 @@
     {:else if success}
       <Alert type="success" message="Successfully deployed casperlabs." deployed={true} />
     {:else if failed}
-      <Alert type="danger" message={message || "Failed to deploy casperlabs."} />
+      <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
 
