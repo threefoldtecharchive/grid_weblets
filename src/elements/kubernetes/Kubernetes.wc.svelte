@@ -44,11 +44,11 @@
     { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
   ];
 
-  // prettier-ignore
-  const networkFields: IFormField[] = [
-    { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
-    { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xxx.0.0/16", type: "text", validator: validatePrivateIPRange, invalid: false },
-  ];
+  // // prettier-ignore
+  // const networkFields: IFormField[] = [
+  //   { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
+  //   { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xxx.0.0/16", type: "text", validator: validatePrivateIPRange, invalid: false },
+  // ];
 
   // prettier-ignore
   const baseFields: IFormField[] = [
@@ -75,7 +75,7 @@
     !profile ||
     data.master.status !== "valid" ||
     data.workers.reduce((res, { status }) => res || status !== "valid", false) ||
-    isInvalid([...baseFields, ...kubernetesFields, ...networkFields]);
+    isInvalid([...baseFields, ...kubernetesFields]);
 
   // prettier-ignore
   let modalData: object;
@@ -162,9 +162,9 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
-        {#each networkFields as field (field.symbol)}
+        <!-- {#each networkFields as field (field.symbol)}
           <Input bind:data={data.network[field.symbol]} {field} />
-        {/each}
+        {/each} -->
       </section>
       <section style={display(active, "master")}>
         {#each baseFields as field (field.symbol)}
