@@ -8,7 +8,7 @@ On **Pull Request**, and **Push** to development branch: It will do a clean inst
 
 ### 2 - [CICD Docker](/.github/workflows/ci-cd-docker.yml)
 
-On **Push** to development branch: It will build and push a new docker image based on project release tag.
+On **Push** to development branch, and on **Release** published: It will build and push a new docker image based on project release tag.
 
 ### 3 - [CICD](/.github/workflows/ci-cd.yml)
 
