@@ -44,6 +44,12 @@
     { label: "Cluster Token", symbol: "secret", placeholder: "Cluster Token", type: "password", validator: validateToken, invalid: false },
   ];
 
+  // // prettier-ignore
+  // const networkFields: IFormField[] = [
+  //   { label: "Network Name", symbol: "name", placeholder: "Network Name", type: "text", validator: validateName , invalid: false},
+  //   { label: "Network IP Range", symbol: "ipRange", placeholder: "xxx.xxx.0.0/16", type: "text", validator: validatePrivateIPRange, invalid: false },
+  // ];
+
   // prettier-ignore
   const baseFields: IFormField[] = [
     { label: "Name", symbol: "name", placeholder: "Cluster instance name", type: "text", validator: validateName, invalid: false},
@@ -156,6 +162,9 @@
             <Input bind:data={data[field.symbol]} {field} />
           {/if}
         {/each}
+        <!-- {#each networkFields as field (field.symbol)}
+          <Input bind:data={data.network[field.symbol]} {field} />
+        {/each} -->
       </section>
       <section style={display(active, "master")}>
         {#each baseFields as field (field.symbol)}
