@@ -13,7 +13,7 @@ We are using _VERSION_, and _NETWORK_ arguments in this workflow that will be pr
 
 ````js
 NETWORK = "dev" | "qa" | "test" | "main" (default: dev)
-VERSION = "any valid string"
+VERSION = "release tag or the first 7 chars of commit hash"
 ````
 > NOTE: In case of release, the _NETWORK_ value follows the tag type by default, e.g. if the release tag contains qa so the _NETWORK_ will be `"qa"` as well, also`"dev"` only works with **PUSH** to the development branch. Check [Releasing](./releasing.md#tags-type-based-on-network) section for more details about tag types
 
