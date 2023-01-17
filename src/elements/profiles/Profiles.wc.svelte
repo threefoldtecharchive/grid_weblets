@@ -1,7 +1,51 @@
 <svelte:options tag="tf-profiles" />
 
+<script lang="ts" context="module">
+  import { form } from "tf-svelte-rx-forms";
+  import { mnemonics, noBalanceMessage, sshKey } from "../../types/profileManager";
+</script>
+
 <script lang="ts">
   let showPassword = false;
+
+  // Mnemonics
+  let mnemonicsLoading = false;
+  let mnemonicsError = "";
+  $: mnemonics$ = $mnemonics;
+  $: mnemonicsIsDisabled = mnemonics$.pending || mnemonicsLoading;
+  $: mnemonicsInvalid = (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.valid && !mnemonicsIsDisabled;
+  $: mnemonicsHasError = (mnemonicsInvalid && mnemonics$.error) || mnemonicsError;
+
+  async function createAccount() {
+    mnemonicsLoading = true;
+    mnemonicsError = "";
+    const grid = new window.configs.grid3_client.GridClient(
+      process.env.NETWORK as any,
+      "",
+      "test",
+      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+    );
+    grid._connect();
+
+    try {
+      const account = await grid.tfchain.createAccount("::1");
+      mnemonics.setValue(account.mnemonic);
+      mnemonics["__input"].value = account.mnemonic; // temp solution [svelte wc things :"(]
+      mnemonics.markAsDirty();
+      mnemonics.markAsTouched();
+    } catch (e) {
+      mnemonicsError = e.message;
+    }
+    mnemonicsLoading = false;
+  }
+
+  // SSH
+  let sshLoading = false;
+  let sshError = "";
+  $: sshKey$ = $sshKey;
+  $: sshIsDisabled = !mnemonics$.valid;
+  $: sshInvalid = (sshKey$.touched || sshKey$.dirty) && !sshKey$.valid && !sshIsDisabled;
+  $: sshHasError = (sshInvalid && sshKey$.error) || sshError;
 </script>
 
 <div class="modal is-active">
@@ -29,25 +73,43 @@
         </p>
         <div class="control has-icons-right">
           <div class="is-flex is-justify-content-space-between">
-            <div class="control is-flex-grow-1 mr-3">
-              <input id="mnemonics" class="input" type={showPassword ? "text" : "password"} placeholder="Mnemonics" />
-              <i
-                class="fas"
-                class:fa-eye={showPassword}
-                class:fa-eye-slash={!showPassword}
-                style:position="absolute"
-                style:top="50%"
-                style:transform="translateY(-50%)"
-                style:right="10px"
-                style:cursor="pointer"
-                on:click|stopPropagation={() => (showPassword = !showPassword)}
+            <div class="control is-flex-grow-1 mr-3" class:is-loading={mnemonicsIsDisabled}>
+              <input
+                id="mnemonics"
+                use:form={mnemonics}
+                class="input"
+                type={showPassword ? "text" : "password"}
+                placeholder="Mnemonics"
+                class:is-danger={mnemonicsInvalid}
+                class:is-success={mnemonics$.valid}
+                disabled={mnemonicsIsDisabled}
               />
+              {#if !mnemonicsIsDisabled}
+                <i
+                  class="fas"
+                  class:fa-eye={showPassword}
+                  class:fa-eye-slash={!showPassword}
+                  style:position="absolute"
+                  style:top="12px"
+                  style:right="10px"
+                  style:cursor="pointer"
+                  on:click|stopPropagation={() => (showPassword = !showPassword)}
+                />
+              {/if}
+              {#if mnemonicsHasError}
+                <p class="help is-danger">
+                  {mnemonicsError || mnemonics$.error}
+                </p>
+              {/if}
             </div>
-            <button class="button is-small is-primary">Create Account</button>
+            <button
+              class="button is-small is-primary mt-1"
+              class:is-loading={mnemonicsIsDisabled}
+              disabled={mnemonicsIsDisabled || mnemonics$.error === noBalanceMessage}
+              on:click={createAccount}>Create Account</button
+            >
           </div>
-          <!-- is-success -->
         </div>
-        <!-- <p class="help is-success">This username is available</p> -->
       </div>
 
       <div class="field mt-2">
@@ -58,9 +120,24 @@
         </p>
         <div class="is-flex is-justify-content-space-between">
           <div class="control is-flex-grow-1 mr-3">
-            <textarea id="ssh" class="textarea" placeholder="Textarea" style:resize="none" />
+            <textarea
+              id="ssh"
+              use:form={sshKey}
+              class="textarea"
+              placeholder="Textarea"
+              style:resize="none"
+              disabled={sshIsDisabled}
+              class:is-danger={sshInvalid}
+              class:is-success={sshKey$.valid}
+            />
+            {#if sshHasError}
+              <p class="help is-danger">
+                {sshHasError || sshKey$.error}
+              </p>
+            {/if}
           </div>
-          <button class="button is-small is-primary">Generate SSH Keys</button>
+          <button class="button is-small is-primary" disabled={sshIsDisabled || sshKey$.valid}>Generate SSH Keys</button
+          >
         </div>
       </div>
     </section>
