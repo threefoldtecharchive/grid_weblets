@@ -109,10 +109,15 @@
   }
 
   async function storeSSH(sshkey: string) {
+    sshError = null;
     if (sshkey === (await readSSH())) return;
     sshStatus = "write";
-    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    await grid.kvstore.set({ key: "metadata", value: JSON.stringify({ sshkey }) });
+    try {
+      const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
+      await grid.kvstore.set({ key: "metadata", value: JSON.stringify({ sshkey }) });
+    } catch (e) {
+      sshError = e.message;
+    }
     sshStatus = undefined;
   }
 
@@ -135,32 +140,38 @@
   }
 
   let generatingSSH = false;
+  let sshError: string = null;
   async function onGenerateSSH() {
     generatingSSH = true;
+    sshError = null;
 
-    const keys = await generateKeyPair({
-      alg: "RSASSA-PKCS1-v1_5",
-      hash: "SHA-256",
-      name: "Threefold",
-      size: 4096,
-    });
+    try {
+      const keys = await generateKeyPair({
+        alg: "RSASSA-PKCS1-v1_5",
+        hash: "SHA-256",
+        name: "Threefold",
+        size: 4096,
+      });
 
-    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    await grid.kvstore.set({
-      key: "metadata",
-      value: JSON.stringify({ sshkey: keys.publicKey }),
-    });
+      const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
+      await grid.kvstore.set({
+        key: "metadata",
+        value: JSON.stringify({ sshkey: keys.publicKey }),
+      });
 
-    sshKey.setValue(keys.publicKey);
-    await sshKey.validate();
+      sshKey.setValue(keys.publicKey);
+      await sshKey.validate();
 
-    const data = `data:text/raw;charset=utf-8,${encodeURIComponent(keys.privateKey)}`;
-    const a = document.createElement("a");
-    a.download = "id_rsa";
-    a.href = data;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+      const data = `data:text/raw;charset=utf-8,${encodeURIComponent(keys.privateKey)}`;
+      const a = document.createElement("a");
+      a.download = "id_rsa";
+      a.href = data;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      sshError = e.message;
+    }
 
     generatingSSH = false;
   }
@@ -423,13 +434,14 @@
                   label: "Public SSH Key",
                   symbol: "sshKey",
                   type: "textarea",
-                  error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
+                  error: sshError || (sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined),
                   placeholder: "Your public SSH Key",
                   loading: sshStatus !== undefined || generatingSSH,
                   disabled: sshStatus !== undefined,
                 }}
                 data={sshKey$.value}
                 invalid={!sshKey$.valid}
+                on:input={() => (sshError = null)}
               />
             </div>
 
