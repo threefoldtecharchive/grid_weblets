@@ -179,7 +179,7 @@
   let twinId: number;
   let address: string;
   let __validMnemonic = false;
-  $: if (mnemonics$.valid && !__validMnemonic && sshKey$.valid) {
+  $: if (mnemonics$.valid && !__validMnemonic) {
     __validMnemonic = true;
     getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _)
       .then(grid => {
@@ -427,6 +427,10 @@
             </button>
           </div>
 
+          {#if twinId !== undefined && address !== undefined}
+            <QrCode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+          {/if}
+
           <div class="is-flex is-justify-content-space-between">
             <div style:width="100%" bind:this={sshKeyInput}>
               <Input
@@ -461,12 +465,9 @@
         </form>
 
         {#if twinId !== undefined && address !== undefined}
-          <div class="is-flex is-justify-content-space-between">
-            <div class="is-flex-grow-1 mr-5">
-              <Input field={{ label: "Twin ID", disabled: true, symbol: "twinId", type: "text" }} data={twinId} />
-              <Input field={{ label: "Address", disabled: true, symbol: "address", type: "text" }} data={address} />
-            </div>
-            <QrCode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+          <div>
+            <Input field={{ label: "Twin ID", disabled: true, symbol: "twinId", type: "text" }} data={twinId} />
+            <Input field={{ label: "Address", disabled: true, symbol: "address", type: "text" }} data={address} />
           </div>
         {/if}
       </section>
