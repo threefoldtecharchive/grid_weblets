@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Base from "./elements/base/Base.wc.svelte";
+  // import Base from "./elements/base/Base.wc.svelte";
   import ProfileManager from "./elements/profiles/Profiles.wc.svelte";
 
-  import Fullvm from "./elements/fullvm/Fullvm.wc.svelte";
+  /* import Fullvm from "./elements/fullvm/Fullvm.wc.svelte";
   import Vm from "./elements/vm/Vm.wc.svelte";
   import Kubernetes from "./elements/kubernetes/Kubernetes.wc.svelte";
   import Caprover from "./elements/caprover/Caprover.wc.svelte";
@@ -52,13 +52,13 @@
     new Component({
       target: self,
     });
-  }
+  } */
 </script>
 
-<Base />
+<!-- <Base /> -->
 <ProfileManager />
 
-<div style="display: flex; justify-content: center; flex-wrap: wrap;">
+<!-- <div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}
     <p
       style={"cursor: pointer; margin: 0 5px;" + (selectedWebletIndex === i ? `color: steelblue` : undefined)}
@@ -72,4 +72,4 @@
   {/each}
 </div>
 
-<div bind:this={self} />
+<div bind:this={self} /> -->
