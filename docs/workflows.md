@@ -8,7 +8,14 @@ On **Pull Request**, and **Push** to development branch: It will do a clean inst
 
 ### 2 - [CICD Docker](/.github/workflows/ci-cd-docker.yml)
 
-On **Push** to development branch, and on **Release** published: It will build and push a new docker image based on project release tag.
+On **Push** to development branch, and on **Release** published: It will build and push a new docker image based on project release tag.<br>
+We are using _VERSION_, and _NETWORK_ arguments in this workflow that will be propagated into the builds [config](https://github.com/threefoldtech/grid_weblets/blob/development/webpack.config.js#L72), The values of those arguments could be as follows:
+
+````js
+NETWORK = "dev" | "qa" | "test" | "main" (default: dev)
+VERSION = "any valid string"
+````
+
 
 ### 3 - [CICD](/.github/workflows/ci-cd.yml)
 
