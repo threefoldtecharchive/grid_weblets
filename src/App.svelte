@@ -1,15 +1,14 @@
 <script lang="ts">
-  // import Base from "./elements/base/Base.wc.svelte";
+  import Base from "./elements/base/Base.wc.svelte";
   import ProfileManager from "./elements/profiles/Profiles.wc.svelte";
 
-  /* import Fullvm from "./elements/fullvm/Fullvm.wc.svelte";
+  import Fullvm from "./elements/fullvm/Fullvm.wc.svelte";
   import Vm from "./elements/vm/Vm.wc.svelte";
   import Kubernetes from "./elements/kubernetes/Kubernetes.wc.svelte";
   import Caprover from "./elements/caprover/Caprover.wc.svelte";
   import Peertube from "./elements/peertube/Peertube.wc.svelte";
   import Funkwhale from "./elements/funkwhale/Funkwhale.wc.svelte";
   import Mattermost from "./elements/Mattermost/Mattermost.wc.svelte";
-  // import Mastodon from "./elements/Mastodon/Mastodon.wc.svelte";
   import Discourse from "./elements/discourse/Discourse.wc.svelte";
   import Taiga from "./elements/taiga/Taiga.wc.svelte";
   import Owncloud from "./elements/owncloud/Owncloud.wc.svelte";
@@ -30,7 +29,6 @@
     { name: "Peertube", cmp: Peertube },
     { name: "Funkwhale", cmp: Funkwhale },
     { name: "Mattermost", cmp: Mattermost },
-    // { name: "Mastodon", cmp: Mastodon },
     { name: "Discourse", cmp: Discourse },
     { name: "Taiga", cmp: Taiga },
     { name: "Owncloud", cmp: Owncloud },
@@ -52,13 +50,13 @@
     new Component({
       target: self,
     });
-  } */
+  }
 </script>
 
-<!-- <Base /> -->
+<Base />
 <ProfileManager />
 
-<!-- <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+<div style="display: flex; justify-content: center; flex-wrap: wrap;">
   {#each weblets as weblet, i (weblet.name)}
     <p
       style={"cursor: pointer; margin: 0 5px;" + (selectedWebletIndex === i ? `color: steelblue` : undefined)}
@@ -72,4 +70,4 @@
   {/each}
 </div>
 
-<div bind:this={self} /> -->
+<div bind:this={self} />

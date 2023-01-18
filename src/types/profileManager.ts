@@ -65,7 +65,6 @@ export function getTwinAndAddress(mnemonics: string): Promise<GetTwinAndAddress 
 export function readSSH(mnemonics: string): Promise<string> {
   return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
     .then(grid => {
-      console.log({ grid });
       return grid;
     })
     .then(grid => grid.kvstore.get({ key: "metadata" }))

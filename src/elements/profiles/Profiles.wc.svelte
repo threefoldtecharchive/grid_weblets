@@ -26,7 +26,7 @@
 
 <script lang="ts">
   let showMnemonicsPassword = false;
-  let active = true;
+  let active = false;
   let migrateMode = false;
   let showMigratePassword = false;
   let migrating = false;
@@ -165,17 +165,39 @@
   const baseConfig = window.configs.baseConfig;
   $: baseConfig$ = $baseConfig;
   $: if (mnemonics$.valid && sshKey$.valid && twinAndAddress && !baseConfig$) {
-    baseConfig.set({
-      networkEnv: process.env.NETWORK,
-      mnemonics: mnemonics$.value,
-      sshKey: sshKey$.value,
-      address: twinAndAddress.address,
-      twinId: twinAndAddress.twinId,
+    requestAnimationFrame(() => {
+      baseConfig.set({
+        networkEnv: process.env.NETWORK,
+        mnemonics: mnemonics$.value,
+        sshKey: sshKey$.value,
+        address: twinAndAddress.address,
+        twinId: twinAndAddress.twinId,
+      });
     });
-  } else if (baseConfig$) {
+  } else if (!(mnemonics$.valid && sshKey$.valid && twinAndAddress) && baseConfig$) {
     baseConfig.set(null);
   }
+
+  // balance store
+  const balance = window.configs.balanceStore;
+  $: balance$ = $balance;
 </script>
+
+<div class="box is-flex is-align-items-center" style:cursor="pointer" on:click={() => (active = true)}>
+  <span style:background-color="#ddd8d8" style:border-radius="50%" class="mr-2">
+    <i class="fas fa-user-cog" style:padding="1rem" style:font-size="1rem" />
+  </span>
+  {#if baseConfig$}
+    <div>
+      {#if balance$.loading}
+        <p><strong>Loading account balance...</strong></p>
+      {:else}
+        <p>Balance:&nbsp;<strong>{balance$.balance} TFT</strong></p>
+        <p>Locked:&nbsp;<strong>{balance$.locked} TFT</strong></p>
+      {/if}
+    </div>
+  {/if}
+</div>
 
 <div class="modal" class:is-active={active}>
   <div class="modal-background" />
@@ -293,7 +315,6 @@
 
                     if (sshKey$.valid) {
                       sshKey.reset();
-                      console.log(sshKey$.value);
                     }
                   }}
                 />
