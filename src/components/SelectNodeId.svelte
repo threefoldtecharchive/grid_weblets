@@ -373,7 +373,7 @@
     bind:data={nodeSelection}
     field={nodeSelectionField}
     on:input={() => {
-      if (nodeSelection === "manual") {
+      if (nodeSelection === "manual" || nodeSelection === "automatic") {
         data = undefined;
         return (status = null);
       }
