@@ -87,7 +87,14 @@ export function storeSSH(mnemonics: string, ssh: string): Promise<boolean> {
     .catch(() => false);
 }
 
-export const password = fb.control<string>("", [validators.required("Password is required.")]);
+export const password = fb.control<string>("", [
+  validators.required("Password is required."),
+  (_, ctx) => {
+    if (ctx && ctx.error) {
+      return { message: ctx.error };
+    }
+  },
+]);
 
 async function resolve<T>(promise: Promise<T>): Promise<[T, Error]> {
   try {
@@ -105,12 +112,13 @@ export async function migrate(mnemonics: string, storeSecret: string) {
   const newDB = newClient.kvstore;
 
   const extrinsics = <any[]>[];
-  const [keys, error] = await resolve(oldClient.kvstore.list());
+  const [keys, error] = await resolve<string[]>(oldClient.kvstore.list());
   if (error) {
     oldClient.disconnect();
     throw new Error("Failed to get keys.");
   }
 
+  // const total = keys.length;
   let failed = 0;
   let migrated = 0;
   for (const key of keys) {
@@ -124,10 +132,10 @@ export async function migrate(mnemonics: string, storeSecret: string) {
     e2 ? failed++ : migrated++;
   }
 
-  if (failed > 0 && extrinsics.length === 0) {
-    oldClient.disconnect();
-    throw new Error("StoreSecret is wrong. Please enter the right storeSecret.");
-  }
+  // if (failed > 0 && extrinsics.length === 0) {
+  //   oldClient.disconnect();
+  //   throw new Error("StoreSecret is wrong. Please enter the right storeSecret.");
+  // }
 
   if (extrinsics.length > 0) {
     const [_, error] = await resolve(newClient.utility.batchAll({ extrinsics }));
@@ -137,14 +145,15 @@ export async function migrate(mnemonics: string, storeSecret: string) {
     }
   }
 
-  if (failed > 0 && extrinsics.length !== 0) {
-    oldClient.disconnect();
-    throw new Error(
-      "Part of the keys are migrated successfully, but still some keys are not migrated. Maybe they are encrypted with different password or not encrypted",
-    );
-  }
+  // if (failed > 0 && extrinsics.length !== 0) {
+  //   oldClient.disconnect();
+  //   throw new Error(
+  //     "Part of the keys are migrated successfully, but still some keys are not migrated. Maybe they are encrypted with different password or not encrypted",
+  //   );
+  // }
 
-  return oldClient.disconnect();
+  oldClient.disconnect();
+  return { total: keys.length, migrated, failed };
 }
 
 export function generateSSH(mnemonics: string) {

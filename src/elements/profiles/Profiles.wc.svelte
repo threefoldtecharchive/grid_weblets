@@ -30,7 +30,6 @@
   let migrateMode = false;
   let showMigratePassword = false;
   let migrating = false;
-  let migratingSuccess = false;
   let migratingError = "";
 
   // Migrate
@@ -38,13 +37,20 @@
   $: disableMigrate = !password$.valid || migrating;
   $: passwordHasError = (password$.touched || password$.dirty) && !password$.valid && !!password$.error;
 
+  let migrationDetails: ReturnType<typeof migrate> extends Promise<infer T> ? T : unknown;
   function onMigrate() {
     migrating = true;
-    migratingSuccess = false;
     migratingError = "";
+    migrationDetails = null;
+
     migrate(mnemonics$.value, password$.value)
-      .then(() => (migratingSuccess = true))
-      .catch(err => (migratingError = err.message))
+      .then(_migrationDetails => {
+        migrationDetails = _migrationDetails;
+        if (_migrationDetails.failed > 0) {
+          password.setValue(password$.value, { error: `Failed to migrated ${_migrationDetails.failed} keys.` });
+        }
+      })
+      .catch(err => password.setValue(password$.value, { error: err.message }))
       .finally(() => (migrating = false));
   }
 
@@ -212,8 +218,8 @@
               value={password$.value}
               class:is-danger={passwordHasError}
               on:input={() => {
-                if (migratingSuccess) {
-                  migratingSuccess = false;
+                if (migrationDetails) {
+                  migrationDetails = null;
                 }
 
                 if (migratingError) {
@@ -241,9 +247,15 @@
           </div>
         </div>
 
-        {#if migratingSuccess || migratingError}
-          <div class="notification is-light" class:is-success={migratingSuccess} class:is-danger={migratingError}>
-            {migratingSuccess ? "Successfully migrated all your old keys." : migratingError}
+        {#if migrationDetails || migratingError}
+          <div class="notification is-light" class:is-info={!!migrationDetails} class:is-danger={migratingError}>
+            {migrationDetails
+              ? `Migration Finished. Total keys: ${migrationDetails.total}, Already migrated keys: ${
+                  migrationDetails.migrated
+                }, Migrated keys: ${
+                  migrationDetails.total - (migrationDetails.failed + migrationDetails.migrated)
+                }, Failed to migrate: ${migrationDetails.failed}.`
+              : migratingError}
           </div>
         {/if}
 
