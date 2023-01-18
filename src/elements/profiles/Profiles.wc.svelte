@@ -2,15 +2,56 @@
 
 <script lang="ts" context="module">
   import { form } from "tf-svelte-rx-forms";
-  import { mnemonics, noBalanceMessage, sshKey } from "../../types/profileManager";
+  import QrCode from "../../components/QrCode.svelte";
+  import {
+    generateSSH,
+    GetTwinAndAddress,
+    getTwinAndAddress,
+    migrate,
+    mnemonics,
+    noBalanceMessage,
+    password,
+    readSSH,
+    sshKey,
+    storeSSH,
+  } from "../../types/profileManager";
+
+  const bridge =
+    process.env.NETWORK === "main"
+      ? "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
+      : process.env.NETWORK === "test"
+      ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
+      : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
 </script>
 
 <script lang="ts">
-  let showPassword = false;
+  let showMnemonicsPassword = false;
+  let active = true;
+  let migrateMode = false;
+  let showMigratePassword = false;
+  let migrating = false;
+  let migratingSuccess = false;
+  let migratingError = "";
+
+  // Migrate
+  $: password$ = $password;
+  $: disableMigrate = !password$.valid || migrating;
+  $: passwordHasError = (password$.touched || password$.dirty) && !password$.valid && !!password$.error;
+
+  function onMigrate() {
+    migrating = true;
+    migratingSuccess = false;
+    migratingError = "";
+    migrate(mnemonics$.value, password$.value)
+      .then(() => (migratingSuccess = true))
+      .catch(err => (migratingError = err.message))
+      .finally(() => (migrating = false));
+  }
 
   // Mnemonics
   let mnemonicsLoading = false;
   let mnemonicsError = "";
+  let createdNewAccount = false;
   $: mnemonics$ = $mnemonics;
   $: mnemonicsIsDisabled = mnemonics$.pending || mnemonicsLoading;
   $: mnemonicsInvalid = (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.valid && !mnemonicsIsDisabled;
@@ -18,6 +59,7 @@
 
   async function createAccount() {
     mnemonicsLoading = true;
+    createdNewAccount = false;
     mnemonicsError = "";
     const grid = new window.configs.grid3_client.GridClient(
       process.env.NETWORK as any,
@@ -30,25 +72,106 @@
     try {
       const account = await grid.tfchain.createAccount("::1");
       mnemonics.setValue(account.mnemonic);
-      mnemonics["__input"].value = account.mnemonic; // temp solution [svelte wc things :"(]
       mnemonics.markAsDirty();
       mnemonics.markAsTouched();
+      createdNewAccount = true;
     } catch (e) {
       mnemonicsError = e.message;
     }
     mnemonicsLoading = false;
   }
 
+  // Store mnemonics in sessionStore
+  $: if (mnemonics$.valid || mnemonics$.error === noBalanceMessage) {
+    sessionStorage.setItem("mnemonics", mnemonics$.value);
+  } else {
+    sessionStorage.removeItem("mnemonics");
+  }
+
+  // Get mnemonics from sessionStore (if exists)
+  $: {
+    const seeds = sessionStorage.getItem("mnemonics");
+    if (seeds) {
+      mnemonics.setValue(seeds);
+      mnemonics.markAsDirty();
+      mnemonics.markAsTouched();
+      mnemonicsLoading = true;
+      mnemonics.validate().finally(() => (mnemonicsLoading = false));
+    }
+  }
+
+  // Fetch twinId & address when seeds are valid
+  let twinAndAddress: GetTwinAndAddress = null;
+  $: if ((mnemonics$.valid || mnemonics$.error === noBalanceMessage) && !twinAndAddress) {
+    getTwinAndAddress(mnemonics$.value).then(data => (twinAndAddress = data));
+  } else if (!mnemonics$.valid && mnemonics$.error !== noBalanceMessage && twinAndAddress) {
+    twinAndAddress = null;
+  }
+
   // SSH
   let sshLoading = false;
   let sshError = "";
   $: sshKey$ = $sshKey;
-  $: sshIsDisabled = !mnemonics$.valid;
+  $: sshIsDisabled = !mnemonics$.valid || sshLoading;
   $: sshInvalid = (sshKey$.touched || sshKey$.dirty) && !sshKey$.valid && !sshIsDisabled;
   $: sshHasError = (sshInvalid && sshKey$.error) || sshError;
+
+  // Read SSH Key
+  let SSH_KEY: string;
+  $: if (mnemonics$.valid && !sshKey$.valid && !sshKey$.pending && !sshLoading && SSH_KEY !== sshKey$.value) {
+    sshLoading = true;
+    readSSH(mnemonics$.value)
+      .then(ssh => {
+        SSH_KEY = ssh;
+        sshKey.setValue(ssh);
+        sshKey.markAsDirty();
+        sshKey.markAsTouched();
+      })
+      .finally(() => (sshLoading = false));
+  }
+
+  // Store SSH Key
+  $: if (mnemonics$.valid && sshKey$.valid && !sshKey$.pending && !sshLoading && SSH_KEY !== sshKey$.value) {
+    SSH_KEY = sshKey$.value;
+    sshLoading = true;
+    storeSSH(mnemonics$.value, sshKey$.value)
+      .then(stored => {
+        if (!stored) {
+          sshKey.setValue(sshKey$.value, { error: "Failed to store sshkey." });
+        }
+      })
+      .finally(() => (sshLoading = false));
+  }
+
+  function onGenerateSSH() {
+    sshLoading = true;
+    generateSSH(mnemonics$.value)
+      .then(keys => {
+        sshKey.setValue(keys.publicKey);
+        sshKey.markAsTouched();
+        sshKey.markAsDirty();
+      })
+      .catch(err => sshKey.setValue(sshKey$.value, { error: err.message }))
+      .finally(() => (sshLoading = false));
+  }
+
+  // Publich profile to all weblets
+  const baseConfig = window.configs.baseConfig;
+  $: baseConfig$ = $baseConfig;
+  $: if (mnemonics$.valid && sshKey$.valid && twinAndAddress && !baseConfig$) {
+    baseConfig.set({
+      networkEnv: process.env.NETWORK,
+      mnemonics: mnemonics$.value,
+      sshKey: sshKey$.value,
+      address: twinAndAddress.address,
+      twinId: twinAndAddress.twinId,
+    });
+  } else if (baseConfig$) {
+    baseConfig.set(null);
+  }
 </script>
 
-<div class="modal is-active">
+<div class="modal" class:is-active={active}>
   <div class="modal-background" />
   <div class="modal-card" style:width="80%" style:max-width="80%">
     <header class="modal-card-head">
@@ -62,83 +185,201 @@
           <span class="has-text-weight-medium">get started.</span>
         </span>
       </div>
-      <button class="delete" aria-label="close" />
+      <button
+        class="button is-primary mr-2 is-small"
+        class:is-outlined={!migrateMode}
+        on:click={function () {
+          migrateMode = !migrateMode;
+          this.blur();
+        }}
+        disabled={!mnemonics$.valid || migrating}
+      >
+        Migrate
+      </button>
+      <button class="button is-danger is-small" on:click={() => (active = false)}> Close </button>
     </header>
     <section class="modal-card-body">
-      <div class="field">
-        <label class="label mb-0" for="mnemonics">Mnemonics</label>
-        <p class="mb-2 is-size-6 has-text-grey">
-          Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing
-          mnemonics or click the 'Create Account' button to create an account and generate mnemonics.
-        </p>
-        <div class="control has-icons-right">
-          <div class="is-flex is-justify-content-space-between">
-            <div class="control is-flex-grow-1 mr-3" class:is-loading={mnemonicsIsDisabled}>
-              <input
-                id="mnemonics"
-                use:form={mnemonics}
-                class="input"
-                type={showPassword ? "text" : "password"}
-                placeholder="Mnemonics"
-                class:is-danger={mnemonicsInvalid}
-                class:is-success={mnemonics$.valid}
-                disabled={mnemonicsIsDisabled}
+      <div style:display={migrateMode ? "block" : "none"}>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <div class="control has-icons-right" class:is-loading={migrating}>
+            <input
+              id="password"
+              use:form={password}
+              class="input"
+              type={showMigratePassword ? "text" : "password"}
+              placeholder="Store Secret"
+              value={password$.value}
+              class:is-danger={passwordHasError}
+              on:input={() => {
+                if (migratingSuccess) {
+                  migratingSuccess = false;
+                }
+
+                if (migratingError) {
+                  migratingError = "";
+                }
+              }}
+            />
+            {#if !migrating}
+              <i
+                class="fas"
+                class:fa-eye={showMigratePassword}
+                class:fa-eye-slash={!showMigratePassword}
+                style:position="absolute"
+                style:top="12px"
+                style:right="10px"
+                style:cursor="pointer"
+                on:click|stopPropagation={() => (showMigratePassword = !showMigratePassword)}
               />
-              {#if !mnemonicsIsDisabled}
-                <i
-                  class="fas"
-                  class:fa-eye={showPassword}
-                  class:fa-eye-slash={!showPassword}
-                  style:position="absolute"
-                  style:top="12px"
-                  style:right="10px"
-                  style:cursor="pointer"
-                  on:click|stopPropagation={() => (showPassword = !showPassword)}
+            {/if}
+            {#if passwordHasError}
+              <p class="help is-danger">
+                {password$.error}
+              </p>
+            {/if}
+          </div>
+        </div>
+
+        {#if migratingSuccess || migratingError}
+          <div class="notification is-light" class:is-success={migratingSuccess} class:is-danger={migratingError}>
+            {migratingSuccess ? "Successfully migrated all your old keys." : migratingError}
+          </div>
+        {/if}
+
+        <div class="is-flex is-justify-content-center">
+          <button class="button is-primary" disabled={disableMigrate} on:click={onMigrate} class:is-loading={migrating}>
+            Migrate
+          </button>
+        </div>
+      </div>
+
+      <div style:display={migrateMode ? "none" : "block"}>
+        <div class="field">
+          <label class="label mb-0" for="mnemonics">Mnemonics</label>
+          <p class="mb-2 is-size-6 has-text-grey">
+            Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing
+            mnemonics or click the 'Create Account' button to create an account and generate mnemonics.
+          </p>
+          <div class="control has-icons-right">
+            <div class="is-flex is-justify-content-space-between">
+              <div class="control is-flex-grow-1 mr-3" class:is-loading={mnemonicsIsDisabled}>
+                <input
+                  id="mnemonics"
+                  use:form={mnemonics}
+                  class="input"
+                  type={showMnemonicsPassword ? "text" : "password"}
+                  placeholder="Mnemonics"
+                  class:is-danger={mnemonicsInvalid}
+                  class:is-success={mnemonics$.valid}
+                  disabled={mnemonicsIsDisabled}
+                  value={mnemonics$.value}
+                  on:input={() => {
+                    if (createdNewAccount) {
+                      createdNewAccount = false;
+                    }
+
+                    if (sshKey$.valid) {
+                      sshKey.reset();
+                      console.log(sshKey$.value);
+                    }
+                  }}
                 />
-              {/if}
-              {#if mnemonicsHasError}
+                {#if !mnemonicsIsDisabled}
+                  <i
+                    class="fas"
+                    class:fa-eye={showMnemonicsPassword}
+                    class:fa-eye-slash={!showMnemonicsPassword}
+                    style:position="absolute"
+                    style:top="12px"
+                    style:right="10px"
+                    style:cursor="pointer"
+                    on:click|stopPropagation={() => (showMnemonicsPassword = !showMnemonicsPassword)}
+                  />
+                {/if}
+                {#if mnemonicsHasError}
+                  <p class="help is-danger">
+                    {mnemonicsError || mnemonics$.error}
+                  </p>
+                {/if}
+              </div>
+              <button
+                class="button is-small is-primary mt-1"
+                class:is-loading={mnemonicsIsDisabled}
+                disabled={mnemonicsIsDisabled ||
+                  mnemonics$.error === noBalanceMessage ||
+                  mnemonics$.valid ||
+                  createdNewAccount}
+                on:click={createAccount}
+              >
+                Create Account
+              </button>
+            </div>
+            {#if createdNewAccount}
+              <div class="notification is-warning is-light mt-2">
+                <i class="fa-sharp fa-solid fa-triangle-exclamation" />
+                Please make sure to store your mnemonics somewhere safe to be able to access your deployments later on. There
+                is no way for neither you nor ThreeFold nor anybody else to recover lost mnemonics.
+              </div>
+            {/if}
+          </div>
+        </div>
+
+        {#if twinAndAddress}
+          <QrCode data="TFT:{bridge}?message=twin_{twinAndAddress.twinId}&sender=me&amount=100" />
+        {/if}
+
+        <div class="field mt-2">
+          <label class="label mb-0" for="ssh">Public SSH Key</label>
+          <p class="mb-2 is-size-6 has-text-grey">
+            SSH Keys are used to authenticate you to the Mastodon instance for management purposes. If you don't have an
+            SSH Key or are not familiar, we can generate one for you.
+          </p>
+          <div class="is-flex is-justify-content-space-between">
+            <div class="control is-flex-grow-1 mr-3" class:is-loading={sshLoading}>
+              <textarea
+                id="ssh"
+                use:form={sshKey}
+                class="textarea"
+                placeholder="Textarea"
+                style:resize="none"
+                disabled={sshIsDisabled}
+                class:is-danger={sshInvalid}
+                class:is-success={sshKey$.valid}
+                value={sshKey$.value}
+              />
+              {#if sshHasError}
                 <p class="help is-danger">
-                  {mnemonicsError || mnemonics$.error}
+                  {sshHasError || sshKey$.error}
                 </p>
               {/if}
             </div>
             <button
-              class="button is-small is-primary mt-1"
-              class:is-loading={mnemonicsIsDisabled}
-              disabled={mnemonicsIsDisabled || mnemonics$.error === noBalanceMessage}
-              on:click={createAccount}>Create Account</button
+              class="button is-small is-primary"
+              class:is-loading={sshLoading}
+              disabled={sshIsDisabled || sshKey$.valid}
+              on:click={onGenerateSSH}
             >
+              Generate SSH Keys
+            </button>
           </div>
         </div>
-      </div>
 
-      <div class="field mt-2">
-        <label class="label mb-0" for="ssh">Public SSH Key</label>
-        <p class="mb-2 is-size-6 has-text-grey">
-          SSH Keys are used to authenticate you to the Mastodon instance for management purposes. If you don't have an
-          SSH Key or are not familiar, we can generate one for you.
-        </p>
-        <div class="is-flex is-justify-content-space-between">
-          <div class="control is-flex-grow-1 mr-3">
-            <textarea
-              id="ssh"
-              use:form={sshKey}
-              class="textarea"
-              placeholder="Textarea"
-              style:resize="none"
-              disabled={sshIsDisabled}
-              class:is-danger={sshInvalid}
-              class:is-success={sshKey$.valid}
-            />
-            {#if sshHasError}
-              <p class="help is-danger">
-                {sshHasError || sshKey$.error}
-              </p>
-            {/if}
+        {#if twinAndAddress}
+          <div class="field mt-2">
+            <label class="label" for="twin">Twin ID</label>
+            <div class="control">
+              <input id="twin" class="input" type="text" value={twinAndAddress.twinId} disabled />
+            </div>
           </div>
-          <button class="button is-small is-primary" disabled={sshIsDisabled || sshKey$.valid}>Generate SSH Keys</button
-          >
-        </div>
+
+          <div class="field mt-2">
+            <label class="label" for="address">Address</label>
+            <div class="control">
+              <input id="address" class="input" type="text" value={twinAndAddress.address} disabled />
+            </div>
+          </div>
+        {/if}
       </div>
     </section>
     <footer class="modal-card-foot" />

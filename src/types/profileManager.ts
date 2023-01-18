@@ -1,4 +1,5 @@
 import { fb, validators } from "tf-svelte-rx-forms";
+import { generateKeyPair } from "web-ssh-keygen";
 import getBalance from "../utils/getBalance";
 import getGrid from "../utils/getGrid";
 import { SSH_REGEX } from "../utils/validateName";
@@ -38,4 +39,134 @@ export const sshKey = fb.control<string>("", [
       return { message: "Public SSH Key doesn't seem to be valid." };
     }
   },
+  (_, ctx) => {
+    if (ctx && ctx.error) {
+      return { message: ctx.error };
+    }
+  },
 ]);
+
+export type GetTwinAndAddress = { twinId: number; address: string };
+const getTwinAndAddressData = new Map<string, GetTwinAndAddress>();
+export function getTwinAndAddress(mnemonics: string): Promise<GetTwinAndAddress | null> {
+  if (getTwinAndAddressData.has(mnemonics)) {
+    return Promise.resolve(getTwinAndAddressData.get(mnemonics));
+  }
+
+  return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
+    .then(grid => Promise.all([Promise.resolve(grid), grid.twins.get_my_twin_id()]))
+    .then(([grid, twinId]) => {
+      getTwinAndAddressData.set(mnemonics, { twinId, address: grid.twins.client.client.address });
+      return getTwinAndAddressData.get(mnemonics);
+    })
+    .catch(() => null);
+}
+
+export function readSSH(mnemonics: string): Promise<string> {
+  return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
+    .then(grid => {
+      console.log({ grid });
+      return grid;
+    })
+    .then(grid => grid.kvstore.get({ key: "metadata" }))
+    .then(metadata => {
+      return JSON.parse(metadata).sshkey || "";
+    })
+    .catch(() => "");
+}
+
+export function storeSSH(mnemonics: string, ssh: string): Promise<boolean> {
+  const metadata = JSON.stringify({ sshkey: ssh });
+  return readSSH(mnemonics)
+    .then(oldSsh => {
+      if (ssh === oldSsh) return true;
+      return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
+        .then(grid => grid.kvstore.set({ key: "metadata", value: metadata }))
+        .then(() => true);
+    })
+    .catch(() => false);
+}
+
+export const password = fb.control<string>("", [validators.required("Password is required.")]);
+
+async function resolve<T>(promise: Promise<T>): Promise<[T, Error]> {
+  try {
+    return [await promise, null];
+  } catch (error) {
+    return [null, error];
+  }
+}
+
+export async function migrate(mnemonics: string, storeSecret: string) {
+  const oldClient = await getGrid({ networkEnv: process.env.NETWORK, mnemonics, storeSecret } as any, _ => _); // prettier-ignore
+  const newClient = await getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _); // prettier-ignore
+
+  const oldDB = oldClient.kvstore;
+  const newDB = newClient.kvstore;
+
+  const extrinsics = <any[]>[];
+  const [keys, error] = await resolve(oldClient.kvstore.list());
+  if (error) {
+    oldClient.disconnect();
+    throw new Error("Failed to get keys.");
+  }
+
+  let failed = 0;
+  let migrated = 0;
+  for (const key of keys) {
+    const [v1, e1] = await resolve(oldDB.get({ key }));
+    if (!e1) {
+      extrinsics.push(newDB.client.client.api.tx.tfkvStore.set(key, newDB.client.kvStore.encrypt(v1)));
+      continue;
+    }
+
+    const [_, e2] = await resolve(newDB.get({ key }));
+    e2 ? failed++ : migrated++;
+  }
+
+  if (failed > 0 && extrinsics.length === 0) {
+    oldClient.disconnect();
+    throw new Error("StoreSecret is wrong. Please enter the right storeSecret.");
+  }
+
+  if (extrinsics.length > 0) {
+    const [_, error] = await resolve(newClient.utility.batchAll({ extrinsics }));
+    if (error) {
+      oldClient.disconnect();
+      throw error;
+    }
+  }
+
+  if (failed > 0 && extrinsics.length !== 0) {
+    oldClient.disconnect();
+    throw new Error(
+      "Part of the keys are migrated successfully, but still some keys are not migrated. Maybe they are encrypted with different password or not encrypted",
+    );
+  }
+
+  return oldClient.disconnect();
+}
+
+export function generateSSH(mnemonics: string) {
+  let keys: ReturnType<typeof generateKeyPair> extends Promise<infer T> ? T : unknown;
+
+  return generateKeyPair({
+    alg: "RSASSA-PKCS1-v1_5",
+    hash: "SHA-256",
+    name: "Threefold",
+    size: 4096,
+  })
+    .then(_keys => (keys = _keys))
+    .then(() => getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _))
+    .then(grid => grid.kvstore.set({ key: "metadata", value: JSON.stringify({ sshkey: keys.publicKey }) }))
+    .then(() => {
+      const data = `data:text/raw;charset=utf-8,${encodeURIComponent(keys.privateKey)}`;
+      const a = document.createElement("a");
+      a.download = "id_rsa";
+      a.href = data;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return keys;
+    });
+}
