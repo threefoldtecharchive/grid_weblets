@@ -371,10 +371,13 @@
 {#if !multiple}
   <Input
     bind:data={nodeSelection}
-    field={{ ...nodeSelectionField, disabled: validating }}
+    field={nodeSelectionField}
     on:input={() => {
-      status = data = undefined;
-      // reset all selection fields
+      if (nodeSelection === "manual") {
+        data = undefined;
+        return (status = null);
+      }
+      if (data !== null && nodes.length > 0) status = "valid";
     }}
   />
 {/if}
