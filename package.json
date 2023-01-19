@@ -97,7 +97,7 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "serve": "^13.0.2",
     "sirv-cli": "^1.0.0",
-    "tf-svelte-rx-forms": "^1.0.2",
+    "tf-svelte-rx-forms": "^1.0.3",
     "ts-rmb-http-client": "^1.1.2",
     "uuid": "^8.3.2",
     "web-ssh-keygen": "^0.1.2",
