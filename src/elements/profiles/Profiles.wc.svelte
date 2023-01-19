@@ -220,6 +220,8 @@
           this.blur();
         }}
         disabled={!mnemonics$.valid || migrating}
+        style:background-color="#1982b1"
+        style:color="white"
       >
         Migrate
       </button>
@@ -281,7 +283,14 @@
         {/if}
 
         <div class="is-flex is-justify-content-center">
-          <button class="button is-primary" disabled={disableMigrate} on:click={onMigrate} class:is-loading={migrating}>
+          <button
+            class="button is-primary"
+            disabled={disableMigrate}
+            on:click={onMigrate}
+            class:is-loading={migrating}
+            style:background-color="#1982b1"
+            style:color="white"
+          >
             Migrate
           </button>
         </div>
@@ -343,6 +352,8 @@
                   mnemonics$.valid ||
                   createdNewAccount}
                 on:click={createAccount}
+                style:background-color="#1982b1"
+                style:color="white"
               >
                 Create Account
               </button>
@@ -391,6 +402,8 @@
               class:is-loading={sshLoading}
               disabled={sshIsDisabled || sshKey$.valid}
               on:click={onGenerateSSH}
+              style:background-color="#1982b1"
+              style:color="white"
             >
               Generate SSH Keys
             </button>
@@ -421,66 +434,4 @@
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-
-  strong {
-    color: inherit !important;
-  }
-
-  .button.is-primary {
-    background-color: #6261fb;
-  }
-
-  .button.is-primary:hover {
-    background-color: #4747f0;
-  }
-
-  .button.is-primary.is-outlined {
-    border-color: #6261fb;
-    color: #6261fb;
-  }
-
-  .button.is-primary.is-outlined:hover,
-  .button.is-primary.is-outlined:active,
-  .button.is-primary.is-outlined:focus {
-    color: #fff;
-    background-color: #6261fb;
-    border-color: transparent;
-  }
-
-  .button.is-primary.is-outlined:active,
-  .button.is-primary.is-outlined:focus {
-    box-shadow: 0 0 0 2px #9c9cf0;
-  }
-
-  .button.is-primary.is-outlined[disabled] {
-    border-color: #6261fb;
-  }
-
-  .button.is-primary.is-outlined.is-loading::after {
-    border-color: transparent transparent #6261fb #6261fb !important;
-  }
-
-  .input.is-success,
-  .textarea.is-success,
-  .select.is-success select,
-  .select.is-success:not(:hover)::after {
-    border-color: #6261fb !important;
-  }
-
-  .icon-text.has-text-success {
-    color: #6261fb !important;
-  }
-
-  .switch__input:checked + .slider {
-    background-color: #6261fb;
-  }
-
-  .notification.is-success.is-light {
-    background-color: #efeef0;
-    color: #6261fb;
-  }
-
-  .button.is-primary[disabled] {
-    background-color: #6261fb;
-  }
 </style>
