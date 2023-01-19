@@ -225,7 +225,14 @@
       >
         Migrate
       </button>
-      <button class="button is-danger is-small" on:click={() => (active = false)}> Close </button>
+      <button
+        class="button is-danger is-small"
+        on:click={() => (active = false)}
+        style:background-color="#e0e0e0"
+        style:color="black"
+      >
+        Close
+      </button>
     </header>
     <section class="modal-card-body">
       <div style:display={migrateMode ? "block" : "none"}>
