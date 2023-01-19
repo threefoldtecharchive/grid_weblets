@@ -373,7 +373,10 @@
     bind:data={nodeSelection}
     field={{ ...nodeSelectionField, disabled: validating }}
     on:input={() => {
-      status = data = undefined;
+      data = undefined;
+      requestAnimationFrame(() => {
+        status = undefined;
+      });
       // reset all selection fields
     }}
   />

@@ -1,28 +1,20 @@
 <svelte:options tag="tf-profiles" />
 
-<script lang="ts">
-  import { SSH_REGEX } from "../../utils/validateName";
-  // Components
+<script lang="ts" context="module">
+  import { form } from "tf-svelte-rx-forms";
   import QrCode from "../../components/QrCode.svelte";
-  import { onMount } from "svelte";
-  import Input from "../../components/Input.svelte";
-  import { fb, form, validators } from "tf-svelte-rx-forms";
-  import getGrid from "../../utils/getGrid";
-  import { generateKeyPair } from "web-ssh-keygen";
-  import Alert from "../../components/Alert.svelte";
-
-  const balanceStore = window.configs.balanceStore;
-  const baseConfigStore = window.configs.baseConfig;
-  let init = false;
-  let show = false;
-  let alreadyMigratedCount = 0;
-  let loading = false;
-  let success = false;
-  let failed = false;
-
-  function profileToggle(value: boolean) {
-    return () => (show = value);
-  }
+  import {
+    generateSSH,
+    GetTwinAndAddress,
+    getTwinAndAddress,
+    migrate,
+    mnemonics,
+    noBalanceMessage,
+    password,
+    readSSH,
+    sshKey,
+    storeSSH,
+  } from "../../types/profileManager";
 
   const bridge =
     process.env.NETWORK === "main"
@@ -30,95 +22,51 @@
       : process.env.NETWORK === "test"
       ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
       : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+</script>
 
-  export const noBalanceMessage = "Your balance is not enough.";
-  const mnemonics = fb.control<string>(
-    "",
-    [
-      validators.required("Mnemonics is required."),
-      ctrl => {
-        if (!window.configs.bip39.validateMnemonic(ctrl.value)) {
-          return { message: "Mnemonic doesn't seem to be valid." };
-        }
-      },
-    ],
-    [
-      async ctrl => {
-        try {
-          await getGrid({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any, _ => _);
-        } catch (e) {
-          return { message: e.message };
-        }
-      },
+<script lang="ts">
+  let showMnemonicsPassword = false;
+  let active = false;
+  let migrateMode = false;
+  let showMigratePassword = false;
+  let migrating = false;
+  let migratingError = "";
 
-      // async ctrl => {
-      //   const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
-      //   if (userBalance.free < 1) {
-      //     return { message: noBalanceMessage };
-      //   }
-      // },
-    ],
-  );
-  let mnemonicsInput: HTMLDivElement;
+  // Migrate
+  $: password$ = $password;
+  $: disableMigrate = !password$.valid || migrating;
+  $: passwordHasError = (password$.touched || password$.dirty) && !password$.valid && !!password$.error;
+
+  let migrationDetails: ReturnType<typeof migrate> extends Promise<infer T> ? T : unknown;
+  function onMigrate() {
+    migrating = true;
+    migratingError = "";
+    migrationDetails = null;
+
+    migrate(mnemonics$.value, password$.value)
+      .then(_migrationDetails => {
+        migrationDetails = _migrationDetails;
+        if (_migrationDetails.failed > 0) {
+          password.setValue(password$.value, { error: `Failed to migrated ${_migrationDetails.failed} keys.` });
+        }
+      })
+      .catch(err => password.setValue(password$.value, { error: err.message }))
+      .finally(() => (migrating = false));
+  }
+
+  // Mnemonics
+  let mnemonicsLoading = false;
+  let mnemonicsError = "";
+  let createdNewAccount = false;
   $: mnemonics$ = $mnemonics;
-  $: if (init) sessionStorage.setItem("mnemonics", mnemonics$.valid ? mnemonics$.value : "");
+  $: mnemonicsIsDisabled = mnemonics$.pending || mnemonicsLoading;
+  $: mnemonicsInvalid = (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.valid && !mnemonicsIsDisabled;
+  $: mnemonicsHasError = (mnemonicsInvalid && mnemonics$.error) || mnemonicsError;
 
-  const sshKey = fb.control<string>("", [
-    validators.required("Public SSH Key is required."),
-    ctrl => {
-      if (!SSH_REGEX.test(ctrl.value)) {
-        return { message: "Public SSH Key doesn't seem to be valid." };
-      }
-    },
-  ]);
-  let sshKeyInput: HTMLDivElement;
-  $: sshKey$ = $sshKey;
-  let __sshKey: string;
-  let __mnemonic: string;
-  $: if (!mnemonics$.valid) __mnemonic = undefined;
-  $: if (init && mnemonics$.valid && !sshKey$.valid && __mnemonic !== mnemonics$.value) {
-    __mnemonic = mnemonics$.value;
-    readSSH().then(key => {
-      if (key) {
-        __sshKey = key;
-        sshKey.setValue(key);
-      }
-    });
-  }
-  $: if (init && mnemonics$.valid && sshKey$.valid && (__sshKey !== sshKey$.value || __mnemonic !== mnemonics$.value)) {
-    __sshKey = sshKey$.value;
-    __mnemonic = mnemonics$.value;
-    storeSSH(sshKey$.value);
-  }
-
-  let sshStatus: "read" | "write" = undefined;
-  async function readSSH() {
-    sshStatus = "read";
-    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    return (
-      grid.kvstore
-        ?.get({ key: "metadata" })
-        .then(metadata => {
-          if (metadata) {
-            return JSON.parse(metadata).sshkey;
-          }
-        })
-        .catch(() => null)
-        .finally(() => (sshStatus = undefined)) ?? null
-    );
-  }
-
-  async function storeSSH(sshkey: string) {
-    if (sshkey === (await readSSH())) return;
-    sshStatus = "write";
-    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    await grid.kvstore.set({ key: "metadata", value: JSON.stringify({ sshkey }) });
-    sshStatus = undefined;
-  }
-
-  let creatingAccount = false;
-  async function onCreateAccount() {
-    creatingAccount = true;
+  async function createAccount() {
+    mnemonicsLoading = true;
+    createdNewAccount = false;
+    mnemonicsError = "";
     const grid = new window.configs.grid3_client.GridClient(
       process.env.NETWORK as any,
       "",
@@ -126,433 +74,371 @@
       new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     );
     grid._connect();
-    const createdAccount = await grid.tfchain.createAccount("::1");
-    mnemonics.setValue(createdAccount.mnemonic);
-    mnemonics.markAsDirty();
-    mnemonics.markAsTouched();
-    await mnemonics.validate();
-    creatingAccount = false;
-  }
-
-  let generatingSSH = false;
-  async function onGenerateSSH() {
-    generatingSSH = true;
-
-    const keys = await generateKeyPair({
-      alg: "RSASSA-PKCS1-v1_5",
-      hash: "SHA-256",
-      name: "Threefold",
-      size: 4096,
-    });
-
-    const grid = await getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _);
-    await grid.kvstore.set({
-      key: "metadata",
-      value: JSON.stringify({ sshkey: keys.publicKey }),
-    });
-
-    sshKey.setValue(keys.publicKey);
-    await sshKey.validate();
-
-    const data = `data:text/raw;charset=utf-8,${encodeURIComponent(keys.privateKey)}`;
-    const a = document.createElement("a");
-    a.download = "id_rsa";
-    a.href = data;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    generatingSSH = false;
-  }
-
-  let twinId: number;
-  let address: string;
-  let __validMnemonic = false;
-  $: if (mnemonics$.valid && !__validMnemonic && sshKey$.valid) {
-    __validMnemonic = true;
-    getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value } as any, _ => _)
-      .then(grid => {
-        address = grid.twins.client.client.address;
-        return grid.twins.get_my_twin_id();
-      })
-      .then(twin => {
-        twinId = twin;
-        window.configs.baseConfig.set({
-          networkEnv: process.env.NETWORK,
-          mnemonics: mnemonics$.value,
-          sshKey: sshKey$.value,
-          address,
-          twinId,
-        });
-      });
-  } else if (!mnemonics$.valid) {
-    __validMnemonic = false;
-    twinId = undefined;
-    address = undefined;
-    window.configs.baseConfig.set(null);
-  }
-
-  $: profile$ = $baseConfigStore;
-  $: balanceStore$ = $balanceStore;
-
-  let migrateMode = false;
-  const PREFIX = "v2";
-  let passwordInput: HTMLFormElement;
-  const password = fb.control<string>("", [validators.required("Password is required.")]);
-  $: password$ = $password;
-
-  let migrating = false;
-  async function onMigrate() {
-    migrating = true;
-
-    const __getGrid = (secret = mnemonics$.value) => getGrid({ networkEnv: process.env.NETWORK, mnemonics: mnemonics$.value, storeSecret: secret } as any, _ => _); // prettier-ignore
-
-    const oldClient = await __getGrid(password$.value);
-    const newClient = await __getGrid();
-    const oldDB = oldClient.kvstore;
-    const newDB = newClient.kvstore;
 
     try {
-      loading = true;
-      const oldKeys = await oldClient.kvstore.list();
-      let failedCount = 0;
-      const extrinsics = [];
-      for (const oldKey of oldKeys) {
-        try {
-          const oldValue = await oldDB.get({ key: oldKey });
-          const newValue = newDB.client.kvStore.encrypt(oldValue);
-          extrinsics.push(newDB.client.client.api.tx.tfkvStore.set(oldKey, newValue));
-        } catch {
-          try {
-            await newDB.get({ key: oldKey });
-            alreadyMigratedCount++;
-            success = true;
-            console.log(`${oldKey} key is migrated`);
-          } catch (error) {
-            failedCount++;
-            failed = true;
-          }
-        }
-      }
-      if (extrinsics.length > 0) {
-        try {
-          await newClient.utility.batchAll({ extrinsics });
-        } catch (e) {
-          throw Error(`keys are not migrated due to: ${e}`);
-        }
-      }
-      console.log(
-        `Migrated keys: ${extrinsics.length}, already migrated keys: ${alreadyMigratedCount}, failed keys: ${failedCount}`,
-      );
-      if (failedCount > 0 && extrinsics.length === 0) {
-        failed = true;
-        throw Error("storeSecret is wrong. Please enter the right storeSecret.");
-      } else if (failedCount > 0 && extrinsics.length !== 0) {
-        throw Error(
-          "Part of the keys are migrated successfully, but still some keys are not migrated. Maybe they are encrypted with different password or not encrypted",
-        );
-      }
-    } catch {
-      /* pass */
+      const account = await grid.tfchain.createAccount("::1");
+      mnemonics.setValue(account.mnemonic);
+      mnemonics.markAsDirty();
+      mnemonics.markAsTouched();
+      createdNewAccount = true;
+    } catch (e) {
+      mnemonicsError = e.message;
     }
-    await oldClient.disconnect();
-    migrating = false;
-    loading = false;
+    mnemonicsLoading = false;
   }
 
-  let mounted: 0 | 1 | 2 = 0;
-  onMount(() => (mounted = 1));
+  // Store mnemonics in sessionStore
+  $: if (mnemonics$.valid || mnemonics$.error === noBalanceMessage) {
+    sessionStorage.setItem("mnemonics", mnemonics$.value);
+  } else {
+    sessionStorage.removeItem("mnemonics");
+  }
 
-  $: if (mounted === 1 && mnemonicsInput && sshKeyInput && passwordInput) {
-    mounted = 2;
+  // Get mnemonics from sessionStore (if exists)
+  $: {
+    const seeds = sessionStorage.getItem("mnemonics");
+    if (seeds) {
+      mnemonics.setValue(seeds);
+      mnemonics.markAsDirty();
+      mnemonics.markAsTouched();
+      mnemonicsLoading = true;
+      mnemonics.validate().finally(() => (mnemonicsLoading = false));
+    }
+  }
 
-    form(mnemonicsInput.querySelector("input"), mnemonics);
-    form(sshKeyInput.querySelector("textarea"), sshKey);
-    form(passwordInput.querySelector("input"), password);
-    const mn = sessionStorage.getItem("mnemonics");
-    if (mn) {
-      requestAnimationFrame(() => {
-        readSSH()
-          .then(key => {
-            sshKey.setValue(key);
-          })
-          .finally(() => {
-            mnemonics.setValue(mn);
-            init = true;
-          });
+  // Fetch twinId & address when seeds are valid
+  let twinAndAddress: GetTwinAndAddress = null;
+  $: if ((mnemonics$.valid || mnemonics$.error === noBalanceMessage) && !twinAndAddress) {
+    getTwinAndAddress(mnemonics$.value).then(data => (twinAndAddress = data));
+  } else if (!mnemonics$.valid && mnemonics$.error !== noBalanceMessage && twinAndAddress) {
+    twinAndAddress = null;
+  }
+
+  // SSH
+  let sshLoading = false;
+  let sshError = "";
+  $: sshKey$ = $sshKey;
+  $: sshIsDisabled = !mnemonics$.valid || sshLoading;
+  $: sshInvalid = (sshKey$.touched || sshKey$.dirty) && !sshKey$.valid && !sshIsDisabled;
+  $: sshHasError = (sshInvalid && sshKey$.error) || sshError;
+
+  // Read SSH Key
+  let SSH_KEY: string;
+  $: if (mnemonics$.valid && !sshKey$.valid && !sshKey$.pending && !sshLoading && SSH_KEY !== sshKey$.value) {
+    sshLoading = true;
+    readSSH(mnemonics$.value)
+      .then(ssh => {
+        SSH_KEY = ssh;
+        sshKey.setValue(ssh);
+        sshKey.markAsDirty();
+        sshKey.markAsTouched();
+      })
+      .finally(() => (sshLoading = false));
+  }
+
+  // Store SSH Key
+  $: if (mnemonics$.valid && sshKey$.valid && !sshKey$.pending && !sshLoading && SSH_KEY !== sshKey$.value) {
+    SSH_KEY = sshKey$.value;
+    sshLoading = true;
+    storeSSH(mnemonics$.value, sshKey$.value)
+      .then(stored => {
+        if (!stored) {
+          sshKey.setValue(sshKey$.value, { error: "Failed to store sshkey." });
+        }
+      })
+      .finally(() => (sshLoading = false));
+  }
+
+  function onGenerateSSH() {
+    sshLoading = true;
+    generateSSH(mnemonics$.value)
+      .then(keys => {
+        sshKey.setValue(keys.publicKey);
+        sshKey.markAsTouched();
+        sshKey.markAsDirty();
+      })
+      .catch(err => sshKey.setValue(sshKey$.value, { error: err.message }))
+      .finally(() => (sshLoading = false));
+  }
+
+  // Publich profile to all weblets
+  const baseConfig = window.configs.baseConfig;
+  $: baseConfig$ = $baseConfig;
+  $: if (mnemonics$.valid && sshKey$.valid && twinAndAddress && !baseConfig$) {
+    requestAnimationFrame(() => {
+      baseConfig.set({
+        networkEnv: process.env.NETWORK,
+        mnemonics: mnemonics$.value,
+        sshKey: sshKey$.value,
+        address: twinAndAddress.address,
+        twinId: twinAndAddress.twinId,
       });
-    } else {
-      init = true;
-    }
+    });
+  } else if (!(mnemonics$.valid && sshKey$.valid && twinAndAddress) && baseConfig$) {
+    baseConfig.set(null);
   }
+
+  // balance store
+  const balance = window.configs.balanceStore;
+  $: balance$ = $balance;
 </script>
 
-<div class="profile-menu" on:mousedown={profileToggle(true)}>
-  <button type="button">
-    <span class="icon is-small">
-      <i class="fas fa-user-cog" />
-    </span>
-  </button>
-  {#if profile$}
-    <div class="profile-active">
-      {#if balanceStore$.loading}
-        <p>Loading Account Balance</p>
-      {:else if balanceStore$.balance !== null}
-        <p>Balance: <span style="font-weight: bold;">{balanceStore$.balance.toFixed(2)}</span> TFT</p>
-        <p>Locked: <span>{balanceStore$.locked.toFixed(2)}</span> TFT</p>
+<div class="box is-flex is-align-items-center" style:cursor="pointer" on:click={() => (active = true)}>
+  <span style:background-color="#ddd8d8" style:border-radius="50%" class="mr-2">
+    <i class="fas fa-user-cog" style:padding="1rem" style:font-size="1rem" />
+  </span>
+  {#if baseConfig$}
+    <div>
+      {#if balance$.loading}
+        <p><strong>Loading account balance...</strong></p>
+      {:else}
+        <p>Balance:&nbsp;<strong>{balance$.balance} TFT</strong></p>
+        <p>Locked:&nbsp;<strong>{balance$.locked} TFT</strong></p>
       {/if}
     </div>
   {/if}
 </div>
 
-<div class="profile-overlay" class:is-active={show} on:mousedown={profileToggle(false)}>
-  <section class="profile-container" class:is-active={show} on:mousedown|stopPropagation>
-    <div class="box">
-      <div class="is-flex is-justify-content-space-between">
-        <h4 class="is-size-4">Profile Manager</h4>
-        <div class="d-flex flex-column">
+<div class="modal" class:is-active={active}>
+  <div class="modal-background" />
+  <div class="modal-card" style:width="80%" style:max-width="80%">
+    <header class="modal-card-head">
+      <div class="modal-card-title">
+        <h4 class="has-text-weight-bold mb-1">Profile Manager</h4>
+        <span class="is-size-6">
+          Please visit
+          <a href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager" target="_blank">
+            the manual
+          </a>
+          <span class="has-text-weight-medium">get started.</span>
+        </span>
+      </div>
+      <button
+        class="button is-primary mr-2 is-small"
+        on:click={function () {
+          migrateMode = !migrateMode;
+          this.blur();
+        }}
+        disabled={!mnemonics$.valid || migrating}
+        style:background-color="#1982b1"
+        style:color="white"
+      >
+        Migrate
+      </button>
+      <button
+        class="button is-danger is-small"
+        on:click={() => (active = false)}
+        style:background-color="#e0e0e0"
+        style:color="black"
+      >
+        Close
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <div style:display={migrateMode ? "block" : "none"}>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <div class="control has-icons-right" class:is-loading={migrating}>
+            <input
+              id="password"
+              use:form={password}
+              class="input"
+              type={showMigratePassword ? "text" : "password"}
+              placeholder="Store Secret"
+              value={password$.value}
+              class:is-danger={passwordHasError}
+              on:input={() => {
+                if (migrationDetails) {
+                  migrationDetails = null;
+                }
+
+                if (migratingError) {
+                  migratingError = "";
+                }
+              }}
+            />
+            {#if !migrating}
+              <i
+                class="fas"
+                class:fa-eye={showMigratePassword}
+                class:fa-eye-slash={!showMigratePassword}
+                style:position="absolute"
+                style:top="12px"
+                style:right="10px"
+                style:cursor="pointer"
+                on:click|stopPropagation={() => (showMigratePassword = !showMigratePassword)}
+              />
+            {/if}
+            {#if passwordHasError}
+              <p class="help is-danger">
+                {password$.error}
+              </p>
+            {/if}
+          </div>
+        </div>
+
+        {#if migrationDetails || migratingError}
+          <div class="notification is-light" class:is-info={!!migrationDetails} class:is-danger={migratingError}>
+            {migrationDetails
+              ? `Migration Finished. Total keys: ${migrationDetails.total}, Already migrated keys: ${
+                  migrationDetails.migrated
+                }, Migrated keys: ${
+                  migrationDetails.total - (migrationDetails.failed + migrationDetails.migrated)
+                }, Failed to migrate: ${migrationDetails.failed}.`
+              : migratingError}
+          </div>
+        {/if}
+
+        <div class="is-flex is-justify-content-center">
           <button
-            class="button"
-            class:is-link={migrateMode}
+            class="button is-primary"
+            disabled={disableMigrate}
+            on:click={onMigrate}
             class:is-loading={migrating}
-            disabled={migrating || !mnemonics$.valid}
-            on:click={() => (migrateMode = !migrateMode)}
             style:background-color="#1982b1"
             style:color="white"
           >
             Migrate
           </button>
-          <button class="button" style:background-color="#e0e0e0" style:color="black" on:click={profileToggle(false)}>
-            Close
-          </button>
         </div>
       </div>
-      <p class="mt-4">
-        Please visit <a
-          href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
-          target="_blank"
-        >
-          the manual
-        </a>
-        to <strong>get started.</strong>
-      </p>
-      <hr />
 
-      <section style:display={migrateMode ? "block" : "none"}>
-        <form on:submit|preventDefault={onMigrate} bind:this={passwordInput}>
-          <Input
-            field={{
-              label: "Password",
-              placeholder: "Store Secret",
-              symbol: "password",
-              error: password$.touched ? password$.error : undefined,
-              type: "password",
-              disabled: migrating,
-            }}
-            data={password$.value}
-            invalid={!password$.valid}
-          />
+      <div style:display={migrateMode ? "none" : "block"}>
+        <div class="field">
+          <label class="label mb-0" for="mnemonics">Mnemonics</label>
+          <p class="mb-2 is-size-6 has-text-grey">
+            Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing
+            mnemonics or click the 'Create Account' button to create an account and generate mnemonics.
+          </p>
+          <div class="control has-icons-right">
+            <div class="is-flex is-justify-content-space-between">
+              <div class="control is-flex-grow-1 mr-3" class:is-loading={mnemonicsIsDisabled}>
+                <input
+                  id="mnemonics"
+                  use:form={mnemonics}
+                  class="input"
+                  type={showMnemonicsPassword ? "text" : "password"}
+                  placeholder="Mnemonics"
+                  class:is-danger={mnemonicsInvalid}
+                  class:is-success={mnemonics$.valid}
+                  disabled={mnemonicsIsDisabled}
+                  value={mnemonics$.value}
+                  on:input={() => {
+                    if (createdNewAccount) {
+                      createdNewAccount = false;
+                    }
 
-          <div class="is-flex is-justify-content-center">
-            <button
-              class="button is-success"
-              style:background-color="#1982b1"
-              style:color="white"
-              disabled={!password$.valid || migrating}
-              class:is-loading={migrating}
-            >
-              Migrate
-            </button>
+                    if (sshKey$.valid) {
+                      sshKey.reset();
+                    }
+                  }}
+                />
+                {#if !mnemonicsIsDisabled}
+                  <i
+                    class="fas"
+                    class:fa-eye={showMnemonicsPassword}
+                    class:fa-eye-slash={!showMnemonicsPassword}
+                    style:position="absolute"
+                    style:top="12px"
+                    style:right="10px"
+                    style:cursor="pointer"
+                    on:click|stopPropagation={() => (showMnemonicsPassword = !showMnemonicsPassword)}
+                  />
+                {/if}
+                {#if mnemonicsHasError}
+                  <p class="help is-danger">
+                    {mnemonicsError || mnemonics$.error}
+                  </p>
+                {/if}
+              </div>
+              <button
+                class="button is-small is-primary mt-1"
+                class:is-loading={mnemonicsIsDisabled}
+                disabled={mnemonicsIsDisabled ||
+                  mnemonics$.error === noBalanceMessage ||
+                  mnemonics$.valid ||
+                  createdNewAccount}
+                on:click={createAccount}
+                style:background-color="#1982b1"
+                style:color="white"
+              >
+                Create Account
+              </button>
+            </div>
+            {#if createdNewAccount}
+              <div class="notification is-warning is-light mt-2">
+                <i class="fa-sharp fa-solid fa-triangle-exclamation" />
+                Please make sure to store your mnemonics somewhere safe to be able to access your deployments later on. There
+                is no way for neither you nor ThreeFold nor anybody else to recover lost mnemonics.
+              </div>
+            {/if}
           </div>
-        </form>
-      </section>
-      <div style="margin-top: 2rem;">
-        {#if loading}
-          <Alert type="info" message={"Migrating..."} />
-        {:else if success}
-          <Alert
-            type="success"
-            message={alreadyMigratedCount
-              ? `${alreadyMigratedCount} keys was already migrated.`
-              : "Successfully migrated keys."}
-          />
-        {:else if failed}
-          <Alert type="danger" message={"Failed to migrate keys."} />
+        </div>
+
+        {#if twinAndAddress}
+          <QrCode data="TFT:{bridge}?message=twin_{twinAndAddress.twinId}&sender=me&amount=100" />
         {/if}
-      </div>
 
-      <section style:display={migrateMode ? "none" : "block"}>
-        <form on:submit|preventDefault>
+        <div class="field mt-2">
+          <label class="label mb-0" for="ssh">Public SSH Key</label>
+          <p class="mb-2 is-size-6 has-text-grey">
+            SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have
+            an SSH Key or are not familiar, we can generate one for you.
+          </p>
           <div class="is-flex is-justify-content-space-between">
-            <div style:width="100%" bind:this={mnemonicsInput}>
-              <Input
-                field={{
-                  label: "Mnemonics",
-                  symbol: "mnemonics",
-                  type: "password",
-                  error: (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.pending ? mnemonics$.error : undefined,
-                  placeholder: "Mnemonics",
-                  disabled: mnemonics$.pending || creatingAccount,
-                }}
-                data={mnemonics$.value}
-                invalid={!mnemonics$.valid}
+            <div class="control is-flex-grow-1 mr-3" class:is-loading={sshLoading}>
+              <textarea
+                id="ssh"
+                use:form={sshKey}
+                class="textarea"
+                placeholder="Textarea"
+                style:resize="none"
+                disabled={sshIsDisabled}
+                class:is-danger={sshInvalid}
+                class:is-success={sshKey$.valid}
+                value={sshKey$.value}
               />
+              {#if sshHasError}
+                <p class="help is-danger">
+                  {sshHasError || sshKey$.error}
+                </p>
+              {/if}
             </div>
-
             <button
-              class="button is-primary ml-2 is-small"
-              disabled={mnemonics$.valid || mnemonics$.pending || creatingAccount}
-              style:margin-top="36px"
-              on:click={onCreateAccount}
-              type="button"
-              style:background-color="#1982b1"
-              style:color="white"
-            >
-              {mnemonics$.pending
-                ? "Validating Mnemonics..."
-                : creatingAccount
-                ? "Creating Account..."
-                : "Create Account"}
-            </button>
-          </div>
-
-          <div class="is-flex is-justify-content-space-between">
-            <div style:width="100%" bind:this={sshKeyInput}>
-              <Input
-                field={{
-                  label: "Public SSH Key",
-                  symbol: "sshKey",
-                  type: "textarea",
-                  error: sshKey$.touched || sshKey$.dirty ? sshKey$.error : undefined,
-                  placeholder: "Your public SSH Key",
-                  loading: sshStatus !== undefined || generatingSSH,
-                  disabled: sshStatus !== undefined,
-                }}
-                data={sshKey$.value}
-                invalid={!sshKey$.valid}
-              />
-            </div>
-
-            <button
-              class="button is-primary ml-2 is-small"
-              class:is-loading={generatingSSH}
-              style:margin-top="32px"
-              disabled={sshStatus !== undefined || sshKey$.valid || generatingSSH || !mnemonics$.valid}
-              type="button"
+              class="button is-small is-primary"
+              class:is-loading={sshLoading}
+              disabled={sshIsDisabled || sshKey$.valid}
               on:click={onGenerateSSH}
               style:background-color="#1982b1"
               style:color="white"
             >
-              {sshStatus === "read" ? "Reading..." : sshStatus === "write" ? "Storing..." : "Generate SSH Keys"}
+              Generate SSH Keys
             </button>
           </div>
-        </form>
+        </div>
 
-        {#if twinId !== undefined && address !== undefined}
-          <div class="is-flex is-justify-content-space-between">
-            <div class="is-flex-grow-1 mr-5">
-              <Input field={{ label: "Twin ID", disabled: true, symbol: "twinId", type: "text" }} data={twinId} />
-              <Input field={{ label: "Address", disabled: true, symbol: "address", type: "text" }} data={address} />
+        {#if twinAndAddress}
+          <div class="field mt-2">
+            <label class="label" for="twin">Twin ID</label>
+            <div class="control">
+              <input id="twin" class="input" type="text" value={twinAndAddress.twinId} disabled />
             </div>
-            <QrCode data="TFT:{bridge}?message=twin_{twinId}&sender=me&amount=100" />
+          </div>
+
+          <div class="field mt-2">
+            <label class="label" for="address">Address</label>
+            <div class="control">
+              <input id="address" class="input" type="text" value={twinAndAddress.address} disabled />
+            </div>
           </div>
         {/if}
-      </section>
-    </div>
-  </section>
+      </div>
+    </section>
+    <footer class="modal-card-foot" />
+  </div>
 </div>
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-
-  .profile-menu {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: white;
-    border-radius: 6px;
-    border: 1px solid #ddd8d8;
-    cursor: pointer;
-    margin: 10px;
-    button {
-      height: 60px;
-      width: 60px;
-      border-radius: 70%;
-      border: none;
-      cursor: inherit;
-
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .profile-active {
-      padding-left: 15px;
-
-      > p:first-of-type {
-        font-weight: bold;
-        margin-bottom: -5px;
-      }
-
-      > p:last-of-type span {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .profile-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background-color: rgba(black, 0.8);
-    z-index: 998;
-
-    transition-timing-function: ease;
-    transition-property: opacity, visibility;
-    transition-duration: 0.35s;
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    &.is-active {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: all;
-    }
-  }
-
-  .profile-container {
-    position: fixed;
-    top: 100px;
-    right: 15px;
-    width: calc(100% - 275px);
-    padding: 15px;
-
-    /* scroll */
-    max-height: calc(100vh - 115px);
-    overflow-y: auto;
-
-    transition-duration: 0.35s;
-    transition-property: transform, opacity, visibility;
-    transition-timing-function: ease;
-    transform: translateY(50px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-
-  .is-active {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: all;
-  }
-
-  // .vertical-line {
-  //   border-left: 4px solid black;
-  //   height: 100%;
-  // }
 </style>
