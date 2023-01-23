@@ -100,9 +100,10 @@
         deploymentStore.set(0);
         success = true;
       })
-      .catch((err: string) => {
+      .catch((err: any) => {
         failed = true;
-        message = normalizeDeploymentErrorMessage(err, "K8s");
+        const error = typeof err === "string" ? err : err.message;
+        message = normalizeDeploymentErrorMessage(error, "K8s");
       })
       .finally(() => {
         loading = false;
