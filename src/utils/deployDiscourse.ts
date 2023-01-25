@@ -67,7 +67,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machine.node_id = nodeId;
   machine.public_ip = false;
   machine.planetary = true;
-  machine.flist = "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.flist";
+  machine.flist = "https://hub.grid.tf/tf-official-apps/discourse-v4.0.flist";
   machine.qsfs_disks = [];
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/.start_discourse.sh";
