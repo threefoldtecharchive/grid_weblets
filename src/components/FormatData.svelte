@@ -136,4 +136,15 @@
       }}
     />
   {/if}
+  {#if vm.env.MATTERMOST_DOMAIN}
+    <Input
+      data={"https://" + vm.env.MATTERMOST_DOMAIN}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
 {/if}

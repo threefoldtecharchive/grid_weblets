@@ -53,6 +53,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     SMTPServer: server,
     SMTPPort: port,
     SSH_KEY: profile.sshKey,
+    MATTERMOST_DOMAIN: domain,
   };
 
   const vms = new MachinesModel();
