@@ -20,6 +20,7 @@
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import rootFs from "../../utils/rootFs";
   import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
 
   let loading = false;
   let success = false;
@@ -41,7 +42,7 @@
     {
       label: "Name",
       symbol: "name",
-      placeholder: "Discourse Instance Name",
+      placeholder: "Wordpress Instance Name",
       type: "text",
       validator: validateName,
       invalid: false,
@@ -63,12 +64,12 @@
       invalid: false,
     },
     {
-      label: "Admin Email Address",
+      label: "Email",
       symbol: "adminEmail",
       placeholder: "support@example.com",
       type: "text",
       validator: validateRequiredEmail,
-      invalid: true,
+      invalid: false,
     },
   ];
   // define this solution packages
@@ -171,9 +172,10 @@
   </form>
 </div>
 
-<!-- {#if modalData}
+{#if modalData}
   <Modal data={modalData} on:closed={() => (modalData = null)} />
-{/if} -->
+{/if}
+
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
   @import "../../assets/global.scss";
