@@ -12,6 +12,8 @@
   import Alert from "../../components/Alert.svelte";
   import { noActiveProfile } from "../../utils/message";
   import Tabs from "../../components/Tabs.svelte";
+  import { display } from "../../utils/display";
+  import Input from "../../components/Input.svelte";
 
   let loading = false;
   let success = false;
@@ -95,16 +97,16 @@
     {:else}
       <Tabs bind:active {tabs} />
     {/if}
-    <!-- <section style={display(active, "config")}>
-          {#each fields as field (field.symbol)}
-            {#if field.invalid !== undefined}
-              <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
-            {:else}
-              <Input bind:data={data[field.symbol]} {field} />
-            {/if}
-          {/each}
-  
-          <SelectCapacity
+    <section style={display(active, "config")}>
+      {#each adminFields as field (field.symbol)}
+        {#if field.invalid !== undefined}
+          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
+        {:else}
+          <Input bind:data={data[field.symbol]} {field} />
+        {/if}
+      {/each}
+
+      <!-- <SelectCapacity
             {packages}
             selectedPackage={selectCapacity.selectedPackage}
             cpu={data.cpu}
@@ -133,10 +135,10 @@
             {profile}
             on:fetch={({ detail }) => (data.selection.nodes = detail)}
             nodes={data.selection.nodes}
-          />
-        </section>
-  
-        <section style={display(active, "mail")}>
+          /> -->
+    </section>
+
+    <!-- <section style={display(active, "mail")}>
           <div class="notification is-warning is-light">
             <p>Discourse needs SMTP service so please configure these settings properly.</p>
           </div>
@@ -147,10 +149,9 @@
               <Input bind:data={data.smtp[field.symbol]} {field} />
             {/if}
           {/each}
-        </section>
-      {/if}
-  
-      <DeployBtn
+        </section> -->
+
+    <!-- <DeployBtn
         {disabled}
         {loading}
         {success}
