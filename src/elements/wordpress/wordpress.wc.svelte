@@ -1,11 +1,11 @@
-<svelte:options tag="tf-wp" />
+<svelte:options tag="tf-wordpress" />
 
 <script lang="ts">
-  import type { IFormField, IPackage, ITab } from "../../types";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
   import type { IProfile } from "../../types/Profile";
   import { Env } from "../../types/vm";
-  import Wordpress from "../../types/wp";
-  import validateName, { validateRequiredEmail, validateRequiredPassword } from "../../utils/validateName";
+  import Wordpress from "../../types/wordpress";
+  import validateName, { isInvalid, validateRequiredEmail, validateRequiredPassword } from "../../utils/validateName";
 
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
@@ -14,6 +14,12 @@
   import Tabs from "../../components/Tabs.svelte";
   import { display } from "../../utils/display";
   import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import rootFs from "../../utils/rootFs";
+  import DeployBtn from "../../components/DeployBtn.svelte";
 
   let loading = false;
   let success = false;
@@ -21,16 +27,25 @@
   let invalid = true;
   let status: "valid" | "invalid";
   let profile: IProfile;
+  let gateway: GatewayNodes;
   let message: string;
   let modalData: object;
   let active = "config";
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
-  //  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...data.smtp.fields,...fields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...adminFields]); // prettier-ignore
   let data = new Wordpress();
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
   let adminFields: IFormField[] = [
+    {
+      label: "Name",
+      symbol: "name",
+      placeholder: "Discourse Instance Name",
+      type: "text",
+      validator: validateName,
+      invalid: false,
+    },
     {
       label: "Username",
       symbol: "adminUsername",
@@ -62,6 +77,7 @@
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 50 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
+  let selectCapacity = new SelectCapacityUpdate();
   $: logs = $currentDeployment;
   async function deployWordpressHandler() {
     console.log("deployWordpressHandler");
@@ -105,65 +121,60 @@
           <Input bind:data={data[field.symbol]} {field} />
         {/if}
       {/each}
-
-      <!-- <SelectCapacity
-            {packages}
-            selectedPackage={selectCapacity.selectedPackage}
-            cpu={data.cpu}
-            memory={data.memory}
-            diskSize={data.diskSize}
-            on:update={({ detail }) => {
-              selectCapacity = detail;
-              if (!detail.invalid) {
-                const { cpu, memory, diskSize } = detail.package;
-                data.cpu = cpu;
-                data.memory = memory;
-                data.disks[0].size = diskSize;
-              }
-            }}
-          />
-          <SelectGatewayNode bind:gateway bind:invalid />
-          <SelectNodeId
-            cpu={data.cpu}
-            memory={data.memory}
-            publicIp={false}
-            ssd={data.diskSize + rootFs(data.cpu, data.memory)}
-            bind:data={data.nodeId}
-            bind:nodeSelection={data.selection.type}
-            bind:status
-            filters={data.selection.filters}
-            {profile}
-            on:fetch={({ detail }) => (data.selection.nodes = detail)}
-            nodes={data.selection.nodes}
-          /> -->
-    </section>
-
-    <!-- <section style={display(active, "mail")}>
-          <div class="notification is-warning is-light">
-            <p>Discourse needs SMTP service so please configure these settings properly.</p>
-          </div>
-          {#each data.smtp.fields as field (field.symbol)}
-            {#if field.invalid !== undefined}
-              <Input bind:data={data.smtp[field.symbol]} bind:invalid={field.invalid} {field} />
-            {:else}
-              <Input bind:data={data.smtp[field.symbol]} {field} />
-            {/if}
-          {/each}
-        </section> -->
-
-    <!-- <DeployBtn
-        {disabled}
-        {loading}
-        {success}
-        {failed}
-        on:click={e => {
-          if (success || failed) {
-            e.preventDefault();
-            success = false;
-            failed = false;
-            loading = false;
+      <SelectCapacity
+        {packages}
+        selectedPackage={selectCapacity.selectedPackage}
+        cpu={data.cpu}
+        memory={data.memory}
+        diskSize={0}
+        on:update={({ detail }) => {
+          selectCapacity = detail;
+          if (!detail.invalid) {
+            const { cpu, memory, diskSize } = detail.package;
+            data.cpu = cpu;
+            data.memory = memory;
+            data.disks[0].size = diskSize;
           }
         }}
-      /> -->
+      />
+      <SelectGatewayNode bind:gateway bind:invalid />
+      <!-- TODO: add disk size to ssd if required -->
+
+      <SelectNodeId
+        cpu={data.cpu}
+        memory={data.memory}
+        publicIp={false}
+        ssd={rootFs(data.cpu, data.memory)}
+        bind:data={data.nodeId}
+        bind:nodeSelection={data.selection.type}
+        bind:status
+        filters={data.selection.filters}
+        {profile}
+        on:fetch={({ detail }) => (data.selection.nodes = detail)}
+        nodes={data.selection.nodes}
+      />
+    </section>
+    <DeployBtn
+      {disabled}
+      {loading}
+      {success}
+      {failed}
+      on:click={e => {
+        if (success || failed) {
+          e.preventDefault();
+          success = false;
+          failed = false;
+          loading = false;
+        }
+      }}
+    />
   </form>
 </div>
+
+<!-- {#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if} -->
+<style lang="scss" scoped>
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+  @import "../../assets/global.scss";
+</style>

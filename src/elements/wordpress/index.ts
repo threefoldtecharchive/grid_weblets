@@ -1,1 +1,1 @@
-import "./wp.wc.svelte";
+import "./wordpress.wc.svelte";
