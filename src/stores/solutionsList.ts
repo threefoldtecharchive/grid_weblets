@@ -17,4 +17,5 @@ export const solutionList = {
   subsquid: "ss",
   algorand: "al",
   qvm: "qvm",
+  wordpress: "wp",
 };
