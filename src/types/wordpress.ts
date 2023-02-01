@@ -7,6 +7,6 @@ export default class Wordpress extends VM {
   public adminEmail = "";
   public adminUsername = "admin";
   public diskSize = 50;
-  public adminPassword = generatePassword(length); // prettier-ignore
+  public adminPassword = generatePassword(length);
   public domain = "";
 }

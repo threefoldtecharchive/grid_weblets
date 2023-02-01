@@ -23,7 +23,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import deployWordpress from "../../utils/deployWordpress";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import destroy from "../../utils/destroy";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let loading = false;
   let success = false;
@@ -38,12 +38,11 @@
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
-  //$: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...adminFields]); // prettier-ignore
-  let disabled = false;
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
   let data = new Wordpress();
   data.disks = [new Disk()];
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
-  let adminFields: IFormField[] = [
+  let fields: IFormField[] = [
     {
       label: "Name",
       symbol: "name",
@@ -74,7 +73,7 @@
       placeholder: "support@example.com",
       type: "text",
       validator: validateRequiredEmail,
-      invalid: false,
+      invalid: true,
     },
   ];
   // define this solution packages
@@ -100,30 +99,26 @@
     success = false;
     failed = false;
     message = undefined;
-    await destroy(profile, "wordpress", "WP839acded");
-    // deployWordpress(data, profile, gateway)
-    //   .then((data: any) => {
-    //     modalData = data.deploymentInfo;
-    //     deploymentStore.set(0);
-    //     success = true;
-    //   })
-    //   // .catch((err: string) => {
-    //   //   failed = true;
-    //   //   console.log(err)
-    //   //    message = normalizeDeploymentErrorMessage(err, "Wordpress");
-    //   // })
-    //   .finally(() => {
-    //     loading = false;
-    //   });
+    deployWordpress(data, profile, gateway)
+      .then((data: any) => {
+        modalData = data.deploymentInfo;
+        deploymentStore.set();
+        success = true;
+      })
+      .catch((err: string) => {
+        failed = true;
+        console.log(err);
+        message = normalizeDeploymentErrorMessage(err, "Wordpress");
+      })
+      .finally(() => {
+        loading = false;
+      });
   }
 </script>
 
 <SelectProfile
   on:profile={({ detail }) => {
     profile = detail;
-    if (detail) {
-      data.envs[0] = new Env(undefined, "SSH_KEY", detail?.sshKey);
-    }
   }}
 />
 <div style="padding: 15px;">
@@ -146,46 +141,46 @@
       <Alert type="danger" {message} />
     {:else}
       <Tabs bind:active {tabs} />
+      <section style={display(active, "config")}>
+        {#each fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
+        <SelectCapacity
+          {packages}
+          selectedPackage={selectCapacity.selectedPackage}
+          cpu={data.cpu}
+          memory={data.memory}
+          diskSize={data.diskSize}
+          on:update={({ detail }) => {
+            selectCapacity = detail;
+            if (!detail.invalid) {
+              const { cpu, memory, diskSize } = detail.package;
+              data.cpu = cpu;
+              data.memory = memory;
+              data.disks[0].size = diskSize;
+            }
+          }}
+        />
+        <SelectGatewayNode bind:gateway bind:invalid />
+        <SelectNodeId
+          cpu={data.cpu}
+          memory={data.memory}
+          publicIp={false}
+          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
+          bind:data={data.nodeId}
+          bind:nodeSelection={data.selection.type}
+          bind:status
+          filters={data.selection.filters}
+          {profile}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
+          nodes={data.selection.nodes}
+        />
+      </section>
     {/if}
-    <section style={display(active, "config")}>
-      {#each adminFields as field (field.symbol)}
-        {#if field.invalid !== undefined}
-          <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
-        {:else}
-          <Input bind:data={data[field.symbol]} {field} />
-        {/if}
-      {/each}
-      <SelectCapacity
-        {packages}
-        selectedPackage={selectCapacity.selectedPackage}
-        cpu={data.cpu}
-        memory={data.memory}
-        diskSize={data.diskSize}
-        on:update={({ detail }) => {
-          selectCapacity = detail;
-          if (!detail.invalid) {
-            const { cpu, memory, diskSize } = detail.package;
-            data.cpu = cpu;
-            data.memory = memory;
-            data.disks[0].size = diskSize;
-          }
-        }}
-      />
-      <SelectGatewayNode bind:gateway bind:invalid />
-      <SelectNodeId
-        cpu={data.cpu}
-        memory={data.memory}
-        publicIp={false}
-        ssd={data.diskSize + rootFs(data.cpu, data.memory)}
-        bind:data={data.nodeId}
-        bind:nodeSelection={data.selection.type}
-        bind:status
-        filters={data.selection.filters}
-        {profile}
-        on:fetch={({ detail }) => (data.selection.nodes = detail)}
-        nodes={data.selection.nodes}
-      />
-    </section>
     <DeployBtn
       {disabled}
       {loading}
