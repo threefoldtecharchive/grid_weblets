@@ -21,6 +21,8 @@
   import rootFs from "../../utils/rootFs";
   import DeployBtn from "../../components/DeployBtn.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  import deployWordpress from "../../utils/deployWordpress";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
 
   let loading = false;
   let success = false;
@@ -81,7 +83,37 @@
   let selectCapacity = new SelectCapacityUpdate();
   $: logs = $currentDeployment;
   async function deployWordpressHandler() {
-    console.log("deployWordpressHandler");
+    loading = true;
+
+    console.log(data);
+
+    if (!hasEnoughBalance()) {
+      failed = true;
+      loading = false;
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+      return;
+    }
+
+    success = false;
+    failed = false;
+    message = undefined;
+
+    deployWordpress(data, profile, gateway)
+      .then((data: any) => {
+        modalData = data.deploymentInfo;
+        deploymentStore.set(0);
+        success = true;
+      })
+      .catch((err: string) => {
+        failed = true;
+        // message = err.includes("Cannot read properties of undefined")
+        //   ? "Failed to deploy Discourse. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
+        //   : "Falied to deploy Discourse.";
+        console.log(err);
+      })
+      .finally(() => {
+        loading = false;
+      });
   }
 </script>
 
