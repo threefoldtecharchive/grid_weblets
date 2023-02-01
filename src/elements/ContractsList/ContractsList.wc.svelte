@@ -54,7 +54,7 @@
                   id: contractID,
                   type: "rent",
                   state: state,
-                  createdAt: new Date(+createdAt),
+                  createdAt: new Date(+createdAt * 1000),
                   nodeID: nodeID,
                 } as IContract),
             );
@@ -63,14 +63,14 @@
               type: "name", 
               state: state, 
               deploymentData: {name: name}, 
-              createdAt: new Date(+createdAt) } as IContract)); // prettier-ignore
+              createdAt: new Date(+createdAt *1000) } as IContract)); // prettier-ignore
             const nodes = nodeContracts.map(
               ({ contractID, state, deploymentData, createdAt, nodeID }) =>
                 ({
                   id: contractID,
                   type: "node",
                   state: state,
-                  createdAt: new Date(+createdAt),
+                  createdAt: new Date(+createdAt * 1000),
                   nodeID: nodeID,
                   deploymentData: jsonParser(deploymentData),
                 } as IContract),
