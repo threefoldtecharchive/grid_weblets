@@ -63,7 +63,7 @@
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
     { label: "QSFS Virtual Machine", value: "qvm"},
-    { label: "wordpress", value: "wordpress"}
+    { label: "Wordpress", value: "wordpress"}
 
   ];
   let grid;
