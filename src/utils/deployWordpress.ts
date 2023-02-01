@@ -10,38 +10,35 @@ import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployWordpress(data: Wordpress, profile: IProfile, gateway: GatewayNodes) {
-  // gateway model: <solution-type><twin-id><solution_name>
-  // const domainName = await getUniqueDomainName(profile, data.name, "wordpress");
+  // // gateway model: <solution-type><twin-id><solution_name>
+  const domainName = await getUniqueDomainName(profile, data.name, "wordpress");
 
-  // // Dynamically select node to deploy the gateway
-  // const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  // Dynamically select node to deploy the gateway
+  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
 
-  // data.domain = `http://${domainName}.${nodeDomain}`;
+  data.domain = `http://${domainName}.${nodeDomain}`;
 
-  // // deploy wordpress instance
-  // const deploymentInfo = await deployWordpressVM(profile, data);
+  // deploy wordpress instance
+  const deploymentInfo = await deployWordpressVM(profile, data);
 
-  // const planetaryIP = deploymentInfo["planetary"] as string;
-  // data.domain = `http://[${planetaryIP}]`;
+  const planetaryIP = deploymentInfo["planetary"] as string;
 
-  // try {
-  //   // deploy the gateway
-  //   await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
-  // } catch (error) {
-  //   // rollback wordpress deployment if gateway deployment failed
-  //   await destroy(profile, "wordpress", data.name);
-  //   throw error;
-  // }
-
-  // return { deploymentInfo };
-  return await destroy(profile, "wordpress", "WP839acded");
+  try {
+    // deploy the gateway
+    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
+  } catch (error) {
+    // rollback wordpress deployment if gateway deployment failed
+    await destroy(profile, "wordpress", data.name);
+    throw error;
+  }
+  await destroy(profile, "wordpress", data.name);
+  return { deploymentInfo };
 }
 
 async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
   const { GatewayNameModel } = window.configs.grid3_client;
   // Gateway Specs
   const gw = new GatewayNameModel();
-  // TODO: is the name should be like this?
   gw.name = domainName;
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
@@ -99,6 +96,7 @@ async function deployWordpressVM(profile: IProfile, data: Wordpress) {
   machine.node_id = nodeId;
   machine.public_ip = false;
   machine.planetary = true;
+  // TODO: replacec the flist url with the official one
   machine.flist = "https://hub.grid.tf/kassem.3bot/0om4r-wordpress_sql-login.flist"; //TODO : replace flist link;
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
