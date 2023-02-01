@@ -127,6 +127,7 @@
     <p>
       WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over
       43.3% of all the websites on the Internet.
+      <!-- TODO: add the docs link -->
       <a target="_blank" href="#"> Quick start documentation</a>
     </p>
     <hr />
