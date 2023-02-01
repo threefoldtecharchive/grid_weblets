@@ -25,7 +25,8 @@
     | "subsquid"
     | "fullvm"
     | "algorand"
-    | "qvm";
+    | "qvm"
+    | "wordpress";
 
   export let tab: TabsType = undefined;
 
@@ -61,7 +62,9 @@
     { label: "Algorand", value: "algorand" },
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
-    { label: "QSFS Virtual Machine", value: "qvm"}
+    { label: "QSFS Virtual Machine", value: "qvm"},
+    { label: "wordpress", value: "wordpress"}
+
   ];
   let grid;
   let active = "vm";
