@@ -3,7 +3,7 @@
 <script lang="ts">
   import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
   import type { IProfile } from "../../types/Profile";
-  import { Env } from "../../types/vm";
+  import { Disk, Env } from "../../types/vm";
   import Wordpress from "../../types/wordpress";
   import validateName, { isInvalid, validateRequiredEmail, validateRequiredPassword } from "../../utils/validateName";
 
@@ -23,6 +23,7 @@
   import Modal from "../../components/DeploymentModal.svelte";
   import deployWordpress from "../../utils/deployWordpress";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import destroy from "../../utils/destroy";
 
   let loading = false;
   let success = false;
@@ -37,8 +38,10 @@
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...adminFields]); // prettier-ignore
+  //$: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...adminFields]); // prettier-ignore
+  let disabled = false;
   let data = new Wordpress();
+  data.disks = [new Disk()];
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
   let adminFields: IFormField[] = [
     {
@@ -97,23 +100,21 @@
     success = false;
     failed = false;
     message = undefined;
-
-    deployWordpress(data, profile, gateway)
-      .then((data: any) => {
-        modalData = data.deploymentInfo;
-        deploymentStore.set(0);
-        success = true;
-      })
-      .catch((err: string) => {
-        failed = true;
-        // message = err.includes("Cannot read properties of undefined")
-        //   ? "Failed to deploy Discourse. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-        //   : "Falied to deploy Discourse.";
-        console.log(err);
-      })
-      .finally(() => {
-        loading = false;
-      });
+    await destroy(profile, "wordpress", "WP839acded");
+    // deployWordpress(data, profile, gateway)
+    //   .then((data: any) => {
+    //     modalData = data.deploymentInfo;
+    //     deploymentStore.set(0);
+    //     success = true;
+    //   })
+    //   // .catch((err: string) => {
+    //   //   failed = true;
+    //   //   console.log(err)
+    //   //    message = normalizeDeploymentErrorMessage(err, "Wordpress");
+    //   // })
+    //   .finally(() => {
+    //     loading = false;
+    //   });
   }
 </script>
 
@@ -135,12 +136,12 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "Discourse")}
+    {#if loading || (logs !== null && logs.type === "Wordpress")}
       <Alert type="info" message={logs?.message ?? "Loading..."} />
     {:else if !profile}
       <Alert type="info" message={noActiveProfile} />
     {:else if success}
-      <Alert type="success" message="Successfully Deployed Discourse." deployed={true} />
+      <Alert type="success" message="Successfully Deployed Wordpress." deployed={true} />
     {:else if failed}
       <Alert type="danger" {message} />
     {:else}
@@ -159,7 +160,7 @@
         selectedPackage={selectCapacity.selectedPackage}
         cpu={data.cpu}
         memory={data.memory}
-        diskSize={0}
+        diskSize={data.diskSize}
         on:update={({ detail }) => {
           selectCapacity = detail;
           if (!detail.invalid) {
@@ -171,13 +172,11 @@
         }}
       />
       <SelectGatewayNode bind:gateway bind:invalid />
-      <!-- TODO: add disk size to ssd if required -->
-
       <SelectNodeId
         cpu={data.cpu}
         memory={data.memory}
         publicIp={false}
-        ssd={rootFs(data.cpu, data.memory)}
+        ssd={data.diskSize + rootFs(data.cpu, data.memory)}
         bind:data={data.nodeId}
         bind:nodeSelection={data.selection.type}
         bind:status

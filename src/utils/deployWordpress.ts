@@ -11,29 +11,30 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployWordpress(data: Wordpress, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "wordpress");
+  // const domainName = await getUniqueDomainName(profile, data.name, "wordpress");
 
-  // Dynamically select node to deploy the gateway
-  const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
+  // // Dynamically select node to deploy the gateway
+  // const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
 
-  data.domain = `http://${domainName}.${nodeDomain}`;
+  // data.domain = `http://${domainName}.${nodeDomain}`;
 
-  // deploy wordpress instance
-  const deploymentInfo = await deployWordpressVM(profile, data);
+  // // deploy wordpress instance
+  // const deploymentInfo = await deployWordpressVM(profile, data);
 
-  const planetaryIP = deploymentInfo["planetary"] as string;
-  data.domain = `http://[${planetaryIP}]`;
+  // const planetaryIP = deploymentInfo["planetary"] as string;
+  // data.domain = `http://[${planetaryIP}]`;
 
-  try {
-    // deploy the gateway
-    await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
-  } catch (error) {
-    // rollback wordpress deployment if gateway deployment failed
-    await destroy(profile, "wordpress", data.name);
-    throw error;
-  }
+  // try {
+  //   // deploy the gateway
+  //   await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
+  // } catch (error) {
+  //   // rollback wordpress deployment if gateway deployment failed
+  //   await destroy(profile, "wordpress", data.name);
+  //   throw error;
+  // }
 
-  return { deploymentInfo };
+  // return { deploymentInfo };
+  return await destroy(profile, "wordpress", "WP839acded");
 }
 
 async function deployPrefixGateway(profile: IProfile, domainName: string, backend: string, publicNodeId: number) {
