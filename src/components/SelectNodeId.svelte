@@ -235,7 +235,7 @@
   let validating = false;
   $: {
     if (nodeSelection === "manual")
-      if (profile && _nodeId !== data) {
+      if (profile) {
         if (!data || !!_nodeValidator(data)) {
           if (_ctrl) {
             _ctrl.abort();
