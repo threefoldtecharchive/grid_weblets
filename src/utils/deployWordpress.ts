@@ -31,7 +31,7 @@ export default async function deployWordpress(data: Wordpress, profile: IProfile
     await destroy(profile, "wordpress", data.name);
     throw error;
   }
-  await destroy(profile, "wordpress", data.name);
+
   return { deploymentInfo };
 }
 
