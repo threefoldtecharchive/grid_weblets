@@ -25,23 +25,27 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
-  import { display } from "../../utils/display";
+  let data = new Wordpress();
+  data.disks = [new Disk()];
+  let profile: IProfile;
+  let gateway: GatewayNodes;
+
   let loading = false;
   let success = false;
   let failed = false;
   let invalid = true;
+
   let status: "valid" | "invalid";
-  let profile: IProfile;
-  let gateway: GatewayNodes;
-  let message: string;
-  let modalData: object;
   let active = "config";
 
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
+
   $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
-  let data = new Wordpress();
-  data.disks = [new Disk()];
+
+  let message: string;
+  let modalData: object;
+
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
   let fields: IFormField[] = [
     {
@@ -78,17 +82,18 @@
     },
   ];
   // define this solution packages
+  let selectCapacity = new SelectCapacityUpdate();
   const packages: IPackage[] = [
     { name: "Minimum", cpu: 1, memory: 1024 * 2, diskSize: 10 },
     { name: "Standard", cpu: 2, memory: 1024 * 2, diskSize: 50 },
     { name: "Recommended", cpu: 4, memory: 1024 * 4, diskSize: 100 },
   ];
-  let selectCapacity = new SelectCapacityUpdate();
-  $: logs = $currentDeployment;
+
   async function deployWordpressHandler() {
     loading = true;
-
-    console.log(data);
+    success = false;
+    failed = false;
+    message = undefined;
 
     if (!hasEnoughBalance()) {
       failed = true;
@@ -97,9 +102,6 @@
       return;
     }
 
-    success = false;
-    failed = false;
-    message = undefined;
     deployWordpress(data, profile, gateway)
       .then((data: any) => {
         modalData = data.deploymentInfo;
@@ -108,13 +110,13 @@
       })
       .catch((err: string) => {
         failed = true;
-        console.log(err);
         message = normalizeDeploymentErrorMessage(err, "Wordpress");
       })
       .finally(() => {
         loading = false;
       });
   }
+  $: logs = $currentDeployment;
 </script>
 
 <SelectProfile
