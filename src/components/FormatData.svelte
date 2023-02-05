@@ -147,4 +147,15 @@
       }}
     />
   {/if}
+  {#if vm.env.WP_URL}
+    <Input
+      data={vm.env.WP_URL}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
 {/if}
