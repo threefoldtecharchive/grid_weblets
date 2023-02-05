@@ -10,7 +10,7 @@ import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployWordpress(data: Wordpress, profile: IProfile, gateway: GatewayNodes) {
-  // // gateway model: <solution-type><twin-id><solution_name>
+  // gateway model: <solution-type><twin-id><solution_name>
   const domainName = await getUniqueDomainName(profile, data.name, "wordpress");
 
   // Dynamically select node to deploy the gateway
@@ -75,18 +75,18 @@ async function deployWordpressVM(profile: IProfile, data: Wordpress) {
     disks: [{ size }],
   } = data;
 
+  // wp deployments model (vm, disk, net): <type><random_suffix>
   const randomSuffix = generateString(10).toLowerCase();
 
   // Network Specs
-
   const network = createNetwork(new Network(`nw${randomSuffix}`));
-  console.log(size);
+
   /* Docker disk */
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
   disk.size = size;
-  disk.mountpoint = "/var/lib/docker";
-  console.log(size);
+  disk.mountpoint = "/var/www/html";
+
   // machine Specs
   const machine = new MachineModel();
   machine.name = name; //`machine${randomSuffix}`;
