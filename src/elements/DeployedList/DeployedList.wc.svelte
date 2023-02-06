@@ -63,7 +63,7 @@
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
     { label: "QSFS Virtual Machine", value: "qvm"},
-    { label: "Wordpress", value: "wordpress"}
+    { label: "Wordpress", value: "wp"}
 
   ];
   let grid;
@@ -479,6 +479,15 @@
         },
       ],
       algorand: rows => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: i => removing === rows[i].name,
+        },
+      ],
+      wp: rows => [
         {
           type: "info",
           label: "Show Details",
