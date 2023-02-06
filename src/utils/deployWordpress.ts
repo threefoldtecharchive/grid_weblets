@@ -124,7 +124,7 @@ async function deployWordpressVM(profile: IProfile, data: Wordpress) {
 
   // deploy
   return deploy(profile, "Wordpress", name, async grid => {
-    await checkVMExist(grid, "Wordpress", name); // change the project name of the grid to be Wordpress
+    await checkVMExist(grid, "wordpress", name); // change the project name of the grid to be Wordpress
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
