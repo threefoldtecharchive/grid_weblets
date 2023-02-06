@@ -495,6 +495,30 @@
           disabled: () => removing !== null,
           loading: i => removing === rows[i].name,
         },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.WP_URL;
+            window.open(domain, "_blank").focus();
+          },
+          disabled: i => {
+            const env = rows[i].details.env;
+            return !env || !env.WP_URL || removing !== null;
+          },
+        },
+        {
+          type: "success",
+          label: "Admin Panel",
+          click: (_, i) => {
+            const domain = rows[i].details.env.WP_URL;
+            window.open(domain + "/wp-admin", "_blank").focus();
+          },
+          disabled: i => {
+            const env = rows[i].details.env;
+            return !env || !env.DOMAIN_NAME || removing !== null;
+          },
+        },
       ],
     },
     {
