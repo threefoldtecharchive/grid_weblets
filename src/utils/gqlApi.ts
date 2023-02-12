@@ -8,7 +8,7 @@ export default function gqlApi<T>(
   variables: object = {},
 ): Promise<T> {
   const { networkEnv } = profile;
-  const grid = new window.configs.grid3_client.GridClient("" as unknown as NetworkEnv, "", "", null);
+  const grid = new window.configs.grid3_client.GridClient("" as unknown as NetworkEnv, "", "");
 
   const { graphql } = grid.getDefaultUrls(networkEnv as unknown as NetworkEnv);
 

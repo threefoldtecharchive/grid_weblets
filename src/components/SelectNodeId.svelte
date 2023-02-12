@@ -248,7 +248,7 @@
           _ctrl = new AbortController();
 
           const { networkEnv } = profile;
-          const grid = new GridClient("" as any, "", "", null);
+          const grid = new GridClient("" as any, "", "");
           const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
 
           validating = true;

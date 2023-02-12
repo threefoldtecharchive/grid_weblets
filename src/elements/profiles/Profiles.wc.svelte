@@ -67,12 +67,7 @@
     mnemonicsLoading = true;
     createdNewAccount = false;
     mnemonicsError = "";
-    const grid = new window.configs.grid3_client.GridClient(
-      process.env.NETWORK as any,
-      "",
-      "test",
-      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
-    );
+    const grid = new window.configs.grid3_client.GridClient(process.env.NETWORK as any, "", "test");
     grid._connect();
 
     try {

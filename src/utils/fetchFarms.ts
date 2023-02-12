@@ -61,7 +61,7 @@ export default function fetchFarms(profile: IProfile, filters: FilterOptions, ex
 }
 
 export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
-  const grid = new window.configs.grid3_client.GridClient("" as any, "", "", null);
+  const grid = new window.configs.grid3_client.GridClient("" as any, "", "");
 
   const { graphql, rmbProxy } = grid.getDefaultUrls(profile.networkEnv);
 

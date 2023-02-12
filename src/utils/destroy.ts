@@ -6,7 +6,6 @@ export default function destroy(profile: IProfile, type: string, name: string) {
     networkEnv as any,
     mnemonics,
     mnemonics,
-    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     type,
     window.configs.grid3_client.BackendStorageType.tfkvstore,
   );

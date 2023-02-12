@@ -3,7 +3,7 @@ import type { IProfile } from "../types/Profile";
 
 export default async function nodeExists(profile: IProfile, nodeId: number): Promise<boolean> {
   const { networkEnv } = profile;
-  const grid = new window.configs.grid3_client.GridClient("" as unknown as NetworkEnv, "", "", null);
+  const grid = new window.configs.grid3_client.GridClient("" as unknown as NetworkEnv, "", "");
 
   const { rmbProxy } = grid.getDefaultUrls(networkEnv as unknown as NetworkEnv);
   return fetch(`${rmbProxy}/nodes/${nodeId}`, {

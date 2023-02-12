@@ -9,7 +9,7 @@ export default function findNodes(
 ): Promise<ISelectOption[]> {
   async function resolver(res: (x: ISelectOption[]) => void) {
     const { networkEnv } = profile;
-    const grid = new window.configs.grid3_client.GridClient("" as any, "", "", null);
+    const grid = new window.configs.grid3_client.GridClient("" as any, "", "");
 
     const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
     const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy, grid.rmbClient);
