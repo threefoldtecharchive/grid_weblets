@@ -31,5 +31,5 @@ COPY --from=build /app/dist /usr/share/nginx/html
 WORKDIR /usr/share/nginx/html
 RUN apk add --no-cache bash
 
-
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
