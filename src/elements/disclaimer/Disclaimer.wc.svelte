@@ -6,7 +6,7 @@
     test: { env: "testing", url: "https://github.com/threefoldtech/test_feedback/issues" },
   };
 
-  $: env = envs[process.env.NETWORK];
+  $: env = envs[window.env?.network ?? process.env.NETWORK];
 </script>
 
 {#if env}
