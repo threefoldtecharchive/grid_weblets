@@ -8,11 +8,9 @@ interface IConfig {
 
 export default async function deleteDeployment(configs: IConfig, key: "k8s" | "machines", name: string, type: string) {
   const { GridClient } = window.configs.grid3_client;
-  const { HTTPMessageBusClient } = window.configs.client;
 
   const { mnemonics, networkEnv } = configs;
-  const http = new HTTPMessageBusClient(0, "", "", "");
-  const grid = new GridClient(networkEnv as any, mnemonics, mnemonics, http, type, "tfkvstore" as any);
+  const grid = new GridClient(networkEnv as any, mnemonics, mnemonics, type, "tfkvstore" as any);
 
   // remove deployment in namespace `type`
   console.log({ grid });

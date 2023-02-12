@@ -22,6 +22,8 @@ module.exports = {
       path: require.resolve("path-browserify"),
       stream: require.resolve("stream-browserify"),
       fs: require.resolve("browserify-fs"),
+      net: require.resolve("net-browserify"),
+      tls: require.resolve("tls-browserify"),
     },
   },
   output: {

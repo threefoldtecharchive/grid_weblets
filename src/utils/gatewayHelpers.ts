@@ -53,7 +53,6 @@ export async function getUniqueDomainName(profile, name, solutionType) {
     networkEnv as any,
     mnemonics,
     mnemonics,
-    new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
     solutionType,
     window.configs.grid3_client.BackendStorageType.tfkvstore,
   );
