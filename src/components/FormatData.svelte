@@ -125,6 +125,18 @@
       }}
     />
   {/if}
+  {#if vm.env.OWNCLOUD_DOMAIN}
+    <Input
+      data={"https://" + vm.env.OWNCLOUD_DOMAIN}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
+
   {#if vm.env.FUNKWHALE_HOSTNAME}
     <Input
       data={"https://" + vm.env.FUNKWHALE_HOSTNAME}
