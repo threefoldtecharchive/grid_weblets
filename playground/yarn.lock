@@ -5974,10 +5974,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.5.0.tgz#810f21b0b03ec898e2c5b71ada00978f8acff27c"
-  integrity sha512-vSEQCjwjR9ZHRqsiyBDOi+90BUskzfhif3un2f+1dmlJ2YgGom0LPvlEet1Lyrr5e/MuFl45XBU5TjXyM+TPTg==
+grid3_client@1.6.0-rc3:
+  version "1.6.0-rc3"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-1.6.0-rc3.tgz#736636e99a632e0d8d6a4a1a33ef2dd6cc3187ae"
+  integrity sha512-BwmqKHgda0uko2ejIuvL0Hr9205XGVPzvv2U1IQ2aLS+icOYGIRDzplvxFnEWGN8D1rmAqNMVcockqzMjKLZIQ==
   dependencies:
     "@jimber/pkid" "1.0.4"
     algosdk "^1.19.0"
@@ -5998,7 +5998,7 @@ grid3_client@^1.5.0:
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
     stellar-sdk "^9.1.0"
-    tfgrid-api-client "1.18.0"
+    tfgrid-api-client "1.24.0"
     ts-rmb-client-base "1.0.0"
     ts-rmb-http-client "1.1.2"
     ts-rmb-redis-client "1.0.0"
@@ -10952,10 +10952,10 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-tfgrid-api-client@1.18.0:
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.18.0.tgz#ea12e912650c66d985bc0ab030f08d182ea4924f"
-  integrity sha512-4qV4MhbibgqngyM9xqX8UdaX8IRMpHIrg/onEt0uVXbX2dhsd9Rth9qxlxwxCTqG7Lj9W1/cdbFTka4G+5pCOw==
+tfgrid-api-client@1.24.0:
+  version "1.24.0"
+  resolved "https://registry.yarnpkg.com/tfgrid-api-client/-/tfgrid-api-client-1.24.0.tgz#c2c7c1c34d025510051cfe31f1b6990a16b07f3a"
+  integrity sha512-ZZ/i1Vkgzz6o5AigHTc5BsJ5yrg5VBw97YcooUXZdLWLMUHw/0GXIDN9BIYZ0OzkAtdkrDrVG200HzkD4hWfbg==
   dependencies:
     "@polkadot/api" "^8.9.1"
     bip39 "^3.0.3"
