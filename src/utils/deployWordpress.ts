@@ -96,8 +96,8 @@ async function deployWordpressVM(profile: IProfile, data: Wordpress) {
   machine.node_id = nodeId;
   machine.public_ip = false;
   machine.planetary = true;
-  // TODO: replacec the flist url with the official one
-  machine.flist = "https://hub.grid.tf/kassem.3bot/0om4r-wordpress_sql-login.flist"; //TODO : replace flist link;
+  machine.flist = "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist";
+
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
 
