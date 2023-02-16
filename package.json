@@ -76,8 +76,6 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
-    "@polkadot/api": "^6.8.1",
-    "@polkadot/extension-dapp": "^0.41.1",
     "add": "^2.0.6",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
@@ -87,7 +85,7 @@
     "cypress": "^10.1.0",
     "decimal.js": "^10.3.1",
     "front-matter": "^4.0.2",
-    "grid3_client": "^1.6.0-rc3",
+    "grid3_client": "^1.6.0-rc5",
     "js-yaml": "^4.1.0",
     "marked": "^3.0.8",
     "page": "^1.11.6",
@@ -97,7 +95,6 @@
     "serve": "^13.0.2",
     "sirv-cli": "^1.0.0",
     "tf-svelte-rx-forms": "^1.0.3",
-    "ts-rmb-http-client": "^1.1.2",
     "uuid": "^8.3.2",
     "web-ssh-keygen": "^0.1.2",
     "yarn": "^1.22.17"
