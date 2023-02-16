@@ -130,9 +130,7 @@
     <p>
       WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over
       43.3% of all the websites on the Internet.
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_wordpress">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_wordpress.html"> Quick start documentation</a>
     </p>
     <hr />
 
