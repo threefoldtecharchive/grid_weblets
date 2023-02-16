@@ -16,6 +16,7 @@ It solves such problem where you had to write complex HTML (and associated style
 
   - Nodejs 16^
   - yarn
+  - libtool
 
    > For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
 

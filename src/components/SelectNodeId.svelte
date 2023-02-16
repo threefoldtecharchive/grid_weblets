@@ -235,7 +235,7 @@
   let validating = false;
   $: {
     if (nodeSelection === "manual")
-      if (profile && _nodeId !== data) {
+      if (profile) {
         if (!data || !!_nodeValidator(data)) {
           if (_ctrl) {
             _ctrl.abort();
@@ -301,9 +301,7 @@
               return node["nodeId"];
             })
             .then(async (node: any) => {
-              nodeIdField.disabled = validating = node;
               await pingNode(node);
-              nodeIdField.disabled = validating = false;
             })
             .catch((err: Error) => {
               console.log("Error", err);
@@ -352,14 +350,14 @@
       let grid = await getGrid(profile, grid => grid);
       try {
         status = null;
-        validating = true;
+        nodeIdField.disabled = nodeSelectionField.disabled = validating = true;
         await grid.zos.pingNode({ nodeId: node });
         aliveNode = true;
-        validating = false;
+        nodeIdField.disabled = nodeSelectionField.disabled = validating = false;
         status = "valid";
         return true;
       } catch (e) {
-        nodeIdField.disabled = validating = false;
+        nodeIdField.disabled = nodeSelectionField.disabled = validating = false;
         status = "down";
         aliveNode = false;
         return false;

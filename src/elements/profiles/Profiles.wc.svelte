@@ -76,7 +76,8 @@
     grid._connect();
 
     try {
-      const account = await grid.tfchain.createAccount("::1");
+      const relay = process.env.NETWORK === "main" ? "relay.grid.tf" : `relay.${process.env.NETWORK}.grid.tf`;
+      const account = await grid.tfchain.createAccount(relay);
       mnemonics.setValue(account.mnemonic);
       mnemonics.markAsDirty();
       mnemonics.markAsTouched();
