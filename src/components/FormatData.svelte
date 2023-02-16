@@ -159,4 +159,36 @@
       }}
     />
   {/if}
+  <!-- wordpress data  -->
+  {#if vm.env.WP_URL}
+    <Input
+      data={vm.env.WP_URL}
+      field={{
+        label: "Domain",
+        symbol: "domain",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
+  {#if vm.env.MYSQL_USER && vm.env.MYSQL_PASSWORD}
+    <Input
+      data={vm.env.MYSQL_USER}
+      field={{
+        label: "Username",
+        symbol: "username",
+        type: "text",
+        disabled: true,
+      }}
+    />
+    <Input
+      data={vm.env.MYSQL_PASSWORD}
+      field={{
+        label: "Password",
+        symbol: "password",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
 {/if}
