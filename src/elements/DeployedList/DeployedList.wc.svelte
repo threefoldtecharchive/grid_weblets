@@ -26,6 +26,7 @@
     | "fullvm"
     | "algorand"
     | "qvm"
+    | "umbrel"
     | "wordpress";
 
   export let tab: TabsType = undefined;
@@ -63,6 +64,7 @@
     //{ label: "TFhub Validator", value: "tfhubValidator" },
     { label: "Node Pilot", value: "nodepilot" },
     { label: "QSFS Virtual Machine", value: "qvm"},
+    { label: "Umbrel", value: "umbrel"},
     { label: "Wordpress", value: "wordpress"}
 
   ];
@@ -485,6 +487,27 @@
           click: (_, i) => (infoToShow = rows[i].details),
           disabled: () => removing !== null,
           loading: i => removing === rows[i].name,
+        },
+      ],
+      umbrel: rows => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: i => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Visit",
+          click: (_, i) => {
+            const domain = rows[i].details.env.UMBREL_URL;
+            window.open("https://" + domain, "_blank").focus();
+          },
+          disabled: i => {
+            const env = rows[i].details.env;
+            return !env || !env.WP_URL || removing !== null;
+          },
         },
       ],
       wordpress: rows => [
