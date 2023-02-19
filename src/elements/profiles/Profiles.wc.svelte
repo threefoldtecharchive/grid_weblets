@@ -16,10 +16,11 @@
     storeSSH,
   } from "../../types/profileManager";
 
+  const nw = window.env?.network ?? process.env.NETWORK;
   const bridge =
-    process.env.NETWORK === "main"
+    nw === "main"
       ? "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
-      : process.env.NETWORK === "test"
+      : nw === "test"
       ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
       : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
 </script>
@@ -67,11 +68,16 @@
     mnemonicsLoading = true;
     createdNewAccount = false;
     mnemonicsError = "";
-    const grid = new window.configs.grid3_client.GridClient(process.env.NETWORK as any, "", "test");
+    const grid = new window.configs.grid3_client.GridClient(
+      process.env.NETWORK as any,
+      "",
+      "test",
+      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
+    );
     grid._connect();
 
     try {
-      const relay = process.env.NETWORK === "main" ? "relay.grid.tf" : `relay.${process.env.NETWORK}.grid.tf`;
+      const relay = nw === "main" ? "relay.grid.tf" : `relay.${nw}.grid.tf`;
       const account = await grid.tfchain.createAccount(relay);
       mnemonics.setValue(account.mnemonic);
       mnemonics.markAsDirty();
@@ -163,7 +169,7 @@
   $: if (mnemonics$.valid && sshKey$.valid && twinAndAddress && !baseConfig$) {
     requestAnimationFrame(() => {
       baseConfig.set({
-        networkEnv: process.env.NETWORK,
+        networkEnv: nw,
         mnemonics: mnemonics$.value,
         sshKey: sshKey$.value,
         address: twinAndAddress.address,

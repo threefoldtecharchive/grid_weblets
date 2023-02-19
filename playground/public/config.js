@@ -1,0 +1,3 @@
+window.env = {
+  network: "dev",
+};
