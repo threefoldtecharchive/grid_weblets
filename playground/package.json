@@ -15,7 +15,7 @@
     "buffer": "^6.0.3",
     "core-js": "^3.6.5",
     "front-matter": "^4.0.2",
-    "grid3_client": "^1.6.0-rc5",
+    "grid3_client": "^1.6.0-rc7",
     "marked": "^4.0.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
