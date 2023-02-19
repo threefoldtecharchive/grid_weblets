@@ -4,6 +4,8 @@ import getBalance from "../utils/getBalance";
 import getGrid from "../utils/getGrid";
 import { SSH_REGEX } from "../utils/validateName";
 
+const networkEnv = window.env?.network ?? process.env.NETWORK;
+
 export const noBalanceMessage = "Your balance is not enough.";
 export const mnemonics = fb.control<string>(
   "",
@@ -18,13 +20,16 @@ export const mnemonics = fb.control<string>(
   [
     async ctrl => {
       try {
-        await getGrid({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any, _ => _);
+        await getGrid({ networkEnv, mnemonics: ctrl.value } as any, _ => _);
       } catch (e) {
         return { message: e.message };
       }
     },
     async ctrl => {
-      const userBalance = await getBalance({ networkEnv: process.env.NETWORK, mnemonics: ctrl.value } as any);
+      const userBalance = await getBalance({
+        networkEnv,
+        mnemonics: ctrl.value,
+      } as any);
       if (userBalance.free < 1) {
         return { message: noBalanceMessage };
       }
@@ -53,7 +58,7 @@ export function getTwinAndAddress(mnemonics: string): Promise<GetTwinAndAddress 
     return Promise.resolve(getTwinAndAddressData.get(mnemonics));
   }
 
-  return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
+  return getGrid({ networkEnv, mnemonics } as any, _ => _)
     .then(grid => Promise.all([Promise.resolve(grid), grid.twins.get_my_twin_id()]))
     .then(([grid, twinId]) => {
       getTwinAndAddressData.set(mnemonics, { twinId, address: grid.twins.client.client.address });
@@ -63,7 +68,7 @@ export function getTwinAndAddress(mnemonics: string): Promise<GetTwinAndAddress 
 }
 
 export function readSSH(mnemonics: string): Promise<string> {
-  return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
+  return getGrid({ networkEnv, mnemonics } as any, _ => _)
     .then(grid => {
       return grid;
     })
@@ -79,7 +84,7 @@ export function storeSSH(mnemonics: string, ssh: string): Promise<boolean> {
   return readSSH(mnemonics)
     .then(oldSsh => {
       if (ssh === oldSsh) return true;
-      return getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _)
+      return getGrid({ networkEnv, mnemonics } as any, _ => _)
         .then(grid => grid.kvstore.set({ key: "metadata", value: metadata }))
         .then(() => true);
     })
@@ -104,8 +109,8 @@ async function resolve<T>(promise: Promise<T>): Promise<[T, Error]> {
 }
 
 export async function migrate(mnemonics: string, storeSecret: string) {
-  const oldClient = await getGrid({ networkEnv: process.env.NETWORK, mnemonics, storeSecret } as any, _ => _); // prettier-ignore
-  const newClient = await getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _); // prettier-ignore
+  const oldClient = await getGrid({ networkEnv, mnemonics, storeSecret } as any, _ => _); // prettier-ignore
+  const newClient = await getGrid({ networkEnv, mnemonics } as any, _ => _); // prettier-ignore
 
   const oldDB = oldClient.kvstore;
   const newDB = newClient.kvstore;
@@ -165,7 +170,7 @@ export function generateSSH(mnemonics: string) {
     size: 4096,
   })
     .then(_keys => (keys = _keys))
-    .then(() => getGrid({ networkEnv: process.env.NETWORK, mnemonics } as any, _ => _))
+    .then(() => getGrid({ networkEnv, mnemonics } as any, _ => _))
     .then(grid => grid.kvstore.set({ key: "metadata", value: JSON.stringify({ sshkey: keys.publicKey }) }))
     .then(() => {
       const data = `data:text/raw;charset=utf-8,${encodeURIComponent(keys.privateKey)}`;

@@ -24,7 +24,8 @@ export interface IStore {
     | "Fullvm"
     | "Algorand"
     | "Qvm"
-    | "QSFS";
+    | "QSFS"
+    | "Wordpress";
   name: string;
   message: string;
 }

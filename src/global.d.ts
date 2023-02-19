@@ -10,6 +10,7 @@ import deploymentStore from "./stores/deploymentStore";
 import notificationStore from "./stores/notifications";
 import currentDeploymentStore from "./stores/currentDeployment";
 import balanceStore from "./stores/balance";
+import type { NetworkEnv } from "grid3_client";
 
 interface AppConfigs {
   grid3_client: typeof grid3_client;
@@ -22,8 +23,13 @@ interface AppConfigs {
   bip39: typeof bip39;
 }
 
+interface EnvionmentVariables {
+  network?: NetworkEnv;
+}
+
 declare global {
   interface Window {
     configs: AppConfigs;
+    env?: EnvionmentVariables;
   }
 }
