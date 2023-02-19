@@ -21,6 +21,7 @@
   import ContractsList from "./elements/ContractsList/ContractsList.wc.svelte";
   import Algorand from "./elements/algorand/Algorand.wc.svelte";
   import QVM from "./elements/qvm/Qvm.wc.svelte";
+  import Umbrel from "./elements/umbrel/umbrel.wc.svelte";
   import Wordpress from "./elements/wordpress/wordpress.wc.svelte";
   const weblets = [
     { name: "Full VM", cmp: Fullvm },
@@ -40,6 +41,7 @@
     { name: "NodePilot", cmp: NodePilot },
     { name: "QVM", cmp: QVM },
     { name: "Algorand", cmp: Algorand },
+    { name: "Umbrel", cmp: Umbrel },
     { name: "Wordpress", cmp: Wordpress },
     { name: "Deployed List", cmp: DeployedList },
     { name: "Contracts List", cmp: ContractsList },

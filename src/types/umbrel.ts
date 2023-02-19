@@ -7,5 +7,5 @@ export default class Umbrel extends VM {
   public diskSize = 50;
   public username;
   public password = generatePassword(12);
-  public domain = "";
+  public umbrelDomain = "";
 }
