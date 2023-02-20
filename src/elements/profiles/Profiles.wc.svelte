@@ -16,13 +16,8 @@
     storeSSH,
   } from "../../types/profileManager";
 
-  const nw = window.env?.network ?? process.env.NETWORK;
-  const bridge =
-    nw === "main"
-      ? "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
-      : nw === "test"
-      ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
-      : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+  const nw = window.env?.NETWORK;
+  const bridge = window.env?.BRIDGE_TFT_ADDRESS;
 </script>
 
 <script lang="ts">
@@ -68,16 +63,11 @@
     mnemonicsLoading = true;
     createdNewAccount = false;
     mnemonicsError = "";
-    const grid = new window.configs.grid3_client.GridClient(
-      process.env.NETWORK as any,
-      "",
-      "test",
-      new window.configs.client.HTTPMessageBusClient(0, "", "", ""),
-    );
+    const grid = new window.configs.grid3_client.GridClient(window.env?.NETWORK as any, "", "test");
     grid._connect();
 
     try {
-      const relay = nw === "main" ? "relay.grid.tf" : `relay.${nw}.grid.tf`;
+      const relay = window.env.RELAY_DOMAIN;
       const account = await grid.tfchain.createAccount(relay);
       mnemonics.setValue(account.mnemonic);
       mnemonics.markAsDirty();

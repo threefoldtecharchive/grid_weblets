@@ -104,7 +104,7 @@ class Weblet {
   data: function () {
     return {
       envs: { dev: "DEVNET", test: "TESTNET", qa: "QANET", main: "MAINNET" },
-      network: window.env?.NETWORK ,
+      network: window.env?.NETWORK,
     };
   },
 })

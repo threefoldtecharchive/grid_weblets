@@ -9,4 +9,3 @@ import * as bip39 from "bip39";
   buffer,
   bip39,
 };
-(window as any).env = {};
