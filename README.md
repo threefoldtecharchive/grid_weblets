@@ -2,6 +2,7 @@
 
 ![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets)
 [![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml)
+[![Cypress Tests](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml)
 
 ## Introduction
 
