@@ -60,7 +60,7 @@
   let mnemonicsError = "";
   let createdNewAccount = false;
   $: mnemonics$ = $mnemonics;
-  $: mnemonicsIsDisabled = mnemonics$.pending || mnemonicsLoading;
+  $: mnemonicsIsDisabled = mnemonicsLoading;
   $: mnemonicsInvalid = (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.valid && !mnemonicsIsDisabled;
   $: mnemonicsHasError = (mnemonicsInvalid && mnemonics$.error) || mnemonicsError;
 
