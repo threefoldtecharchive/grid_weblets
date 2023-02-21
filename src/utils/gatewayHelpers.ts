@@ -6,10 +6,16 @@ export interface GatewayNodes {
   idx?: number;
 }
 export async function selectGatewayNode(): Promise<[number, string]> {
-  const { GridClient, Nodes, randomChoice } = window.configs.grid3_client;
+  const { GridClient, randomChoice } = window.configs.grid3_client;
 
-  const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.proxyURL, GridClient.config.rmbClient);
+  const grid = new GridClient({
+    network: window.env.NETWORK,
+    mnemonic: "",
+    storeSecret: "secret",
+  });
+  grid._connect();
 
+  const nodes = grid.capacity;
   const selectedNode = randomChoice(await nodes.filterNodes({ gateway: true }));
 
   const nodeId = selectedNode.nodeId;
@@ -25,8 +31,15 @@ export function selectSpecificGatewayNode(gateway: GatewayNodes): [number, strin
 }
 
 export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
-  const { GridClient, Nodes } = window.configs.grid3_client;
-  const nodes = new Nodes(GridClient.config.graphqlURL, GridClient.config.proxyURL, GridClient.config.rmbClient);
+  const { GridClient } = window.configs.grid3_client;
+  const grid = new GridClient({
+    network: window.env.NETWORK,
+    mnemonic: "",
+    storeSecret: "secret",
+  });
+  grid._connect();
+
+  const nodes = grid.capacity;
   const LoadedNodes = await nodes.filterNodes({ gateway: true });
   const gws: GatewayNodes[] = [];
 
@@ -40,14 +53,19 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
   return gws;
 }
 export async function getUniqueDomainName(profile, name, solutionType) {
-  const { networkEnv, mnemonics } = profile;
-  const client = new window.configs.grid3_client.GridClient(
-    networkEnv as any,
-    mnemonics,
-    mnemonics,
-    solutionType,
-    window.configs.grid3_client.BackendStorageType.tfkvstore,
-  );
+  const { mnemonics } = profile;
+  const client = new window.configs.grid3_client.GridClient({
+    mnemonic: mnemonics,
+    backendStorageType: window.configs.grid3_client.BackendStorageType.tfkvstore,
+    projectName: solutionType,
+
+    network: window.env.NETWORK,
+    substrateURL: window.env.SUBSTRATE_URL,
+    proxyURL: window.env.GRIDPROXY_URL,
+    graphqlURL: window.env.GRAPHQL_URL,
+    activationURL: window.env.ACTIVATION_SERVICE_URL,
+    relayURL: window.env.RELAY_DOMAIN,
+  });
 
   const solutionCode = solutionList[solutionType];
   await client.connect();

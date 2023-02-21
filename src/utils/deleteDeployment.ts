@@ -7,10 +7,19 @@ interface IConfig {
 }
 
 export default async function deleteDeployment(configs: IConfig, key: "k8s" | "machines", name: string, type: string) {
-  const { GridClient } = window.configs.grid3_client;
+  const { mnemonics } = configs;
+  const grid = new window.configs.grid3_client.GridClient({
+    mnemonic: mnemonics,
+    backendStorageType: window.configs.grid3_client.BackendStorageType.tfkvstore,
+    projectName: type,
 
-  const { mnemonics, networkEnv } = configs;
-  const grid = new GridClient(networkEnv as any, mnemonics, mnemonics, type, "tfkvstore" as any);
+    network: window.env.NETWORK,
+    substrateURL: window.env.SUBSTRATE_URL,
+    proxyURL: window.env.GRIDPROXY_URL,
+    graphqlURL: window.env.GRAPHQL_URL,
+    activationURL: window.env.ACTIVATION_SERVICE_URL,
+    relayURL: window.env.RELAY_DOMAIN,
+  });
 
   // remove deployment in namespace `type`
   console.log({ grid });
@@ -23,7 +32,7 @@ export default async function deleteDeployment(configs: IConfig, key: "k8s" | "m
   }
 
   // remove deployments (vm, gw) in default namespace ``
-  grid.projectName = "";
+  grid.clientOptions.projectName = "";
   await grid._connect();
   console.log({ grid });
   return await _deleteDeployments(grid, name, configs, "", key);

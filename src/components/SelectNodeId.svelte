@@ -14,8 +14,6 @@
   import MultiSelect from "./MultiSelect.svelte";
   import getGrid from "../utils/getGrid";
 
-  const { GridClient } = window.configs?.grid3_client ?? {};
-
   const dispatch = createEventDispatcher<{
     fetch: ISelectOption[];
     multiple: number[];
@@ -194,7 +192,7 @@
         _setLabel(0, old_farm_label, farmsLabel);
       });
 
-    fetchCountries(profile)
+    fetchCountries()
       .then(countries => {
         _setCountriesOptions(1, countries);
       })
@@ -247,13 +245,9 @@
           if (_ctrl) _ctrl.abort();
           _ctrl = new AbortController();
 
-          const { networkEnv } = profile;
-          const grid = new GridClient("" as any, "", "");
-          const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
-
           validating = true;
           status = null;
-          fetch(`${rmbProxy}/nodes/${data}`, {
+          fetch(`${window.env.GRIDPROXY_URL}/nodes/${data}`, {
             method: "GET",
             signal: _ctrl.signal,
           })
@@ -285,12 +279,11 @@
 
               if (filters.publicIPs) {
                 return gqlApi<{ nodes: { id: number }[] }>(
-                  profile,
                   "query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}",
                   { id: data },
                 )
                   .then(({ nodes: [{ id }] }) => {
-                    return gqlApi<{publicIps: []}>(profile, 'query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
+                    return gqlApi<{publicIps: []}>('query getIps($id: Int!) { publicIps(where: { contractId_eq: 0, farm: {farmID_eq: $id}}) {id}}', { id }); // prettier-ignore
                   })
                   .then(({ publicIps: ips }) => {
                     status = ips.length > 0 ? "valid" : "invalid";

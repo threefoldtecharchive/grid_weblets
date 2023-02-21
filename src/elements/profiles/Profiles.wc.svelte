@@ -63,7 +63,11 @@
     mnemonicsLoading = true;
     createdNewAccount = false;
     mnemonicsError = "";
-    const grid = new window.configs.grid3_client.GridClient(window.env?.NETWORK as any, "", "test");
+    const grid = new window.configs.grid3_client.GridClient({
+      network: window.env.NETWORK,
+      mnemonic: "",
+      storeSecret: "secret",
+    });
     grid._connect();
 
     try {

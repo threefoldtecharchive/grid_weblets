@@ -1,12 +1,5 @@
-import type { IProfile } from "../types/Profile";
-
-export async function fetchCountries(profile: IProfile): Promise<any> {
-  const { networkEnv } = profile;
-  const grid = new window.configs.grid3_client.GridClient("" as any, "", "");
-
-  const { rmbProxy } = grid.getDefaultUrls(networkEnv as any);
-
-  return fetch(`${rmbProxy}/stats?status=up`, {
+export async function fetchCountries(): Promise<any> {
+  return fetch(`${window.env.GRIDPROXY_URL}/stats?status=up`, {
     method: "GET",
   })
     .then(response => response.json())
