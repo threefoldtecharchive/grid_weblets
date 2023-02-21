@@ -24,7 +24,16 @@ interface AppConfigs {
 }
 
 interface EnvionmentVariables {
-  network?: NetworkEnv;
+  NETWORK: NetworkEnv;
+  GRAPHQL_URL: string;
+  GRIDPROXY_URL: string;
+  SUBSTRATE_URL: string;
+  ACTIVATION_SERVICE_URL: string;
+  RELAY_DOMAIN: string;
+  BRIDGE_TFT_ADDRESS: string;
+  STELLAR_NETWORK: string;
+  STELLAR_HORIZON_URL: string;
+  TFT_ASSET_ISSUER: string;
 }
 
 declare global {

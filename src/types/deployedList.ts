@@ -97,8 +97,8 @@ export default class DeployedList {
 
     try {
       projectName
-        ? (this.grid.projectName = projectName) // to load project named deployments
-        : (this.grid.projectName = ""); // to load orphan deployments
+        ? (this.grid.clientOptions.projectName = projectName) // to load project named deployments
+        : (this.grid.clientOptions.projectName = ""); // to load orphan deployments
       this.grid._connect(); // update the values of grid props
 
       return this.grid.machines
