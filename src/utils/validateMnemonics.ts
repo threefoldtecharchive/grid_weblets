@@ -1,17 +1,18 @@
-import type { BackendStorageType, NetworkEnv } from "grid3_client";
 import type { IProfile } from "../types/Profile";
 
 export default function validateMnemonics(profile: IProfile) {
-  const { networkEnv, mnemonics } = profile;
-  const http = new window.configs.client.HTTPMessageBusClient(0, "", "", "");
-  const grid = new window.configs.grid3_client.GridClient(
-    networkEnv as unknown as NetworkEnv,
-    mnemonics,
-    mnemonics,
-    http,
-    undefined,
-    "tfkvstore" as BackendStorageType,
-  );
+  const { mnemonics } = profile;
+  const grid = new window.configs.grid3_client.GridClient({
+    mnemonic: mnemonics,
+    backendStorageType: window.configs.grid3_client.BackendStorageType.tfkvstore,
+
+    network: window.env.NETWORK,
+    substrateURL: window.env.SUBSTRATE_URL,
+    proxyURL: window.env.GRIDPROXY_URL,
+    graphqlURL: window.env.GRAPHQL_URL,
+    activationURL: window.env.ACTIVATION_SERVICE_URL,
+    relayURL: window.env.RELAY_DOMAIN,
+  });
   return grid
     .connect()
     .then(() => grid.disconnect())
