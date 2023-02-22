@@ -5967,10 +5967,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@2.0.0-rc1:
-  version "2.0.0-rc1"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc1.tgz#cb3049a4d82e2e64f0df723e98f58e763598c659"
-  integrity sha512-2uzvbv9sd/ZSQXJ/vZ80uB9yVVVxkrCtM92Yq/Sr3kFr1S8zMOQiS3INIFBEXG/c/fuadhaarkgvIFd22U4HgA==
+grid3_client@2.0.0-rc2:
+  version "2.0.0-rc2"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc2.tgz#2c52d672101778d0eb676961ef5caa21a1ad0ef3"
+  integrity sha512-3zLRVFcM4MldszBc/K0sUgk7uS2tOpTnSeS980FTFgco2je66S/GjrVCWM538GP+6rBCECvZohB7sPeO4pHjpw==
   dependencies:
     "@jimber/pkid" "1.0.4"
     algosdk "^1.19.0"
