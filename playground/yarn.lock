@@ -5967,10 +5967,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@2.0.0-rc2:
-  version "2.0.0-rc2"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc2.tgz#2c52d672101778d0eb676961ef5caa21a1ad0ef3"
-  integrity sha512-3zLRVFcM4MldszBc/K0sUgk7uS2tOpTnSeS980FTFgco2je66S/GjrVCWM538GP+6rBCECvZohB7sPeO4pHjpw==
+grid3_client@2.0.0-rc3:
+  version "2.0.0-rc3"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc3.tgz#075aa733e72d3ccc10ecca3e6a4bfb6bf83dd0ae"
+  integrity sha512-9jK8ptdKjlP+VYEfSrcHXm5UKZQ4+Ob8u4uoYp1NnditNOGELtyjVWeJWpi6oSX+1AhjD3qUUQsPVj6o5uhtBQ==
   dependencies:
     "@jimber/pkid" "1.0.4"
     algosdk "^1.19.0"
@@ -5990,7 +5990,7 @@ grid3_client@2.0.0-rc2:
     netaddr "^1.1.0"
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
-    rmb-sdk-ts "1.0.8"
+    rmb-sdk-ts "1.0.9"
     stellar-sdk "^9.1.0"
     tfgrid-api-client "1.24.0"
     ts-rmb-redis-client "1.0.0"
@@ -9689,11 +9689,6 @@ realpath-native@^1.1.0:
   dependencies:
     util.promisify "^1.0.0"
 
-reconnecting-websocket@^4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/reconnecting-websocket/-/reconnecting-websocket-4.4.0.tgz#3b0e5b96ef119e78a03135865b8bb0af1b948783"
-  integrity sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==
-
 redis@^4.3.1:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/redis/-/redis-4.5.1.tgz#f5a818970bb2dc5d60540bab41308640604c7d33"
@@ -9976,17 +9971,16 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rmb-sdk-ts@1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/rmb-sdk-ts/-/rmb-sdk-ts-1.0.8.tgz#05b3c7c9c03646a1609f46ec49c370858002e96e"
-  integrity sha512-E1o2wU662QCmW8YX2E8Wrpm6xRCYsAUWPXqj2nXh05OcmAuX83P9OO8HPZXjfWMWo/qqihTPIuWCAvvc4mBoyA==
+rmb-sdk-ts@1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/rmb-sdk-ts/-/rmb-sdk-ts-1.0.9.tgz#b35ee2b8ceaca151db68f2dc6c931042f3a07b0f"
+  integrity sha512-gk4rA9qZ2kfuI7mNygQMiPC/plzL4oPMmEMbRG/4dTj9BHRy1Fw+9Fq7qURQMj6PyvkdmZrJ3/UOZGjSoyiU2w==
   dependencies:
     "@polkadot/api" "^8.9.1"
     base64url "^3.0.1"
     buffer "^6.0.3"
     crypto-js "^4.1.1"
     google-protobuf "^3.21.2"
-    reconnecting-websocket "^4.4.0"
     uuid "^8.3.2"
     ws "^8.12.0"
 
