@@ -47,12 +47,12 @@ export default function fetchFarms(profile: IProfile, filters: FilterOptions, ex
     queryDataSelect = queryDataIPFilter;
   }
 
-  return gqlApi<IQueryCount>(profile, query)
+  return gqlApi<IQueryCount>(query)
     .then(({ farms: { farms_limit } }) => {
       return { farms_limit };
     })
     .then(async vars => {
-      let { farms } = await gqlApi<IQueryData>(profile, queryDataSelect, vars);
+      let { farms } = await gqlApi<IQueryData>(queryDataSelect, vars);
 
       farms = await getOnlineFarms(profile, farms, exclusiveFor, filters.publicIPs);
 
@@ -61,9 +61,8 @@ export default function fetchFarms(profile: IProfile, filters: FilterOptions, ex
 }
 
 export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
-  const grid = new window.configs.grid3_client.GridClient("" as any, "", "", null);
-
-  const { graphql, rmbProxy } = grid.getDefaultUrls(profile.networkEnv);
+  const graphql = window.env.GRAPHQL_URL;
+  const gridproxy = window.env.GRIDPROXY_URL;
 
   let blockedFarms = [];
   const onlineFarmsSet = new Set();
@@ -71,10 +70,10 @@ export async function getOnlineFarms(profile, farms, exclusiveFor, publicIp) {
 
   if (exclusiveFor && !publicIp) {
     // no need for exclusive for if we have an ip
-    blockedFarms = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
+    blockedFarms = await getBlockedFarmsIDs(exclusiveFor, gridproxy, graphql);
   }
 
-  const upNodes = await paginatedFetcher(`${rmbProxy}/nodes?&status=up`, 0, 50);
+  const upNodes = await paginatedFetcher(`${gridproxy}/nodes?&status=up`, 0, 50);
 
   for (const node of upNodes) {
     if (!blockedFarms.includes(node.farmId)) {

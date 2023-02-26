@@ -8,17 +8,23 @@ export default function findNodes(
   exclusiveFor = "",
 ): Promise<ISelectOption[]> {
   async function resolver(res: (x: ISelectOption[]) => void) {
-    const { networkEnv } = profile;
-    const grid = new window.configs.grid3_client.GridClient("" as any, "", "", null);
+    const gridproxy = window.env.GRIDPROXY_URL;
+    const graphql = window.env.GRAPHQL_URL;
 
-    const { graphql, rmbProxy } = grid.getDefaultUrls(networkEnv as any);
-    const nodes = new window.configs.grid3_client.Nodes(graphql, rmbProxy, grid.rmbClient);
+    const grid = new window.configs.grid3_client.GridClient({
+      network: window.env.NETWORK,
+      mnemonic: "",
+      storeSecret: "secret",
+    });
+    grid._connect();
+
+    const nodes = grid.capacity;
 
     try {
       let avilableNodes = await nodes.filterNodes(filters);
 
       if (!filters.publicIPs && exclusiveFor != "") {
-        const blockedNodes = await getBlockedNodesIDs(exclusiveFor, rmbProxy, graphql);
+        const blockedNodes = await getBlockedNodesIDs(exclusiveFor, gridproxy, graphql);
 
         // remove the blocked nodes from the nodes the first page
         avilableNodes = exclude(blockedNodes, avilableNodes);
@@ -55,12 +61,12 @@ export default function findNodes(
   return new Promise(resolver);
 }
 
-async function getBlockedNodesIDs(exclusiveFor: string, rmbProxy: string, graphql: string): Promise<number[]> {
+async function getBlockedNodesIDs(exclusiveFor: string, gridproxy: string, graphql: string): Promise<number[]> {
   // This step for preventing select a node that already has a deployment of the same type.
   // For now, it is only used with presearch.
   const gqlClient = new window.configs.grid3_client.Graphql(graphql);
 
-  const blockedFarmsIDs = await getBlockedFarmsIDs(exclusiveFor, rmbProxy, graphql);
+  const blockedFarmsIDs = await getBlockedFarmsIDs(exclusiveFor, gridproxy, graphql);
 
   // get all the nodeIds of all the farms
   const farmsIDs = `[${blockedFarmsIDs.join(", ")}]`;
@@ -76,7 +82,7 @@ async function getBlockedNodesIDs(exclusiveFor: string, rmbProxy: string, graphq
   return farmNodesIDs;
 }
 
-export async function getBlockedFarmsIDs(exclusiveFor: string, rmbProxy: string, graphql: string): Promise<number[]> {
+export async function getBlockedFarmsIDs(exclusiveFor: string, gridproxy: string, graphql: string): Promise<number[]> {
   const gqlClient = new window.configs.grid3_client.Graphql(graphql);
 
   // get the total number of deployment of the same type
@@ -98,7 +104,7 @@ export async function getBlockedFarmsIDs(exclusiveFor: string, rmbProxy: string,
   // get the farmIds of all the used nodes. "in Set to remove duplicates"
   const farmIds = new Set<number>();
   for (const nodeId of nodeIds) {
-    const res = await fetch(`${rmbProxy}/nodes/${nodeId}`);
+    const res = await fetch(`${gridproxy}/nodes/${nodeId}`);
     farmIds.add((await res.json())["farmId"]);
   }
   const farmIdsarr = Array.from(farmIds);

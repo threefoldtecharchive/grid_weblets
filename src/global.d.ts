@@ -1,6 +1,5 @@
 /// <reference types="svelte" />
 
-import * as client from "ts-rmb-http-client";
 import * as grid3_client from "grid3_client";
 import * as buffer from "buffer";
 import * as bip39 from "bip39";
@@ -14,7 +13,6 @@ import balanceStore from "./stores/balance";
 import type { NetworkEnv } from "grid3_client";
 
 interface AppConfigs {
-  client: typeof client;
   grid3_client: typeof grid3_client;
   baseConfig: typeof baseConfigStore;
   deploymentStore: typeof deploymentStore;
@@ -26,7 +24,16 @@ interface AppConfigs {
 }
 
 interface EnvionmentVariables {
-  network?: NetworkEnv;
+  NETWORK: NetworkEnv;
+  GRAPHQL_URL: string;
+  GRIDPROXY_URL: string;
+  SUBSTRATE_URL: string;
+  ACTIVATION_SERVICE_URL: string;
+  RELAY_DOMAIN: string;
+  BRIDGE_TFT_ADDRESS: string;
+  STELLAR_NETWORK: string;
+  STELLAR_HORIZON_URL: string;
+  TFT_ASSET_ISSUER: string;
 }
 
 declare global {

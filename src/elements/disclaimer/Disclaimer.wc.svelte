@@ -4,9 +4,11 @@
   const envs = {
     dev: { env: "development", url: "https://github.com/threefoldtech/test_feedback/issues" },
     test: { env: "testing", url: "https://github.com/threefoldtech/test_feedback/issues" },
+    qa: { env: "QA", url: "https://github.com/threefoldtech/test_feedback/issues" },
+    custom: { env: "customized", url: "https://github.com/threefoldtech/test_feedback/issues" },
   };
 
-  $: env = envs[window.env?.network ?? process.env.NETWORK];
+  $: env = envs[window.env?.NETWORK];
 </script>
 
 {#if env}

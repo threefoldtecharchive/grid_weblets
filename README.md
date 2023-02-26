@@ -2,6 +2,7 @@
 
 ![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets)
 [![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml)
+[![Cypress Tests](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml)
 
 ## Introduction
 
@@ -18,11 +19,9 @@ It solves such problem where you had to write complex HTML (and associated style
   - yarn
   - libtool
 
-   > For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
+  > For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
 
 - **Clone the repository**
-
-  
 
   ```bash
   git clone https://github.com/threefoldtech/grid_weblets.git
@@ -52,6 +51,16 @@ yarn build:app
 ```
 
 This will generate the production build in the `dist` directory, which can be served using [Caddy](https://caddyserver.com/) or [NGINX](https://www.nginx.com/)
+
+You can run the playground in different modes. by editing the config file in `playground/public/config.js`
+For an automated generation of the config file you can use the script `build-env` in `scripts/` it will generate the config file based on your env-vars.
+
+```bash
+cd playground/public
+bash ../../scripts/build-env.sh
+```
+
+More illustration on the build-env script [here](docs/build.md)
 
 ## Testing
 
