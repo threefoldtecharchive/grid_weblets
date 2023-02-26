@@ -24,8 +24,6 @@
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
-  import { prevent_default } from "svelte/internal";
-  import { display } from "../../utils/display";
 
   let data = new Subsquid();
   let profile: IProfile;
