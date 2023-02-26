@@ -24,6 +24,8 @@
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import { prevent_default } from "svelte/internal";
+  import { display } from "../../utils/display";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -95,6 +97,12 @@
   }
 
   $: logs = $currentDeployment;
+
+  $: showLogs = loading || (logs !== null && logs.type === "Subsquid");
+  $: showNoProfile = !showLogs && !profile;
+  $: showSuccess = !showLogs && !showNoProfile && success;
+  $: showFailed = !showLogs && !showNoProfile && failed;
+  $: showContent = !showLogs && !showNoProfile && !showSuccess && !showFailed;
 </script>
 
 <SelectProfile
@@ -116,15 +124,23 @@
 
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "Subsquid")}
+    <div style:display={showLogs ? "block" : "none"}>
       <Alert type="info" message={logs?.message ?? "Loading..."} />
-    {:else if !profile}
+    </div>
+
+    <div style:display={showNoProfile ? "block" : "none"}>
       <Alert type="info" message={noActiveProfile} />
-    {:else if success}
+    </div>
+
+    <div style:display={showSuccess ? "block" : "none"}>
       <Alert type="success" message="Successfully Deployed Subsquid." deployed={true} />
-    {:else if failed}
+    </div>
+
+    <div style:display={showFailed ? "block" : "none"}>
       <Alert type="danger" {message} />
-    {:else}
+    </div>
+
+    <div style:display={showContent ? "block" : "none"}>
       <Tabs bind:active {tabs} />
 
       {#each fields as field (field.symbol)}
@@ -164,7 +180,7 @@
         on:fetch={({ detail }) => (data.selection.nodes = detail)}
         nodes={data.selection.nodes}
       />
-    {/if}
+    </div>
 
     <DeployBtn
       {disabled}
