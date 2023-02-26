@@ -20,15 +20,12 @@
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid, validateUmbrelPassword } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   let data = new Umbrel();
   data.disks = [new Disk()];
   let profile: IProfile;
-  let gateway: GatewayNodes;
 
   let loading = false;
   let success = false;
@@ -94,7 +91,7 @@
       return;
     }
 
-    deployUmbrel(data, profile, gateway)
+    deployUmbrel(data, profile)
       .then((data: any) => {
         modalData = data.deploymentInfo;
         deploymentStore.set();
@@ -160,7 +157,6 @@
           }
         }}
       />
-      <SelectGatewayNode bind:gateway bind:invalid />
       <SelectNodeId
         cpu={data.cpu}
         memory={data.memory}
