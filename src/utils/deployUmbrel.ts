@@ -17,6 +17,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
     nodeId,
     umbrelDomain,
     password,
+    publicIp,
     username,
     disks: [{ size }],
   } = data;
@@ -40,7 +41,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   machine.memory = memory;
   machine.disks = [disk];
   machine.node_id = nodeId;
-  machine.public_ip = false;
+  machine.public_ip = publicIp;
   machine.planetary = true;
   machine.flist = "https://hub.grid.tf/kassem.3bot/0om4r-umbrel-1.0.0.flist";
 

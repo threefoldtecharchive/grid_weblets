@@ -30,7 +30,6 @@
   let loading = false;
   let success = false;
   let failed = false;
-  let invalid = true;
 
   let status: "valid" | "invalid";
   let active = "config";
@@ -38,7 +37,7 @@
   const deploymentStore = window.configs?.deploymentStore;
   const currentDeployment = window.configs?.currentDeploymentStore;
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || invalid || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed))  || !profile || status !== "valid" || selectCapacity.invalid || isInvalid([...fields]); // prettier-ignore
 
   let message: string;
   let modalData: object;
@@ -69,6 +68,7 @@
       validator: validateUmbrelPassword,
       invalid: false,
     },
+    { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: "checkbox" },
   ];
   // define this solution packages
   let selectCapacity = new SelectCapacityUpdate();
@@ -160,7 +160,7 @@
       <SelectNodeId
         cpu={data.cpu}
         memory={data.memory}
-        publicIp={false}
+        publicIp={data.publicIp}
         ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
         bind:data={data.nodeId}
         bind:nodeSelection={data.selection.type}
