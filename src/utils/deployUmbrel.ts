@@ -48,6 +48,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = true;
+  //  TODO replace with the official flist
   machine.flist = "https://hub.grid.tf/kassem.3bot/0om4r-umbrel-1.0.0.flist";
 
   machine.rootfs_size = rootFs(cpu, memory);
