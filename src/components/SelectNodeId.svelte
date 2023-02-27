@@ -92,14 +92,20 @@
     nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
       publicIPs: filters.publicIPs,
-      country: filters.country,
-      farmName: filters.farmName,
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
       hru: filters.hru,
       availableFor: $configs.twinId,
     };
+
+    if (filters.country !== null && filters.country !== "") {
+      _filters["country"] = filters.country;
+    }
+
+    if (filters.farmName !== null && filters.farmName !== "") {
+      _filters["farmName"] = filters.farmName;
+    }
 
     findNodes(_filters, profile, exclusiveFor)
       .then(async _nodes => {
