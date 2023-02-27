@@ -93,7 +93,7 @@
 
     deployUmbrel(data, profile)
       .then((data: any) => {
-        modalData = data.deploymentInfo;
+        modalData = data;
         deploymentStore.set();
         success = true;
       })
