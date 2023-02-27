@@ -44,6 +44,8 @@ export default class DeployedList {
   public loadK8s(): Promise<IListReturn> {
     let total = 0;
     try {
+      this.grid.clientOptions.projectName = "Kubernetes";
+      this.grid._connect();
       return this.grid.k8s
         .list()
         .then(DeployedList.__filterNames)
