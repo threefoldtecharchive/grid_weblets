@@ -280,7 +280,9 @@
                   migrationDetails.migrated
                 }, Migrated keys: ${
                   migrationDetails.total - (migrationDetails.failed + migrationDetails.migrated)
-                }, Failed to migrate: ${migrationDetails.failed}.`
+                }, Failed to migrate: ${
+                  migrationDetails.failed
+                } keys. Maybe the failed keys are encrypted with a different password or not encrypted or a disconnection happened while migrating.`
               : migratingError}
           </div>
         {/if}
