@@ -3,6 +3,7 @@ import { writable } from "svelte/store";
 export interface IStore {
   type:
     | "Kubernetes"
+    | "Machines"
     | "VM"
     | "CapRover"
     | "Discourse"

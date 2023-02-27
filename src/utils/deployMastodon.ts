@@ -9,7 +9,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployMastodon(profile: IProfile, mastodon: Mastodon, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, mastodon.name, "mastodon");
+  const domainName = await getUniqueDomainName(profile, mastodon.name, "Mastodon");
 
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   mastodon.domain = `${domainName}.${nodeDomain}`;
@@ -20,7 +20,7 @@ export default async function deployMastodon(profile: IProfile, mastodon: Mastod
   try {
     await _deployGateway(profile, domainName, ip, publicNodeId);
   } catch (err) {
-    await destroy(profile, "mastodon", mastodon.name);
+    await destroy(profile, "Mastodon", mastodon.name);
     throw err;
   }
 
@@ -100,7 +100,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "Mastodon", name, async grid => {
-    await checkVMExist(grid, "mastodon", name);
+    await checkVMExist(grid, "Mastodon", name);
 
     return grid.machines
       .deploy(vms)
@@ -126,7 +126,7 @@ function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: num
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", name, async grid => {
-    await checkGW(grid, name, "mastodon");
+    await checkGW(grid, name, "Mastodon");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(name))

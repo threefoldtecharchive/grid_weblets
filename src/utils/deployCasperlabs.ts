@@ -12,7 +12,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployCasperlabs(data: Casperlabs, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "casperlabs");
+  const domainName = await getUniqueDomainName(profile, data.name, "Casperlabs");
 
   // Dynamically select node to deploy the gateway
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
@@ -29,7 +29,7 @@ export default async function deployCasperlabs(data: Casperlabs, profile: IProfi
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback casperlabs deployment if gateway deployment failed
-    await destroy(profile, "casperlabs", data.name);
+    await destroy(profile, "Casperlabs", data.name);
     throw error;
   }
 
@@ -93,7 +93,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
 
   // deploy
   return deploy(profile, "Casperlabs", name, async grid => {
-    await checkVMExist(grid, "casperlabs", name);
+    await checkVMExist(grid, "Casperlabs", name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -119,7 +119,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
-    await checkGW(grid, domainName, "casperlabs");
+    await checkGW(grid, domainName, "Casperlabs");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

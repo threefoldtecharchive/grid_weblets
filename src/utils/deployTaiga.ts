@@ -9,7 +9,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployTaiga(data: Taiga, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "taiga");
+  const domainName = await getUniqueDomainName(profile, data.name, "Taiga");
 
   // Dynamically select node to deploy the gateway
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
@@ -24,7 +24,7 @@ export default async function deployTaiga(data: Taiga, profile: IProfile, gatewa
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback the TaigaVM if the gateway fails to deploy
-    await destroy(profile, "taiga", data.name);
+    await destroy(profile, "Taiga", data.name);
     throw error;
   }
 
@@ -106,7 +106,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "Taiga", name, async grid => {
-    await checkVMExist(grid, "taiga", name);
+    await checkVMExist(grid, "Taiga", name);
 
     return grid.machines
       .deploy(vms)
@@ -132,7 +132,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
-    await checkGW(grid, domainName, "taiga");
+    await checkGW(grid, domainName, "Taiga");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

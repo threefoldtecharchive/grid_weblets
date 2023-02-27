@@ -3,33 +3,9 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import type { IProfile } from "../../types/Profile";
-  import type { ITab } from "../../types";
+  import type { DeploymentTab, ITab } from "../../types";
   import DeployedList from "../../types/deployedList";
   import deleteDeployment from "../../utils/deleteDeployment";
-
-  type TabsType =
-    | "k8s"
-    | "vm"
-    | "caprover"
-    | "funkwhale"
-    | "peertube"
-    | "mattermost"
-    | "mastodon"
-    | "tfhubValidator"
-    | "discourse"
-    | "taiga"
-    | "owncloud"
-    | "presearch"
-    | "casperlabs"
-    | "nodepilot"
-    | "subsquid"
-    | "fullvm"
-    | "algorand"
-    | "qvm"
-    | "wordpress";
-
-  export let tab: TabsType = undefined;
-
   // components
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Tabs from "../../components/Tabs.svelte";
@@ -42,32 +18,34 @@
   import type { IAction } from "../../types/table-action";
   import DialogueMsg from "../../components/DialogueMsg.svelte";
   import getGrid from "../../utils/getGrid";
+  import type { IStore } from "../../stores/currentDeployment";
 
-  // prettier-ignore
-  const tabs: ITab[] = [
-    { label: "Full Virtual Machine", value: "fullvm" },
-    { label: "Micro Virtual Machine", value: "vm" },
-    { label: "Kubernetes", value: "k8s" },
-    { label: "CapRover", value: "caprover" },
-    { label: "Peertube", value: "peertube" },
-    { label: "Funkwhale", value: "funkwhale" },
-    { label: "Mattermost", value: "mattermost" },
-    { label: "Mastodon", value: "mastodon" },
-    { label: "Discourse", value: "discourse" },
-    { label: "Taiga", value: "taiga" },
-    { label: "Owncloud", value: "owncloud" },
-    { label: "Presearch", value: "presearch" },
-    { label: "Subsquid", value: "subsquid" },
-    { label: "Casperlabs", value: "casperlabs" },
-    { label: "Algorand", value: "algorand" },
-    //{ label: "TFhub Validator", value: "tfhubValidator" },
-    { label: "Node Pilot", value: "nodepilot" },
-    { label: "QSFS Virtual Machine", value: "qvm"},
-    { label: "Wordpress", value: "wordpress"}
+  type TabsType = IStore["type"];
+  export let tab: TabsType = undefined;
 
+  const tabs: DeploymentTab[] = [
+    { label: "Full Virtual Machine", value: "Fullvm" },
+    { label: "Micro Virtual Machine", value: "VM" },
+    { label: "Kubernetes", value: "Kubernetes" },
+    { label: "CapRover", value: "CapRover" },
+    { label: "Peertube", value: "Peertube" },
+    { label: "Funkwhale", value: "Funkwhale" },
+    { label: "Mattermost", value: "Mattermost" },
+    { label: "Mastodon", value: "Mastodon" },
+    { label: "Discourse", value: "Discourse" },
+    { label: "Taiga", value: "Taiga" },
+    { label: "Owncloud", value: "Owncloud" },
+    { label: "Presearch", value: "Presearch" },
+    { label: "Subsquid", value: "Subsquid" },
+    { label: "Casperlabs", value: "Casperlabs" },
+    { label: "Algorand", value: "Algorand" },
+    //{ label: "TFhub Validator", value: "TFhubValidator" },
+    { label: "Node Pilot", value: "NodePilot" },
+    { label: "QSFS Virtual Machine", value: "Qvm" },
+    { label: "Wordpress", value: "Wordpress" },
   ];
   let grid;
-  let active = "vm";
+  let active: IStore["type"] = "VM";
   $: active = tab || active;
 
   let loading = false;
@@ -98,7 +76,7 @@
 
   function _reloadTab() {
     const x = active;
-    active = "";
+    active = undefined;
 
     const y = tab;
     tab = undefined;
@@ -109,7 +87,7 @@
   }
 
   let removing: string = null;
-  function onRemoveHandler(key: "k8s" | "machines", name: string, type: string) {
+  function onRemoveHandler(key: "k8s" | "machines", name: string, type: IStore["type"]) {
     removing = name;
     window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
     return deleteDeployment(profile, key, name, type)
@@ -168,7 +146,7 @@
   async function onDeleteHandler() {
     message = null;
 
-    const key = active === "k8s" ? "k8s" : "machines";
+    const key = active === "Kubernetes" ? "k8s" : "machines";
     for (const row of selectedRows) {
       await onRemoveHandler(key, row.name, active);
     }
@@ -180,7 +158,7 @@
 
   const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = new Proxy(
     {
-      vm: rows => [
+      VM: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -578,8 +556,8 @@
       <DialogueMsg bind:opened on:removed={onDeleteHandler} {name} />
 
       <!-- K8S -->
-      {#if active === "k8s"}
-        {#await list?.loadK8s()}
+      {#if active === "Kubernetes"}
+        {#await list.loadK8s()}
           <Alert type="info" message="Listing Kubernetes..." />
         {:then rows}
           {#if rows.data.length}
@@ -620,10 +598,10 @@
           <Alert type="danger" message={err.message || err || "Failed to list Kubernetes"} />
         {/await}
       {:else}
-        {#await list?.loadDeployments(active === "vm" ? undefined : active)}
+        {#await list?.loadDeployments(active)}
           <Alert
             type="info"
-            message={`Listing ${active == "casperlabs" ? "Casperlab" : get_solution_label(active)}s...`}
+            message={`Listing ${active == "Casperlabs" ? "Casperlab" : get_solution_label(active)}s...`}
           />
         {:then rows}
           {#if rows.data.length}
@@ -647,7 +625,7 @@
             <Alert
               type="gray"
               message={`No ${
-                active == "casperlabs" ? "Casperlab" : get_solution_label(active)
+                active == "Casperlabs" ? "Casperlab" : get_solution_label(active)
               }s found on this profile.`}
             />
           {/if}
@@ -656,7 +634,7 @@
             type="danger"
             message={err.message ||
               err ||
-              `Failed to list ${active == "casperlabs" ? "Casperlab" : get_solution_label(active)}s`}
+              `Failed to list ${active == "Casperlabs" ? "Casperlab" : get_solution_label(active)}s`}
           />
         {/await}
       {/if}

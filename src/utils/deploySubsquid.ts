@@ -11,7 +11,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deploySubsquid(data: Subsquid, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "subsquid");
+  const domainName = await getUniqueDomainName(profile, data.name, "Subsquid");
 
   // Dynamically select node to deploy the gateway
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
@@ -28,7 +28,7 @@ export default async function deploySubsquid(data: Subsquid, profile: IProfile, 
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback subsquid deployment if gateway deployment failed
-    await destroy(profile, "subsquid", data.name);
+    await destroy(profile, "Subsquid", data.name);
     throw error;
   }
 
@@ -96,7 +96,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
 
   // deploy
   return deploy(profile, "Subsquid", name, async grid => {
-    await checkVMExist(grid, "subsquid", name); // change the project name of the grid to be subsquid
+    await checkVMExist(grid, "Subsquid", name); // change the project name of the grid to be subsquid
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -121,7 +121,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
-    await checkGW(grid, domainName, "subsquid");
+    await checkGW(grid, domainName, "Subsquid");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

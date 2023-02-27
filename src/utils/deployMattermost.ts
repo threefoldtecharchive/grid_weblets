@@ -11,7 +11,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployMattermost(profile: IProfile, mattermost: Mattermost, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, mattermost.name, "mattermost");
+  const domainName = await getUniqueDomainName(profile, mattermost.name, "Mattermost");
 
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   mattermost.domain = `${domainName}.${nodeDomain}`;
@@ -22,7 +22,7 @@ export default async function deployMattermost(profile: IProfile, mattermost: Ma
   try {
     await _deployGateway(profile, domainName, ip, publicNodeId);
   } catch (err) {
-    await destroy(profile, "mattermost", mattermost.name);
+    await destroy(profile, "Mattermost", mattermost.name);
     throw err;
   }
 
@@ -69,7 +69,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "Mattermost", name, async grid => {
-    await checkVMExist(grid, "mattermost", name);
+    await checkVMExist(grid, "Mattermost", name);
 
     return grid.machines
       .deploy(vms)
@@ -95,7 +95,7 @@ function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: num
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", name, async grid => {
-    await checkGW(grid, name, "mattermost");
+    await checkGW(grid, name, "Mattermost");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(name))

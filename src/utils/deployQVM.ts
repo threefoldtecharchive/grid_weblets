@@ -24,7 +24,7 @@ export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
 
   try {
     return deploy(profile, "Qvm", qsfs.name, async grid => {
-      await checkVMExist(grid, "qvm", name);
+      await checkVMExist(grid, "Qvm", name);
       return grid.qsfs_zdbs
         .deploy(qsfs)
         .then(() => grid.qsfs_zdbs.get({ name: name }))

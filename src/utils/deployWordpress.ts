@@ -11,7 +11,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployWordpress(data: Wordpress, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "wordpress");
+  const domainName = await getUniqueDomainName(profile, data.name, "Wordpress");
 
   // Dynamically select node to deploy the gateway
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
@@ -28,7 +28,7 @@ export default async function deployWordpress(data: Wordpress, profile: IProfile
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback wordpress deployment if gateway deployment failed
-    await destroy(profile, "wordpress", data.name);
+    await destroy(profile, "Wordpress", data.name);
     throw error;
   }
 
@@ -52,7 +52,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
-    await checkGW(grid, domainName, "wordpress");
+    await checkGW(grid, domainName, "Wordpress");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))
@@ -124,7 +124,7 @@ async function deployWordpressVM(profile: IProfile, data: Wordpress) {
 
   // deploy
   return deploy(profile, "Wordpress", name, async grid => {
-    await checkVMExist(grid, "wordpress", name); // change the project name of the grid to be Wordpress
+    await checkVMExist(grid, "Wordpress", name); // change the project name of the grid to be Wordpress
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))

@@ -83,7 +83,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
   machines.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "CapRover", name, async grid => {
-    await checkVMExist(grid, "caprover", name);
+    await checkVMExist(grid, "CapRover", name);
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))

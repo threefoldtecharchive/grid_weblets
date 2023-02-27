@@ -79,7 +79,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
 
   // Deploy
   return deploy(profile, "Algorand", name, async grid => {
-    await checkVMExist(grid, "algorand", name);
+    await checkVMExist(grid, "Algorand", name);
 
     return grid.machines
       .deploy(machines)

@@ -62,6 +62,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { parse } from "marked";
+import type { IStore } from "../../../src/stores/currentDeployment";
 let userAgent = navigator.userAgent;
 
 if (!userAgent.match(/chrome|chromium|crios/i)) {
@@ -74,7 +75,7 @@ class Weblet {
   public constructor(
     public name: string,
     public symbol: string,
-    deployment = "",
+    deployment: IStore["type"] | undefined = undefined,
     public section: "deployment" | "calculator" | "my account",
     public img: string | null = null,
   ) {
@@ -111,43 +112,43 @@ class Weblet {
 export default class Editor extends Vue {
   public sections = ["deployment", "my account"];
   public weblets: Weblet[] = [
-    new Weblet("Full Virtual Machine", "fullvm", "fullvm", "deployment", "vm.png"),
-    new Weblet("Micro Virtual Machine", "vm", "vm", "deployment", "vm.png"),
-    new Weblet("Kubernetes", `kubernetes`, "k8s", "deployment", "kubernetes.png"),
-    new Weblet("CapRover", "caprover", "caprover", "deployment", "caprover.png"),
+    new Weblet("Full Virtual Machine", "fullvm", "Fullvm", "deployment", "vm.png"),
+    new Weblet("Micro Virtual Machine", "vm", "VM", "deployment", "vm.png"),
+    new Weblet("Kubernetes", `kubernetes`, "Kubernetes", "deployment", "kubernetes.png"),
+    new Weblet("CapRover", "caprover", "CapRover", "deployment", "caprover.png"),
 
-    new Weblet("Peertube", "peertube", "peertube", "deployment", "peertube.png"),
-    new Weblet("Funkwhale", "funkwhale", "funkwhale", "deployment", "funkwhale.png"),
+    new Weblet("Peertube", "peertube", "Peertube", "deployment", "peertube.png"),
+    new Weblet("Funkwhale", "funkwhale", "Funkwhale", "deployment", "funkwhale.png"),
 
-    new Weblet("Mattermost", "mattermost", "mattermost", "deployment", "mattermost.png"),
+    new Weblet("Mattermost", "mattermost", "Mattermost", "deployment", "mattermost.png"),
     // new Weblet(
     //   "Mastodon",
     //   "mastodon",
-    //   "mastodon",
+    //   "Mastodon",
     //   "deployment",
     //   "mastodon.png"
     // ),
-    new Weblet("Discourse", "discourse", "discourse", "deployment", "discourse.png"),
+    new Weblet("Discourse", "discourse", "Discourse", "deployment", "discourse.png"),
 
-    new Weblet("Taiga", "taiga", "taiga", "deployment", "taiga.png"),
-    new Weblet("Owncloud", "owncloud", "owncloud", "deployment", "owncloud.png"),
-    new Weblet("Presearch", "presearch", "presearch", "deployment", "presearch.png"),
-    new Weblet("Subsquid", "subsquid", "subsquid", "deployment", "subsquid.png"),
-    new Weblet("Casperlabs", "casperlabs", "casperlabs", "deployment", "casperlabs.png"),
-    new Weblet("Algorand", "algorand", "algorand", "deployment", "algorand.png"),
+    new Weblet("Taiga", "taiga", "Taiga", "deployment", "taiga.png"),
+    new Weblet("Owncloud", "owncloud", "Owncloud", "deployment", "owncloud.png"),
+    new Weblet("Presearch", "presearch", "Presearch", "deployment", "presearch.png"),
+    new Weblet("Subsquid", "subsquid", "Subsquid", "deployment", "subsquid.png"),
+    new Weblet("Casperlabs", "casperlabs", "Casperlabs", "deployment", "casperlabs.png"),
+    new Weblet("Algorand", "algorand", "Algorand", "deployment", "algorand.png"),
     /*new Weblet(
       "TFhub Validator",
       "validator",
-      "tfhubValidator",
+      "TFhubValidator",
       "deployment",
       "vm.png"
     ),*/
-    new Weblet("Node Pilot", "nodepilot", "nodepilot", "deployment", "vm.png"),
+    new Weblet("Node Pilot", "nodepilot", "NodePilot", "deployment", "vm.png"),
     // new Weblet("QSFS Virtual Machine", "qvm", "qvm", "deployment", "vm.png"),
-    new Weblet("Wordpress", "wordpress", "wordpress", "deployment", "wordpress.png"),
+    new Weblet("Wordpress", "wordpress", "Wordpress", "deployment", "wordpress.png"),
 
-    new Weblet("Contracts", "contractslist", "", "my account", ""),
-    new Weblet("Deployments", "deployedlist", "", "my account", ""),
+    new Weblet("Contracts", "contractslist", undefined, "my account", ""),
+    new Weblet("Deployments", "deployedlist", undefined, "my account", ""),
 
     // new Weblet("Farming Calculator", "farming-calculator", "", "calculator"),
   ];
