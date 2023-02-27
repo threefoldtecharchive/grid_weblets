@@ -160,16 +160,8 @@
     />
   {/if}
   <!-- umbrel data  -->
-  {#if vm.env.UMBREL_URL}
+  {#if vm.env.UMBREL_DISK}
     <Input
-      data={vm.env.UMBREL_URL}
-      field={{
-        label: "Domain",
-        symbol: "domain",
-        type: "text",
-        disabled: true,
-      }}
-    /><Input
       data={vm.env.USERNAME}
       field={{
         label: "Username",
