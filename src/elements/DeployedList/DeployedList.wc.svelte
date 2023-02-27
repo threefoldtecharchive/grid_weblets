@@ -499,7 +499,7 @@
         },
         {
           type: "warning",
-          label: "Visit",
+          label: "Admin Panel",
           click: (_, i) => {
             if (rows[i].details.publicIP) {
               // remove prefix form ip address
