@@ -31,15 +31,20 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   /* Docker disk */
   const disk = new DiskModel();
   disk.name = `disk${randomSuffix}`;
-  disk.size = size;
+  disk.size = 10;
   disk.mountpoint = "/var/lib/docker";
 
+  /* Umbrel disk */
+  const umbrel_disk = new DiskModel();
+  umbrel_disk.name = `disk${randomSuffix}U`;
+  umbrel_disk.size = size;
+  umbrel_disk.mountpoint = "/umbrelDisk";
   // machine Specs
   const machine = new MachineModel();
   machine.name = name; //`machine${randomSuffix}`;
   machine.cpu = cpu;
   machine.memory = memory;
-  machine.disks = [disk];
+  machine.disks = [disk, umbrel_disk];
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = true;
@@ -52,7 +57,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
     SSH_KEY: profile.sshKey,
     USERNAME: username,
     PASSWORD: password,
-    UMBREL_URL: umbrelDomain,
+    UMBREL_DISK: umbrel_disk.mountpoint,
   };
 
   // VMS Specs

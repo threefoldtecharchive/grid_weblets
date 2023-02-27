@@ -501,8 +501,14 @@
           type: "warning",
           label: "Visit",
           click: (_, i) => {
-            const domain = rows[i].details.env.UMBREL_URL;
-            window.open("https://" + domain, "_blank").focus();
+            if (!rows[i].details.publicIP) {
+              // remove prefix form ip address
+              const domain = rows[i].details.publicIP.ip.slice(0, -3);
+              window.open(`http://[${domain}]`, "_blank").focus();
+            } else {
+              const domain = rows[i].details.planetary;
+              window.open(`http://${domain}`, "_blank").focus();
+            }
           },
           disabled: i => {
             const env = rows[i].details.env;
