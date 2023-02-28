@@ -15,14 +15,13 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
     cpu,
     memory,
     nodeId,
-    umbrelDomain,
     password,
     publicIp,
     username,
     disks: [{ size }],
   } = data;
 
-  // wp deployments model (vm, disk, net): <type><random_suffix>
+  // umbrel deployments model (vm, disk, net): <type><random_suffix> and <type><random_suffix>U for umbrelDisk
   const randomSuffix = generateString(10).toLowerCase();
 
   // Network Specs
@@ -48,9 +47,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   machine.node_id = nodeId;
   machine.public_ip = publicIp;
   machine.planetary = true;
-  //  TODO replace with the official flist
-  machine.flist = "https://hub.grid.tf/kassem.3bot/0om4r-umbrel-1.0.0.flist";
-
+  machine.flist = "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist";
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
 
