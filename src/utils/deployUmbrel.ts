@@ -73,7 +73,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
 
   // deploy
   return deploy(profile, "Umbrel", name, async grid => {
-    await checkVMExist(grid, "umbrel", name); // change the project name of the grid to be Umbrel
+    await checkVMExist(grid, "umbrel", name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
