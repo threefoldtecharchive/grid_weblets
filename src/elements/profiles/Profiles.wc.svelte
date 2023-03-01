@@ -216,8 +216,9 @@
           this.blur();
         }}
         disabled={!mnemonics$.valid || migrating}
-        style:background-color="#1982b1"
-        style:color="white"
+        style:background-color={migrateMode ? "#1982b1" : "transparent"}
+        style:color={migrateMode ? "white" : "#1982b1"}
+        style:border="1px solid #1982b1"
       >
         Migrate
       </button>
@@ -233,7 +234,11 @@
     <section class="modal-card-body">
       <div style:display={migrateMode ? "block" : "none"}>
         <div class="field">
-          <label class="label" for="password">Password</label>
+          <label class="label mb-0" for="password">Password</label>
+          <p class="mb-2 is-size-6 has-text-grey">
+            Please insert your old password (aka. <strong>store secret</strong>) which you want to migrate your
+            deployments from.
+          </p>
           <div class="control has-icons-right" class:is-loading={migrating}>
             <input
               id="password"
