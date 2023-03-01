@@ -57,6 +57,7 @@ export default class App extends Vue {
     "fullvm",
     "algorand",
     "qvm",
+    "umbrel",
     "wordpress"
   ];
   sidenav: ISidenav | null = null;

@@ -25,6 +25,7 @@ export interface IStore {
     | "Algorand"
     | "Qvm"
     | "QSFS"
+    | "Umbrel"
     | "Wordpress";
   name: string;
   message: string;

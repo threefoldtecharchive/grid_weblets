@@ -159,6 +159,27 @@
       }}
     />
   {/if}
+  <!-- umbrel data  -->
+  {#if vm.env.UMBREL_DISK}
+    <Input
+      data={vm.env.USERNAME}
+      field={{
+        label: "Username",
+        symbol: "username",
+        type: "text",
+        disabled: true,
+      }}
+    />
+    <Input
+      data={vm.env.PASSWORD}
+      field={{
+        label: "Password",
+        symbol: "password",
+        type: "text",
+        disabled: true,
+      }}
+    />
+  {/if}
   <!-- wordpress data  -->
   {#if vm.env.WP_URL}
     <Input
