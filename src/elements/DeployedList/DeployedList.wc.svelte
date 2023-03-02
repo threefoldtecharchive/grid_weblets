@@ -465,6 +465,33 @@
           loading: i => removing === rows[i].name,
         },
       ],
+      umbrel: rows => [
+        {
+          type: "info",
+          label: "Show Details",
+          click: (_, i) => (infoToShow = rows[i].details),
+          disabled: () => removing !== null,
+          loading: i => removing === rows[i].name,
+        },
+        {
+          type: "warning",
+          label: "Admin Panel",
+          click: (_, i) => {
+            if (rows[i].details.publicIP) {
+              // remove prefix form ip address
+              const domain = rows[i].details.publicIP.ip.slice(0, -3);
+              window.open(`http://${domain}`, "_blank").focus();
+            } else {
+              const domain = rows[i].details.planetary;
+              window.open(`http://[${domain}]`, "_blank").focus();
+            }
+          },
+          disabled: i => {
+            const env = rows[i].details.env;
+            return !env || !env.WP_URL || removing !== null;
+          },
+        },
+      ],
       wordpress: rows => [
         {
           type: "info",

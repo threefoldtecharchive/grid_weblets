@@ -159,6 +159,11 @@ export function validatePassword(value: string): string | void {
   if (value.length > 15) return "Password must be less than 15 characters";
 }
 
+export function validateUmbrelPassword(value: string): string | void {
+  if (value == "") return "Password is required";
+  if (value.length < 12) return "Password must be at least 12";
+}
+
 export function validateRequiredPassword(value: string): string | void {
   if (value == "") return "Password is required";
   return validatePassword(value);

@@ -146,6 +146,7 @@ export default class Editor extends Vue {
     new Weblet("Node Pilot", "nodepilot", "NodePilot", "deployment", "vm.png"),
     // new Weblet("QSFS Virtual Machine", "qvm", "qvm", "deployment", "vm.png"),
     new Weblet("Wordpress", "wordpress", "Wordpress", "deployment", "wordpress.png"),
+    new Weblet("Umbrel", "umbrel", "Umbrel", "deployment", "umbrel.png"),
 
     new Weblet("Contracts", "contractslist", undefined, "my account", ""),
     new Weblet("Deployments", "deployedlist", undefined, "my account", ""),
