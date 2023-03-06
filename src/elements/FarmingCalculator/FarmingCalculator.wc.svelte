@@ -292,20 +292,22 @@
                 <div class="field">
                   <div class="control">
                     {#if field.symbol === "certified"}
-                      <div>
-                        <p class="label">{field.label}</p>
-                        {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
-                          <label style="display: block;">
-                            <input
-                              type="radio"
-                              name="cert"
-                              value={cert.value}
-                              bind:group={activeProfile[field.symbol]}
-                            />
-                            {cert.name}
-                          </label>
-                        {/each}
-                      </div>
+                      {#if activeProfile.type !== ProfileTypes.DIY}
+                        <div>
+                          <p class="label">{field.label}</p>
+                          {#each titanCertification as cert}
+                            <label style="display: block;">
+                              <input
+                                type="radio"
+                                name="cert"
+                                value={cert.value}
+                                bind:group={activeProfile[field.symbol]}
+                              />
+                              {cert.name}
+                            </label>
+                          {/each}
+                        </div>
+                      {/if}
                     {:else if field.type === "checkbox"}
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
@@ -369,20 +371,22 @@
                 <div class="field">
                   <div class="control">
                     {#if field.symbol === "certified"}
-                      <div>
-                        <p class="label">{field.label}</p>
-                        {#each activeProfile.type === ProfileTypes.DIY ? certifications : titanCertification as cert}
-                          <label style="display: block;">
-                            <input
-                              type="radio"
-                              name="cert"
-                              value={cert.value}
-                              bind:group={activeProfile[field.symbol]}
-                            />
-                            {cert.name}
-                          </label>
-                        {/each}
-                      </div>
+                      {#if activeProfile.type !== ProfileTypes.DIY}
+                        <div>
+                          <p class="label">{field.label}</p>
+                          {#each titanCertification as cert}
+                            <label style="display: block;">
+                              <input
+                                type="radio"
+                                name="cert"
+                                value={cert.value}
+                                bind:group={activeProfile[field.symbol]}
+                              />
+                              {cert.name}
+                            </label>
+                          {/each}
+                        </div>
+                      {/if}
                     {:else if field.type === "checkbox"}
                       <label class="checkbox">
                         <p class="label">{field.label}</p>
