@@ -206,14 +206,7 @@
     { id: "cn", name: "Certified Node", value: Certification.CERTIFIED },
   ];
 
-  const titanCertification = [
-    ...certifications,
-    {
-      id: "gc",
-      name: "Node Belongs To Gold Certified Farm",
-      value: Certification.GOLD_CERTIFIED,
-    },
-  ];
+  const titanCertification = [...certifications];
 </script>
 
 <section class="farming-container">
