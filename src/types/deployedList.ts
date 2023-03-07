@@ -41,10 +41,10 @@ export default class DeployedList {
         .catch(() => res(null));
     });
   }
-  public loadK8s(): Promise<IListReturn> {
+  public loadK8sDeployment(type: string): Promise<IListReturn> {
     let total = 0;
     try {
-      this.grid.clientOptions.projectName = "Kubernetes";
+      this.grid.clientOptions.projectName = type;
       this.grid._connect();
       return this.grid.k8s
         .list()
@@ -67,6 +67,19 @@ export default class DeployedList {
         data: [],
       });
     }
+  }
+
+  public async loadK8s(): Promise<IListReturn> {
+    const deps1 = await this.loadK8sDeployment("");
+
+    const deps2 = await this.loadK8sDeployment("k8s");
+    
+    const deps3 = await this.loadK8sDeployment("Kubernetes");
+
+    return {
+      total: deps1.total + deps2.total + deps3.total,
+      data: [...deps1.data, ...deps2.data, ...deps3.data],
+    };
   }
 
   private _loadVm(name: string) {
