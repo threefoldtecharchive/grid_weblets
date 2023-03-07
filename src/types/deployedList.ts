@@ -127,19 +127,27 @@ export default class DeployedList {
   }
 
   public async loadDeployments(type?: string): Promise<IListReturn> {
+    // if no type? list the all the vms in the default namespace. "Old deployment scenario for VM"
     if (!type) return this.loadVm();
 
-    // list the deployment created without project name that includes `flistkey` "Backward compatibility"
+    /**
+     * Deployments of the same type can be in 
+     */  
+   
+    // 1. default namespace: filtered by the project name in the flist
     const deps1 = await this.loadVm().then(vms => {
-      return vms.data.filter(vm => vm.flist.toLowerCase().includes(type));
+      return vms.data.filter(vm => vm.flist.toLowerCase().includes(type.toLowerCase()));
     });
-
-    // list deployments create with project name
+    
+    // 2. uppercase project name as namespace.
     const deps2 = await this.loadVm(type);
+    
+    // 3. lowercase project name as namespace.
+    const deps3 = await this.loadVm(type.toLowerCase());
 
     return {
-      total: deps2.total + deps1.length,
-      data: [...deps1, ...deps2.data],
+      total: deps1.length + deps2.total + deps3.total,
+      data: [...deps1, ...deps2.data, ...deps3.data],
     };
   }
 
