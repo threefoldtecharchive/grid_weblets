@@ -90,7 +90,6 @@
     loadingNodes = true;
     status = null;
     const label = "Please select a node id.";
-    // nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
       publicIPs: filters.publicIPs,
       cru: filters.cru,
