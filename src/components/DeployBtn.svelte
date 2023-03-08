@@ -17,8 +17,7 @@
       <div class="notification is-warning is-light">Make sure not to leave the page if an action is in progress.</div>
     {:else if deployment}
       <div class="notification is-warning is-light">
-        Another action
-        <strong>{deployment.type} {deployment.name}</strong> is in progress.
+        There is another action in progress: <strong>{deployment.type} {deployment.name}</strong>
       </div>
     {/if}
   </div>
