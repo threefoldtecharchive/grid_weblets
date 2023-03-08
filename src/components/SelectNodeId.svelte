@@ -384,8 +384,6 @@
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     {#if nodeSelection === "automatic" || (multiple && field.symbol !== "country")}
-      {filters[field.symbol]}
-      {typeof filters[field.symbol]}
       <Input
         data={filters[field.symbol] === "null" ? null : filters[field.symbol]}
         {field}
