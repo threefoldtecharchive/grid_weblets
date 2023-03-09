@@ -66,9 +66,8 @@
     const grid = new window.configs.grid3_client.GridClient({
       network: window.env.NETWORK,
       mnemonic: mnemonics$.value,
-      storeSecret: "secret",
     });
-    grid.connect();
+    await grid.connect();
 
     try {
       const relay = window.env.RELAY_DOMAIN;
