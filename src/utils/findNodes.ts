@@ -13,10 +13,10 @@ export default function findNodes(
 
     const grid = new window.configs.grid3_client.GridClient({
       network: window.env.NETWORK,
-      mnemonic: "",
+      mnemonic: profile.mnemonics,
       storeSecret: "secret",
     });
-    grid._connect();
+    grid.connect();
 
     const nodes = grid.capacity;
 

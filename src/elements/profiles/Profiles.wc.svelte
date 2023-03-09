@@ -65,10 +65,10 @@
     mnemonicsError = "";
     const grid = new window.configs.grid3_client.GridClient({
       network: window.env.NETWORK,
-      mnemonic: "",
+      mnemonic: mnemonics$.value,
       storeSecret: "secret",
     });
-    grid._connect();
+    grid.connect();
 
     try {
       const relay = window.env.RELAY_DOMAIN;
