@@ -9,6 +9,24 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
+  
+  env:
+    - name: "MODE"
+      value: ""
+    - name: "GRAPHQL_URL"
+      value: ""
+    - name: "BRIDGE_TFT_ADDRESS"
+      value: ""
+    - name: "GRIDPROXY_URL"
+      value: ""
+    - name: "SUBSTRATE_URL"
+      value: ""
+    - name: "ACTIVATION_SERVICE_URL"
+      value: ""
+    - name: "RELAY_DOMAIN"
+      value: ""
+    - name: "STELLAR_NETWORK"
+      value: ""
 
 imagePullSecrets: []
 nameOverride: ""
