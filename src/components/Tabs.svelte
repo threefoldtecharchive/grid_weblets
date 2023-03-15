@@ -13,7 +13,7 @@
   export let opened = false;
   export let selectedTab: string = null;
   export let selectedID: number = null;
-  export let disableModal = false;
+  export let enableModal = false;
 
   const onRemove = (idx: number) => () => {
     dispatch("removed", idx);
@@ -54,7 +54,7 @@
     {/if}
   </ul>
 </div>
-{#if !disableModal}
+{#if enableModal}
   <div class={"modal" + (opened ? " is-active" : "")}>
     <div class="modal-background" />
     <div class="modal-card">
