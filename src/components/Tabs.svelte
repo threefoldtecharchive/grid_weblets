@@ -13,6 +13,7 @@
   export let opened = false;
   export let selectedTab: string = null;
   export let selectedID: number = null;
+  export let disableModal = false;
 
   const onRemove = (idx: number) => () => {
     dispatch("removed", idx);
@@ -53,22 +54,24 @@
     {/if}
   </ul>
 </div>
-<div class={"modal" + (opened ? " is-active" : "")}>
-  <div class="modal-background" />
-  <div class="modal-card">
-    <section class="modal-card-body">
-      Delete {selectedTab}?
-      <div style="float: right; margin-top: 50px;">
-        <button
-          class="button is-danger"
-          style="background-color: #FF5151; color: #fff"
-          on:click|preventDefault|stopPropagation={onRemove(selectedID)}>Delete</button
-        >
-        <button class="button" on:click|stopPropagation={() => (opened = !opened)}>Cancel</button>
-      </div>
-    </section>
+{#if !disableModal}
+  <div class={"modal" + (opened ? " is-active" : "")}>
+    <div class="modal-background" />
+    <div class="modal-card">
+      <section class="modal-card-body">
+        Delete {selectedTab}?
+        <div style="float: right; margin-top: 50px;">
+          <button
+            class="button is-danger"
+            style="background-color: #FF5151; color: #fff"
+            on:click|preventDefault|stopPropagation={onRemove(selectedID)}>Delete</button
+          >
+          <button class="button" on:click|stopPropagation={() => (opened = !opened)}>Cancel</button>
+        </div>
+      </section>
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss" scoped>
   @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
