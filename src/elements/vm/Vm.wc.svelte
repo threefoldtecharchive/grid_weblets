@@ -117,7 +117,7 @@
     return mounts.length !== mountSet.size || names.length !== nameSet.size;
   }
 
-  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields, ...networkFields]) || _isInvalidDisks() || !(data.planetary || data.publicIp || data.publicIp6); // prettier-ignore
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || validateFlist.invalid || nameField.invalid || isInvalid([...baseFields,...envFields, ...networkFields]) || _isInvalidDisks(); // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
   const validateFlist = {
     loading: false,
