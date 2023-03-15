@@ -223,7 +223,10 @@
       </button>
       <button
         class="button is-danger is-small"
-        on:click={() => (active = false)}
+        on:click={() => {
+          active = false;
+          migrateMode = false;
+        }}
         style:background-color="#e0e0e0"
         style:color="black"
       >
