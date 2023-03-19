@@ -41,10 +41,10 @@ export default class DeployedList {
         .catch(() => res(null));
     });
   }
-  public loadK8s(): Promise<IListReturn> {
+  public loadK8sDeployment(type: string): Promise<IListReturn> {
     let total = 0;
     try {
-      this.grid.clientOptions.projectName = "Kubernetes";
+      this.grid.clientOptions.projectName = type;
       this.grid._connect();
       return this.grid.k8s
         .list()
@@ -67,6 +67,19 @@ export default class DeployedList {
         data: [],
       });
     }
+  }
+
+  public async loadK8s(): Promise<IListReturn> {
+    const deps1 = await this.loadK8sDeployment("");
+
+    const deps2 = await this.loadK8sDeployment("k8s");
+    
+    const deps3 = await this.loadK8sDeployment("Kubernetes");
+
+    return {
+      total: deps1.total + deps2.total + deps3.total,
+      data: [...deps1.data, ...deps2.data, ...deps3.data],
+    };
   }
 
   private _loadVm(name: string) {
@@ -127,19 +140,27 @@ export default class DeployedList {
   }
 
   public async loadDeployments(type?: string): Promise<IListReturn> {
+    // if no type? list the all the vms in the default namespace. "Old deployment scenario for VM"
     if (!type) return this.loadVm();
 
-    // list the deployment created without project name that includes `flistkey` "Backward compatibility"
+    /**
+     * Deployments of the same type can be in 
+     */  
+   
+    // 1. default namespace: filtered by the project name in the flist
     const deps1 = await this.loadVm().then(vms => {
-      return vms.data.filter(vm => vm.flist.toLowerCase().includes(type));
+      return vms.data.filter(vm => vm.flist.toLowerCase().includes(type.toLowerCase()));
     });
-
-    // list deployments create with project name
+    
+    // 2. uppercase project name as namespace.
     const deps2 = await this.loadVm(type);
+    
+    // 3. lowercase project name as namespace.
+    const deps3 = await this.loadVm(type.toLowerCase());
 
     return {
-      total: deps2.total + deps1.length,
-      data: [...deps1, ...deps2.data],
+      total: deps1.length + deps2.total + deps3.total,
+      data: [...deps1, ...deps2.data, ...deps3.data],
     };
   }
 
