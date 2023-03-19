@@ -171,7 +171,7 @@
       });
     });
   } else if (!(mnemonics$.valid && sshKey$.valid && twinAndAddress) && baseConfig$) {
-    baseConfig.set(null);
+    requestAnimationFrame(baseConfig.set.bind(baseConfig, null));
   }
 
   // balance store
