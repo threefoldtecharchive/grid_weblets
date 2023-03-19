@@ -85,21 +85,27 @@
     }
   }
 
+  const IGNORED_VALUES = [null, "null", "", undefined, "undefined"];
   function onLoadNodesHandler() {
     loadingNodes = true;
     status = null;
     const label = "Please select a node id.";
-    nodeIdSelectField.options[0].label = "Loading...";
     const _filters = {
       publicIPs: filters.publicIPs,
-      country: filters.country,
-      farmName: filters.farmName,
       cru: filters.cru,
       mru: filters.mru,
       sru: filters.sru,
       hru: filters.hru,
       availableFor: $configs.twinId,
     };
+
+    if (!IGNORED_VALUES.includes(filters.country)) {
+      _filters["country"] = filters.country;
+    }
+
+    if (!IGNORED_VALUES.includes(filters.farmName)) {
+      _filters["farmName"] = filters.farmName;
+    }
 
     findNodes(_filters, profile, exclusiveFor)
       .then(async _nodes => {
@@ -377,7 +383,11 @@
   <h5 class="is-size-5 has-text-weight-bold">Nodes Filter</h5>
   {#each filtersFields as field (field.symbol)}
     {#if nodeSelection === "automatic" || (multiple && field.symbol !== "country")}
-      <Input data={filters[field.symbol]} {field} on:input={_update(field.symbol)} />
+      <Input
+        data={filters[field.symbol] === "null" ? null : filters[field.symbol]}
+        {field}
+        on:input={_update(field.symbol)}
+      />
     {/if}
   {/each}
 
