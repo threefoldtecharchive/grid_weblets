@@ -65,13 +65,14 @@
     mnemonicsError = "";
     const grid = new window.configs.grid3_client.GridClient({
       network: window.env.NETWORK,
-      mnemonic: mnemonics$.value,
+      mnemonic: "",
+      storeSecret: "test",
     });
-    await grid.connect();
+    grid._connect();
 
     try {
-      const relay = window.env.RELAY_DOMAIN;
-      const account = await grid.tfchain.createAccount(relay);
+      const relay = grid.getDefaultUrls(window.env.NETWORK).relay.slice(6);
+      const account = await grid.tfchain.createAccount(relay, null);
       mnemonics.setValue(account.mnemonic);
       mnemonics.markAsDirty();
       mnemonics.markAsTouched();
