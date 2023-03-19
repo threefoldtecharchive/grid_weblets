@@ -62,7 +62,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { parse } from "marked";
-import type { IStore } from "../../../src/stores/currentDeployment";
+import type { IStore } from "../../../src/types/istore";
 let userAgent = navigator.userAgent;
 
 if (!userAgent.match(/chrome|chromium|crios/i)) {
