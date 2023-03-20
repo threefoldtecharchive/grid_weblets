@@ -110,8 +110,9 @@
     _sub = deployedStore.subscribe(() => {
       _reloadTab();
     });
-
-    grid = await getGrid(profile, grid => grid, false);
+    if (profile) {
+      grid = await getGrid(profile, grid => grid, false);
+    }
   });
 
   onDestroy(() => {

@@ -65,13 +65,14 @@
     mnemonicsError = "";
     const grid = new window.configs.grid3_client.GridClient({
       network: window.env.NETWORK,
-      mnemonic: mnemonics$.value,
+      mnemonic: "",
+      storeSecret: "test",
     });
-    await grid.connect();
+    grid._connect();
 
     try {
-      const relay = window.env.RELAY_DOMAIN;
-      const account = await grid.tfchain.createAccount(relay);
+      const relay = grid.getDefaultUrls(window.env.NETWORK).relay.slice(6);
+      const account = await grid.tfchain.createAccount(relay, null);
       mnemonics.setValue(account.mnemonic);
       mnemonics.markAsDirty();
       mnemonics.markAsTouched();
@@ -170,7 +171,7 @@
       });
     });
   } else if (!(mnemonics$.valid && sshKey$.valid && twinAndAddress) && baseConfig$) {
-    baseConfig.set(null);
+    requestAnimationFrame(baseConfig.set.bind(baseConfig, null));
   }
 
   // balance store
@@ -219,13 +220,17 @@
         style:color={migrateMode ? "white" : "#1982b1"}
         style:border="1px solid #1982b1"
       >
-        Migrate
+        {migrateMode ? "Back To Profile" : "Got Old Deployments? Migrate Now!"}
       </button>
       <button
         class="button is-danger is-small"
-        on:click={() => (active = false)}
+        on:click={() => {
+          active = false;
+          migrateMode = false;
+        }}
         style:background-color="#e0e0e0"
         style:color="black"
+        disabled={migrating}
       >
         Close
       </button>
