@@ -22,7 +22,7 @@
 </div>
 
 <div style:display={showData.success ? "block" : "none"}>
-  <Alert type="success" message="Successfully Deployed Subsquid." deployed={true} />
+  <Alert type="success" message="Successfully Deployed {showData.metadata.type}." deployed={true} />
 </div>
 
 <div style:display={showData.failed ? "block" : "none"}>

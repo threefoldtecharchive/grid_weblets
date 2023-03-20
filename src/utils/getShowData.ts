@@ -22,5 +22,6 @@ export function getShowData(options: Options) {
     success: showSuccess,
     failed: showFailed,
     content: showContent,
+    metadata: options,
   };
 }
