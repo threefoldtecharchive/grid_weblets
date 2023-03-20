@@ -22,5 +22,6 @@ export const solutionList: {
   Subsquid: "ss",
   Algorand: "al",
   Qvm: "qvm",
+  Umbrel: "um",
   Wordpress: "wp",
 };
