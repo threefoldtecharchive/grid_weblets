@@ -12,18 +12,18 @@
   import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
 
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
-  import { noActiveProfile } from "../../utils/message";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import { getShowData } from "../../utils/getShowData";
+  import WebletsHelperMessages from "../../components/WebletsHelperMessages.svelte";
 
   let data = new Subsquid();
   let profile: IProfile;
@@ -37,7 +37,6 @@
   let status: "valid" | "invalid";
 
   const deploymentStore = window.configs?.deploymentStore;
-  const currentDeployment = window.configs?.currentDeploymentStore;
 
   data.disks = [new Disk()];
 
@@ -94,13 +93,7 @@
       });
   }
 
-  $: logs = $currentDeployment;
-
-  $: showLogs = loading || (logs !== null && logs.type === "Subsquid");
-  $: showNoProfile = !showLogs && !profile;
-  $: showSuccess = !showLogs && !showNoProfile && success;
-  $: showFailed = !showLogs && !showNoProfile && failed;
-  $: showContent = !showLogs && !showNoProfile && !showSuccess && !showFailed;
+  $: showData = getShowData({ success, loading, failed, type: "Subsquid" });
 </script>
 
 <SelectProfile
@@ -122,23 +115,9 @@
 
     <hr />
 
-    <div style:display={showLogs ? "block" : "none"}>
-      <Alert type="info" message={logs?.message ?? "Loading..."} />
-    </div>
+    <WebletsHelperMessages {showData} {message} />
 
-    <div style:display={showNoProfile ? "block" : "none"}>
-      <Alert type="info" message={noActiveProfile} />
-    </div>
-
-    <div style:display={showSuccess ? "block" : "none"}>
-      <Alert type="success" message="Successfully Deployed Subsquid." deployed={true} />
-    </div>
-
-    <div style:display={showFailed ? "block" : "none"}>
-      <Alert type="danger" {message} />
-    </div>
-
-    <div style:display={showContent ? "block" : "none"}>
+    <div style:display={showData.content ? "block" : "none"}>
       <Tabs bind:active {tabs} />
 
       {#each fields as field (field.symbol)}
