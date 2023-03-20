@@ -220,13 +220,17 @@
         style:color={migrateMode ? "white" : "#1982b1"}
         style:border="1px solid #1982b1"
       >
-        Migrate
+        {migrateMode ? "Back To Profile" : "Got Old Deployments? Migrate Now!"}
       </button>
       <button
         class="button is-danger is-small"
-        on:click={() => (active = false)}
+        on:click={() => {
+          active = false;
+          migrateMode = false;
+        }}
         style:background-color="#e0e0e0"
         style:color="black"
+        disabled={migrating}
       >
         Close
       </button>
