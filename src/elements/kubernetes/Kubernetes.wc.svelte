@@ -159,7 +159,7 @@
     </div>
 
     <div style:display={showSuccess ? "block" : "none"}>
-      <Alert type="success" message="Successfully Deployed Wordpress." deployed={true} />
+      <Alert type="success" message="Successfully Deployed Kubernetes." deployed={true} />
     </div>
 
     <div style:display={showFailed ? "block" : "none"}>
