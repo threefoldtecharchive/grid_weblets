@@ -185,6 +185,12 @@
   }
 
   $: logs = $currentDeployment;
+
+  $: showLogs = loading || (logs !== null && logs.type === "Qvm");
+  $: showNoProfile = !showLogs && !profile;
+  $: showSuccess = !showLogs && !showNoProfile && success;
+  $: showFailed = !showLogs && !showNoProfile && failed;
+  $: showContent = !showLogs && !showNoProfile && !showSuccess && !showFailed;
 </script>
 
 <SelectProfile
@@ -204,15 +210,23 @@
     </p>
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "VM")}
+    <div style:display={showLogs ? "block" : "none"}>
       <Alert type="info" message={logs?.message ?? "Loading..."} />
-    {:else if !profile}
+    </div>
+
+    <div style:display={showNoProfile ? "block" : "none"}>
       <Alert type="info" message={noActiveProfile} />
-    {:else if success}
-      <Alert type="success" message="Successfully deployed QVM." deployed={true} />
-    {:else if failed}
+    </div>
+
+    <div style:display={showSuccess ? "block" : "none"}>
+      <Alert type="success" message="Successfully Deployed Wordpress." deployed={true} />
+    </div>
+
+    <div style:display={showFailed ? "block" : "none"}>
       <Alert type="danger" {message} />
-    {:else}
+    </div>
+
+    <div style:display={showContent ? "block" : "none"}>
       <Tabs bind:active {tabs} />
       <section style:display={active === "config" ? null : "none"}>
         <Input bind:data={data.name} bind:invalid={nameField.invalid} field={nameField} />
@@ -283,7 +297,7 @@
           on:multiple={e => (qsfs.nodeIds = e.detail)}
         />
       </section>
-    {/if}
+    </div>
 
     <DeployBtn
       disabled={disabled || validateFlist.loading}
