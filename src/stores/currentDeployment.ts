@@ -1,35 +1,5 @@
 import { writable } from "svelte/store";
-
-export interface IStore {
-  type:
-    | "Kubernetes"
-    | "VM"
-    | "CapRover"
-    | "Discourse"
-    | "Peertube"
-    | "Funkwhale"
-    | "GatewayName"
-    | "Add Worker"
-    | "Remove Worker"
-    | "Deleting Deployment"
-    | "Taiga"
-    | "Owncloud"
-    | "Presearch"
-    | "Subsquid"
-    | "Mattermost"
-    | "Mastodon"
-    | "TFhubValidator"
-    | "Casperlabs"
-    | "NodePilot"
-    | "Fullvm"
-    | "Algorand"
-    | "Qvm"
-    | "QSFS"
-    | "Umbrel"
-    | "Wordpress";
-  name: string;
-  message: string;
-}
+import type { IStore } from "../types/istore";
 
 function createCurrentDeploymentStore() {
   const { subscribe, set, update } = writable<IStore>(null);
@@ -61,3 +31,4 @@ function createCurrentDeploymentStore() {
 }
 
 export default createCurrentDeploymentStore();
+export { IStore };

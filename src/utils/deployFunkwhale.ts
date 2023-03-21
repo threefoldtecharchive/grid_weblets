@@ -11,7 +11,7 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 
 export default async function deployFunkwhale(data: Funkwhale, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "funkwhale");
+  const domainName = await getUniqueDomainName(profile, data.name, "Funkwhale");
 
   // Dynamically select node to deploy the gateway
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
@@ -26,7 +26,7 @@ export default async function deployFunkwhale(data: Funkwhale, profile: IProfile
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
     // rollback the FunkwhaleVM if the gateway fails to deploy
-    await destroy(profile, "funkwhale", data.name);
+    await destroy(profile, "Funkwhale", data.name);
     throw error;
   }
 
@@ -96,7 +96,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "Funkwhale", name, async grid => {
-    await checkVMExist(grid, "funkwhale", name);
+    await checkVMExist(grid, "Funkwhale", name);
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -122,7 +122,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
-    await checkGW(grid, domainName, "funkwhale");
+    await checkGW(grid, domainName, "Funkwhale");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

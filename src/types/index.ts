@@ -1,3 +1,4 @@
+import type { IStore } from "./../stores/currentDeployment";
 export interface IGlobalOptions {
   title?: string;
   sidenav?: string | boolean;
@@ -46,6 +47,11 @@ export interface ITab {
   label: string;
   value: string;
   removable?: boolean;
+}
+
+export interface DeploymentTab {
+  label: string;
+  value: IStore["type"];
 }
 
 export type Packages = "Minimum" | "Standard" | "Recommended" | "Custom";

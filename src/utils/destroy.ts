@@ -1,6 +1,7 @@
+import type { IStore } from "./../stores/currentDeployment";
 import type { IProfile } from "../types/Profile";
 
-export default function destroy(profile: IProfile, type: string, name: string) {
+export default async function destroy(profile: IProfile, type: IStore["type"], name: string) {
   const { mnemonics } = profile;
   const client = new window.configs.grid3_client.GridClient({
     mnemonic: mnemonics,
@@ -14,5 +15,9 @@ export default function destroy(profile: IProfile, type: string, name: string) {
     activationURL: window.env.ACTIVATION_SERVICE_URL,
     relayURL: window.env.RELAY_DOMAIN,
   });
-  return client.machines.delete({ name });
+  window.configs.currentDeploymentStore.deploy("Deleting Deployment", name);
+  await client.connect();
+  return client.machines.delete({ name }).finally(() => {
+    window.configs.currentDeploymentStore.clear();
+  });
 }

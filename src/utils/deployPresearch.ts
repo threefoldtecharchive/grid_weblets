@@ -60,7 +60,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
 
   // Deploy
   return deploy(profile, "Presearch", name, async grid => {
-    await checkVMExist(grid, "presearch", name);
+    await checkVMExist(grid, "Presearch", name);
 
     return grid.machines
       .deploy(machines)

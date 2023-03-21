@@ -1,3 +1,4 @@
+import type { IStore } from "./../stores/currentDeployment";
 import { solutionList } from "../stores/solutionsList";
 
 export interface GatewayNodes {
@@ -52,7 +53,7 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
 
   return gws;
 }
-export async function getUniqueDomainName(profile, name, solutionType) {
+export async function getUniqueDomainName(profile, name, solutionType: IStore["type"]) {
   const { mnemonics } = profile;
   const client = new window.configs.grid3_client.GridClient({
     mnemonic: mnemonics,

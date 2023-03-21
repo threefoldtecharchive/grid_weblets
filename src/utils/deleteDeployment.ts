@@ -1,3 +1,4 @@
+import type { IStore } from "./../stores/currentDeployment";
 import { getUniqueDomainName } from "./gatewayHelpers";
 
 interface IConfig {
@@ -6,7 +7,12 @@ interface IConfig {
   networkEnv: string;
 }
 
-export default async function deleteDeployment(configs: IConfig, key: "k8s" | "machines", name: string, type: string) {
+export default async function deleteDeployment(
+  configs: IConfig,
+  key: "k8s" | "machines",
+  name: string,
+  type: IStore["type"],
+) {
   const { mnemonics } = configs;
   const grid = new window.configs.grid3_client.GridClient({
     mnemonic: mnemonics,
@@ -40,7 +46,7 @@ export default async function deleteDeployment(configs: IConfig, key: "k8s" | "m
 
 async function _deleteDeployments(grid, name, configs, type, key) {
   const domainName = await getUniqueDomainName(configs, name, type);
-  if (type === "qvm") {
+  if (type === "Qvm") {
     const qvm = await grid.machines.getObj(name);
     await grid.qsfs_zdbs.delete({ name: qvm[0].mounts[0].name });
   }

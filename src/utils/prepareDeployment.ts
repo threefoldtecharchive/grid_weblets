@@ -1,4 +1,5 @@
-export default async function checkVMExist(grid, type, name) {
+import type { IStore } from "./../stores/currentDeployment";
+export default async function checkVMExist(grid, type: IStore["type"], name) {
   // check if the vm exists in default namespace
   const oldVM = await grid.machines.getObj(name);
   if (oldVM.length != 0) {
@@ -14,7 +15,7 @@ export default async function checkVMExist(grid, type, name) {
   await grid.machines.getObj(name);
 }
 
-export async function checkGW(grid, domainName, type) {
+export async function checkGW(grid, domainName, type: IStore["type"]) {
   // deploy on project namespace
   grid.projectName = type;
   grid._connect();

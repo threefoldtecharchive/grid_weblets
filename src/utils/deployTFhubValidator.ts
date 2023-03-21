@@ -90,7 +90,7 @@ function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator
   vms.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "TFhubValidator", name, async grid => {
-    await checkVMExist(grid, "tfhubValidator", name);
+    await checkVMExist(grid, "TFhubValidator", name);
 
     return grid.machines
       .deploy(vms)
