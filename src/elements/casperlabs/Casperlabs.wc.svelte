@@ -86,7 +86,7 @@
 
   $: logs = $currentDeployment;
 
-  $: showLogs = loading || (logs !== null && logs.type === "Wordpress");
+  $: showLogs = loading || (logs !== null && logs.type === "Casperlabs");
   $: showNoProfile = !showLogs && !profile;
   $: showSuccess = !showLogs && !showNoProfile && success;
   $: showFailed = !showLogs && !showNoProfile && failed;
