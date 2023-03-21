@@ -169,7 +169,7 @@
           loading: i => removing === rows[i].name,
         },
       ],
-      caprover: rows => [
+      CapRover: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -200,7 +200,7 @@
           },
         },
       ],
-      peertube: rows => [
+      Peertube: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -221,7 +221,7 @@
           },
         },
       ],
-      funkwhale: rows => [
+      Funkwhale: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -242,7 +242,7 @@
           },
         },
       ],
-      taiga: rows => [
+      Taiga: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -275,7 +275,7 @@
           },
         },
       ],
-      mattermost: rows => [
+      Mattermost: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -296,7 +296,7 @@
           },
         },
       ],
-      mastodon: rows => [
+      Mastodon: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -317,7 +317,7 @@
           },
         },
       ],
-      tfhubValidator: rows => [
+      TFhubValidator: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -326,7 +326,7 @@
           loading: i => removing === rows[i].name,
         },
       ],
-      discourse: rows => [
+      Discourse: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -347,7 +347,7 @@
           },
         },
       ],
-      casperlabs: rows => [
+      Casperlabs: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -368,7 +368,7 @@
           },
         },
       ],
-      owncloud: rows => [
+      Owncloud: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -389,7 +389,7 @@
           },
         },
       ],
-      presearch: rows => [
+      Presearch: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -398,7 +398,7 @@
           loading: i => removing === rows[i].name,
         },
       ],
-      subsquid: rows => [
+      Subsquid: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -419,7 +419,7 @@
           },
         },
       ],
-      nodepilot: rows => [
+      NodePilot: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -440,7 +440,7 @@
           },
         },
       ],
-      fullvm: rows => [
+      Fullvm: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -449,7 +449,7 @@
           loading: i => removing === rows[i].name,
         },
       ],
-      qvm: rows => [
+      Qvm: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -458,7 +458,7 @@
           loading: i => removing === rows[i].name,
         },
       ],
-      algorand: rows => [
+      Algorand: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -467,7 +467,7 @@
           loading: i => removing === rows[i].name,
         },
       ],
-      umbrel: rows => [
+      Umbrel: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -494,7 +494,7 @@
           },
         },
       ],
-      wordpress: rows => [
+      Wordpress: rows => [
         {
           type: "info",
           label: "Show Details",
