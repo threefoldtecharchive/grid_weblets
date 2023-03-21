@@ -94,6 +94,12 @@
   }
 
   $: logs = $currentDeployment;
+
+  $: showLogs = loading || (logs !== null && logs.type === "Discourse");
+  $: showNoProfile = !showLogs && !profile;
+  $: showSuccess = !showLogs && !showNoProfile && success;
+  $: showFailed = !showLogs && !showNoProfile && failed;
+  $: showContent = !showLogs && !showNoProfile && !showSuccess && !showFailed;
 </script>
 
 <SelectProfile
@@ -115,15 +121,23 @@
 
     <hr />
 
-    {#if loading || (logs !== null && logs.type === "Discourse")}
+    <div style:display={showLogs ? "block" : "none"}>
       <Alert type="info" message={logs?.message ?? "Loading..."} />
-    {:else if !profile}
+    </div>
+
+    <div style:display={showNoProfile ? "block" : "none"}>
       <Alert type="info" message={noActiveProfile} />
-    {:else if success}
-      <Alert type="success" message="Successfully Deployed Discourse." deployed={true} />
-    {:else if failed}
+    </div>
+
+    <div style:display={showSuccess ? "block" : "none"}>
+      <Alert type="success" message="Successfully Deployed Wordpress." deployed={true} />
+    </div>
+
+    <div style:display={showFailed ? "block" : "none"}>
       <Alert type="danger" {message} />
-    {:else}
+    </div>
+
+    <div style:display={showContent ? "block" : "none"}>
       <Tabs bind:active {tabs} />
 
       <section style={display(active, "config")}>
@@ -179,7 +193,7 @@
           {/if}
         {/each}
       </section>
-    {/if}
+    </div>
 
     <DeployBtn
       {disabled}
