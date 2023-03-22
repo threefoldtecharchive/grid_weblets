@@ -183,10 +183,20 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.2.tgz#e9e035b9b166ca0af657a7848eb2718f0f22f183"
   integrity sha512-KYRCASVTv6aeUi1tsF8/vpyR7zpfs3FUzy2Jqm+MU+LmUKhQ0y2FpfwqkCcxSg2ua4GALJd8k2R76WxwZGbQpA==
 
+"@noble/hashes@^1.2.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.0.tgz#085fd70f6d7d9d109671090ccae1d3bec62554a1"
+  integrity sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==
+
 "@noble/secp256k1@1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.7.0.tgz#d15357f7c227e751d90aa06b05a0e5cf993ba8c1"
   integrity sha512-kbacwGSsH/CTout0ZnZWxnW1B+jH/7r/WAAKLBtrRJ/+CUH7lgmQzl3GTrQua3SGKWNSDsS6lmjnDpIJ5Dxyaw==
+
+"@noble/secp256k1@^1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.7.1.tgz#b251c70f824ce3ca7f8dc3df08d58f005cc0507c"
+  integrity sha512-hOUk6AyBFmqVrv7k5WAw/LpszxVbj9gGN4JRkIX52fdFAj1UA61KXmZDvqVEm+pOyec3+fIeZB02LYa/pWOArw==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -1710,6 +1720,13 @@ bip39@^3.0.3, bip39@^3.0.4:
     create-hash "^1.1.0"
     pbkdf2 "^3.0.9"
     randombytes "^2.0.1"
+
+bip39@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.1.0.tgz#c55a418deaf48826a6ceb34ac55b3ee1577e18a3"
+  integrity sha512-c9kiwdk45Do5GL0vJMe7tS95VjCii65mYAH7DfWl3uW8AVzXKQVUm64i3hzVybBDMp9r7j9iNxR85+ul8MdN/A==
+  dependencies:
+    "@noble/hashes" "^1.2.0"
 
 bl@~0.8.1:
   version "0.8.2"
@@ -4156,12 +4173,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.3, graceful-fs@^4.1.6,
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
 
-grid3_client@2.0.0-rc10:
-  version "2.0.0-rc10"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc10.tgz#0ccb87ceca40f3407f0d66cf82e14e529441cbea"
-  integrity sha512-IY0HJUpZ2M6oYMzH8Dl/qO/FY1ytOjpFZQ6FOO6qnIB+da29bGXIzcXWRTF01nzVUwsQXpFwaIFpaa7SGO7wdg==
+grid3_client@2.0.0-rc12:
+  version "2.0.0-rc12"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc12.tgz#5099ecb23da8e87192cacf1f5d21add0fe53224a"
+  integrity sha512-Ez5qhBqttfTCJgSyzIyp/8ijyJepiytqwtBT1FqGMI3ko7MV+nLkn5FRaV24loDQzegufPsmyQdaRMdPNbgQMA==
   dependencies:
     "@jimber/pkid" "1.0.4"
+    "@noble/secp256k1" "^1.7.1"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -4179,7 +4197,7 @@ grid3_client@2.0.0-rc10:
     netaddr "^1.1.0"
     private-ip "^2.3.3"
     reflect-metadata "^0.1.13"
-    rmb-sdk-ts "1.0.11"
+    rmb-sdk-ts "1.1.1"
     stellar-sdk "^10.4.1"
     tfgrid-api-client "1.27.0"
     ts-rmb-redis-client "1.0.0"
@@ -5003,6 +5021,18 @@ jest-worker@^27.0.2, jest-worker@^27.4.5:
     "@types/node" "*"
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
+
+js-crypto-aes@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/js-crypto-aes/-/js-crypto-aes-1.0.4.tgz#db3fed7b2d7ceec4610eb246be515f12d9674594"
+  integrity sha512-L2fh7Q55+8eS/ALbhgAZYZpTkuo+n12+3GpuUE+U6SGlObmwibG5rVtDTVSTNgV9VuzD2BaY4unTkRWTcfLYxg==
+  dependencies:
+    js-crypto-env "^1.0.4"
+
+js-crypto-env@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/js-crypto-env/-/js-crypto-env-1.0.4.tgz#2be3b0987124bfaf094aadd3c9d91a56aedb0f2a"
+  integrity sha512-b7WdjaX4csatMPfZ/mQ94yb/XTKe3o6qt0jPBVbKmaiOH97e+FlmIANoFEMrhxQM1xxKfA2QYLjgqL/YtdMm9g==
 
 js-sha256@^0.9.0:
   version "0.9.0"
@@ -7017,16 +7047,19 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rmb-sdk-ts@1.0.11:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/rmb-sdk-ts/-/rmb-sdk-ts-1.0.11.tgz#7387965512a14aad4acf136d4fa17fb854af4992"
-  integrity sha512-OzvsMOiu1g5qKaUFsQITFjnzjRvahMou4K5wswckb7FnRe3oWrUU+ZIOrTsL0aZyinREhYnwvBBhL8OnJqvkAw==
+rmb-sdk-ts@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/rmb-sdk-ts/-/rmb-sdk-ts-1.1.1.tgz#0b3035f3cac1fab0c8e1c8927d04cf087fc66b48"
+  integrity sha512-zDS82vyMdeKXl2lRs7XBYSKVJ/Vsw9iRWUhd0TX79LKt3CR+rPp42mbYPtmsw37feUhlrrX2ewkCCK112piWAg==
   dependencies:
+    "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
     base64url "^3.0.1"
+    bip39 "^3.1.0"
     buffer "^6.0.3"
     crypto-js "^4.1.1"
     google-protobuf "^3.21.2"
+    js-crypto-aes "^1.0.4"
     uuid "^8.3.2"
     ws "^8.12.0"
 
