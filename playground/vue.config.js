@@ -1,5 +1,6 @@
 const { join } = require("path");
 const { DefinePlugin } = require("webpack");
+const NodePolyfillWebpackPlugin = require("node-polyfill-webpack-plugin");
 
 const network = process.env.NETWORK || "dev";
 
@@ -12,6 +13,7 @@ module.exports = {
       new DefinePlugin({
         "process.env.NETWORK": JSON.stringify(network),
       }),
+      new NodePolyfillWebpackPlugin(),
     ],
     module: {
       rules: [
@@ -37,6 +39,11 @@ module.exports = {
           },
         },
       ],
+    },
+    resolve: {
+      alias: {
+        crypto: require.resolve("crypto-browserify"),
+      },
     },
   },
 };
