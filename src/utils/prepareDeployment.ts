@@ -1,5 +1,6 @@
+import type { GridClient } from "grid3_client";
 import type { IStore } from "./../stores/currentDeployment";
-export default async function checkVMExist(grid, type: IStore["type"], name) {
+export default async function checkVMExist(grid: GridClient, type: IStore["type"], name) {
   // check if the vm exists in default namespace
   const oldVM = await grid.machines.getObj(name);
   if (oldVM.length != 0) {
@@ -10,14 +11,14 @@ export default async function checkVMExist(grid, type: IStore["type"], name) {
   }
 
   // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
-  grid.projectName = type;
+  grid.clientOptions.projectName = type;
   grid._connect();
   await grid.machines.getObj(name);
 }
 
 export async function checkGW(grid, domainName, type: IStore["type"]) {
   // deploy on project namespace
-  grid.projectName = type;
+  grid.clientOptions.projectName = type;
   grid._connect();
 
   // For invalidating the cashed keys in the KV store, getObj check if the key has no deployments. it is deleted.
