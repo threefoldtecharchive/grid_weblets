@@ -46,7 +46,6 @@ export default async function deleteDeployment(
   await grid.connect();
   const obj = await _deleteDeployments(grid, name, configs, type, key, defaultNameSpace, hasGw);
 
-  console.log(obj);
   if (obj.length) {
     return obj;
   }
@@ -73,7 +72,6 @@ async function _deleteDeployments(grid, name, configs, type, key, defaultNameSpa
   if (!hasGw || defaultNameSpace) return deleted;
 
   const deletedgw = await _deleteDeploymentsGw(grid, domainName);
-  console.log(deleted);
   if (!deletedgw) throw new Error("Can't delete gateway contracts with name " + domainName);
 
   return deleted;
