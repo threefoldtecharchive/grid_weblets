@@ -6048,7 +6048,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@^2.0.0-rc12:
+grid3_client@2.0.0-rc12:
   version "2.0.0-rc12"
   resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0-rc12.tgz#5099ecb23da8e87192cacf1f5d21add0fe53224a"
   integrity sha512-Ez5qhBqttfTCJgSyzIyp/8ijyJepiytqwtBT1FqGMI3ko7MV+nLkn5FRaV24loDQzegufPsmyQdaRMdPNbgQMA==
