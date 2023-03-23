@@ -8,6 +8,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deploySubsquid(data: Subsquid, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -80,6 +81,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
     CHAIN_ENDPOINT: endPoint,
     SUBSQUID_WEBSERVER_HOSTNAME: domain,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();

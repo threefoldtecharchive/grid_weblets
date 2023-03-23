@@ -6,6 +6,7 @@ import { getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployTaiga(data: Taiga, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -92,6 +93,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
     EMAIL_HOST_USER: smtpHostUser,
     EMAIL_HOST_PASSWORD: smtpHostPassword,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = name;

@@ -8,6 +8,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployPeertube(data: Peertube, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -81,6 +82,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
     PT_INITIAL_ROOT_PASSWORD: adminPassword,
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();

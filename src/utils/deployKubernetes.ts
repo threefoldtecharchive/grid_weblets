@@ -2,6 +2,7 @@ import type { default as Kubernetes, Base } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployKubernetes(data: Kubernetes, profile: IProfile) {
   const { master, workers, network, ...base } = data;
@@ -45,5 +46,6 @@ function createNode(data: Base) {
   node.public_ip6 = data.publicIp6;
   node.rootfs_size = data.rootFs;
   node.planetary = data.planetary;
+  node.solutionProviderID = InternalSolutionProviderID;
   return node;
 }

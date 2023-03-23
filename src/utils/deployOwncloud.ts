@@ -3,6 +3,7 @@ import type { IProfile } from "../types/Profile";
 import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import rootFs from "./rootFs";
@@ -79,6 +80,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist = "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist";
   vm.entrypoint = "/sbin/zinit init";
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   let smtp_secure = "none";
   let emailName = "";

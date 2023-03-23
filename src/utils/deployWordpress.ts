@@ -8,6 +8,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployWordpress(data: Wordpress, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -108,6 +109,7 @@ async function deployWordpressVM(profile: IProfile, data: Wordpress) {
     ADMIN_EMAIL: adminEmail,
     WP_URL: domain,
   };
+  machine.solutionProviderID = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();

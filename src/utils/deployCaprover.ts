@@ -5,6 +5,7 @@ import checkVMExist from "./prepareDeployment";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 const CAPROVER_FLIST = "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist";
 
@@ -40,6 +41,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
     DEFAULT_PASSWORD: password,
     CAPTAIN_IS_DEBUG: "true",
   };
+  machine.solutionProviderID = InternalSolutionProviderID;
 
   const machines = new MachinesModel();
   machines.name = name;
