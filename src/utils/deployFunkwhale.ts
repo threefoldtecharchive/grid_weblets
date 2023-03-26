@@ -8,6 +8,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployFunkwhale(data: Funkwhale, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -81,6 +82,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
     DJANGO_SUPERUSER_USERNAME: adminUsername,
     DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();
@@ -113,6 +115,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
+  gw.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

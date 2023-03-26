@@ -9,6 +9,7 @@ import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployCasperlabs(data: Casperlabs, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -77,6 +78,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
     SSH_KEY: profile.sshKey,
     CASPERLABS_HOSTNAME: domain,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   // vms specs
   const vms = new MachinesModel();
@@ -110,6 +112,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
+  gw.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

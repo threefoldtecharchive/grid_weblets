@@ -6,6 +6,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployMastodon(profile: IProfile, mastodon: Mastodon, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
@@ -86,6 +87,7 @@ function _deployMastodon(profile: IProfile, mastodon: Mastodon) {
     SSH_KEY: profile.sshKey,
     IS_TF_CONNECT: `${tfConnect}`,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = name;
@@ -117,6 +119,7 @@ function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: num
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:3000`];
+  gw.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

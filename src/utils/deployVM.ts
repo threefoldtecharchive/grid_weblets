@@ -4,6 +4,7 @@ import type { IProfile } from "../types/Profile";
 import deploy from "./deploy";
 import type { IStore } from "../stores/currentDeployment";
 import checkVMExist from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployVM(data: VM, profile: IProfile, type: IStore["type"]) {
   const { MachineModel, MachinesModel, QSFSDiskModel } = window.configs.grid3_client;
@@ -25,6 +26,7 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
   vm.flist = flist;
   vm.entrypoint = entrypoint;
   vm.env = type == "VM" ? createEnvs(envs) : { SSH_KEY: profile.sshKey };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   /*QSFS*/
   if (qsfsDisk) {

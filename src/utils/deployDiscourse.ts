@@ -7,6 +7,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import destroy from "./destroy";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployDiscourse(data: Discourse, profile: IProfile, gateway: GatewayNodes) {
   const domainName = await getUniqueDomainName(profile, data.name, "Discourse");
@@ -90,6 +91,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machines.machines = [machine];
   machines.network = network;
   machines.description = "discourse machine/node";
+  machine.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "vm",
@@ -115,6 +117,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:88`];
+  gw.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

@@ -5,6 +5,7 @@ import deploy from "./deploy";
 import deployVM from "./deployVM";
 import checkVMExist from "./prepareDeployment";
 import getGrid from "./getGrid";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
   const { QSFSZDBSModel } = window.configs.grid3_client;
@@ -15,6 +16,7 @@ export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {
   qsfs.node_ids = nodeIds;
   qsfs.password = secret;
   qsfs.disk_size = filters.hru;
+  qsfs.solutionProviderID = InternalSolutionProviderID;
   const metadate = {
     type: "QSFS",
     name: name,

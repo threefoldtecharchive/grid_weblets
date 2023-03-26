@@ -6,6 +6,7 @@ import createNetwork from "./createNetwork";
 import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   const { generateString, MachineModel, MachinesModel, DiskModel } = window.configs.grid3_client;
@@ -50,6 +51,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   machine.flist = "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist";
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
+  machine.solutionProviderID = InternalSolutionProviderID;
 
   machine.env = {
     SSH_KEY: profile.sshKey,

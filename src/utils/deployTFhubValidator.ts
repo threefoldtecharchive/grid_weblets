@@ -7,6 +7,7 @@ import deploy from "./deploy";
 import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
 import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployTFhubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
   const validatorVm = await _deployTfHubValidator(profile, tfhubValidator);
@@ -76,6 +77,7 @@ function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator
     ORCHESTRATOR_FEES: orchestrator_fees,
     SSH_KEY: profile.sshKey,
   };
+  vm.solutionProviderID = InternalSolutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = name;

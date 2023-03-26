@@ -6,6 +6,7 @@ import createNetwork from "./createNetwork";
 
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployAlgorand(data: Algorand, profile: IProfile) {
   const deploymentInfo = await depoloyAlgorandVM(data, profile);
@@ -62,6 +63,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     FIRST_ROUND: `${firstRound}`,
     LAST_ROUND: `${lastRound}`,
   };
+  machine.solutionProviderID = InternalSolutionProviderID;
 
   // Machines specs
   const machines = new MachinesModel();

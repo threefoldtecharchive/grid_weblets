@@ -7,6 +7,7 @@ import createNetwork from "./createNetwork";
 import rootFs from "./rootFs";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployPresearch(data: Presearch, profile: IProfile) {
   const deploymentInfo = await depoloyPresearchVM(data, profile);
@@ -43,6 +44,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
     PRESEARCH_BACKUP_PRI_KEY: privateRestoreKey,
     PRESEARCH_BACKUP_PUB_KEY: publicRestoreKey,
   };
+  machine.solutionProviderID = InternalSolutionProviderID;
 
   // Machines specs
   const machines = new MachinesModel();
