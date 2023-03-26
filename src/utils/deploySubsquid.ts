@@ -114,6 +114,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:4444`];
+  gw.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

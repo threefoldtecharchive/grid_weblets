@@ -88,6 +88,7 @@ function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: num
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:8000`];
+  gw.solutionProviderID = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

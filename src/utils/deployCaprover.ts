@@ -73,6 +73,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
       SWM_NODE_MODE: "worker",
       PUBLIC_KEY: publicKey,
     };
+    workerModel.solutionProviderID = InternalSolutionProviderID;
 
     machines.machines.push(workerModel);
   }
