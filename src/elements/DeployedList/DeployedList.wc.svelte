@@ -31,7 +31,7 @@
     { label: "Peertube", value: "Peertube" },
     { label: "Funkwhale", value: "Funkwhale" },
     { label: "Mattermost", value: "Mattermost" },
-    { label: "Mastodon", value: "Mastodon" },
+    // { label: "Mastodon", value: "Mastodon" },
     { label: "Discourse", value: "Discourse" },
     { label: "Taiga", value: "Taiga" },
     { label: "Owncloud", value: "Owncloud" },
@@ -41,7 +41,7 @@
     { label: "Algorand", value: "Algorand" },
     //{ label: "TFhub Validator", value: "TFhubValidator" },
     { label: "Node Pilot", value: "NodePilot" },
-    { label: "QSFS Virtual Machine", value: "Qvm" },
+    // { label: "QSFS Virtual Machine", value: "Qvm" },
     { label: "Umbrel", value: "Umbrel" },
     { label: "Wordpress", value: "Wordpress" },
   ];
