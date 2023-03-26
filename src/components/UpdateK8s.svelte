@@ -20,6 +20,7 @@
   import RootFsSize from "./RootFsSize.svelte";
   import rootFs from "../utils/rootFs";
   import DialogueMsg from "./DialogueMsg.svelte";
+  import { InternalSolutionProviderID } from "../utils/solutionProvider";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -69,6 +70,8 @@
       workerModel.planetary = planetary;
       workerModel.rootfs_size = rootFs;
       workerModel.node_id = node;
+      workerModel.solutionProviderID = InternalSolutionProviderID;
+
       grid.k8s
         .add_worker(workerModel)
         .then(({ contracts }) => {

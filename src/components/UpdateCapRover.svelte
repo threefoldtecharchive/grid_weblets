@@ -19,6 +19,7 @@
   import SelectCapacity from "./SelectCapacity.svelte";
   import getGrid from "../utils/getGrid";
   import DialogueMsg from "./DialogueMsg.svelte";
+  import { InternalSolutionProviderID } from "../utils/solutionProvider";
   const { AddMachineModel, DeleteMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
@@ -104,6 +105,7 @@
       SWM_NODE_MODE: "worker",
       PUBLIC_KEY: worker.publicKey,
     };
+    workerModel.solutionProviderID = InternalSolutionProviderID;
     grid.machines
       .add_machine(workerModel)
       .then(({ contracts }) => {
