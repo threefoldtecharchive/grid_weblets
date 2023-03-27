@@ -90,6 +90,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
     return grid.machines
       .deploy(machines)
       .then(() => grid.machines.getObj(name))
-      .then(([vm]) => vm);
+      .then(([vm]) => vm)
+      .then(() => grid);
   });
 }

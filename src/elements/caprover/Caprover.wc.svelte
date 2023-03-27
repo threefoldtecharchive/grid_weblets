@@ -22,8 +22,6 @@
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import AddBtn from "../../components/AddBtn.svelte";
   import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import { onMount } from "svelte";
-  import getGrid from "../../utils/getGrid";
   import { display } from "../../utils/display";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
@@ -35,7 +33,6 @@
   let profile: IProfile;
   let status: "valid" | "invalid";
   const currentDeployment = window.configs?.currentDeploymentStore;
-  let grid;
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -84,7 +81,7 @@
     message = undefined;
 
     deployCaprover(data, profile)
-      .then(async () => {
+      .then(async grid => {
         let vms = await grid.machines.getObj(data.name);
         success = true;
         modalData = vms;
@@ -92,7 +89,7 @@
 
         vms.forEach(machine => {
           let firstWorker = true;
-          if (machine.env["SWM_NODE_MODE"] == "worker") {
+          if (machine && machine.env["SWM_NODE_MODE"] == "worker") {
             if (firstWorker) {
               workerIp += machine.publicIP["ip"].split("/")[0] + ", ";
               firstWorker = false;
@@ -119,12 +116,6 @@
   $: showSuccess = !showLogs && !showNoProfile && success;
   $: showFailed = !showLogs && !showNoProfile && failed;
   $: showContent = !showLogs && !showNoProfile && !showSuccess && !showFailed;
-
-  onMount(async () => {
-    grid = await getGrid(profile, grid => grid, false);
-    grid.projectName = "caprover";
-    grid._connect();
-  });
 </script>
 
 <SelectProfile
