@@ -30,6 +30,7 @@
   import { noActiveProfile } from "../../utils/message";
   import isInvalidFlist from "../../utils/isInvalidFlist";
   import { display } from "../../utils/display";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -159,11 +160,9 @@
         success = true;
         modalData = data;
       })
-      .catch((err: string) => {
+      .catch(err => {
         failed = true;
-        message = err.includes("Cannot read properties of undefined")
-          ? "Failed to deploy VM. Please contact our support with the message 'Cannot read properties of undefined (reading 'data')'."
-          : "Falied to deploy VM.";
+        message = normalizeDeploymentErrorMessage(err, "FullVM");
       })
       .finally(() => {
         validateFlist.loading = false;
