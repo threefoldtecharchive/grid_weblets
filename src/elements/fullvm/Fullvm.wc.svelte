@@ -160,7 +160,7 @@
         success = true;
         modalData = data;
       })
-      .catch(err => {
+      .catch((err: string) => {
         failed = true;
         message = normalizeDeploymentErrorMessage(err, "FullVM");
       })
