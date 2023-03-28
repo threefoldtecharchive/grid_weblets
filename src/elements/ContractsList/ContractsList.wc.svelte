@@ -44,58 +44,62 @@
     profile = _profile;
     if (profile) {
       loading = true;
-      return getGrid(profile, grid => {
-        grid.contracts
-          .listMyContracts()
-          .then(({ nameContracts, nodeContracts, rentContracts }) => {
-            const rents = rentContracts.map(
-              ({ contractID, nodeID, state, createdAt }) =>
-                ({
-                  id: contractID,
-                  type: "rent",
-                  state: state,
-                  createdAt: new Date(+createdAt * 1000),
-                  nodeID: nodeID,
-                } as IContract),
-            );
-            const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
+      return getGrid(
+        profile,
+        grid => {
+          grid.contracts
+            .listMyContracts()
+            .then(({ nameContracts, nodeContracts, rentContracts }) => {
+              const rents = rentContracts.map(
+                ({ contractID, nodeID, state, createdAt }) =>
+                  ({
+                    id: contractID,
+                    type: "rent",
+                    state: state,
+                    createdAt: new Date(+createdAt * 1000),
+                    nodeID: nodeID,
+                  } as IContract),
+              );
+              const names = nameContracts.map(({ contractID, state, name, createdAt }) => ({ 
               id: contractID, 
               type: "name", 
               state: state, 
               deploymentData: {name: name}, 
               createdAt: new Date(+createdAt *1000) } as IContract)); // prettier-ignore
-            const nodes = nodeContracts.map(
-              ({ contractID, state, deploymentData, createdAt, nodeID }) =>
-                ({
-                  id: contractID,
-                  type: "node",
-                  state: state,
-                  createdAt: new Date(+createdAt * 1000),
-                  nodeID: nodeID,
-                  deploymentData: jsonParser(deploymentData),
-                } as IContract),
-            );
-            contracts = [...names, ...nodes, ...rents];
-          })
-          .then(async () => {
-            for (let contract of contracts) {
-              if (contract.state === "GracePeriod") {
-                const res = await grid.contracts.getDeletionTime({
-                  id: +contract.id,
-                });
-                contract.expiration = res === 0 ? "-" : new Date(res).toLocaleString();
-              } else {
-                contract.expiration = "-";
+              const nodes = nodeContracts.map(
+                ({ contractID, state, deploymentData, createdAt, nodeID }) =>
+                  ({
+                    id: contractID,
+                    type: "node",
+                    state: state,
+                    createdAt: new Date(+createdAt * 1000),
+                    nodeID: nodeID,
+                    deploymentData: jsonParser(deploymentData),
+                  } as IContract),
+              );
+              contracts = [...names, ...nodes, ...rents];
+            })
+            .then(async () => {
+              for (let contract of contracts) {
+                if (contract.state === "GracePeriod") {
+                  const res = await grid.contracts.getDeletionTime({
+                    id: +contract.id,
+                  });
+                  contract.expiration = res === 0 ? "-" : new Date(res).toLocaleString();
+                } else {
+                  contract.expiration = "-";
+                }
               }
-            }
-          })
-          .catch(err => {
-            console.log("Error", err);
-          })
-          .finally(() => {
-            loading = false;
-          });
-      });
+            })
+            .catch(err => {
+              console.log("Error", err);
+            })
+            .finally(() => {
+              loading = false;
+            });
+        },
+        "",
+      );
     } else {
       contracts = [];
     }
@@ -103,14 +107,17 @@
 
   async function getContractDetails(contractId: number) {
     loadingDetails = contractId as unknown as string;
-    let deployment = await getGrid(profile, grid =>
-      grid.zos
-        .getDeployment({ contractId })
-        .then(res => res)
-        .catch(err => {
-          console.log("Deployment Error", err);
-        })
-        .finally(() => (loadingDetails = null)),
+    let deployment = await getGrid(
+      profile,
+      grid =>
+        grid.zos
+          .getDeployment({ contractId })
+          .then(res => res)
+          .catch(err => {
+            console.log("Deployment Error", err);
+          })
+          .finally(() => (loadingDetails = null)),
+      "",
     );
     return deployment;
   }
@@ -119,23 +126,27 @@
     message = null;
     deleting = true;
     deletingType = "all";
-    return getGrid(profile, grid => {
-      grid.contracts
-        .cancelMyContracts()
-        .then(() => {
-          contracts = [];
-        })
-        .catch(err => {
-          console.log("Error", err);
-          message = err.message || err;
-        })
-        .finally(() => {
-          selectedRows = [];
-          deleting = false;
-          deletingType = null;
-          alert("Contracts deleted successfully");
-        });
-    });
+    return getGrid(
+      profile,
+      grid => {
+        grid.contracts
+          .cancelMyContracts()
+          .then(() => {
+            contracts = [];
+          })
+          .catch(err => {
+            console.log("Error", err);
+            message = err.message || err;
+          })
+          .finally(() => {
+            selectedRows = [];
+            deleting = false;
+            deletingType = null;
+            alert("Contracts deleted successfully");
+          });
+      },
+      "",
+    );
   }
 
   function onDeleteSelectedHandler() {
@@ -146,20 +157,24 @@
     message = null;
     deleting = true;
     deletingType = "selected";
-    return getGrid(profile, async grid => {
-      try {
-        await grid.contracts.batchCancelContracts({ ids: selectedContractsIDS });
-      } catch (err) {
-        console.log("Error", err);
-        message = err.message || err;
-      }
-      contracts = contracts.filter(c => {
-        return selectedContracts.findIndex(sc => sc.id === c.id) === -1;
-      });
-      selectedRows = [];
-      deleting = false;
-      deletingType = null;
-    });
+    return getGrid(
+      profile,
+      async grid => {
+        try {
+          await grid.contracts.batchCancelContracts({ ids: selectedContractsIDS });
+        } catch (err) {
+          console.log("Error", err);
+          message = err.message || err;
+        }
+        contracts = contracts.filter(c => {
+          return selectedContracts.findIndex(sc => sc.id === c.id) === -1;
+        });
+        selectedRows = [];
+        deleting = false;
+        deletingType = null;
+      },
+      "",
+    );
   }
 
   let loadingConsumption = false;
