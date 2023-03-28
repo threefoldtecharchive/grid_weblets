@@ -12,5 +12,6 @@ export default async function getBalance(profile: Profile) {
       .getMyBalance()
       .then((res) => res);
     },
+    "",
   );
 }
