@@ -346,7 +346,7 @@
 
   async function pingNode(node: number) {
     if (node && status == "valid") {
-      let grid = await getGrid(profile, grid => grid);
+      let grid = await getGrid(profile, grid => grid, "");
       try {
         status = null;
         nodeIdField.disabled = nodeSelectionField.disabled = validating = true;

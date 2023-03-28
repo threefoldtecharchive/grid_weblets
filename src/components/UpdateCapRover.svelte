@@ -65,9 +65,7 @@
     worker.publicKey = capRover.details.env.PUBLIC_KEY;
     domain = capRover.details.env.CAPROVER_ROOT_DOMAIN;
 
-    grid = await getGrid(profile, grid => grid, false);
-    grid.projectName = "caprover";
-    grid._connect();
+    grid = await getGrid(profile, grid => grid, "CapRover");
 
     if (capRover)
       workers = (await grid.machines.getObj(capRover["name"])).filter(
