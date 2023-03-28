@@ -398,7 +398,7 @@
                 id="ssh"
                 use:form={sshKey}
                 class="textarea"
-                placeholder="Textarea"
+                placeholder="Public SSH Key"
                 style:resize="none"
                 disabled={sshIsDisabled}
                 class:is-danger={sshInvalid}
