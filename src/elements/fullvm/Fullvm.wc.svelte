@@ -128,6 +128,7 @@
     invalid: false,
   };
 
+  $: data.disks[0].size = data.diskSize;
   async function onDeployVM() {
     if (flistSelectValue === "other") {
       validateFlist.loading = true;
