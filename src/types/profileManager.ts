@@ -16,6 +16,11 @@ export const mnemonics = fb.control<string>(
         return { message: "Mnemonic doesn't seem to be valid." };
       }
     },
+    (_, ctx) => {
+      if (ctx && ctx.error) {
+        return { message: ctx.error };
+      }
+    },
   ],
   [
     async ctrl => {

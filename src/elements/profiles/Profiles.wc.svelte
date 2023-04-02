@@ -73,7 +73,7 @@
     try {
       const relay = grid.getDefaultUrls(window.env.NETWORK).relay.slice(6);
       const account = await grid.tfchain.createAccount(relay, null);
-      mnemonics.setValue(account.mnemonic);
+      mnemonics.setValue(account.mnemonic, { error: "Please fund your wallet then refresh." });
       mnemonics.markAsDirty();
       mnemonics.markAsTouched();
       createdNewAccount = true;
