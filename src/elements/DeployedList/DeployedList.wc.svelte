@@ -46,7 +46,7 @@
     { label: "Wordpress", value: "Wordpress" },
   ];
   let grid: GridClient;
-  let active: IStore["type"] = "VM";
+  let active: IStore["type"] = "Fullvm";
   $: active = tab || active;
 
   let loading = false;
