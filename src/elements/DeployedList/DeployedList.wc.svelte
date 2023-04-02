@@ -19,7 +19,7 @@
   import DialogueMsg from "../../components/DialogueMsg.svelte";
   import getGrid from "../../utils/getGrid";
   import type { IStore } from "../../stores/currentDeployment";
-
+  import type { GridClient } from "grid3_client";
   type TabsType = IStore["type"];
   export let tab: TabsType = undefined;
 
@@ -45,7 +45,7 @@
     { label: "Umbrel", value: "Umbrel" },
     { label: "Wordpress", value: "Wordpress" },
   ];
-  let grid;
+  let grid: GridClient;
   let active: IStore["type"] = "Fullvm";
   $: active = tab || active;
 
@@ -112,7 +112,7 @@
       _reloadTab();
     });
     if (profile) {
-      grid = await getGrid(profile, grid => grid, false);
+      grid = await getGrid(profile, grid => grid, "");
     }
   });
 
@@ -174,7 +174,7 @@
           type: "info",
           label: "Show Details",
           click: async (_, i) => {
-            grid.projectName = active;
+            grid.clientOptions.projectName = active;
             grid._connect();
             infoToShow = await grid.machines.getObj(rows[i]["name"]);
           },

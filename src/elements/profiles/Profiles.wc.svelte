@@ -73,7 +73,7 @@
     try {
       const relay = grid.getDefaultUrls(window.env.NETWORK).relay.slice(6);
       const account = await grid.tfchain.createAccount(relay, null);
-      mnemonics.setValue(account.mnemonic);
+      mnemonics.setValue(account.mnemonic, { error: "Please fund your wallet then refresh." });
       mnemonics.markAsDirty();
       mnemonics.markAsTouched();
       createdNewAccount = true;
@@ -398,7 +398,7 @@
                 id="ssh"
                 use:form={sshKey}
                 class="textarea"
-                placeholder="Textarea"
+                placeholder="Public SSH Key"
                 style:resize="none"
                 disabled={sshIsDisabled}
                 class:is-danger={sshInvalid}

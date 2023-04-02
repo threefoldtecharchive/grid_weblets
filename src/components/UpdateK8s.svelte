@@ -57,48 +57,52 @@
   function onAddWorker() {
     loading = true;
     currentDeployment.deploy("Add Worker", worker.name);
-    getGrid(profile, grid => {
-      const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node, rootFs } = worker; // prettier-ignore
-      const workerModel = new AddWorkerModel();
-      workerModel.deployment_name = k8s.name;
-      workerModel.name = name;
-      workerModel.cpu = cpu;
-      workerModel.memory = memory;
-      workerModel.disk_size = diskSize;
-      workerModel.public_ip = publicIp;
-      workerModel.public_ip6 = publicIp6;
-      workerModel.planetary = planetary;
-      workerModel.rootfs_size = rootFs;
-      workerModel.node_id = node;
-      workerModel.solutionProviderID = InternalSolutionProviderID;
+    getGrid(
+      profile,
+      grid => {
+        const { name, cpu, memory, diskSize, publicIp, publicIp6,planetary, node, rootFs } = worker; // prettier-ignore
+        const workerModel = new AddWorkerModel();
+        workerModel.deployment_name = k8s.name;
+        workerModel.name = name;
+        workerModel.cpu = cpu;
+        workerModel.memory = memory;
+        workerModel.disk_size = diskSize;
+        workerModel.public_ip = publicIp;
+        workerModel.public_ip6 = publicIp6;
+        workerModel.planetary = planetary;
+        workerModel.rootfs_size = rootFs;
+        workerModel.node_id = node;
+        workerModel.solutionProviderID = InternalSolutionProviderID;
 
-      grid.k8s
-        .add_worker(workerModel)
-        .then(({ contracts }) => {
-          const { updated } = contracts;
-          if (updated.length > 0) {
-            success = true;
-            shouldBeUpdated = true;
-            worker = new Worker();
-            return grid.k8s.getObj(k8s.name);
-          } else {
+        grid.k8s
+          .add_worker(workerModel)
+          .then(({ contracts }) => {
+            const { updated } = contracts;
+            if (updated.length > 0) {
+              success = true;
+              shouldBeUpdated = true;
+              worker = new Worker();
+              return grid.k8s.getObj(k8s.name);
+            } else {
+              failed = true;
+            }
+          })
+          .then(data => {
+            if (!data) return;
+            workers = data.workers;
+          })
+          .catch(err => {
             failed = true;
-          }
-        })
-        .then(data => {
-          if (!data) return;
-          workers = data.workers;
-        })
-        .catch(err => {
-          failed = true;
-          console.log("Error", err);
-          message = err.message || err;
-        })
-        .finally(() => {
-          loading = false;
-          currentDeployment.clear();
-        });
-    });
+            console.log("Error", err);
+            message = err.message || err;
+          })
+          .finally(() => {
+            loading = false;
+            currentDeployment.clear();
+          });
+      },
+      "Kubernetes",
+    );
   }
 
   function onDeleteWorker(idx: number) {
@@ -106,34 +110,38 @@
     removing = worker.name;
     loading = true;
     currentDeployment.deploy("Remove Worker", worker.name);
-    getGrid(profile, grid => {
-      const workerModel = new DeleteWorkerModel();
-      workerModel.deployment_name = k8s.name;
-      workerModel.name = removing;
-      grid.k8s
-        .delete_worker(workerModel)
-        .then(({ deleted, updated }) => {
-          if (deleted.length > 0 || updated.length > 0) {
-            shouldBeUpdated = true;
-            let r = removing;
-            requestAnimationFrame(() => {
-              workers = workers.filter(({ name }) => name !== r); // prettier-ignore
-            });
-          } else {
-            failed = true;
-            message = "Failed to remove worker";
-          }
-        })
-        .catch(err => {
-          console.log("Error", err);
-          message = err.message || err;
-        })
-        .finally(() => {
-          loading = false;
-          removing = null;
-          currentDeployment.clear();
-        });
-    });
+    getGrid(
+      profile,
+      grid => {
+        const workerModel = new DeleteWorkerModel();
+        workerModel.deployment_name = k8s.name;
+        workerModel.name = removing;
+        grid.k8s
+          .delete_worker(workerModel)
+          .then(({ deleted, updated }) => {
+            if (deleted.length > 0 || updated.length > 0) {
+              shouldBeUpdated = true;
+              let r = removing;
+              requestAnimationFrame(() => {
+                workers = workers.filter(({ name }) => name !== r); // prettier-ignore
+              });
+            } else {
+              failed = true;
+              message = "Failed to remove worker";
+            }
+          })
+          .catch(err => {
+            console.log("Error", err);
+            message = err.message || err;
+          })
+          .finally(() => {
+            loading = false;
+            removing = null;
+            currentDeployment.clear();
+          });
+      },
+      "Kubernetes",
+    );
   }
 
   const style = `

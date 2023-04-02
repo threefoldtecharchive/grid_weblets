@@ -73,7 +73,7 @@ export default class DeployedList {
     const deps1 = await this.loadK8sDeployment("");
 
     const deps2 = await this.loadK8sDeployment("k8s");
-    
+
     const deps3 = await this.loadK8sDeployment("Kubernetes");
 
     return {
@@ -144,17 +144,17 @@ export default class DeployedList {
     if (!type) return this.loadVm();
 
     /**
-     * Deployments of the same type can be in 
-     */  
-   
+     * Deployments of the same type can be in
+     */
+
     // 1. default namespace: filtered by the project name in the flist
     const deps1 = await this.loadVm().then(vms => {
       return vms.data.filter(vm => vm.flist.toLowerCase().includes(type.toLowerCase()));
     });
-    
+
     // 2. uppercase project name as namespace.
     const deps2 = await this.loadVm(type);
-    
+
     // 3. lowercase project name as namespace.
     const deps3 = await this.loadVm(type.toLowerCase());
 
@@ -165,7 +165,7 @@ export default class DeployedList {
   }
 
   public static async init(profile: IProfile): Promise<DeployedList> {
-    return new DeployedList(await getGrid(profile, grid => grid));
+    return new DeployedList(await getGrid(profile, grid => grid, ""));
   }
 
   public static __filterNames(names: string[]): string[] {

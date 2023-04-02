@@ -22,7 +22,6 @@ export default function deploy<T>(
           window.configs.currentDeploymentStore.clear();
         });
     },
-    true,
     type,
   );
 }

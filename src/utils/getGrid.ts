@@ -1,11 +1,11 @@
 import type { IProfile } from "../types/Profile";
 import type { GridClient } from "grid3_client";
+import type { IStore } from "../types/istore";
 
 export default async function getGrid<T>(
   profile: IProfile,
   cb: (grid: GridClient) => T,
-  disconnect = true,
-  solutionType?: string,
+  solutionType: IStore["type"] | "",
 ): Promise<T> {
   const { mnemonics } = profile;
   const grid = new window.configs.grid3_client.GridClient({
