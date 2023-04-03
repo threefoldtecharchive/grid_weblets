@@ -23,7 +23,6 @@ describe("Weblets", function () {
       //Using the Enviroment Variables Credentials
       if (this.credentials.Mnemonics == "Add your Mnemonics") {
         this.credentials.Mnemonics = Cypress.env("TFCHAIN_MNEMONICS");
-        this.credentials.SSH_KEY = Cypress.env("SSH_KEY");
       }
     });
 
