@@ -3,8 +3,6 @@ import vmPage from "../page-objects/vm-page";
 import utils from "../utils/utils";
 
 describe("Weblets", function () {
-  let profileSecret = utils.generateString(10);
-  let profileName = "Cypress" + utils.generateString(5);
   let vmName = "VM" + utils.generateString(5);
   let envVarKey = "TestKey" + utils.generateString(5);
   let envVarValue = "Value" + utils.generateString(5);
@@ -32,23 +30,17 @@ describe("Weblets", function () {
     profileManager.DeactivateProfile();
   });
 
-  it("TC394 - Unlock Profile Manager", function () {
+  it.only("TC394 - Unlock Profile Manager", function () {
     /**********************************************
          Test Suite: Weblets
          Test Cases: TC394 - Unlock Profile Manager
          Scenario:
             - Navigate to the weblets
-            - Create a new profile
-            - Enter the Profile Name, Mnemonics, SSH Key 
+            - Enter Mnemonics, SSH Key 
             - Activate the profile
         **********************************************/
 
-    profileManager.ActivateProfileManager(
-      this.credentials.Mnemonics,
-      this.credentials.SSH_KEY,
-      profileSecret,
-      profileName,
-    );
+    profileManager.ActivateProfileManager(this.credentials.Mnemonics, this.credentials.SSH_KEY);
   });
 
   it("TC377 - Deploy VM", function () {

@@ -9,8 +9,9 @@ class Virtualmachine {
     return cy
       .get("tf-vm")
       .shadow()
-      .find("div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > div:nth-child(2)")
-      .find("select");
+      .find(
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(4) > div:nth-child(2) > select:nth-child(1)",
+      );
   }
 
   get getRootFsBtn() {
@@ -18,7 +19,7 @@ class Virtualmachine {
       .get("tf-vm")
       .shadow()
       .find(
-        "div:nth-child(2) > form:nth-child(1) > div:nth-child(9) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > label:nth-child(1) > span:nth-child(2)",
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(5) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > label:nth-child(1)",
       );
   }
 
@@ -27,7 +28,7 @@ class Virtualmachine {
   }
 
   get getCpuField() {
-    return cy.get("tf-vm").shadow().find("input[placeholder='CPU Cores']").clear({ force: true });
+    return cy.get("tf-vm").shadow().find("input[placeholder='CPU vCores']").clear({ force: true });
   }
 
   get getMemoryField() {
@@ -38,7 +39,7 @@ class Virtualmachine {
     return cy.get("tf-vm").shadow().find(".tabs.is-centered");
   }
 
-  get getAddBtn() {
+  get getAddEnvBtn() {
     return cy
       .get("tf-vm")
       .shadow()
@@ -51,7 +52,7 @@ class Virtualmachine {
       .get("tf-vm")
       .shadow()
       .find(
-        "div:nth-child(2) > form:nth-child(1) > div:nth-child(6) > div:nth-child(2) > div:nth-child(3) > div:nth-child(1)",
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(3) > div:nth-child(2) > div:nth-child(2)",
       )
       .find("input[placeholder= 'Environment Key']");
   }
@@ -61,9 +62,19 @@ class Virtualmachine {
       .get("tf-vm")
       .shadow()
       .find(
-        "div:nth-child(2) > form:nth-child(1) > div:nth-child(6) > div:nth-child(2) > div:nth-child(5) > div:nth-child(1)",
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(3) > div:nth-child(2) > div:nth-child(2)",
       )
       .find("input[placeholder= 'Environment Value']");
+  }
+
+  get getAddDiskBtn() {
+    return cy
+      .get("tf-vm")
+      .shadow()
+      .find(
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(4) > div:nth-child(1) > button:nth-child(1)",
+      )
+      .contains("+ Add");
   }
 
   get getDiskNameField() {
@@ -79,11 +90,21 @@ class Virtualmachine {
   }
 
   get getNodeSelectionList() {
-    return cy.get("tf-vm").shadow().find("div:nth-child(2) > form:nth-child(1) > div:nth-child(21)").find("select");
+    return cy
+      .get("tf-vm")
+      .shadow()
+      .find(
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(17) > div:nth-child(2) > select:nth-child(1)",
+      );
   }
 
   get getFarmsList() {
-    return cy.get("tf-vm").shadow().find("div:nth-child(2) > form:nth-child(1) > div:nth-child(24)").find("select");
+    return cy
+      .get("tf-vm")
+      .shadow()
+      .find(
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(20) > div:nth-child(2) > select:nth-child(1)",
+      );
   }
 
   get getApplySelectionBtn() {
@@ -161,37 +182,41 @@ class Virtualmachine {
 
   get getDeploymentList() {
     return cy
-      .get("tf-deployedlist[tab='vm']")
+      .get("tf-deployedlist")
       .shadow()
-      .find("div:nth-child(2) > section:nth-child(1) > div:nth-child(5)", { timeout: 60000 });
+      .find("div:nth-child(2) > section:nth-child(1) > div:nth-child(6)", { timeout: 60000 });
   }
 
   get getDeploymentListCheckBox() {
     return cy
-      .get("tf-deployedlist[tab='vm']")
+      .get("tf-deployedlist")
       .shadow()
       .find(
-        "div:nth-child(2) > section:nth-child(1) > div:nth-child(5) > table:nth-child(1) > thead:nth-child(1) > tr:nth-child(1) > th:nth-child(1) > input:nth-child(1)",
+        "div:nth-child(2) > section:nth-child(1) > div:nth-child(6) > table:nth-child(1) > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(1) > input:nth-child(1)",
       );
   }
 
   get getDeleteBtn() {
     return cy
-      .get("tf-deployedlist[tab='vm']")
+      .get("tf-deployedlist")
       .shadow()
       .find(".is-flex.is-justify-content-space-between.is-align-items-center.mt-2.mb-2")
       .contains("Delete");
   }
 
+  get getDeleteConfirmationBtn() {
+    return cy.get("tf-deployedlist").shadow().find("button[class='button is-danger']");
+  }
+
   get getDeploymentNotFoundText() {
     return cy
-      .get("tf-deployedlist[tab='vm']")
+      .get("tf-deployedlist")
       .shadow()
-      .contains("No Virtual Machines found on this profile.", { timeout: 300000 });
+      .contains("No Micro Virtual Machines found on this profile.", { timeout: 300000 });
   }
 
   Navigate() {
-    sidebar.SelectFromSidebar("Virtual Machine");
+    sidebar.SelectFromSidebar("Micro Virtual Machine");
   }
 
   Deploy(vmName, rootFs, cpu, memory, envVarKey, envVarValue, diskName, diskSize, mountPoint, farmName) {
@@ -225,7 +250,7 @@ class Virtualmachine {
     this.getConfigTab.contains("Environment Variables").click();
 
     //Add New ENV Var
-    this.getAddBtn.click();
+    this.getAddEnvBtn.click();
 
     //Add Env Var Key
     this.getEnvVarKeyField.type(envVarKey, { force: true });
@@ -241,7 +266,7 @@ class Virtualmachine {
     this.getConfigTab.contains("Disks").click();
 
     //Add New Disk
-    this.getAddBtn.click();
+    this.getAddDiskBtn.click();
 
     //Change Disk Name
     this.getDiskNameField.type(diskName, { force: true });
@@ -273,7 +298,7 @@ class Virtualmachine {
         ************************/
 
     //Deploy VM
-    this.getDeployBtn.click();
+    this.getDeployBtn.wait(20000).click();
 
     //Verify that the vm is deployed from the Details Modal box
     this.getDeploymentModalBox.should("be.visible");
@@ -298,6 +323,9 @@ class Virtualmachine {
 
     //Click on the Delete Button
     this.getDeleteBtn.click({ force: true });
+
+    //Click on the Confiramtion Delete Button
+    this.getDeleteConfirmationBtn.click({ force: true });
 
     //Verify that the vm was deleted
     this.getDeploymentNotFoundText.should("be.visible");
