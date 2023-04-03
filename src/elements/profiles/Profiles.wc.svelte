@@ -43,7 +43,7 @@
       .then(_migrationDetails => {
         migrationDetails = _migrationDetails;
         if (_migrationDetails.failed > 0) {
-          password.setValue(password$.value, { error: `Failed to migrated ${_migrationDetails.failed} keys.` });
+          password.setValue(password$.value, { error: `Failed to migrate ${_migrationDetails.failed} keys.` });
         }
       })
       .catch(err => password.setValue(password$.value, { error: err.message }))
