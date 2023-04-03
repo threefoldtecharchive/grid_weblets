@@ -21,10 +21,10 @@ jobs:
           cache: "yarn"
       - name: Yarn deps
         run: yarn deps
+      - name: Write the cypress.env.json file
+        run: |
+          echo '${{ secrets.TFCHAIN_MNEMONICS }}' > cypress.env.json
       - name: Cypress run
         uses: cypress-io/github-action@v4.2.0
         with:
-          start: npx cypress run
           browser: chrome
-        env:
-          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
