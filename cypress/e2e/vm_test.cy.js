@@ -19,6 +19,12 @@ describe("Weblets", function () {
     //Load data from fixtures/credentials.json
     cy.fixture("credentials.json").then(function (credentials) {
       this.credentials = credentials;
+
+      //Using the Enviroment Variables Credentials
+      if (this.credentials.Mnemonics == "Add your Mnemonics") {
+        this.credentials.Mnemonics = Cypress.env("TFCHAIN_MNEMONICS");
+        this.credentials.SSH_KEY = Cypress.env("SSH_KEY");
+      }
     });
 
     //URL can be changed from basUrl in cypress.config.ts
@@ -30,7 +36,7 @@ describe("Weblets", function () {
     profileManager.DeactivateProfile();
   });
 
-  it.only("TC394 - Unlock Profile Manager", function () {
+  it("TC394 - Unlock Profile Manager", function () {
     /**********************************************
          Test Suite: Weblets
          Test Cases: TC394 - Unlock Profile Manager
