@@ -18,6 +18,7 @@
   let contracts: IContract[] = [];
   let loading = false;
   let selectedContracts: IContract[] = [];
+  let selectedContractsIDS: number[] = [];
   let deleting = false;
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
@@ -151,8 +152,6 @@
 
   function onDeleteSelectedHandler() {
     if (selectedContracts.length === contracts.length) return onDeleteHandler();
-    const selectedContractsIDS: number[] = [];
-    selectedContracts.forEach(contract => selectedContractsIDS.push(+contract.id));
 
     message = null;
     deleting = true;
@@ -265,25 +264,13 @@
             style={`border-color: #FF5151; color: #FF5151; background: white;`}
             disabled={!profile || loading || deleting || contracts.length === 0 || selectedContracts.length === 0}
             on:click={() => {
-              name = "selected contracts";
               opened = !opened;
+              selectedContracts.forEach(contract => selectedContractsIDS.push(+contract.id));
             }}
           >
             Delete Selected
           </button>
-          <DialogueMsg bind:opened on:removed={onDeleteSelectedHandler} {name} />
-          <button
-            class={"button is-danger" + (deleting && deletingType === "all" ? " is-loading" : "")}
-            style={`background-color: #FF5151; color: #fff`}
-            disabled={!profile || loading || deleting || contracts.length === 0}
-            on:click={() => {
-              name = "your contracts";
-              deleteAllopened = !deleteAllopened;
-            }}
-          >
-            Delete All
-          </button>
-          <DialogueMsg bind:opened={deleteAllopened} on:removed={onDeleteHandler} {name} />
+          <DialogueMsg bind:opened on:removed={onDeleteSelectedHandler} name={selectedContracts} />
         </div>
       </div>
     {:else}

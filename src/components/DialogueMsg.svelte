@@ -2,13 +2,13 @@
 
 <script lang="ts">
   import { createEventDispatcher, onMount } from "svelte";
+  import type { IContract } from "../utils/getContractsConsumption";
 
   const dispatch = createEventDispatcher<{ removed: number; select: string; init: void }>();
 
   export let opened = false;
-  export let name: string = null;
+  export let name: string[] | IContract[] = [];
   export let selectedID: number = null;
-
   const onRemove = (idx: number) => () => {
     dispatch("removed", idx);
     opened = !opened;
@@ -23,7 +23,7 @@
   <div class="modal-background" />
   <div class="modal-card">
     <section class="modal-card-body">
-      Are you sure you want to delete {name}?
+      Are you sure you want to delete {Array.prototype.map.call(name, n => n.id + "").toString()}?
       <div style="float: right; margin-top: 50px;">
         <button
           class="button is-danger"
