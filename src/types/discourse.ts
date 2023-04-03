@@ -32,7 +32,7 @@ class SMTP {
       invalid: false,
     },
     {
-      label: "Username",
+      label: "Username/Email",
       symbol: "userName",
       placeholder: "user@example.com",
       type: "text",
