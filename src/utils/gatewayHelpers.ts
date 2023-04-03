@@ -1,5 +1,6 @@
 import type { IStore } from "./../stores/currentDeployment";
 import { solutionList } from "../stores/solutionsList";
+import type { NodeInfo } from "grid3_client";
 
 export interface GatewayNodes {
   nodeDomain: string;
@@ -41,7 +42,18 @@ export async function LoadGatewayNodes(): Promise<GatewayNodes[]> {
   grid._connect();
 
   const nodes = grid.capacity;
-  const LoadedNodes = await nodes.filterNodes({ gateway: true });
+  let LoadedNodes: NodeInfo[] = [];
+  let exhausted = false;
+  let idx = 1;
+  while (!exhausted) {
+    const LoadedNodesPartial = await nodes.filterNodes({ gateway: true, page: idx });
+    if (LoadedNodesPartial.length === 0) {
+      exhausted = true;
+    } else {
+      idx++;
+      LoadedNodes = LoadedNodes.concat(LoadedNodesPartial);
+    }
+  }
   const gws: GatewayNodes[] = [];
 
   for (const node of LoadedNodes) {

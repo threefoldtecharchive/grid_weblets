@@ -6048,10 +6048,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-grid3_client@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.0.0.tgz#4f115fb2ba6aefe9cc9519ef93f980a37ad82538"
-  integrity sha512-j7/P0AJGtdPlt3lIh1QM37TjU3QPn+FAqnlAw4igrUECaHEtJUmtQSHBVRDlR+Azn1fS6fQqiaNPBY9ZH9VxrA==
+grid3_client@2.1.0-rc1:
+  version "2.1.0-rc1"
+  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.1.0-rc1.tgz#47b2fde458f3e1e41a2dd626311a37ad5080a160"
+  integrity sha512-vqRIemkxm4spX+pLenIaGhVOz6n/bxfLW9oicrzuamk+XZvq7huN0crFd4g+kNMWr5+9YYZmoGVqqrL+A9K5Tg==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"

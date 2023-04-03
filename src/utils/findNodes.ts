@@ -20,24 +20,24 @@ export default function findNodes(
     const nodes = grid.capacity;
 
     try {
-      let avilableNodes = await nodes.filterNodes(filters);
+      let availableNodes = await nodes.filterNodes(filters);
 
       if (!filters.publicIPs && exclusiveFor != "") {
         const blockedNodes = await getBlockedNodesIDs(exclusiveFor, gridproxy, graphql);
 
         // remove the blocked nodes from the nodes the first page
-        avilableNodes = exclude(blockedNodes, avilableNodes);
+        availableNodes = exclude(blockedNodes, availableNodes);
 
         let pageNumber = 1;
         // check if there are more pages
-        while (avilableNodes.length === 0) {
+        while (availableNodes.length === 0) {
           try {
             pageNumber += 1;
-            avilableNodes = await nodes.filterNodes({
+            availableNodes = await nodes.filterNodes({
               ...filters,
               page: pageNumber,
             });
-            avilableNodes = exclude(blockedNodes, avilableNodes);
+            availableNodes = exclude(blockedNodes, availableNodes);
           } catch (err) {
             console.log("End of the pages.");
             break;
@@ -45,7 +45,7 @@ export default function findNodes(
         }
       }
 
-      const resNodes = avilableNodes.map(node => {
+      const resNodes = availableNodes.map(node => {
         return {
           label: `NodeID(${node.nodeId})`,
           value: node.nodeId,
