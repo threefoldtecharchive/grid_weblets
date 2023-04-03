@@ -110,6 +110,8 @@
     findNodes(_filters, profile, exclusiveFor)
       .then(async _nodes => {
         dispatch("fetch", _nodes);
+        status = undefined;
+        aliveNode = false;
         if (_nodes.length <= 0) {
           data = null;
           status = null;
