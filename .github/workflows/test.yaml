@@ -21,6 +21,9 @@ jobs:
           cache: "yarn"
       - name: Yarn deps
         run: yarn deps
+      - name: Generate SSH Key
+        run: |
+          ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
       - name: Write the cypress.env.json file
         run: |
           echo '${{ secrets.TFCHAIN_MNEMONICS }}' > cypress.env.json

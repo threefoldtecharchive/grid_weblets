@@ -24,10 +24,10 @@ class ProfileManager {
     this.getProfileManagerBtn.click();
 
     //Add Mnemonics
-    this.getMnemonicsField.clear().type(mnemonics, { force: true });
+    this.getMnemonicsField.clear().type(mnemonics, { force: true, delay: 0 });
 
     //Add SSH Key
-    this.getPublicSShKeyField.clear().type(sshKey, { force: true });
+    this.getPublicSShKeyField.clear().type(sshKey, { force: true, delay: 0 });
 
     //Click outside the modal to close it
     this.getProfileCloseButton.click();

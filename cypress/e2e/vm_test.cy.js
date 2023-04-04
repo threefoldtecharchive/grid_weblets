@@ -21,8 +21,13 @@ describe("Weblets", function () {
       this.credentials = credentials;
 
       //Using the Enviroment Variables Credentials
-      if (this.credentials.Mnemonics == "Add your Mnemonics") {
+      if (this.credentials.Mnemonics == "Add your Mnemonics" || this.credentials.Mnemonics == "") {
         this.credentials.Mnemonics = Cypress.env("TFCHAIN_MNEMONICS");
+      }
+      if (this.credentials.SSH_KEY == "Add Your SSH Key" || this.credentials.SSH_KEY == "") {
+        cy.exec("cd ~ && cat .ssh/id_ed25519.pub").then(result => {
+          this.credentials.SSH_KEY = result.stdout;
+        });
       }
     });
 
