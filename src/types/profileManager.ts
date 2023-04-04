@@ -85,7 +85,7 @@ export function readSSH(mnemonics: string): Promise<string> {
 }
 
 export function storeSSH(mnemonics: string, ssh: string): Promise<boolean> {
-  const metadata = JSON.stringify({ sshkey: ssh });
+  const metadata = JSON.stringify({ sshkey: ssh.trim() });
   return readSSH(mnemonics)
     .then(oldSsh => {
       if (ssh === oldSsh) return true;
