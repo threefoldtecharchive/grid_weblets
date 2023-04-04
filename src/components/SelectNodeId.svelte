@@ -7,7 +7,7 @@
   import findNodes from "../utils/findNodes";
   import fetchFarms from "../utils/fetchFarms";
   import { fetchCountries } from "../utils/fetchCountries";
-
+  import NodeID from "../types/nodeId";
   // components
   import Input from "./Input.svelte";
   import gqlApi from "../utils/gqlApi";
@@ -73,7 +73,7 @@
 
   export let nodeSelection: string = undefined;
 
-  export let filters: any;
+  export let filters: any = new NodeID().filters;
 
   $: {
     if (filters) {
@@ -278,14 +278,16 @@
 
               const { total_resources: total, used_resources: used } = node.capacity;
               // prettier-ignore
-              let hasEnoughResources = ((total.sru - used.sru) / 1024 ** 3) >= filters.sru &&
-                        ((total.mru - used.mru) / 1024 ** 3) >= filters.mru;
+              console.log(total.cru, used.cru)
+              let hasEnoughResources =
+                (total.sru - used.sru) / 1024 ** 3 >= (filters?.sru ?? ssd) &&
+                (total.mru - used.mru) / 1024 ** 3 >= (filters?.mru ?? Math.round(memory / 1024));
               if (!hasEnoughResources) {
                 status = "invalid";
                 return;
               }
 
-              if (filters.publicIPs) {
+              if (filters?.publicIPs || publicIp) {
                 return gqlApi<{ nodes: { id: number }[] }>(
                   "query getFarmId($id: Int!) { nodes(where: { nodeID_eq: $id }) { id: farmID }}",
                   { id: data },

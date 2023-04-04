@@ -205,12 +205,8 @@
           publicIp={data.master.publicIp}
           ssd={data.master.diskSize + data.master.rootFs}
           bind:data={data.master.node}
-          bind:nodeSelection={data.master.selection.type}
-          filters={data.master.selection.filters}
           bind:status={data.master.status}
           {profile}
-          on:fetch={({ detail }) => (data.master.selection.nodes = detail)}
-          nodes={data.master.selection.nodes}
         />
       </section>
       <section style={display(active, "workers")}>
