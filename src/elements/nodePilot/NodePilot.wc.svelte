@@ -170,9 +170,7 @@
     <h4 class="is-size-4">Deploy a Node Pilot</h4>
     <p>
       Deploy a new Node Pilot on the Threefold Grid
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_nodepilot">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_nodepilot.html"> Quick start documentation</a>
     </p>
     <hr />
 

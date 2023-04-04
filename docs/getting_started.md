@@ -39,7 +39,7 @@ export TARGET_WEBLETS="vm peertube DeployedList"
 yarn serve:app
 ```
 
-To read about each weblet and how to use it, and also how to config your twin id and activate your profile on the playground you can go to the [weblets documentation](https://library.threefold.me/info/manual/#/manual__weblets_profile_manager).
+To read about each weblet and how to use it, and also how to config your twin id and activate your profile on the playground you can go to the [weblets documentation](https://manual.grid.tf/weblets/weblets_profile_manager.html?highlight=profile#profile-manager).
 
 ## Weblet List
 

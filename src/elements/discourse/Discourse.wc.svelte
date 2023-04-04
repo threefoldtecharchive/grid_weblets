@@ -113,9 +113,7 @@
     <p>
       Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a
       mailing list, discussion forum, long-form chat room, and more!
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_discourse">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_discourse.html"> Quick start documentation</a>
     </p>
 
     <hr />

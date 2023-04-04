@@ -108,9 +108,7 @@
     <p>
       Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt
       to the needs of our evolving world.
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_casper">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_casper.html"> Quick start documentation</a>
     </p>
     <hr />
 
