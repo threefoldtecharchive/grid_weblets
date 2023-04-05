@@ -280,8 +280,7 @@
               // prettier-ignore
               let hasEnoughResources =
                 (total.sru - used.sru) / 1024 ** 3 >= (filters?.sru ?? ssd) &&
-                (total.mru - used.mru) / 1024 ** 3 >= (filters?.mru ?? Math.round(memory / 1024)) &&
-                (total.cru - used.cru >= filters?.cru ?? cpu);
+                (total.mru - used.mru) / 1024 ** 3 >= (filters?.mru ?? Math.round(memory / 1024));
               if (!hasEnoughResources) {
                 status = "invalid";
                 return;
