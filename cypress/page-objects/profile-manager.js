@@ -8,7 +8,7 @@ class ProfileManager {
   }
 
   get getPublicSShKeyField() {
-    return cy.get("tf-profiles").shadow().find("textarea");
+    return cy.get("tf-profiles").shadow().find("#ssh");
   }
 
   get getProfileCloseButton() {
@@ -19,15 +19,24 @@ class ProfileManager {
     return cy.get("body");
   }
 
+  get alert() {
+    return cy.get("tf-profiles").shadow().find(".help.is-danger");
+  }
+
   ActivateProfileManager(mnemonics, sshKey) {
     //Open the profile manager
     this.getProfileManagerBtn.click();
 
     //Add Mnemonics
-    this.getMnemonicsField.clear().type(mnemonics, { force: true, delay: 0 });
+    this.getMnemonicsField.clear().type(mnemonics, { force: true, delay: 0, timeout: 10000 });
 
     //Add SSH Key
-    this.getPublicSShKeyField.clear().type(sshKey, { force: true, delay: 0 });
+    this.getPublicSShKeyField.click();
+    this.getPublicSShKeyField.invoke("val", sshKey);
+    this.getPublicSShKeyField.type(" ", { force: true, delay: 0, timeout: 20000 });
+
+    //Wait for SSH verification
+    this.alert.should("not.exist");
 
     //Click outside the modal to close it
     this.getProfileCloseButton.click();
