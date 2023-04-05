@@ -48,6 +48,7 @@
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
+    { label: "Wireguard Config", symbol: "wireguard", placeholder: "", type: 'checkbox' },
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
@@ -270,6 +271,8 @@
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
+          {:else if field.symbol === "wireguard"}
+            <Input bind:data={data.network.addAccess} {field} />
           {:else}
             <Input bind:data={data[field.symbol]} {field} />
           {/if}

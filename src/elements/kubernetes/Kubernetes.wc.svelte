@@ -59,6 +59,7 @@
     { label: "Public IPv4", symbol: "publicIp", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    { label: "Wireguard Config", symbol: "wireguard", placeholder: "", type: 'checkbox' },
   ];
 
   let data = new Kubernetes();
@@ -185,6 +186,8 @@
         {#each baseFields as field (field.symbol)}
           {#if field.invalid !== undefined}
             <Input bind:data={data.master[field.symbol]} bind:invalid={field.invalid} {field} />
+          {:else if field.symbol === "wireguard"}
+            <Input bind:data={data.network.addAccess} {field} />
           {:else}
             <Input bind:data={data.master[field.symbol]} {field} />
           {/if}
