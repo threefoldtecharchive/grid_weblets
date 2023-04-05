@@ -133,9 +133,17 @@
   }
 
   // Store SSH Key
-  $: if (mnemonics$.valid && sshKey$.valid && !sshKey$.pending && !sshLoading && SSH_KEY !== sshKey$.value) {
+  $: if (
+    mnemonics$.valid &&
+    sshKey$.valid &&
+    !sshKey$.pending &&
+    !sshLoading &&
+    SSH_KEY !== sshKey$.value &&
+    SSH_KEY !== sshKey$.value.trim()
+  ) {
     SSH_KEY = sshKey$.value;
     sshLoading = true;
+    sshKey$.value = sshKey$.value.trim();
     storeSSH(mnemonics$.value, sshKey$.value)
       .then(stored => {
         if (!stored) {
