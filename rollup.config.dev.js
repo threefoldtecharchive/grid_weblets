@@ -64,6 +64,7 @@ export default {
       sourceMap: !production,
       inlineSources: !production,
     }),
+    json(),
 
     // In dev mode, call `npm run start` once
     // the bundle has been generated

@@ -53,6 +53,7 @@ function build(options) {
         sourceMap: !production,
         inlineSources: !production,
       }),
+      json(),
       production && terser(),
       replace({
         preventAssignment: true,
