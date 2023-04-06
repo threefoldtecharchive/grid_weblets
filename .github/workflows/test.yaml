@@ -35,4 +35,4 @@ jobs:
           browser: chrome
           start: yarn serve:app
           wait-on: "http://localhost:8000"
-          wait-on-timeout: 120
+          wait-on-timeout: 500
