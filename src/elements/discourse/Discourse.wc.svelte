@@ -160,7 +160,7 @@
               const { cpu, memory, diskSize } = detail.package;
               data.cpu = cpu;
               data.memory = memory;
-              data.disks[0].size = diskSize;
+              data.diskSize = diskSize;
             }
           }}
         />
