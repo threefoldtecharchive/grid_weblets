@@ -22,6 +22,7 @@
   import { noActiveProfile } from "../../utils/message";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
 
   let data = new Umbrel();
   data.disks = [new Disk()];
@@ -175,7 +176,7 @@
         cpu={data.cpu}
         memory={data.memory}
         publicIp={data.publicIp}
-        ssd={data.disks.reduce((total, disk) => total + disk.size + 10, 0)}
+        ssd={data.diskSize + 10 + rootFs(data.cpu, data.memory)}
         bind:data={data.nodeId}
         bind:nodeSelection={data.selection.type}
         bind:status

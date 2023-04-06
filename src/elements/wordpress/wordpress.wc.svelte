@@ -24,6 +24,7 @@
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
 
   let data = new Wordpress();
   data.disks = [new Disk()];
@@ -187,7 +188,7 @@
         cpu={data.cpu}
         memory={data.memory}
         publicIp={false}
-        ssd={data.disks.reduce((total, disk) => total + disk.size, 0)}
+        ssd={data.diskSize + rootFs(data.cpu, data.memory)}
         bind:data={data.nodeId}
         bind:nodeSelection={data.selection.type}
         bind:status
