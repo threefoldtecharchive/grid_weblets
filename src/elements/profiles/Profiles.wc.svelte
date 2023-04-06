@@ -189,7 +189,7 @@
 
 <div class="box is-flex is-align-items-center" style:cursor="pointer" on:click={() => (active = true)}>
   <span
-    style:display={mnemonicsLoading ? "none" : "block"}
+    style:display={mnemonics$.pending || mnemonicsLoading ? "none" : "block"}
     style:background-color="#ddd8d8"
     style:border-radius="50%"
     class="mr-2"
@@ -197,13 +197,16 @@
     <i class="fas fa-user-cog" style:padding="1rem" style:font-size="1rem" />
   </span>
   <span
-    style:display={mnemonicsLoading ? "block" : "none"}
+    style:display={mnemonics$.pending || mnemonicsLoading ? "block" : "none"}
     style:background-color="#ddd8d8"
     style:border-radius="50%"
     class="mr-2"
   >
     <i class="fa-solid fa-spinner fa-spin-pulse" style:padding="0.7rem" style:font-size="1.5rem" />
   </span>
+  <div style:display={mnemonics$.pending || mnemonicsLoading ? "block" : "none"}>
+    <p class="grey-light"><strong>Loading account... </strong></p>
+  </div>
   {#if baseConfig$}
     <div>
       {#if balance$.loading}
