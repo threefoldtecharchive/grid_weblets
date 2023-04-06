@@ -23,7 +23,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
   const randomSuffix = generateString(10).toLowerCase();
 
   // Private network
-  const network = createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16"));
+  const network = await createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16"));
 
   // Machine specs
   const machine = new MachineModel();

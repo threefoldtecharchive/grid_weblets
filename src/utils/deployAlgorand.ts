@@ -34,7 +34,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
   const randomSuffix = generateString(10).toLowerCase();
 
   // Private network
-  const network = createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16"));
+  const network = await createNetwork(new Network(`nw${randomSuffix}`, "10.200.0.0/16"));
 
   // Disk Specs
   const disk = new DiskModel();

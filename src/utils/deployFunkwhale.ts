@@ -56,7 +56,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
   // Network Specs
   const net = new Network();
   net.name = `net${randomSuffix}`;
-  const network = createNetwork(net);
+  const network = await createNetwork(net);
 
   // Disk Specs
   const disk = new DiskModel();

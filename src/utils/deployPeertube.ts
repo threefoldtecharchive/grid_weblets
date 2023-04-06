@@ -56,7 +56,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   // Network Specs
   const net = new Network();
   net.name = `net${randomSuffix}`;
-  const network = createNetwork(net);
+  const network = await createNetwork(net);
 
   // Disk Specs
   const disk = new DiskModel();

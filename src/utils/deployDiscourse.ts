@@ -52,7 +52,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
 
   const randomSuffix = generateString(10).toLowerCase();
 
-  const network = createNetwork(new Network(`nw${randomSuffix}`));
+  const network = await createNetwork(new Network(`nw${randomSuffix}`));
 
   /* Docker disk */
   const disk = new DiskModel();

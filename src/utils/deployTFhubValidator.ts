@@ -15,7 +15,7 @@ export default async function deployTFhubValidator(profile: IProfile, tfhubValid
   return validatorVm;
 }
 
-function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
+async function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
   const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {
@@ -81,7 +81,7 @@ function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator
 
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = createNetwork(new Network());
+  vms.network = await createNetwork(new Network());
   vms.machines = [vm];
 
   const metadate = {

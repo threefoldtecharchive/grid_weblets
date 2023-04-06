@@ -53,7 +53,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
   const randomSuffix = generateString(10).toLowerCase();
 
   // define a network
-  const network = createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
+  const network = await createNetwork(new Network(`net${randomSuffix}`, "10.1.0.0/16")); // prettier-ignore
 
   // disk
   const disk = new DiskModel();

@@ -26,7 +26,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   const randomSuffix = generateString(10).toLowerCase();
 
   // Network Specs
-  const network = createNetwork(new Network(`nw${randomSuffix}`));
+  const network = await createNetwork(new Network(`nw${randomSuffix}`));
 
   /* Docker disk */
   const disk = new DiskModel();
