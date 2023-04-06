@@ -270,7 +270,11 @@
           >
             Delete Selected
           </button>
-          <DialogueMsg bind:opened on:removed={onDeleteSelectedHandler} name={selectedContracts} />
+          <DialogueMsg
+            bind:opened
+            on:removed={onDeleteSelectedHandler}
+            name={Array.prototype.map.call(selectedContracts, n => n.id + "").toString()}
+          />
         </div>
       </div>
     {:else}
