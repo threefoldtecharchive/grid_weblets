@@ -7,6 +7,7 @@ import typescript from "@rollup/plugin-typescript";
 import fs from "fs";
 import path from "path";
 import replace from "@rollup/plugin-replace";
+import json from "@rollup/plugin-json";
 
 const production = !process.env.ROLLUP_WATCH;
 const network = process.env.NETWORK || "dev";
@@ -53,6 +54,7 @@ function build(options) {
         sourceMap: !production,
         inlineSources: !production,
       }),
+      json(),
       production && terser(),
       replace({
         preventAssignment: true,
