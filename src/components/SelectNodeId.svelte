@@ -356,7 +356,7 @@
         await grid.zos.pingNode({ nodeId: node });
         aliveNode = true;
         nodeIdField.disabled = nodeSelectionField.disabled = validating = false;
-        status = "valid";
+        if (data && status !== "invalid") status = "valid";
         return true;
       } catch (e) {
         nodeIdField.disabled = nodeSelectionField.disabled = validating = false;
