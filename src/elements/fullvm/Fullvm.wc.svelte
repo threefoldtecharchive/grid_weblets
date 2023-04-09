@@ -48,7 +48,7 @@
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },
     { label: "Public IPv6", symbol: "publicIp6", placeholder: "", type: 'checkbox' },
     { label: "Planetary Network", symbol: "planetary", placeholder: "", type: 'checkbox' },
-    { label: "Wireguard Config", symbol: "wireguard", placeholder: "", type: 'checkbox' },
+    { label: "Add Wireguard Access", symbol: "wireguard", placeholder: "", type: 'checkbox' },
   ];
 
   const nameField: IFormField = { label: "Name", placeholder: "Virtual Machine Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
