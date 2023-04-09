@@ -240,13 +240,9 @@
                 memory={worker.memory}
                 publicIp={worker.publicIp}
                 ssd={worker.diskSize + worker.rootFs}
-                filters={worker.selection.filters}
                 bind:data={worker.node}
-                bind:nodeSelection={worker.selection.type}
                 bind:status={worker.status}
                 {profile}
-                on:fetch={({ detail }) => (worker.selection.nodes = detail)}
-                nodes={worker.selection.nodes}
               />
             </div>
           {/each}
