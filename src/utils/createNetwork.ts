@@ -1,4 +1,4 @@
-import { GridClient } from "grid3_client";
+import type { GridClient } from "grid3_client";
 import type { Network } from "../types/kubernetes";
 import { get } from "svelte/store";
 
@@ -6,11 +6,12 @@ async function getClient(): Promise<GridClient> {
   const profile = get(window.configs.baseConfig);
   if (!profile) return;
 
-  const gridClient = new GridClient({
+  const gridClient = new window.configs.grid3_client.GridClient({
     network: profile.networkEnv,
     mnemonic: profile.mnemonics,
     storeSecret: profile.mnemonics,
   });
+
   await gridClient.connect();
   return gridClient;
 }
