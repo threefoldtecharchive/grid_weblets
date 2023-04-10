@@ -344,7 +344,7 @@
       5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
-        <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_caprover_worker">
+        <a target="_blank" href="https://www2.manual.grid.tf/weblets/weblets_caprover_worker.html">
           Click here for the documentation
         </a>
       </strong>

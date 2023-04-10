@@ -203,7 +203,7 @@
     <h4 class="is-size-4">Deploy a Full Virtual Machine</h4>
     <p>
       Deploy a new full virtual machine on the Threefold Grid
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_fullvm">
+      <a target="_blank" href="https://www2.manual.grid.tf/weblets/weblets_fullVm.html#full-virtual-machine">
         Quick start documentation</a
       >
     </p>
