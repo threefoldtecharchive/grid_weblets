@@ -57,7 +57,7 @@
   $: mnemonics$ = $mnemonics;
   $: mnemonicsIsDisabled = mnemonicsLoading;
   $: mnemonicsInvalid = (mnemonics$.touched || mnemonics$.dirty) && !mnemonics$.valid && !mnemonicsIsDisabled;
-  $: mnemonicsHasError = (mnemonicsInvalid && mnemonics$.error) || mnemonicsError;
+  $: mnemonicsHasError = !mnemonics$.pending && ((mnemonicsInvalid && mnemonics$.error) || mnemonicsError);
 
   async function createAccount() {
     mnemonicsLoading = true;
@@ -133,9 +133,17 @@
   }
 
   // Store SSH Key
-  $: if (mnemonics$.valid && sshKey$.valid && !sshKey$.pending && !sshLoading && SSH_KEY !== sshKey$.value) {
+  $: if (
+    mnemonics$.valid &&
+    sshKey$.valid &&
+    !sshKey$.pending &&
+    !sshLoading &&
+    SSH_KEY !== sshKey$.value &&
+    SSH_KEY !== sshKey$.value.trim()
+  ) {
     SSH_KEY = sshKey$.value;
     sshLoading = true;
+    sshKey$.value = sshKey$.value.trim();
     storeSSH(mnemonics$.value, sshKey$.value)
       .then(stored => {
         if (!stored) {
@@ -180,9 +188,25 @@
 </script>
 
 <div class="box is-flex is-align-items-center" style:cursor="pointer" on:click={() => (active = true)}>
-  <span style:background-color="#ddd8d8" style:border-radius="50%" class="mr-2">
+  <span
+    style:display={mnemonics$.pending || mnemonicsLoading ? "none" : "block"}
+    style:background-color="#ddd8d8"
+    style:border-radius="50%"
+    class="mr-2"
+  >
     <i class="fas fa-user-cog" style:padding="1rem" style:font-size="1rem" />
   </span>
+  <span
+    style:display={mnemonics$.pending || mnemonicsLoading ? "block" : "none"}
+    style:background-color="#ddd8d8"
+    style:border-radius="50%"
+    class="mr-2"
+  >
+    <i class="fa-solid fa-spinner fa-spin-pulse" style:padding="0.7rem" style:font-size="1.5rem" />
+  </span>
+  <div style:display={mnemonics$.pending || mnemonicsLoading ? "block" : "none"}>
+    <p class="grey-light"><strong>Loading account... </strong></p>
+  </div>
   {#if baseConfig$}
     <div>
       {#if balance$.loading}
@@ -317,16 +341,16 @@
           </p>
           <div class="control has-icons-right">
             <div class="is-flex is-justify-content-space-between">
-              <div class="control is-flex-grow-1 mr-3" class:is-loading={mnemonicsIsDisabled}>
+              <div class="control is-flex-grow-1 mr-3" class:is-loading={mnemonicsIsDisabled || mnemonics$.pending}>
                 <input
                   id="mnemonics"
                   use:form={mnemonics}
                   class="input"
                   type={showMnemonicsPassword ? "text" : "password"}
                   placeholder="Mnemonics"
-                  class:is-danger={mnemonicsInvalid}
+                  class:is-danger={!mnemonics$.pending && mnemonicsInvalid}
                   class:is-success={mnemonics$.valid}
-                  disabled={mnemonicsIsDisabled}
+                  disabled={mnemonicsIsDisabled || mnemonics$.pending}
                   value={mnemonics$.value}
                   on:input={() => {
                     if (createdNewAccount) {
@@ -338,7 +362,7 @@
                     }
                   }}
                 />
-                {#if !mnemonicsIsDisabled}
+                {#if !mnemonicsIsDisabled && !mnemonics$.pending}
                   <i
                     class="fas"
                     class:fa-eye={showMnemonicsPassword}
@@ -355,11 +379,17 @@
                     {mnemonicsError || mnemonics$.error}
                   </p>
                 {/if}
+                {#if mnemonics$.pending}
+                  <p class="help grey-light">
+                    Validating mnemonics <i class="px-1 fa-solid fa-ellipsis fa-flip" />
+                  </p>
+                {/if}
               </div>
               <button
                 class="button is-small is-primary mt-1"
                 class:is-loading={mnemonicsIsDisabled}
                 disabled={mnemonicsIsDisabled ||
+                  mnemonics$.pending ||
                   mnemonics$.error === noBalanceMessage ||
                   mnemonics$.valid ||
                   createdNewAccount}
