@@ -20,6 +20,7 @@
   import getGrid from "../../utils/getGrid";
   import type { IStore } from "../../stores/currentDeployment";
   import type { GridClient } from "grid3_client";
+  import getWireguardConfig from "../../utils/getWireguardConfig";
   type TabsType = IStore["type"];
   export let tab: TabsType = undefined;
 
@@ -156,6 +157,40 @@
     _reloadTab();
   }
 
+  function parseWirguardConfig(configString: string) {
+    const lines = configString.split("\n");
+    const config: any = {}; // Using any to avoid strict typing for simplicity
+
+    let currentSection: string | null = null;
+    for (const line of lines) {
+      // Match the section header and extract the section name
+      const sectionMatch = line.match(/^\[(\w+)\]$/);
+      if (sectionMatch) {
+        currentSection = sectionMatch[1];
+        config[currentSection] = {};
+        continue;
+      }
+
+      // Match key-value pairs and add them to the current section
+      const keyValueMatch = line.match(/^(\w+)\s*=\s*(.+)$/);
+      if (keyValueMatch) {
+        const key = keyValueMatch[1];
+        const value = keyValueMatch[2];
+        if (currentSection) {
+          if (key === "AllowedIPs") {
+            config[currentSection][key] = value.split(", ").map((ip: string) => ip.trim());
+          } else if (key === "PersistentKeepalive") {
+            config[currentSection][key] = parseInt(value);
+          } else {
+            config[currentSection][key] = value;
+          }
+        }
+      }
+    }
+
+    return config;
+  }
+
   const _vmHeader = ["#", "Name", "Public IPv4", "Public IPv6", "Planetary Network IP", "Flist", "Billing Rate"];
 
   const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = new Proxy(
@@ -164,7 +199,12 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {
+            const interfaces = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
+            const styledInterface = parseWirguardConfig(interfaces[0]);
+            styledInterface ? rows[i].details?.interfaces.push(styledInterface) : "";
+            infoToShow = rows[i].details;
+          },
           disabled: () => removing !== null,
           loading: i => removing === rows[i].name,
         },
@@ -444,7 +484,12 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {
+            const interfaces = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
+            const styledInterface = parseWirguardConfig(interfaces[0]);
+            styledInterface ? rows[i].details?.interfaces.push(styledInterface) : "";
+            infoToShow = rows[i].details;
+          },
           disabled: () => removing !== null,
           loading: i => removing === rows[i].name,
         },
@@ -607,7 +652,14 @@
                 {
                   type: "info",
                   label: "Show Details",
-                  click: (_, i) => (infoToShow = rows.data[i].details),
+                  click: async (_, i) => {
+                    const interfaces = await getWireguardConfig({
+                      name: rows.data[i].details?.masters[0]?.interfaces[0].network,
+                    });
+                    const styledInterface = parseWirguardConfig(interfaces[0]);
+                    styledInterface ? rows.data[i].details?.masters[0]?.interfaces.push(styledInterface) : "";
+                    infoToShow = rows.data[i].details;
+                  },
                   disabled: () => removing !== null,
                   loading: i => removing === rows.data[i].name,
                 },

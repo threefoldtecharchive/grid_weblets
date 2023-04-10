@@ -81,7 +81,7 @@ async function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubVal
 
   const vms = new MachinesModel();
   vms.name = name;
-  vms.network = await createNetwork(new Network());
+  vms.network = createNetwork(new Network());
   vms.machines = [vm];
 
   const metadate = {

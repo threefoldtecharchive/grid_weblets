@@ -46,12 +46,12 @@ export class Network {
   constructor(
     public name: string = "NW" + v4().split("-")[0],
     public ipRange: string = "10.20.0.0/16",
-    public addAccess: boolean = false,
+    public addAccess: boolean = true,
   ) {}
 
   public get valid(): boolean {
     const { name, ipRange } = this;
-    console.log("addAccess", this.addAccess);
+
     return (
       name !== "" && ipRange !== "" && validateName(name) === undefined && validatePrivateIPRange(ipRange) === undefined
     );

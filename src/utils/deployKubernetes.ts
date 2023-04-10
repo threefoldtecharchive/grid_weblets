@@ -10,7 +10,7 @@ export default async function deployKubernetes(data: Kubernetes, profile: IProfi
 
   const masterNodes = [createNode(master)];
   const workerNodes = workers.map(createNode);
-  const _network = await createNetwork(network);
+  const _network = createNetwork(network);
 
   const k8s = new window.configs.grid3_client.K8SModel();
   k8s.name = name;

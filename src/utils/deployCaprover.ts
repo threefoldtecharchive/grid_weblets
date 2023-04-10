@@ -13,7 +13,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
   const { MachinesModel, DiskModel, MachineModel } = window.configs.grid3_client;
   const { name, workers, memory, nodeId, publicKey, cpu, domain, diskSize, password } = data; // prettier-ignore
 
-  const network = await createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
+  const network = createNetwork(new Network(`NW${name}`, "10.200.0.0/16")); // prettier-ignore
 
   /* Docker disk */
   const disk = new DiskModel();

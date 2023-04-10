@@ -56,7 +56,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
   // Network Specs
   const net = new Network();
   net.name = `net${randomSuffix}`;
-  const network = await createNetwork(net);
+  const network = createNetwork(net);
 
   // Docker disk
   const disk = new DiskModel();
