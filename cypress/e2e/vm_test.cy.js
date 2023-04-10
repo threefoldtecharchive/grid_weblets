@@ -3,8 +3,6 @@ import vmPage from "../page-objects/vm-page";
 import utils from "../utils/utils";
 
 describe("Weblets", function () {
-  let profileSecret = utils.generateString(10);
-  let profileName = "Cypress" + utils.generateString(5);
   let vmName = "VM" + utils.generateString(5);
   let envVarKey = "TestKey" + utils.generateString(5);
   let envVarValue = "Value" + utils.generateString(5);
@@ -21,6 +19,16 @@ describe("Weblets", function () {
     //Load data from fixtures/credentials.json
     cy.fixture("credentials.json").then(function (credentials) {
       this.credentials = credentials;
+
+      //Using the Enviroment Variables Credentials
+      if (this.credentials.Mnemonics == "Add your Mnemonics" || this.credentials.Mnemonics == "") {
+        this.credentials.Mnemonics = Cypress.env("TFCHAIN_MNEMONICS");
+      }
+      if (this.credentials.SSH_KEY == "Add Your SSH Key" || this.credentials.SSH_KEY == "") {
+        cy.exec("cd ~ && cat .ssh/id_ed25519.pub").then(result => {
+          this.credentials.SSH_KEY = result.stdout;
+        });
+      }
     });
 
     //URL can be changed from basUrl in cypress.config.ts
@@ -38,17 +46,11 @@ describe("Weblets", function () {
          Test Cases: TC394 - Unlock Profile Manager
          Scenario:
             - Navigate to the weblets
-            - Create a new profile
-            - Enter the Profile Name, Mnemonics, SSH Key 
+            - Enter Mnemonics, SSH Key 
             - Activate the profile
         **********************************************/
 
-    profileManager.ActivateProfileManager(
-      this.credentials.Mnemonics,
-      this.credentials.SSH_KEY,
-      profileSecret,
-      profileName,
-    );
+    profileManager.ActivateProfileManager(this.credentials.Mnemonics, this.credentials.SSH_KEY);
   });
 
   it("TC377 - Deploy VM", function () {

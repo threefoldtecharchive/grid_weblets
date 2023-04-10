@@ -8,6 +8,8 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
     strategy:
       matrix:
         node-version: [16.x]
@@ -21,8 +23,16 @@ jobs:
           cache: "yarn"
       - name: Yarn deps
         run: yarn deps
+      - name: Generate SSH Key
+        run: |
+          ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
+      - name: Write the cypress.env.json file
+        run: |
+          echo '${{ secrets.TFCHAIN_MNEMONICS }}' > cypress.env.json
       - name: Cypress run
-        uses: cypress-io/github-action@v4.2.0
+        uses: cypress-io/github-action@v5.1.0
         with:
-          start: npx cypress run
           browser: chrome
+          start: yarn serve:app
+          wait-on: "http://localhost:8080/"
+          wait-on-timeout: 350
