@@ -15,7 +15,7 @@ export default async function deployTFhubValidator(profile: IProfile, tfhubValid
   return validatorVm;
 }
 
-async function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
+function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {
   const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {

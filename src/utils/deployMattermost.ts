@@ -30,7 +30,7 @@ export default async function deployMattermost(profile: IProfile, mattermost: Ma
   return matterMostVm;
 }
 
-async function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
+function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
   const { MachineModel, MachinesModel } = window.configs.grid3_client;
 
   const { name, username, password, server, domain, port, nodeId, cpu, memory, publicIp, smtpPassword } = mattermost;
