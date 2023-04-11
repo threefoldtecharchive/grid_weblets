@@ -124,11 +124,25 @@
 
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
-      const { name, master, workers, consumption } = row;
+      let { name, master, workers, wireguard, consumption } = row;
       let publicIp = master.publicIP ?? ({} as any);
+
       master.publicIP ? (publicIp.ip = publicIp.ip.split("/")[0]) : (publicIp.ip = "None");
       master.publicIP ? (publicIp.ip6 = publicIp.ip6.split("/")[0]) : (publicIp.ip6 = "None");
-      return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
+      let config: string[];
+
+      (async () => {
+        config = await getWireguardConfig({ name: master.interfaces[0].network });
+        config ? (wireguard = config[0]) : (wireguard = "None");
+        row.wireguard = wireguard;
+        console.log("row.wireguard", row.wireguard);
+      })();
+
+      console.log("row", row);
+      console.log("row.consumption", row.consumption);
+      console.log("wireguard", wireguard);
+
+      return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, row.wireguard, consumption]; // prettier-ignore
     });
   }
 
@@ -646,7 +660,16 @@
             {/if}
             <Table
               rowsData={rows.data}
-              headers={["#", "Name", "Public IPv4", "Public IPv6", "Planetary Network IP", "Workers", "Billing Rate"]}
+              headers={[
+                "#",
+                "Name",
+                "Public IPv4",
+                "Public IPv6",
+                "Planetary Network IP",
+                "Workers",
+                "Wireguard Config",
+                "Billing Rate",
+              ]}
               rows={_createK8sRows(rows.data)}
               actions={[
                 {
