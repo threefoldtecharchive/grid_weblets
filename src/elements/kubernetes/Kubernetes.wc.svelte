@@ -143,9 +143,7 @@
       It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations
       (fits e.g. IoT, edge, ARM workloads).
 
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_k8s">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_k8s.html"> Quick start documentation</a>
     </p>
 
     <hr />

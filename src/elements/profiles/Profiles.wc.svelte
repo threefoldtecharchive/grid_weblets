@@ -227,9 +227,7 @@
         <h4 class="has-text-weight-bold mb-1">Profile Manager</h4>
         <span class="is-size-6">
           Please visit
-          <a href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager" target="_blank">
-            the manual
-          </a>
+          <a href="https://manual.grid.tf/weblets/weblets_profile_manager.html" target="_blank"> the manual </a>
           <span class="has-text-weight-medium">get started.</span>
         </span>
       </div>

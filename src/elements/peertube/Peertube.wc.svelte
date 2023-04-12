@@ -112,9 +112,7 @@
     <h4 class="is-size-4">Deploy a Peertube Instance</h4>
     <p>
       Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_peertube">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_peertube.html"> Quick start documentation</a>
     </p>
     <hr />
 

@@ -133,7 +133,7 @@
     <p>
       CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP,
       ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_caprover">
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_caprover.html?highlight=caprover#caprover">
         Quick start documentation</a
       >
     </p>
@@ -176,7 +176,7 @@
               <strong>
                 If you don't know what Captain root domain is, make sure to visit <a
                   target="_blank"
-                  href="https://library.threefold.me/info/manual/#/manual__weblets_caprover"
+                  href="https://manual.grid.tf/weblets/weblets_caprover.html?highlight=caprover#caprover"
                 >
                   the Quick start documentation
                 </a>.

@@ -188,9 +188,7 @@
     <p>
       Owncloud develops and provides open-source software for content collaboration, allowing teams to easily share and
       work on files seamlessly regardless of device or location.
-      <a target="_blank" href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_owncloud.html"> Quick start documentation</a>
     </p>
     <hr />
 
