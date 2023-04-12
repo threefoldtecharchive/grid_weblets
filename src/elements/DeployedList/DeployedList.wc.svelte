@@ -124,12 +124,10 @@
 
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
-      let { name, master, workers, consumption } = row;
+      const { name, master, workers, consumption } = row;
       let publicIp = master.publicIP ?? ({} as any);
-
       master.publicIP ? (publicIp.ip = publicIp.ip.split("/")[0]) : (publicIp.ip = "None");
       master.publicIP ? (publicIp.ip6 = publicIp.ip6.split("/")[0]) : (publicIp.ip6 = "None");
-
       return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
     });
   }

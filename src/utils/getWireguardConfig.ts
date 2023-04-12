@@ -10,8 +10,6 @@ export default async function getWireguardConfig(network: NetworkGetModel) {
     const client = await getGrid(profile as unknown as IProfile, c => c, "");
 
     const wireguard = await client.networks.getWireGuardConfigs({ name: network.name });
-
-    console.log("wireguard", wireguard);
     return wireguard;
   } catch (error) {
     console.log("error", error);
