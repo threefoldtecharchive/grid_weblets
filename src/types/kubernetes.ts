@@ -46,7 +46,7 @@ export class Network {
   constructor(
     public name: string = "NW" + v4().split("-")[0],
     public ipRange: string = "10.20.0.0/16",
-    public addAccess: boolean = true,
+    public addAccess: boolean = false,
   ) {}
 
   public get valid(): boolean {

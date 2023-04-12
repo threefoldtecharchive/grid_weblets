@@ -32,6 +32,7 @@
   import RootFsSize from "../../components/RootFsSize.svelte";
   import { display } from "../../utils/display";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import getWireguardConfig from "../../utils/getWireguardConfig";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -153,9 +154,13 @@
     message = undefined;
 
     deployVM(data, profile, "VM")
-      .then(data => {
+      .then(async data => {
         deploymentStore.set(0);
         success = true;
+        const wireguard = await getWireguardConfig({ name: data.interfaces[0].network });
+        if (wireguard) {
+          data.wireguard = wireguard[0];
+        }
         modalData = data;
       })
       .catch((err: string) => {
