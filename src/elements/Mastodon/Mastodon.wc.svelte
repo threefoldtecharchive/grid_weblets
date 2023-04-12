@@ -171,7 +171,7 @@
       Mastodon is free and open-source software for running self-hosted social networking services. It has microblogging
       features similar to the Twitter service, which are offered by a large number of independently run nodes, known as
       instances, each with its own code of conduct, terms of service, privacy options, and moderation policies.
-      <a target="_blank" href="https://www2.manual.grid.tf/weblets/weblets_mastodon.html"> Quick start documentation</a>
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_mastodon.html"> Quick start documentation</a>
     </p>
     <hr />
 

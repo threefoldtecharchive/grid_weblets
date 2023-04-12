@@ -115,9 +115,7 @@
     <p>
       Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and
       stores them for processing in a later stage.
-      <a target="_blank" href="https://www2.manual.grid.tf/weblets/weblets_subsquid.html#subsquid">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_subsquid.html"> Quick start documentation</a>
     </p>
 
     <hr />

@@ -199,7 +199,7 @@
     <h4 class="is-size-4 mb-4">Deploy a Algorand Instance</h4>
     <p>
       Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major payments processor.
-      <a target="_blank" href="https://www2.manual.grid.tf/weblets/weblets_algorand.html"> Quick start documentation</a>
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_algorand.html"> Quick start documentation</a>
     </p>
 
     <hr />

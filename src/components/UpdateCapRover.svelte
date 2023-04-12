@@ -344,7 +344,7 @@
       5- Click <strong>Join cluster</strong> button<br />
       <br />
       <strong>
-        <a target="_blank" href="https://www2.manual.grid.tf/weblets/weblets_caprover_worker.html">
+        <a target="_blank" href="https://manual.grid.tf/weblets/weblets_caprover_worker.html">
           Click here for the documentation
         </a>
       </strong>
