@@ -124,25 +124,13 @@
 
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
-      let { name, master, workers, wireguard, consumption } = row;
+      let { name, master, workers, consumption } = row;
       let publicIp = master.publicIP ?? ({} as any);
 
       master.publicIP ? (publicIp.ip = publicIp.ip.split("/")[0]) : (publicIp.ip = "None");
       master.publicIP ? (publicIp.ip6 = publicIp.ip6.split("/")[0]) : (publicIp.ip6 = "None");
-      let config: string[];
 
-      (async () => {
-        config = await getWireguardConfig({ name: master.interfaces[0].network });
-        config ? (wireguard = config[0]) : (wireguard = "None");
-        row.wireguard = wireguard;
-        console.log("row.wireguard", row.wireguard);
-      })();
-
-      console.log("row", row);
-      console.log("row.consumption", row.consumption);
-      console.log("wireguard", wireguard);
-
-      return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, row.wireguard, consumption]; // prettier-ignore
+      return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
     });
   }
 
@@ -171,40 +159,6 @@
     _reloadTab();
   }
 
-  function parseWirguardConfig(configString: string) {
-    const lines = configString.split("\n");
-    const config: any = {}; // Using any to avoid strict typing for simplicity
-
-    let currentSection: string | null = null;
-    for (const line of lines) {
-      // Match the section header and extract the section name
-      const sectionMatch = line.match(/^\[(\w+)\]$/);
-      if (sectionMatch) {
-        currentSection = sectionMatch[1];
-        config[currentSection] = {};
-        continue;
-      }
-
-      // Match key-value pairs and add them to the current section
-      const keyValueMatch = line.match(/^(\w+)\s*=\s*(.+)$/);
-      if (keyValueMatch) {
-        const key = keyValueMatch[1];
-        const value = keyValueMatch[2];
-        if (currentSection) {
-          if (key === "AllowedIPs") {
-            config[currentSection][key] = value.split(", ").map((ip: string) => ip.trim());
-          } else if (key === "PersistentKeepalive") {
-            config[currentSection][key] = parseInt(value);
-          } else {
-            config[currentSection][key] = value;
-          }
-        }
-      }
-    }
-
-    return config;
-  }
-
   const _vmHeader = ["#", "Name", "Public IPv4", "Public IPv6", "Planetary Network IP", "Flist", "Billing Rate"];
 
   const actions: { [key in TabsType]?: (rows: any[]) => IAction[] } = new Proxy(
@@ -214,9 +168,10 @@
           type: "info",
           label: "Show Details",
           click: async (_, i) => {
-            const interfaces = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
-            const styledInterface = parseWirguardConfig(interfaces[0]);
-            styledInterface ? rows[i].details?.interfaces.push(styledInterface) : "";
+            const wireguard = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
+            if (wireguard) {
+              rows[i].details.wireguard = wireguard[0];
+            }
             infoToShow = rows[i].details;
           },
           disabled: () => removing !== null,
@@ -499,9 +454,10 @@
           type: "info",
           label: "Show Details",
           click: async (_, i) => {
-            const interfaces = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
-            const styledInterface = parseWirguardConfig(interfaces[0]);
-            styledInterface ? rows[i].details?.interfaces.push(styledInterface) : "";
+            const wireguard = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
+            if (wireguard) {
+              rows[i].details.wireguard = wireguard[0];
+            }
             infoToShow = rows[i].details;
           },
           disabled: () => removing !== null,
@@ -660,27 +616,19 @@
             {/if}
             <Table
               rowsData={rows.data}
-              headers={[
-                "#",
-                "Name",
-                "Public IPv4",
-                "Public IPv6",
-                "Planetary Network IP",
-                "Workers",
-                "Wireguard Config",
-                "Billing Rate",
-              ]}
+              headers={["#", "Name", "Public IPv4", "Public IPv6", "Planetary Network IP", "Workers", "Billing Rate"]}
               rows={_createK8sRows(rows.data)}
               actions={[
                 {
                   type: "info",
                   label: "Show Details",
                   click: async (_, i) => {
-                    const interfaces = await getWireguardConfig({
+                    const wireguard = await getWireguardConfig({
                       name: rows.data[i].details?.masters[0]?.interfaces[0].network,
                     });
-                    const styledInterface = parseWirguardConfig(interfaces[0]);
-                    styledInterface ? rows.data[i].details?.masters[0]?.interfaces.push(styledInterface) : "";
+                    if (wireguard) {
+                      rows.data[i].details.wireguard = wireguard[0];
+                    }
                     infoToShow = rows.data[i].details;
                   },
                   disabled: () => removing !== null,
