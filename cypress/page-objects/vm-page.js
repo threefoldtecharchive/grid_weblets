@@ -94,7 +94,7 @@ class Virtualmachine {
       .get("tf-vm")
       .shadow()
       .find(
-        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(17) > div:nth-child(2) > select:nth-child(1)",
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(19) > div:nth-child(2) > select:nth-child(1)",
       );
   }
 
@@ -103,7 +103,7 @@ class Virtualmachine {
       .get("tf-vm")
       .shadow()
       .find(
-        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(20) > div:nth-child(2) > select:nth-child(1)",
+        "div:nth-child(2) > form:nth-child(1) > div:nth-child(8) > section:nth-child(2) > div:nth-child(22) > div:nth-child(2) > select:nth-child(1)",
       );
   }
 
