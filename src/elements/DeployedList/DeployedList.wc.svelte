@@ -20,6 +20,7 @@
   import getGrid from "../../utils/getGrid";
   import type { IStore } from "../../stores/currentDeployment";
   import type { GridClient } from "grid3_client";
+  import getWireguardConfig from "../../utils/getWireguardConfig";
   type TabsType = IStore["type"];
   export let tab: TabsType = undefined;
 
@@ -164,7 +165,13 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {
+            const wireguard = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
+            if (wireguard) {
+              rows[i].details.wireguard = wireguard[0];
+            }
+            infoToShow = rows[i].details;
+          },
           disabled: () => removing !== null,
           loading: i => removing === rows[i].name,
         },
@@ -444,7 +451,13 @@
         {
           type: "info",
           label: "Show Details",
-          click: (_, i) => (infoToShow = rows[i].details),
+          click: async (_, i) => {
+            const wireguard = await getWireguardConfig({ name: rows[i].details?.interfaces[0].network });
+            if (wireguard) {
+              rows[i].details.wireguard = wireguard[0];
+            }
+            infoToShow = rows[i].details;
+          },
           disabled: () => removing !== null,
           loading: i => removing === rows[i].name,
         },
@@ -607,7 +620,15 @@
                 {
                   type: "info",
                   label: "Show Details",
-                  click: (_, i) => (infoToShow = rows.data[i].details),
+                  click: async (_, i) => {
+                    const wireguard = await getWireguardConfig({
+                      name: rows.data[i].details?.masters[0]?.interfaces[0].network,
+                    });
+                    if (wireguard) {
+                      rows.data[i].details.wireguard = wireguard[0];
+                    }
+                    infoToShow = rows.data[i].details;
+                  },
                   disabled: () => removing !== null,
                   loading: i => removing === rows.data[i].name,
                 },

@@ -43,10 +43,15 @@ export class Master extends Base {
 export class Worker extends Base {}
 
 export class Network {
-  constructor(public name: string = "NW" + v4().split("-")[0], public ipRange: string = "10.20.0.0/16") {}
+  constructor(
+    public name: string = "NW" + v4().split("-")[0],
+    public ipRange: string = "10.20.0.0/16",
+    public addAccess: boolean = false,
+  ) {}
 
   public get valid(): boolean {
     const { name, ipRange } = this;
+
     return (
       name !== "" && ipRange !== "" && validateName(name) === undefined && validatePrivateIPRange(ipRange) === undefined
     );

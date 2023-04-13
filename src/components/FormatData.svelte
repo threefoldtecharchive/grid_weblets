@@ -12,7 +12,8 @@
   const networkField: IFormField = { label: "Network Name", symbol: "network", type: "text", disabled: true }; // prettier-ignore
   const cpuField: IFormField = { label: "CPU", symbol: "cpu", type: "number", disabled: true }; // prettier-ignore
   const memoryField: IFormField = { label: "Memory", symbol: "memory", type: "number", disabled: true }; // prettier-ignore
-  const wireguardField: IFormField = { label: "WireGuard", symbol: "wireguard", type: "text", disabled: true }; // prettier-ignore
+  const wireguardField: IFormField = { label: "WireGuard IP", symbol: "wireguardIP", type: "text", disabled: true }; // prettier-ignore
+  const wireguardConfigField: IFormField = { label: "WireGuard Config", symbol: "wireguardConfig", type: "textarea",class:"config", disabled: true }; // prettier-ignore
   const flistField: IFormField = { label: "Flist", symbol: "flist", type: "text", disabled: true }; // prettier-ignore
   const contractIdField: IFormField = { label: "Contract ID", symbol: "contractId", type: "number", disabled: true }; // prettier-ignore
 </script>
@@ -77,6 +78,10 @@
     />
   {/each}
   <Input data={vm.interfaces[0].ip} field={wireguardField} />
+  {#if vm.wireguard}
+    <Input data={vm.wireguard} field={wireguardConfigField} />
+  {/if}
+
   {#if vm.flist}
     <Input data={vm.flist} field={flistField} />
   {/if}
@@ -213,3 +218,9 @@
     />
   {/if}
 {/if}
+
+<style>
+  .config {
+    white-space: pre-wrap;
+  }
+</style>
